@@ -4,7 +4,7 @@ import { handleSync } from '../../functions/_lib/sync.js';
 import { mergeData } from '../../src/core/merge.ts';
 import { addVerse, editVerse, settle } from '../../src/core/schedule.ts';
 import { lookupPassage, LookupError } from '../../src/services/lookup.ts';
-import { Storage } from '../../src/services/storage.ts';
+import { Storage, type Backend } from '../../src/services/storage.ts';
 import { runSync, SyncError } from '../../src/services/sync.ts';
 import { decryptJson, deriveKeys, encryptJson, generateSyncCode, normalizeSyncCode } from '../../src/services/syncCrypto.ts';
 import { at, D0, day, john316, newData, reviewEverythingDue } from './helpers.ts';
@@ -245,5 +245,114 @@ describe('local storage', () => {
     await s.saveSettings(st);
     expect((await s.loadSettings()).theme).toBe('dark');
     expect((await s.loadSettings()).deviceId).toBe(st.deviceId);
+  });
+});
+
+/** A tiny in-memory backend that records every operation, to prove how saving behaves. */
+function recordingBackend() {
+  const mem = new Map<string, string>();
+  const log: string[] = [];
+  let failNext = false;
+  const backend: Backend = {
+    async get(k) {
+      log.push(`get ${k}`);
+      return mem.get(k);
+    },
+    async set(k, v) {
+      log.push(`set ${k}`);
+      mem.set(k, v);
+    },
+    async setMany(entries) {
+      log.push(`setMany ${entries.map(([k]) => k).join(',')}`);
+      if (failNext) {
+        failNext = false;
+        throw new Error('disk full');
+      }
+      for (const [k, v] of entries) mem.set(k, v);
+    },
+    async del(k) {
+      log.push(`del ${k}`);
+      mem.delete(k);
+    },
+    async keys() {
+      return [...mem.keys()];
+    },
+  };
+  return { backend, mem, log, failOnce: () => (failNext = true) };
+}
+
+describe('saving is a single atomic write (closing the app mid-save can never lose a finished review)', () => {
+  it('writes the new data, previous copy and daily snapshot together in ONE operation, with no read in between', async () => {
+    const r = recordingBackend();
+    const s = new Storage(r.backend);
+    const d = newData();
+    await s.saveData(d, D0);
+    john316(d, at(D0, '07:00'));
+    r.log.length = 0;
+    await s.saveData(d, D0);
+    expect(r.log).toEqual([`setMany data,data.prev,snap:${D0}`]);
+    // later saves the same day: data + previous only, still one operation
+    john316(d, at(D0, '08:00'));
+    r.log.length = 0;
+    await s.saveData(d, D0);
+    expect(r.log).toEqual(['setMany data,data.prev']);
+  });
+
+  it('the new data is the very first thing written (nothing else can delay it)', async () => {
+    const r = recordingBackend();
+    const s = new Storage(r.backend);
+    const d = newData();
+    await s.saveData(d, D0);
+    john316(d, at(D0, '07:00'));
+    r.log.length = 0;
+    await s.saveData(d, D0);
+    expect(r.log[0].startsWith('setMany data')).toBe(true);
+    expect(r.log.filter((l) => l.startsWith('get'))).toHaveLength(0);
+  });
+
+  it('a failed write changes nothing and the next save retries from the right place', async () => {
+    const r = recordingBackend();
+    const s = new Storage(r.backend);
+    const d = newData();
+    await s.saveData(d, D0);
+    const before = r.mem.get('data');
+    john316(d, at(D0, '07:00'));
+    r.failOnce();
+    await expect(s.saveData(d, D0)).rejects.toThrow('disk full');
+    expect(r.mem.get('data')).toBe(before);
+    await s.saveData(d, D0);
+    expect(JSON.parse(r.mem.get('data')!).verses).toBeTruthy();
+    expect(Object.keys(JSON.parse(r.mem.get('data')!).verses)).toHaveLength(1);
+    expect(r.mem.get('data.prev')).toBe(before);
+  });
+
+  it('after recovering from a damaged main copy, the good copy is kept as "previous"', async () => {
+    const r = recordingBackend();
+    const s = new Storage(r.backend);
+    const d = newData();
+    john316(d, at(D0, '07:00'));
+    await s.saveData(d, D0);
+    const d2 = structuredClone(d);
+    john316(d2, at(D0, '08:00'));
+    await s.saveData(d2, D0);
+    const good = r.mem.get('data.prev')!;
+    r.mem.set('data', '{damaged');
+    const fresh = new Storage(r.backend);
+    const loaded = await fresh.loadData(at(D0));
+    expect(loaded.recoveredFrom).toBe('data.prev');
+    john316(loaded.data, at(D0, '09:00'));
+    await fresh.saveData(loaded.data, D0);
+    expect(r.mem.get('data.prev')).toBe(good); // not the damaged text
+    expect(Object.keys(JSON.parse(r.mem.get('data')!).verses)).toHaveLength(2);
+  });
+
+  it('skips the write entirely when nothing changed', async () => {
+    const r = recordingBackend();
+    const s = new Storage(r.backend);
+    const d = newData();
+    await s.saveData(d, D0);
+    r.log.length = 0;
+    await s.saveData(d, D0);
+    expect(r.log).toEqual([]);
   });
 });
