@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-10-07
+
 ### Added
 - **Stats screen (Progress tab):** current and longest streak, reviews completed, a 26-week calendar heatmap, verses per pile, "nearly there" verses, and streak history. Missed days look like rest days (no blame).
 - Review result card shows progress toward the next pile and today's due reviews; a calm "All done for today" moment ends a finished day.
