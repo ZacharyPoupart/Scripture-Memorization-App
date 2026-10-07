@@ -137,4 +137,31 @@ test.describe('adding, editing and organizing verses', () => {
     await page.goto('/#/pile/daily');
     await expect(page.getByTestId('verse-card').first()).toContainText('John 3:16'); // added first
   });
+
+  test('NIV text comes from our server function (API.Bible); falls back when it is not set up', async ({ page }) => {
+    let calls = 0;
+    await page.route('**/api/verse*', (route) => {
+      calls++;
+      const url = new URL(route.request().url());
+      expect(url.searchParams.get('translation')).toBe('NIV');
+      expect(url.searchParams.get('book')).toBe('43');
+      return route.fulfill({ json: { text: 'For God so loved the world (NIV text).' } });
+    });
+    await openApp(page);
+    await page.goto('/#/add');
+    await page.getByTestId('book').selectOption('43');
+    await page.getByTestId('chapter').selectOption('3');
+    await page.getByTestId('translation').selectOption('NIV');
+    await page.getByTestId('start').fill('16');
+    await expect(page.getByTestId('text')).toHaveValue('For God so loved the world (NIV text).');
+    await expect(page.getByTestId('niv-note')).toContainText('Biblica');
+    expect(calls).toBeGreaterThan(0);
+
+    // not configured on the server (501) -> the next source is tried, and if everything fails you can type it
+    await page.unroute('**/api/verse*');
+    await page.route('**/api/verse*', (route) => route.fulfill({ status: 501, json: { error: 'not-configured' } }));
+    await page.route(/bolls\.life/, (route) => route.fulfill({ json: [{ verse: 17, text: 'From the backup source.' }] }));
+    await page.getByTestId('start').fill('17');
+    await expect(page.getByTestId('text')).toHaveValue('From the backup source.');
+  });
 });
