@@ -12,7 +12,7 @@ export default defineConfig({
   reporter: process.env.CI ? [['github'], ['list']] : 'list',
   use: { baseURL: 'http://127.0.0.1:4173', trace: 'retain-on-failure', launchOptions },
   webServer: {
-    command: 'node scripts/e2e-server.mjs',
+    command: process.env.E2E_SKIP_BUILD ? 'node scripts/e2e-server.mjs' : 'npm run build && node scripts/e2e-server.mjs',
     url: 'http://127.0.0.1:4173',
     reuseExistingServer: !process.env.CI,
   },
