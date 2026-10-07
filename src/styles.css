@@ -1,85 +1,96 @@
+/* ============================== Design tokens ==============================
+   Calm, low-glare palette: warm off-white paper (never pure white) with soft charcoal text (never pure black);
+   in dark mode a deep blue-grey (never pure black) with soft off-white text. Every text/background pair is
+   checked against WCAG AA (4.5:1) by tests/unit/contrast.test.ts. The theme follows the system by default;
+   Settings can force light or dark (data-theme). The two dark blocks below MUST stay identical (a test checks). */
 :root {
-  --bg: #f7f5f0;
-  --surface: #ffffff;
-  --surface-2: #f0ede5;
-  --text: #1f2a30;
-  --muted: #66727a;
-  --border: #e4e0d6;
-  --accent: #2f6f73;
-  --accent-strong: #235a5e;
-  --on-accent: #ffffff;
-  --on-pile: #ffffff;
-  --toast-link: #8fd3d8;
-  --good: #2f8a55;
-  --good-bg: #e3f3ea;
-  --warn: #a8691f;
-  --warn-bg: #faeedb;
-  --bad: #b4473f;
-  --bad-bg: #f8e3e0;
-  --daily: #c9822b;
-  --weekly: #2f7f86;
-  --monthly: #5a62b3;
-  --yearly: #3f8f5b;
-  --shadow: 0 1px 2px rgba(30, 40, 45, 0.06), 0 4px 14px rgba(30, 40, 45, 0.06);
+  --bg: #f6f3ec;
+  --surface: #fffdf8;
+  --surface-2: #ece7da;
+  --text: #272d2c;
+  --muted: #5a6564;
+  --border: #d9d2c2;
+  --accent: #2a6569;
+  --accent-strong: #1f5659;
+  --on-accent: #fffdf8;
+  --on-pile: #fffdf8;
+  --toast-link: #96d2d5;
+  --good: #1f6b45;
+  --good-bg: #dfeee5;
+  --warn: #85500f;
+  --warn-bg: #f6e8cf;
+  --bad: #9f352c;
+  --bad-bg: #f5ddd9;
+  --daily: #9a5a0c;
+  --weekly: #1f6a70;
+  --monthly: #4f56a8;
+  --yearly: #2f7048;
+  --shadow: 0 1px 2px rgba(40, 44, 40, 0.06), 0 6px 18px rgba(40, 44, 40, 0.06);
   --radius: 16px;
   --radius-sm: 10px;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
   --tab-h: 62px;
-  --serif: ui-serif, 'New York', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+  --serif: ui-serif, 'New York', 'Iowan Old Style', 'Palatino Linotype', Georgia, 'Times New Roman', serif;
   --sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  /* Scripture text is the hero: ~19-24px, ~65 characters per line, generous leading */
+  --verse-size: clamp(1.22rem, 1.08rem + 0.6vw, 1.5rem);
+  --verse-leading: 1.75;
+  --measure: 34em;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --bg: #111719;
-    --surface: #1a2326;
-    --surface-2: #222d30;
-    --text: #e8eeee;
-    --muted: #93a3a6;
-    --border: #2c3a3d;
-    --accent: #62b5ba;
-    --accent-strong: #84cbd0;
-    --on-accent: #0c1618;
-    --on-pile: #101516;
-    --toast-link: #1f5f64;
-    --good: #5fc489;
-    --good-bg: #173226;
-    --warn: #e0a85a;
-    --warn-bg: #3a2c16;
-    --bad: #e2837b;
-    --bad-bg: #3b1f1c;
-    --daily: #e0a05a;
-    --weekly: #62b5ba;
-    --monthly: #8f97e6;
-    --yearly: #6fc58c;
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 14px rgba(0, 0, 0, 0.3);
+    --bg: #161b1c;
+    --surface: #1e2526;
+    --surface-2: #283031;
+    --text: #e3e8e6;
+    --muted: #a3b0ae;
+    --border: #364143;
+    --accent: #7cc3c7;
+    --accent-strong: #96d2d5;
+    --on-accent: #10191a;
+    --on-pile: #10191a;
+    --toast-link: #1f5659;
+    --good: #7fcf9f;
+    --good-bg: #1a3427;
+    --warn: #e6b26a;
+    --warn-bg: #3b2f19;
+    --bad: #eb9a92;
+    --bad-bg: #3d2220;
+    --daily: #e3a65f;
+    --weekly: #7cc3c7;
+    --monthly: #a4abe8;
+    --yearly: #86cf9f;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 6px 18px rgba(0, 0, 0, 0.25);
     color-scheme: dark;
   }
 }
 :root[data-theme='dark'] {
-  --bg: #111719;
-  --surface: #1a2326;
-  --surface-2: #222d30;
-  --text: #e8eeee;
-  --muted: #93a3a6;
-  --border: #2c3a3d;
-  --accent: #62b5ba;
-  --accent-strong: #84cbd0;
-  --on-accent: #0c1618;
-  --on-pile: #101516;
-  --toast-link: #1f5f64;
-  --good: #5fc489;
-  --good-bg: #173226;
-  --warn: #e0a85a;
-  --warn-bg: #3a2c16;
-  --bad: #e2837b;
-  --bad-bg: #3b1f1c;
-  --daily: #e0a05a;
-  --weekly: #62b5ba;
-  --monthly: #8f97e6;
-  --yearly: #6fc58c;
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 14px rgba(0, 0, 0, 0.3);
+  --bg: #161b1c;
+  --surface: #1e2526;
+  --surface-2: #283031;
+  --text: #e3e8e6;
+  --muted: #a3b0ae;
+  --border: #364143;
+  --accent: #7cc3c7;
+  --accent-strong: #96d2d5;
+  --on-accent: #10191a;
+  --on-pile: #10191a;
+  --toast-link: #1f5659;
+  --good: #7fcf9f;
+  --good-bg: #1a3427;
+  --warn: #e6b26a;
+  --warn-bg: #3b2f19;
+  --bad: #eb9a92;
+  --bad-bg: #3d2220;
+  --daily: #e3a65f;
+  --weekly: #7cc3c7;
+  --monthly: #a4abe8;
+  --yearly: #86cf9f;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 6px 18px rgba(0, 0, 0, 0.25);
   color-scheme: dark;
 }
 
@@ -146,8 +157,22 @@ textarea {
   font: inherit;
   color: inherit;
 }
-button {
+button,
+a,
+select,
+summary {
   cursor: pointer;
+  touch-action: manipulation; /* no double-tap zoom, no 300ms delay */
+  -webkit-touch-callout: none;
+}
+button,
+.btn,
+.tab,
+.chip,
+.option,
+.seg button {
+  user-select: none;
+  -webkit-user-select: none;
 }
 :focus-visible {
   outline: 3px solid color-mix(in srgb, var(--accent) 55%, transparent);
@@ -167,7 +192,7 @@ button {
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
-  padding: calc(var(--safe-top) + 16px) 16px 24px;
+  padding: calc(var(--safe-top) + 18px) calc(18px + var(--safe-right)) 28px calc(18px + var(--safe-left));
 }
 .has-tabs .scroll {
   padding-bottom: 24px;
@@ -217,11 +242,12 @@ button {
 /* ---- tab bar ---- */
 .tabbar {
   flex: none;
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
   display: flex;
   background: color-mix(in srgb, var(--surface) 94%, transparent);
   border-top: 1px solid var(--border);
   padding-bottom: var(--safe-bottom);
-  backdrop-filter: blur(10px);
 }
 .tab {
   flex: 1;
@@ -585,29 +611,31 @@ textarea.input {
   overflow: auto;
 }
 .toast {
+  pointer-events: none; /* never an invisible blocker; only its action button is tappable */
   position: absolute;
-  left: 12px;
-  right: 12px;
-  bottom: calc(var(--tab-h) + var(--safe-bottom) + 12px);
+  left: calc(12px + var(--safe-left));
+  right: calc(12px + var(--safe-right));
+  /* top, so it never covers the primary action in the thumb zone */
+  top: calc(var(--safe-top) + 10px);
   z-index: 70;
   max-width: 520px;
   margin: 0 auto;
   background: var(--text);
   color: var(--bg);
   border-radius: 14px;
-  padding: 12px 14px;
+  padding: 10px 14px;
   display: flex;
   align-items: center;
   gap: 12px;
   box-shadow: var(--shadow);
-  animation: rise 0.2s ease;
+  animation: drop 0.2s ease;
 }
 .toast.no-tabs {
-  /* during a review the bottom belongs to the answer buttons: show messages at the top instead */
-  bottom: auto;
-  top: calc(var(--safe-top) + 64px);
+  top: calc(var(--safe-top) + 64px); /* below the review header so Close stays visible */
 }
 .toast button {
+  pointer-events: auto;
+  min-height: 44px;
   background: none;
   border: 0;
   color: var(--toast-link);
@@ -616,6 +644,12 @@ textarea.input {
 }
 @keyframes fade {
   from {
+    opacity: 0;
+  }
+}
+@keyframes drop {
+  from {
+    transform: translateY(-16px);
     opacity: 0;
   }
 }
@@ -696,11 +730,13 @@ textarea.input {
 }
 .verse-text {
   font-family: var(--serif);
-  font-size: 1.3rem;
-  line-height: 1.85;
-  max-width: 640px;
+  font-size: var(--verse-size);
+  line-height: var(--verse-leading);
+  max-width: var(--measure);
   margin: 0 auto;
   hyphens: manual;
+  text-wrap: pretty;
+  letter-spacing: 0.002em;
 }
 .prompt-ref {
   font-family: var(--sans);
@@ -710,7 +746,7 @@ textarea.input {
   margin: 10px 0 6px;
 }
 .w {
-  border-radius: 6px;
+  border-radius: 3px;
   padding: 0 1px;
   transition: color 0.2s ease, background-color 0.2s ease;
 }
@@ -773,7 +809,7 @@ textarea.input {
 }
 .dock {
   flex: none;
-  padding: 10px 14px calc(12px + var(--safe-bottom));
+  padding: 12px calc(16px + var(--safe-right)) calc(14px + var(--safe-bottom)) calc(16px + var(--safe-left));
   border-top: 1px solid var(--border);
   background: var(--surface);
 }
@@ -930,7 +966,41 @@ textarea.input {
   .scroll {
     padding-top: 28px;
   }
-  .verse-text {
-    font-size: 1.4rem;
+}
+
+/* ---- primary action bar: lives in the thumb zone, above the tab bar ---- */
+.action-bar {
+  flex: none;
+  padding: 10px calc(18px + var(--safe-right)) 12px calc(18px + var(--safe-left));
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+}
+.action-bar > * {
+  max-width: 640px;
+  margin: 0 auto;
+}
+.action-bar .btn {
+  min-height: 54px;
+  font-size: 1.05rem;
+}
+
+/* Hover only where a real pointer exists, so taps on phones never leave a "stuck" highlight */
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover {
+    background: var(--surface-2);
+  }
+  .btn.primary:hover {
+    background: var(--accent-strong);
+    border-color: var(--accent-strong);
+    color: var(--on-accent);
+  }
+  .card.tap:hover {
+    background: var(--surface-2);
+  }
+  .option:hover:not([disabled]) {
+    background: var(--border);
+  }
+  .tab:hover {
+    color: var(--text);
   }
 }
