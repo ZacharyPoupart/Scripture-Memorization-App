@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { formatRef } from '../core/reference.ts';
-import { pileVerses, verseStatus } from '../core/schedule.ts';
+import { nextPile, pileVerses, streakInfo, todaySummary, verseStatus } from '../core/schedule.ts';
+import { doneLine } from '../core/milestones.ts';
+import { feedback } from '../services/feedback.ts';
 import { tooManyMistakes } from '../core/quiz.ts';
 import { PILES, type AppData, type LevelUp, type ReviewMode, type Verse } from '../core/types.ts';
 import { back, navigate, type Route } from '../router.ts';
 import { completeReview, showToast, useApp } from '../store.ts';
-import { Icon, PileBadge, PILE_INFO } from './common.tsx';
+import { CheckMark, Icon, PileBadge, PILE_INFO, pileProgress } from './common.tsx';
 import { MODES } from './ModePicker.tsx';
 import { Blanks } from './modes/Blanks.tsx';
 import { Flashcard } from './modes/Flashcard.tsx';
@@ -58,6 +60,34 @@ function VerseAttempt({ verse, mode, onFinished, onRestart }: { verse: Verse; mo
   }
 }
 
+function ResultProgress({ verse, data }: { verse: Verse; data: AppData }) {
+  const now = Date.now();
+  const p = pileProgress(data, verse, now);
+  const next = nextPile(verse.pile);
+  const sum = todaySummary(data, now);
+  return (
+    <div class={`stack pile-${verse.pile}`} style={{ maxWidth: '320px', margin: '14px auto 0' }} data-testid="result-progress">
+      {p.target && next ? (
+        <div>
+          <div class="bar">
+            <i style={{ width: `${p.pct}%` }} />
+          </div>
+          <div class="muted small" style={{ marginTop: '4px' }}>
+            {p.earned} of {p.target} days toward {PILE_INFO[next].label}
+          </div>
+        </div>
+      ) : (
+        <div class="muted small">Kept for life — reviewed once a year.</div>
+      )}
+      {sum.total > 0 && (
+        <div class="muted small">
+          {sum.met} of {sum.total} due reviews done today
+        </div>
+      )}
+    </div>
+  );
+}
+
 function SkipVerse({ onSkip }: { onSkip: () => void }) {
   useEffect(onSkip, []);
   return null;
@@ -69,7 +99,7 @@ export function Review({ route }: { route: Route }) {
   const queue = useMemo(() => buildQueue(data, route.query, Date.now()), []);
   const [idx, setIdx] = useState(0);
   const [attempt, setAttempt] = useState(0);
-  const [result, setResult] = useState<{ counted: boolean; levelUps: LevelUp[] } | null>(null);
+  const [result, setResult] = useState<{ counted: boolean; levelUps: LevelUp[]; todayComplete: boolean } | null>(null);
   const [tally, setTally] = useState({ counted: 0, practice: 0, ups: 0 });
   const advanceTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
@@ -106,7 +136,8 @@ export function Review({ route }: { route: Route }) {
   const onFinished = () => {
     if (!verse) return;
     const r = completeReview(verse.id);
-    setResult({ counted: r.counted, levelUps: r.levelUps });
+    setResult({ counted: r.counted, levelUps: r.levelUps, todayComplete: r.todayComplete });
+    feedback.complete();
     setTally((t) => ({ counted: t.counted + (r.counted ? 1 : 0), practice: t.practice + (r.counted ? 0 : 1), ups: t.ups + r.levelUps.length }));
     advanceTimer.current = setTimeout(next, 1100);
   };
@@ -117,15 +148,35 @@ export function Review({ route }: { route: Route }) {
   };
 
   if (finished) {
+    const nowT = Date.now();
+    const sum = todaySummary(data, nowT);
+    const streak = streakInfo(data, nowT);
     return (
       <div class="review" data-testid="session-summary">
-        <div class="verse-area center stack" style={{ paddingTop: '60px' }}>
-          <div class="hero">🎉</div>
-          <h1>Session complete</h1>
+        <div class="verse-area center stack" style={{ paddingTop: '48px' }}>
+          {sum.outcome === 'c' ? (
+            <div class="alldone" data-testid="all-done">
+              <CheckMark size={72} />
+              <h1>All done for today</h1>
+              <p class="muted" style={{ margin: 0 }}>
+                {streak.count > 0 ? `Streak: ${streak.count} day${streak.count === 1 ? '' : 's'}. See you tomorrow.` : 'See you tomorrow.'}
+              </p>
+            </div>
+          ) : (
+            <>
+              <div class="hero">🌿</div>
+              <h1>Session complete</h1>
+            </>
+          )}
           <p class="muted">
             {queue.length} verse{queue.length === 1 ? '' : 's'} reviewed · {tally.counted} counted
             {tally.practice > 0 ? ` · ${tally.practice} extra practice` : ''}
           </p>
+          {sum.outcome !== 'c' && sum.remaining > 0 && (
+            <p class="muted small" data-testid="more-later">
+              {sum.remaining} more due today — {sum.readyNow > 0 ? 'ready whenever you are.' : 'the next one unlocks a little later.'}
+            </p>
+          )}
           <div class="row" style={{ justifyContent: 'center' }}>
             <button class="btn primary" onClick={() => navigate('/', true)} data-testid="session-done">
               Back home
@@ -159,10 +210,12 @@ export function Review({ route }: { route: Route }) {
       {result ? (
         <div class="verse-area" onClick={next} data-testid="verse-result">
           <div class="result-card">
-            <div class="big">{result.counted ? '✓' : '＋'}</div>
+            <div class="result-check">{result.counted ? <CheckMark size={64} /> : <div class="big">＋</div>}</div>
             <h2 style={{ marginTop: '10px' }}>{formatRef(verse)}</h2>
-            <p class="muted">{result.counted ? 'Review counted.' : 'Extra practice — it doesn’t change the schedule.'}</p>
+            <p class="muted">{result.counted ? `Review counted. ${doneLine(tally.counted)}` : 'Extra practice — it doesn’t change the schedule.'}</p>
+            <ResultProgress verse={verse} data={data} />
             {result.levelUps.length > 0 && <p>Level up! Now in {PILE_INFO[result.levelUps[result.levelUps.length - 1].to].label}.</p>}
+            {result.todayComplete && <p class="status-ready">That’s everything for today.</p>}
           </div>
         </div>
       ) : (

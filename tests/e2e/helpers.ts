@@ -107,3 +107,17 @@ export async function installFakeSpeech(page: Page, transcript: string) {
 export async function saved(page: Page) {
   await page.evaluate(() => (window as any).__mfl.flush());
 }
+
+/** Replace the app's data with `data` through the real Settings → Import screen (the way a restore works). */
+export async function replaceDataWith(page: Page, data: unknown) {
+  const file = JSON.stringify({ app: 'memorize-for-life', format: 1, appVersion: '1.0.0', exportedAt: new Date().toISOString(), data });
+  await page.goto('/#/settings');
+  await page.getByTestId('import-file').setInputFiles({ name: 'restore.json', mimeType: 'application/json', buffer: Buffer.from(file) });
+  await page.getByTestId('import-replace').click();
+}
+
+/** Local calendar day key; `d` may overflow (e.g. 10 - 90) and is normalized by Date. */
+export const localDay = (y: number, m0: number, d: number) => {
+  const t = new Date(y, m0, d);
+  return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`;
+};

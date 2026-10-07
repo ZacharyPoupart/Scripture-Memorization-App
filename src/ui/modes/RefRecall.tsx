@@ -4,6 +4,7 @@ import { formatRef } from '../../core/reference.ts';
 import { checkReference } from '../../core/quiz.ts';
 import { Overlay } from '../common.tsx';
 import { useShake } from '../dom.ts';
+import { feedback } from '../../services/feedback.ts';
 import { Dock, MistakeDots, type ModeProps } from './shared.tsx';
 
 /** After the verse itself: where is it found? Nothing on screen hints at the answer. */
@@ -25,6 +26,7 @@ export function RefRecall({ verse, onMistake, onDone, onRestart, mistakes }: Mod
     const res = checkReference({ book, chapter: num(chapter), start: num(start), end: num(end) }, verse);
     if (res.ok) {
       setMessage('');
+      feedback.correct();
       onDone();
       return;
     }

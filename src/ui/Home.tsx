@@ -46,10 +46,10 @@ export function Home() {
               <div class="muted small">{new Date(now).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}</div>
               <h1>{greet}</h1>
             </div>
-            <div class="streak" title={`Longest streak: ${streak.longest}`} data-testid="streak">
+            <button class="streak" title={`Longest streak: ${streak.longest}`} aria-label={`Streak: ${streak.count} day${streak.count === 1 ? '' : 's'}. Open progress.`} onClick={() => navigate('/stats')} data-testid="streak">
               <Icon name="flame" fill />
               <span>{streak.count}</span>
-            </div>
+            </button>
           </div>
 
           {frozen && (
@@ -59,12 +59,12 @@ export function Home() {
             </div>
           )}
           {!frozen && untilFreeze !== null && untilFreeze <= 1 && today.total > 0 && (
-            <div class="banner">Review today to keep your verses moving — progress pauses after 3 days without a review.</div>
+            <div class="banner">A review today keeps your verses moving. (After 3 days without one, progress simply pauses — nothing is lost.)</div>
           )}
 
           <div class="card stack">
             <div class="row">
-              <div class="ring" style={{ '--p': pct } as never}>
+              <div class={`ring ${today.outcome === 'c' ? 'done' : ''}`} style={{ '--p': pct } as never}>
                 <div data-testid="today-ring">{today.total ? `${today.met}/${today.total}` : '✓'}</div>
               </div>
               <div class="grow">

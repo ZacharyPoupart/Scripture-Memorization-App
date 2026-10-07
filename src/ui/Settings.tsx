@@ -18,7 +18,8 @@ import {
   updateSettings,
   useApp,
 } from '../store.ts';
-import { Confirm, Field, Overlay, Seg } from './common.tsx';
+import { Confirm, Field, Overlay, Seg, Toggle } from './common.tsx';
+import { feedback, hapticsSupported } from '../services/feedback.ts';
 import { ModePicker } from './ModePicker.tsx';
 
 function SyncCard() {
@@ -271,7 +272,7 @@ export function Settings({ onShowIntro }: { onShowIntro: () => void }) {
               ))}
             </select>
           </Field>
-          <Field label="Fill-in-the-blank difficulty (Daily verses)" hint="Verses in Weekly, Monthly and Yearly always use the hardest version.">
+          <Field group label="Fill-in-the-blank difficulty (Daily verses)" hint="Verses in Weekly, Monthly and Yearly always use the hardest version.">
             <Seg<FillDifficulty>
               label="Difficulty"
               value={settings.fillDifficulty}
@@ -283,8 +284,47 @@ export function Settings({ onShowIntro }: { onShowIntro: () => void }) {
               onChange={(fillDifficulty) => updateSettings({ fillDifficulty })}
             />
           </Field>
-          <Field label="Default review mode">
+          <Field group label="Default review mode">
             <ModePicker />
+          </Field>
+        </div>
+
+        <div class="card stack" data-testid="feedback-card">
+          <h2>Feedback &amp; celebrations</h2>
+          <p class="muted small" style={{ margin: 0 }}>
+            Gentle by design. Everything here is optional and can be switched off.
+          </p>
+          <Toggle
+            label="Quiet sounds"
+            hint="A soft tone for correct answers and finished reviews. Off by default."
+            checked={settings.soundOn}
+            onChange={(soundOn) => {
+              updateSettings({ soundOn });
+              if (soundOn) feedback.complete();
+            }}
+            testid="toggle-sound"
+          />
+          <Toggle
+            label="Vibration"
+            hint={hapticsSupported() ? 'A tiny tap on correct answers.' : 'Not available here — iPhone web apps can’t vibrate. Many Android phones can.'}
+            checked={settings.hapticsOn && hapticsSupported()}
+            disabled={!hapticsSupported()}
+            onChange={(hapticsOn) => {
+              updateSettings({ hapticsOn });
+              if (hapticsOn) feedback.correct();
+            }}
+            testid="toggle-haptics"
+          />
+          <Field group label="Celebrations" hint="Full adds confetti for big moments (a verse moving up, long streaks). Calm keeps it to a quiet message.">
+            <Seg<'full' | 'calm'>
+              label="Celebrations"
+              value={settings.celebrations}
+              options={[
+                { value: 'full', label: 'Full' },
+                { value: 'calm', label: 'Calm' },
+              ]}
+              onChange={(celebrations) => updateSettings({ celebrations })}
+            />
           </Field>
         </div>
 

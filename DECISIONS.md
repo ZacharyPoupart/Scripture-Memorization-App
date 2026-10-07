@@ -45,7 +45,26 @@ Living log for the overnight/long-running improvement pass (started 2026-10-07).
 - **No layout shift:** e2e measures CLS on Home (< 0.05).
 - **Not changed:** any scheduling/stored-data logic. No data shape change.
 
-### Workstream 2 — motivation and feedback (v1.3.0) _(in progress)_
+### Workstream 2 — motivation and feedback (v1.3.0)
+Each feature and the idea it rests on. These are established, widely used behavioural ideas; effect sizes vary between people and apps, so I treat them as reasonable defaults, not guarantees.
+
+| Feature | Principle it is based on | Guardrail |
+|---|---|---|
+| Correct answers settle in with a small animation (and an optional quiet tone/vibration) | **Immediate feedback**: feedback close in time to the action helps people connect effort and result | Sound and vibration are **off by default**, individually switchable; reduced-motion respected |
+| Result card after each review: check mark, progress bar "N of 90 days toward Weekly", "X of Y due reviews done today" | **Visible progress / goal-gradient**: people tend to stay motivated as a goal looks closer | Shows only real numbers from the schedule; nothing invented |
+| Session progress bar (existing), "Nearly there" list on Stats (verses closest to their next pile) | Goal-gradient again | Purely derived from existing data |
+| Calm "All done for today" moment (check mark + streak) and a ring that turns green | **Closure / completion feedback**: a clear end to the day's task is satisfying and lets people stop | No confetti for the ordinary daily finish |
+| Celebrations scaled to the achievement: small = quiet card (3 and 7-day streak), medium = card + little confetti (14–99 days, a verse moving up), large = full confetti (100+ days, a verse reaching Yearly) | **Proportional recognition**; over-rewarding trivial things can dull motivation | Settings → Celebrations: **Full** or **Calm** (no confetti ever). Each streak milestone is celebrated once |
+| Stats screen: streaks and best runs, calendar heatmap, verses per pile, totals | **Self-monitoring**: seeing your own record is one of the better-supported habit aids | Missed days look **exactly like rest days** (no red, no blame); shows what you did, never what you didn't |
+| Wording: freeze = "short pause, nothing is lost"; no "at risk"/"last chance" text | Avoid **loss-aversion pressure** and guilt, which can backfire and drive people away | e2e test scans screens during a freeze for guilt/urgency phrases |
+
+Other notes:
+- **No data shape change.** New preferences (`soundOn`, `hapticsOn`, `celebrations`, `seenMilestones`) live in the device-local *settings*, which load by layering saved values over defaults — verified against the v1.1.0 settings fixture. Streak/heatmap are derived from the existing ledger.
+- **Haptics:** iPhone web apps (Safari/home-screen) cannot vibrate; the switch is disabled there with an explanation (many Android phones can).
+- **Streak milestones** are detected when today becomes complete and keyed `streak:<n>:<day>` in `seenMilestones` so reloads don't repeat them.
+- **Accessibility bug found by the new tests and fixed:** button groups on Settings were inside a `<label>`, so "Easy" / "Flashcard" were announced with the whole section label as their name. Now a labelled `role="group"`.
+- **Test changes:** none to existing tests. New: `unit/stats.test.ts`, `unit/feedback.test.ts`, `e2e/motivation.spec.ts` (+ a11y test in `comfort.spec.ts`, stats route in `offline-smoke.spec.ts`).
+
 
 ## Open questions for you
 _(none yet)_
