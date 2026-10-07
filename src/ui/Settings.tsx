@@ -272,7 +272,7 @@ export function Settings({ onShowIntro }: { onShowIntro: () => void }) {
               ))}
             </select>
           </Field>
-          <Field label="Fill-in-the-blank difficulty (Daily verses)" hint="Verses in Weekly, Monthly and Yearly always use the hardest version.">
+          <Field group label="Fill-in-the-blank difficulty (Daily verses)" hint="Verses in Weekly, Monthly and Yearly always use the hardest version.">
             <Seg<FillDifficulty>
               label="Difficulty"
               value={settings.fillDifficulty}
@@ -284,7 +284,7 @@ export function Settings({ onShowIntro }: { onShowIntro: () => void }) {
               onChange={(fillDifficulty) => updateSettings({ fillDifficulty })}
             />
           </Field>
-          <Field label="Default review mode">
+          <Field group label="Default review mode">
             <ModePicker />
           </Field>
         </div>
@@ -315,7 +315,7 @@ export function Settings({ onShowIntro }: { onShowIntro: () => void }) {
             }}
             testid="toggle-haptics"
           />
-          <Field label="Celebrations" hint="Full adds confetti for big moments (a verse moving up, long streaks). Calm keeps it to a quiet message.">
+          <Field group label="Celebrations" hint="Full adds confetti for big moments (a verse moving up, long streaks). Calm keeps it to a quiet message.">
             <Seg<'full' | 'calm'>
               label="Celebrations"
               value={settings.celebrations}

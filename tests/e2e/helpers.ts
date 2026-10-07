@@ -116,4 +116,8 @@ export async function replaceDataWith(page: Page, data: unknown) {
   await page.getByTestId('import-replace').click();
 }
 
-export const localDay = (y: number, m0: number, d: number) => `${y}-${String(m0 + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+/** Local calendar day key; `d` may overflow (e.g. 10 - 90) and is normalized by Date. */
+export const localDay = (y: number, m0: number, d: number) => {
+  const t = new Date(y, m0, d);
+  return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`;
+};

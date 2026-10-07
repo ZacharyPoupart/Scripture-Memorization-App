@@ -426,10 +426,12 @@ button,
 }
 
 /* ---- forms ---- */
-label.field {
+label.field,
+div.field {
   display: block;
 }
-label.field > span {
+label.field > span,
+.field > .field-label {
   display: block;
   font-size: 0.82rem;
   font-weight: 600;
@@ -1028,6 +1030,7 @@ textarea.input {
   font-variant-numeric: tabular-nums;
 }
 .heat-wrap {
+  min-width: 0;
   display: flex;
   gap: 6px;
   align-items: stretch;
@@ -1046,14 +1049,16 @@ textarea.input {
 }
 .heat {
   flex: 1;
+  min-width: 0;
   display: grid;
   grid-auto-flow: column;
-  grid-template-rows: repeat(7, 1fr);
-  grid-auto-columns: 1fr;
+  grid-template-rows: repeat(7, auto);
+  grid-auto-columns: minmax(0, 1fr);
   gap: 3px;
 }
 .cell {
   display: block;
+  min-width: 0;
   aspect-ratio: 1;
   border-radius: 3px;
   background: var(--surface-2);

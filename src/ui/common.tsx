@@ -191,7 +191,23 @@ export function VerseCard({ data, verse, now, status }: { data: AppData; verse: 
   );
 }
 
-export function Field({ label, children, error, hint }: { label: string; children: ComponentChildren; error?: string | null; hint?: string }) {
+let fieldId = 0;
+export function Field({ label, children, error, hint, group }: { label: string; children: ComponentChildren; error?: string | null; hint?: string; group?: boolean }) {
+  // A <label> wrapping several buttons would become the accessible name of the first button, so groups
+  // of buttons (segmented controls, mode pickers) use a labelled role="group" instead.
+  if (group) {
+    const id = `fld-${++fieldId}`;
+    return (
+      <div class="field" role="group" aria-labelledby={id}>
+        <span id={id} class="field-label">
+          {label}
+        </span>
+        {children}
+        {error && <div class="error-text">{error}</div>}
+        {hint && !error && <div class="hint-text">{hint}</div>}
+      </div>
+    );
+  }
   return (
     <label class="field">
       <span>{label}</span>

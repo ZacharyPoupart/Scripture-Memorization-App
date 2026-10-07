@@ -73,7 +73,7 @@ export function Stats() {
                 <span key={i}>{d}</span>
               ))}
             </div>
-            <div class="heat" data-testid="heatmap">
+            <div class="heat" data-testid="heatmap" style={{ gridTemplateColumns: `repeat(${WEEKS}, minmax(0, 1fr))` }}>
               {cols.map((col, w) =>
                 col.map((c) => <i key={`${w}-${c.day}`} class={`cell k-${c.future ? 'future' : c.kind}`} title={`${fmt(c.day)}: ${c.future ? '' : c.kind === 'complete' ? 'all done' : c.kind === 'practiced' ? 'practiced' : 'no practice'}`} />),
               )}

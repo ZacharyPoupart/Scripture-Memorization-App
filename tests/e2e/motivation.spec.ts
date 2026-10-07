@@ -63,6 +63,8 @@ test.describe('stats screen', () => {
     expect(await page.getByTestId('run').count()).toBeGreaterThan(0);
     // reachable from Home via the streak chip and via the tab bar
     await page.goto('/#/');
+    // the fixture contains a recorded level-up; its celebration is shown once, then dismissed
+    if (await page.getByTestId('celebration').isVisible()) await page.getByTestId('celebration-close').click();
     await page.getByTestId('streak').click();
     await expect(page.getByRole('heading', { name: 'Progress' })).toBeVisible();
     await page.getByRole('link', { name: 'Today' }).click();

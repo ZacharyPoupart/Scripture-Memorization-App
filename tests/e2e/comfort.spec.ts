@@ -153,3 +153,15 @@ test.describe('thumb-reachable primary action (phone)', () => {
     expect(c.y).toBeGreaterThan(vh * 0.65);
   });
 });
+
+test.describe('accessibility basics', () => {
+  test('button groups have their own names (not the whole section label) and switches are real switches', async ({ page }) => {
+    await blockLookups(page);
+    await openApp(page, '/#/settings');
+    for (const name of ['Easy', 'Medium', 'Hard', 'Flashcard', 'Blanks', 'Full', 'Calm', 'Light', 'Dark']) {
+      await expect(page.getByRole('button', { name, exact: true }).first(), name).toBeVisible();
+    }
+    await expect(page.getByRole('group', { name: 'Fill-in-the-blank difficulty (Daily verses)' })).toBeVisible();
+    await expect(page.getByRole('switch', { name: 'Quiet sounds' })).toHaveAttribute('aria-checked', 'false');
+  });
+});
