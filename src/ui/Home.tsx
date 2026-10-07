@@ -2,7 +2,8 @@ import { dayKeyOf, daysBetween, formatDays } from '../core/dates.ts';
 import { daysUntilFreeze, isFrozen, liveVerses, pileVerses, streakInfo, todaySummary, verseStatus } from '../core/schedule.ts';
 import { PILES } from '../core/types.ts';
 import { navigate } from '../router.ts';
-import { useApp } from '../store.ts';
+import { shouldNudgeBackup } from '../core/nudges.ts';
+import { downloadBackup, updateSettings, useApp } from '../store.ts';
 import { Icon, PILE_INFO } from './common.tsx';
 import { ModePicker } from './ModePicker.tsx';
 
@@ -46,7 +47,13 @@ export function Home() {
               <div class="muted small">{new Date(now).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}</div>
               <h1>{greet}</h1>
             </div>
-            <button class="streak" title={`Longest streak: ${streak.longest}`} aria-label={`Streak: ${streak.count} day${streak.count === 1 ? '' : 's'}. Open progress.`} onClick={() => navigate('/stats')} data-testid="streak">
+            <button
+              class="streak"
+              title={`Longest streak: ${streak.longest}`}
+              aria-label={`Streak: ${streak.count} day${streak.count === 1 ? '' : 's'}. Open progress.`}
+              onClick={() => navigate('/stats')}
+              data-testid="streak"
+            >
               <Icon name="flame" fill />
               <span>{streak.count}</span>
             </button>
@@ -112,9 +119,25 @@ export function Home() {
               })}
             </div>
           </div>
-          {settings.syncCode === '' && settings.lastExportAt === 0 && verses.length >= 3 && (
-            <div class="banner info small">
-              Tip: your verses live on this device. Turn on <a href="#/settings">sync</a> or export a backup in Settings so they're never lost.
+          {shouldNudgeBackup({
+            syncOn: !!settings.syncCode,
+            verses: verses.length,
+            lastExportAt: settings.lastExportAt,
+            nudgeDismissedAt: settings.nudgeDismissedAt ?? 0,
+            now,
+          }) && (
+            <div class="banner info" data-testid="backup-nudge">
+              <div style={{ marginBottom: '8px' }}>
+                Your verses live on this device. A quick backup (or turning on sync in Settings) keeps them safe if you ever lose or reset your phone.
+              </div>
+              <div class="row wrap">
+                <button class="btn small primary" onClick={downloadBackup}>
+                  Export a backup
+                </button>
+                <button class="btn small ghost" onClick={() => updateSettings({ nudgeDismissedAt: Date.now() })} data-testid="backup-nudge-dismiss">
+                  Not now
+                </button>
+              </div>
             </div>
           )}
         </div>

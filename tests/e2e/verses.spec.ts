@@ -90,7 +90,7 @@ test.describe('adding, editing and organizing verses', () => {
     await page.goto('/#/piles');
     await page.getByRole('button', { name: '#Trust', exact: true }).click();
     await expect(page.getByTestId('verse-card')).toHaveCount(1);
-    await page.getByRole('button', { name: 'All', exact: true }).click();
+    await page.getByRole('button', { name: 'All topics', exact: true }).click();
     await expect(page.getByTestId('verse-card')).toHaveCount(2);
 
     await page.getByTestId('verse-card').filter({ hasText: 'John 3:16' }).click();

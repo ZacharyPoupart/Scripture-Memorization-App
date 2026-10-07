@@ -6,7 +6,7 @@ const SLIDES = [
   { icon: '➕', title: 'Add verses', body: 'Pick a book, chapter and verses. The text is looked up for you when you’re online, or you can type or paste it any time — even offline.' },
   { icon: '🗂️', title: 'Four piles', body: 'New verses start in Daily (3 reviews a day). After 90 days they move to Weekly, then Monthly, then Yearly — reviewed less and less, but never forgotten.' },
   { icon: '🧠', title: 'Four ways to practice', body: 'Flashcards, fill in the blanks, typing first letters, or speaking aloud. You’ll also recall where each verse is found.' },
-  { icon: '🔥', title: 'Build your streak', body: 'Finish your due reviews each day to grow your streak. If you step away for 3 days, progress pauses — it never punishes you by erasing anything.' },
+  { icon: '🔥', title: 'Build your streak', body: 'Finish your due reviews each day to grow your streak. See your whole history on the Stats tab. If you step away for a few days, progress simply pauses — nothing is ever erased.' },
 ];
 
 export function Onboarding({ onClose }: { onClose: () => void }) {

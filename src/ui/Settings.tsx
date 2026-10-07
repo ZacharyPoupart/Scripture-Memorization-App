@@ -20,7 +20,59 @@ import {
 } from '../store.ts';
 import { Confirm, Field, Overlay, Seg, Toggle } from './common.tsx';
 import { feedback, hapticsSupported } from '../services/feedback.ts';
+import { buildReminderIcs, MAX_REMINDERS } from '../core/reminders.ts';
 import { ModePicker } from './ModePicker.tsx';
+
+function RemindersCard() {
+  const { settings } = useApp();
+  // Three fixed slots (an empty one is simply skipped), so clearing one never shifts the others.
+  const slots = Array.from({ length: MAX_REMINDERS }, (_, i) => settings.reminderTimes?.[i] ?? '');
+  const hasAny = slots.some(Boolean);
+  const set = (i: number, v: string) => {
+    const next = slots.slice();
+    next[i] = v;
+    updateSettings({ reminderTimes: next });
+  };
+  const download = () => {
+    const ics = buildReminderIcs(slots, Date.now());
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' }));
+    a.download = 'memorize-for-life-reminders.ics';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 10_000);
+  };
+  return (
+    <div class="card stack" data-testid="reminders-card">
+      <h2>Daily reminders</h2>
+      <p class="muted small" style={{ margin: 0 }}>
+        Web apps on iPhone can't send their own notifications without a server, so reminders use your Calendar app instead: pick up to three times,
+        tap the button, then choose “Add All”. Your Calendar will alert you at those times, even offline. To change them later, delete the “Memorize
+        For Life” events and add again.
+      </p>
+      <div class="grid3">
+        {slots.map((t, i) => (
+          <label class="field" key={i}>
+            <span>Time {i + 1}</span>
+            <input
+              class="input"
+              type="time"
+              value={t}
+              onInput={(e) => set(i, e.currentTarget.value)}
+              aria-label={`Reminder time ${i + 1}`}
+              data-testid={`reminder-${i}`}
+            />
+          </label>
+        ))}
+      </div>
+      <button class="btn block" disabled={!hasAny} onClick={download} data-testid="reminders-download">
+        Add reminders to Calendar
+      </button>
+      <div class="hint-text">Leave a time empty to skip it. If nothing happens on your iPhone, open this page in Safari and try again.</div>
+    </div>
+  );
+}
 
 function SyncCard() {
   const { settings, sync, online } = useApp();
@@ -36,12 +88,23 @@ function SyncCard() {
       <div class="card stack" data-testid="sync-card">
         <h2>Sync between devices</h2>
         <p class="muted small" style={{ margin: 0 }}>
-          Optional. Link your phone and computer with a private code — no email or password. Your verses are encrypted on your device before they're sent.
+          Optional. Link your phone and computer with a private code — no email or password. Your verses are encrypted on your device before they're
+          sent.
         </p>
         {!secure && <div class="banner">Sync needs a secure (https) connection. It will work on your live site.</div>}
         {!linking ? (
           <div class="row wrap">
-            <button class="btn primary grow" disabled={!secure} onClick={async () => { const c = await enableSync(); if (c) { setShowCode(true); } }} data-testid="sync-enable">
+            <button
+              class="btn primary grow"
+              disabled={!secure}
+              onClick={async () => {
+                const c = await enableSync();
+                if (c) {
+                  setShowCode(true);
+                }
+              }}
+              data-testid="sync-enable"
+            >
               Turn on sync
             </button>
             <button class="btn grow" disabled={!secure} onClick={() => setLinking(true)} data-testid="sync-link">
@@ -51,7 +114,16 @@ function SyncCard() {
         ) : (
           <div class="stack">
             <Field label="Link code from your other device" error={msg}>
-              <input class="input" placeholder="XXXXX-XXXXX-XXXXX-XXXXX" value={codeInput} onInput={(e) => setCodeInput(e.currentTarget.value)} autocapitalize="characters" autocomplete="off" spellcheck={false} data-testid="sync-code-input" />
+              <input
+                class="input"
+                placeholder="XXXXX-XXXXX-XXXXX-XXXXX"
+                value={codeInput}
+                onInput={(e) => setCodeInput(e.currentTarget.value)}
+                autocapitalize="characters"
+                autocomplete="off"
+                spellcheck={false}
+                data-testid="sync-code-input"
+              />
             </Field>
             <div class="row">
               <button class="btn" onClick={() => setLinking(false)}>
@@ -76,14 +148,24 @@ function SyncCard() {
   }
 
   const status =
-    sync.kind === 'syncing' ? 'Syncing…' : sync.kind === 'error' ? sync.message : !online ? 'Offline — will sync when you reconnect.' : settings.lastSyncAt ? `Last synced ${new Date(settings.lastSyncAt).toLocaleString()}` : 'Ready';
+    sync.kind === 'syncing'
+      ? 'Syncing…'
+      : sync.kind === 'error'
+        ? sync.message
+        : !online
+          ? 'Offline — will sync when you reconnect.'
+          : settings.lastSyncAt
+            ? `Last synced ${new Date(settings.lastSyncAt).toLocaleString()}`
+            : 'Ready';
   return (
     <div class="card stack" data-testid="sync-card">
       <h2>Sync is on</h2>
       <div class={`small ${sync.kind === 'error' ? 'error-text' : 'muted'}`} role="status" data-testid="sync-status">
         {status}
       </div>
-      {sync.kind === 'error' && sync.code === 'not-configured' && <div class="hint-text">The server needs a KV namespace named SYNC (see the README's “Turn on sync” section).</div>}
+      {sync.kind === 'error' && sync.code === 'not-configured' && (
+        <div class="hint-text">The server needs a KV namespace named SYNC (see the README's “Turn on sync” section).</div>
+      )}
       <div>
         <div class="muted small" style={{ marginBottom: '4px' }}>
           Link code — enter this on your other device:
@@ -97,7 +179,12 @@ function SyncCard() {
           </button>
           <button
             class="btn small"
-            onClick={() => navigator.clipboard?.writeText(settings.syncCode).then(() => showToast('Code copied.'), () => showToast('Could not copy — show the code and copy it by hand.'))}
+            onClick={() =>
+              navigator.clipboard?.writeText(settings.syncCode).then(
+                () => showToast('Code copied.'),
+                () => showToast('Could not copy — show the code and copy it by hand.'),
+              )
+            }
           >
             Copy
           </button>
@@ -158,7 +245,12 @@ function BackupCard() {
     <div class="card stack" data-testid="backup-card">
       <h2>Backup</h2>
       <p class="muted small" style={{ margin: 0 }}>
-        {days === null ? 'You haven’t exported a backup yet.' : days === 0 ? 'Last exported today.' : `Last exported ${days} day${days === 1 ? '' : 's'} ago.`} A backup file contains all your verses, progress and streaks.
+        {days === null
+          ? 'You haven’t exported a backup yet.'
+          : days === 0
+            ? 'Last exported today.'
+            : `Last exported ${days} day${days === 1 ? '' : 's'} ago.`}{' '}
+        A backup file contains all your verses, progress and streaks.
       </p>
       <div class="row wrap">
         <button class="btn grow" onClick={downloadBackup} data-testid="export">
@@ -200,7 +292,9 @@ function BackupCard() {
         <Overlay center onClose={() => setPending(null)} label="Import backup">
           <div class="modal stack" data-testid="import-dialog">
             <h2>Import this backup?</h2>
-            <p class="muted">The file has {pending.verses} verse{pending.verses === 1 ? '' : 's'}.</p>
+            <p class="muted">
+              The file has {pending.verses} verse{pending.verses === 1 ? '' : 's'}.
+            </p>
             <button
               class="btn primary block"
               onClick={() => {
@@ -257,14 +351,24 @@ export function Settings({ onShowIntro }: { onShowIntro: () => void }) {
         <div class="card stack">
           <h2>Reviewing</h2>
           <Field label="Default translation for new verses">
-            <select class="input" value={data.prefs.value.defaultTranslation} onChange={(e) => setPrefs({ defaultTranslation: e.currentTarget.value })} data-testid="default-translation">
+            <select
+              class="input"
+              value={data.prefs.value.defaultTranslation}
+              onChange={(e) => setPrefs({ defaultTranslation: e.currentTarget.value })}
+              data-testid="default-translation"
+            >
               {TRANSLATIONS.map((t) => (
                 <option key={t}>{t}</option>
               ))}
             </select>
           </Field>
           <Field label="Time between Daily reviews" hint="Each Daily verse is reviewed 3 times a day, at least this far apart.">
-            <select class="input" value={data.prefs.value.spacingHours} onChange={(e) => setPrefs({ spacingHours: Number(e.currentTarget.value) })} data-testid="spacing">
+            <select
+              class="input"
+              value={data.prefs.value.spacingHours}
+              onChange={(e) => setPrefs({ spacingHours: Number(e.currentTarget.value) })}
+              data-testid="spacing"
+            >
               {[1, 2, 3, 4].map((h) => (
                 <option key={h} value={h}>
                   {h} hour{h === 1 ? '' : 's'}
@@ -272,7 +376,11 @@ export function Settings({ onShowIntro }: { onShowIntro: () => void }) {
               ))}
             </select>
           </Field>
-          <Field group label="Fill-in-the-blank difficulty (Daily verses)" hint="Verses in Weekly, Monthly and Yearly always use the hardest version.">
+          <Field
+            group
+            label="Fill-in-the-blank difficulty (Daily verses)"
+            hint="Verses in Weekly, Monthly and Yearly always use the hardest version."
+          >
             <Seg<FillDifficulty>
               label="Difficulty"
               value={settings.fillDifficulty}
@@ -306,7 +414,9 @@ export function Settings({ onShowIntro }: { onShowIntro: () => void }) {
           />
           <Toggle
             label="Vibration"
-            hint={hapticsSupported() ? 'A tiny tap on correct answers.' : 'Not available here — iPhone web apps can’t vibrate. Many Android phones can.'}
+            hint={
+              hapticsSupported() ? 'A tiny tap on correct answers.' : 'Not available here — iPhone web apps can’t vibrate. Many Android phones can.'
+            }
             checked={settings.hapticsOn && hapticsSupported()}
             disabled={!hapticsSupported()}
             onChange={(hapticsOn) => {
@@ -315,7 +425,11 @@ export function Settings({ onShowIntro }: { onShowIntro: () => void }) {
             }}
             testid="toggle-haptics"
           />
-          <Field group label="Celebrations" hint="Full adds confetti for big moments (a verse moving up, long streaks). Calm keeps it to a quiet message.">
+          <Field
+            group
+            label="Celebrations"
+            hint="Full adds confetti for big moments (a verse moving up, long streaks). Calm keeps it to a quiet message."
+          >
             <Seg<'full' | 'calm'>
               label="Celebrations"
               value={settings.celebrations}
@@ -328,6 +442,7 @@ export function Settings({ onShowIntro }: { onShowIntro: () => void }) {
           </Field>
         </div>
 
+        <RemindersCard />
         <SyncCard />
         <BackupCard />
 
@@ -366,7 +481,6 @@ export function Settings({ onShowIntro }: { onShowIntro: () => void }) {
                   resetEverything();
                   setReset(false);
                   setResetText('');
-                  showToast('All data erased.');
                 }}
               >
                 Erase
