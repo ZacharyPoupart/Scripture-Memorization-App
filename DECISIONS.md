@@ -76,7 +76,8 @@ Chosen because they are valuable and low-risk; no scheduling/data-shape changes 
 - **Accessibility:** dialogs now move focus in, trap Tab, close on Escape and return focus to what opened them; each screen sets a page title; e2e checks every visible control has an accessible name. (The Field/label bug is in WS2's notes.)
 - **Walkthrough** text mentions the Stats tab and the kinder freeze wording.
 - **Performance:** no change needed — the production bundle is ~110 KB (≈ 38 KB gzip), everything is local, and per-minute work is a cheap settle. Not measured on a real device.
-- **Tests:** new `unit/organize.test.ts`, `unit/reminders.test.ts`, `unit/nudges.test.ts`, `e2e/polish.spec.ts`; `offline-smoke` now also searches offline. No existing test changed.
+- **Tests:** new `unit/organize.test.ts`, `unit/reminders.test.ts`, `unit/nudges.test.ts`, `e2e/polish.spec.ts`; `offline-smoke` now also searches offline.
+- **Two existing e2e tests were edited (locators only, same assertions) because the UI intentionally changed — please review:** (1) `verses.spec.ts` topic-filter test: the "All" topic chip is now labelled "All topics". (2) `offline-backup-sync.spec.ts` restore test: `getByText('#Gospel')` now also matches the new topic filter chip on the pile page, so it is scoped to the verse card (`getByTestId('verse-card').getByText('#Gospel')`) — still proves the restored verse kept its topic.
 
 ## Open questions for you
 _(none yet)_

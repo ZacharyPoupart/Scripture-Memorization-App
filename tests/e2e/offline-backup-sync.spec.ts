@@ -75,7 +75,7 @@ test.describe('backup and restore', () => {
     await page.getByTestId('import-merge').click();
     await page.goto('/#/pile/daily');
     await expect(page.getByTestId('verse-card')).toHaveCount(2);
-    await expect(page.getByText('#Gospel')).toBeVisible();
+    await expect(page.getByTestId('verse-card').getByText('#Gospel')).toBeVisible(); // on the verse card itself (the page now also has topic filter chips)
 
     // importing again merges: no duplicates
     await page.goto('/#/settings');
