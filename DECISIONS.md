@@ -3,7 +3,7 @@
 Living log for the overnight/long-running improvement pass (started 2026-10-07). If the session is cut off, **read "Resume here" first**.
 
 ## Resume here
-- **Current stage:** Phase 0 (safety + baseline) — PR open.
+- **Current stage:** Phase 0 merged (PR #2 save fix v1.1.1, PR #3 baseline). Workstream 1 (visual design, v1.2.0) in review; Workstream 2 (motivation/stats, v1.3.0) in progress on `feature/motivation`.
 - **Plan:** merge PR #2 (save-race fix, v1.1.1) → Workstream 1 (visual design, v1.2.0) → Workstream 2 (motivation & stats, v1.3.0) → Workstream 3 (product features, v1.4.0) → final docs/checklist.
 - **Rule:** every stage = branch → PR → CI green → merge → stage tag. Never merge red/skipped. Last green state is always `main`.
 - **Rollback to before this whole pass:** `git checkout v1.1.0-stable` (see "Rollback" below).
@@ -29,10 +29,23 @@ Living log for the overnight/long-running improvement pass (started 2026-10-07).
 - Policy for this pass: **no changes to the stored data document's shape.** New device-only preferences are added to the local *settings* object with defaults, which already merges safely over older saved settings.
 
 ## Test changes (for your review)
-_(none yet that modify existing tests — new tests only)_
+- **PR #2 (save fix):** `tests/e2e/verses.spec.ts` (walkthrough "remembered" check) and `tests/e2e/time-rules.spec.ts` (`oneReview`) now call a `saved(page)` helper (waits for the app's save queue via `window.__mfl.flush()`) before reloading. Reason: those tests reloaded within milliseconds of a save, which is what exposed the real non-atomic-save bug; the bug is fixed and the tests now model a human pause. Assertions unchanged.
+- **Existing tests otherwise untouched.** WS1 added new files only: `unit/contrast.test.ts`, `e2e/comfort.spec.ts`, `e2e/offline-smoke.spec.ts`.
 
 ## Decisions
-_(filled in per workstream)_
+
+### Workstream 1 — visual design and comfort (v1.2.0)
+- **Palette (research-informed, not exotic):** warm off-white paper `#f6f3ec` + soft charcoal `#272d2c` in light; deep blue-grey `#161b1c` + soft off-white `#e3e8e6` in dark. Rationale: avoiding pure black-on-pure-white reduces glare/halation for long reading, and dark surfaces that aren't pure black avoid the harsh "smear" on OLED. Accent is a muted teal; status colours are desaturated. All text/background pairs are enforced ≥ 4.5:1 (WCAG AA) by `tests/unit/contrast.test.ts` in **both** themes, and the test also fails if the "follow the system" dark block drifts from the forced-dark block.
+- **Theme:** follows the system by default (unchanged); Settings can force light/dark. `theme-color`/manifest colours updated to match the new paper/charcoal.
+- **Scripture as the hero:** serif at `clamp(1.22rem, 1.08rem + 0.6vw, 1.5rem)` (~19–24 px), line-height 1.75, measure capped at 34em (~65–70 characters/line), `text-wrap: pretty`. Checked by an e2e test (size, leading, line length).
+- **Thumb zone:** the primary action on Home ("Review N ready") and on each pile ("Start · N verses") moved from mid-page cards into a fixed bottom **action bar** above the tab bar (≥ 54 px tall). e2e asserts it sits in the lower third of a phone screen.
+- **Toasts moved to the top** so they can never cover the bottom action bar, and made `pointer-events: none` (only their Undo button is tappable) so a toast can never be an invisible blocker.
+- **Tap quality (iOS):** `touch-action: manipulation` (no double-tap zoom/300 ms delay), `-webkit-touch-callout: none`, `user-select: none` on controls, hover styles only under `@media (hover: hover) and (pointer: fine)` so taps never leave a sticky highlight. Safe-area insets now apply left/right as well as top/bottom.
+- **Motion:** unchanged short animations (≤ 0.25 s); `prefers-reduced-motion` already collapses all animation/transition durations (e2e verifies). Removed the tab-bar `backdrop-filter` blur (cost on older iPhones, no benefit).
+- **No layout shift:** e2e measures CLS on Home (< 0.05).
+- **Not changed:** any scheduling/stored-data logic. No data shape change.
+
+### Workstream 2 — motivation and feedback (v1.3.0) _(in progress)_
 
 ## Open questions for you
 _(none yet)_
