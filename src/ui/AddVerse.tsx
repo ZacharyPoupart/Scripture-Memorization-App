@@ -151,6 +151,12 @@ export function AddVerse({ editId }: { editId?: string }) {
           </span>
         </div>
 
+        {translation === 'NIV' && (
+          <div class="hint-text" data-testid="niv-note">
+            NIV® © Biblica, Inc. Used for personal study; text may come from API.Bible.
+          </div>
+        )}
+
         <Field label="Topic or label (optional)">
           <input class="input" list="topics" placeholder="e.g. Faith, Anxiety, Gospel" value={topic} onInput={(e) => setTopic(e.currentTarget.value)} data-testid="topic" />
           <datalist id="topics">
