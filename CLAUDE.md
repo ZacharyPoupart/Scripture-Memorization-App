@@ -9,12 +9,13 @@ Make Scripture memory a consistent daily habit and make verses stick for life. A
 Preact + TypeScript + Vite, installable PWA (vite-plugin-pwa / Workbox). Data in IndexedDB (localStorage fallback). Optional sync: a Cloudflare Pages Function + KV storing one end-to-end-encrypted blob per link code. Hosting: Cloudflare Pages (Git integration). Tests: Vitest (unit) + Playwright (e2e, Chromium).
 
 ## Layout
-- `src/core/` — **pure logic, no DOM**. `schedule.ts` is the heart (piles, due dates, spacing, graduation, freeze, streak). Also `dates.ts`, `merge.ts` (sync merge), `backup.ts` (export/import validation), `quiz.ts`, `speech.ts`, `text.ts`, `books.ts`, `reference.ts`, `versification.ts` (generated).
-- `src/services/` — `storage.ts` (IndexedDB + snapshots), `lookup.ts` (verse text APIs), `sync.ts` + `syncCrypto.ts`.
+- `src/core/` — **pure logic, no DOM**. `schedule.ts` is the heart (piles, due dates, spacing, graduation, freeze, streak). Also `dates.ts`, `merge.ts` (sync merge), `backup.ts` (export/import validation), `quiz.ts`, `speech.ts`, `text.ts`, `books.ts`, `reference.ts`, `versification.ts` (generated), and read-only helpers that never affect scheduling: `stats.ts` (streak history, heatmap, totals), `milestones.ts`, `organize.ts` (search/sort/filter/topic rename), `reminders.ts` (.ics builder), `nudges.ts`.
+- `src/services/` — `storage.ts` (IndexedDB, atomic saves + snapshots), `lookup.ts` (verse text APIs), `sync.ts` + `syncCrypto.ts`, `feedback.ts` (optional quiet sound/vibration; off by default).
 - `src/store.ts` — app state; all mutations go through `act()` (clone → settle days → mutate → save → schedule sync).
 - `src/ui/` — screens; `src/ui/modes/` — the review modes and reference recall.
 - `functions/` — Cloudflare Pages Function for sync (`functions/_lib/sync.js` is shared with the e2e server).
-- `tests/unit/` (Vitest, TZ pinned to America/New_York) and `tests/e2e/` (Playwright).
+- `tests/unit/` (Vitest, TZ pinned to America/New_York), `tests/e2e/` (Playwright; `helpers.ts` has `saved(page)`, `replaceDataWith`, `localDay`) and `tests/fixtures/` (real v1.1.0 export + settings used by `migration.test.ts`).
+- `DECISIONS.md` (what changed and why, test changes, open questions) and `docs/IOS-CHECKLIST.md` (manual iPhone checks).
 
 ## Commands
 - `npm install` · `npm run dev` (dev server on your network, open the printed Network URL on a phone)
@@ -38,18 +39,21 @@ Preact + TypeScript + Vite, installable PWA (vite-plugin-pwa / Workbox). Data in
 - **Sync merge** must stay commutative, associative and idempotent (`core/merge.ts`, tested). Verse content and pile are separate last-writer-wins groups; reviews are unioned; deletes win.
 
 ## Data safety
-Every save keeps `data.prev`; one snapshot per day (7 kept). Imports validate everything (`normalizeData`) and **merge by default** (replace is explicit and undoable). Never change the on-disk shape without bumping `schema` and writing a migration + tests.
+Every save is ONE atomic write (new data + `data.prev` + once-a-day snapshot, 7 kept); don't add reads or extra steps in front of it. Imports validate everything (`normalizeData`) and **merge by default** (replace is explicit and undoable). Never change the on-disk shape without bumping `schema` and writing a migration + tests; `tests/unit/migration.test.ts` + `tests/fixtures/*-v1.1.0.json` must stay green forever (add a new fixture whenever the shape changes). New device-only preferences go in `Settings` with a default (older saved settings load by layering over defaults). Test hooks on `window.__mfl` (`getState`, `flush`, `crash`) exist for e2e only.
+
+## Design guard rails
+Palette/type live in `src/styles.css` tokens; `tests/unit/contrast.test.ts` enforces WCAG AA in both themes and no pure black/white (change colours there, never ad hoc). Toasts appear at the top and are non-blocking; the primary action lives in the bottom `.action-bar`; hover styles only for real pointers. No guilt/urgency wording (an e2e test scans for it); missed days look like rest days in the heatmap.
 
 ## Working agreements (the owner's rules — follow them)
 1. Every change happens on its own branch with a clear name (e.g. `feature/…`, `fix/…`).
 2. Change only what was asked. If something else looks wrong, **tell the owner instead of fixing it silently**.
 3. Run the tests before committing. Add or update tests for anything you change (rules changes need unit tests first).
 4. Small, focused commits with clear messages.
-5. Open a pull request summarising what changed, how it was tested, and the version bump (use the PR template). The owner reviews the preview link on their phone, then we merge.
+5. Open a pull request summarising what changed, how it was tested, and the version bump (use the PR template). **The owner has delegated merging to Claude's discretion:** merge only on a fully green CI (never skipped/weakened tests), one PR per stage, then add a stage tag with the Tag workflow, and tell the owner what shipped and how to undo it. The owner can still ask for a revert or a hold at any time.
 6. If a release causes problems, **roll back first, then fix**.
 
 ## Releases and rollback
-Semantic versioning in `package.json` (shown in the app via `__APP_VERSION__`). Each PR that ships changes bumps the version and moves notes from `## [Unreleased]` in `CHANGELOG.md` (`npm run release -- patch|minor|major`). Merging to `main` deploys via Cloudflare Pages and `.github/workflows/release.yml` tags `vX.Y.Z` + creates a GitHub release. Rollback: see README ("Rolling back").
+Tags: `release.yml` adds `vX.Y.Z` when a version bump merges; the sandbox can't push tags, so stage tags (`v1.2.0-ui`, `v1.1.0-stable`, …) are created by the add-only `tag.yml` workflow (run it with the tag, a full commit sha on `main`, and a message). Semantic versioning in `package.json` (shown in the app via `__APP_VERSION__`). Each PR that ships changes bumps the version and moves notes from `## [Unreleased]` in `CHANGELOG.md` (`npm run release -- patch|minor|major`). Merging to `main` deploys via Cloudflare Pages and `.github/workflows/release.yml` tags `vX.Y.Z` + creates a GitHub release. Rollback: see README ("Rolling back").
 
 ## Secrets
 None are needed to build, test or run. Never commit keys; use environment variables / gitignored `.env` (see `.env.example`). The only runtime secret is the optional `API_BIBLE_KEY` (Cloudflare secret) used by `functions/api/verse.js` for NIV lookup; the client never sees it. If a key is ever pasted into chat or committed, tell the owner to rotate it.

@@ -12,6 +12,8 @@ The repository `ZacharyPoupart/Scripture-Memorization-App` already exists and th
 5. *Settings → Actions → General → Workflow permissions* → choose **Read and write permissions** (so the release workflow can tag versions).
 
 ## 2. Connect Cloudflare Pages (live site + preview links)
+> **Important:** create a **Pages** project, not a Worker. Cloudflare's *Create* screen now leads with Workers; look for the small link **“Looking to deploy Pages? Get started”** (or the *Pages* tab) and choose **Import an existing Git repository**. Leave **Root directory blank** (it is a folder inside the repo, not a branch name). If you see a *Deploy command* such as `npx wrangler deploy`, you are in the Worker flow — back out.
+
 1. Create a free account at https://dash.cloudflare.com if you don't have one.
 2. *Workers & Pages → Create → Pages → Connect to Git* → authorize GitHub → pick `Scripture-Memorization-App`.
 3. Settings:

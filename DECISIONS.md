@@ -8,6 +8,13 @@ Living log for the overnight/long-running improvement pass (started 2026-10-07).
 - **Rule:** every stage = branch → PR → CI green → merge → stage tag. Never merge red/skipped. Last green state is always `main`.
 - **Rollback to before this whole pass:** `git checkout v1.1.0-stable` (see "Rollback" below).
 
+## How to try the new version on your phone (≈10 minutes)
+1. **Back up first:** open the app → Settings → *Export backup* (or make sure sync is on).
+2. Open your live site in Safari (the new version is deployed automatically after each merge). If you use the home-screen app: open it while online; an **Update** bar appears at the top — tap it. *About* shows the version (should be **1.4.0**).
+3. Walk through [`docs/IOS-CHECKLIST.md`](docs/IOS-CHECKLIST.md): install/offline start, keyboard in Type mode and the reference step, no sticky highlights, nothing blocking taps after messages/dialogs, Light/Dark, and the optional features (sound, calendar reminders, Speak, sync).
+4. Things worth a look with your eyes: the calmer colours and larger verse text; the **Stats** tab (heatmap, “Nearly there”); finishing a review (result card, “All done for today”); Settings → *Feedback & celebrations* and *Daily reminders*; Search on **Piles**.
+5. If anything feels wrong, tell me which screen and what you did. To go back, see **Rollback**.
+
 ## Tags (rollback points)
 | Tag | Meaning |
 |---|---|
@@ -15,7 +22,10 @@ Living log for the overnight/long-running improvement pass (started 2026-10-07).
 | `v1.1.0` | NIV lookup via API.Bible |
 | `v1.1.0-stable` | **last known-good before this pass** (same commit as `v1.1.0`, `d588f84`) |
 | `vX.Y.Z` | auto-tagged by `release.yml` when a version bump merges to `main` |
-| `vX.Y.Z-<stage>` | stage tags added after each workstream (see below) |
+| `v1.2.0-ui` | after Workstream 1 (visual design) |
+| `v1.3.0-motivation` | after Workstream 2 (feedback, stats) |
+| `v1.4.0-features` | after Workstream 3 (search, reminders, safety nets) |
+| `v1.4.0-final` | the finished version of this pass |
 
 ## Phase 0 results
 1. **Stable tag:** `v1.1.0` already existed on `main`. The sandbox git connection **refuses to push new tags** (every attempt: "remote end hung up unexpectedly"), so I added `.github/workflows/tag.yml` — a manual, **add-only** workflow (refuses to move/overwrite a tag, only tags commits already on `main`) — and use it to create `v1.1.0-stable` and later stage tags. Named `v1.1.0-stable` rather than `v1.0.0-stable` because `main` is at 1.1.0.
@@ -79,11 +89,20 @@ Chosen because they are valuable and low-risk; no scheduling/data-shape changes 
 - **Tests:** new `unit/organize.test.ts`, `unit/reminders.test.ts`, `unit/nudges.test.ts`, `e2e/polish.spec.ts`; `offline-smoke` now also searches offline.
 - **Two existing e2e tests were edited (locators only, same assertions) because the UI intentionally changed — please review:** (1) `verses.spec.ts` topic-filter test: the "All" topic chip is now labelled "All topics". (2) `offline-backup-sync.spec.ts` restore test: `getByText('#Gospel')` now also matches the new topic filter chip on the pile page, so it is scoped to the verse card (`getByTestId('verse-card').getByText('#Gospel')`) — still proves the restored verse kept its topic.
 
+### Final stage — docs and a service-worker safety test
+- **New e2e test `update-flow.spec.ts`** (answers "service worker problems that break offline loading"): it builds two real versions (9.0.1 and 9.0.2) into a scratch folder, installs the first, adds a verse, "deploys" the second, and checks: the **Update** bar appears → tapping it loads the new version (About shows it) → the verse is still there → the app **still starts with the network off** afterwards. To support it, `vite.config.ts` accepts an `APP_VERSION_OVERRIDE` env var and `scripts/e2e-server.mjs` accepts `DIST_DIR`/`PORT` (test-only; normal builds are unaffected).
+- Docs: `docs/IOS-CHECKLIST.md`, README, CLAUDE.md (new modules, delegated-merge agreement, tag workflow, data-safety and design guard rails), `docs/SETUP.md` (create a *Pages* project, not a Worker; leave Root directory blank).
+
 ## Open questions for you
-_(none yet)_
+1. **iPhone checks I can't do:** keyboard behaviour in Type mode and the reference step, the `.ics` reminder download from the home-screen app, Speak mode, home-screen install/offline start, and the Update bar. All are on the checklist. Please tell me what you see.
+2. **Reminders:** is the calendar-file approach acceptable? True push notifications would need a small server (push keys + a scheduler), i.e. a new moving part and probably an account. I left that out on purpose.
+3. **API.Bible/NIV terms:** still not read by me (no access). Copyright text and usage reporting may be required; `functions/api/verse.js` returns the copyright text but the app doesn't store/show it yet.
+4. **Celebration defaults:** Full (confetti on big moments) is the default; sound and vibration default to off. Say if you'd prefer Calm by default.
+5. **Cloudflare:** the old Worker project's failed “Workers Builds” check is gone; confirm the Pages project's preview/production deploys look right from your side (I can only see the check result).
+6. **Branch protection:** `test` isn't marked *required* on `main` as far as I can tell; I only merged on green. Consider turning it on (README/SETUP explain).
 
 ## Needs a closer look
-_(none yet)_
+- _(nothing stuck.)_ Two timing flakes appeared in CI during the pass (the walkthrough "remembered" test and the streak test on a slow runner); both traced to the real non-atomic-save bug, fixed in v1.1.1 and not seen since. If a flake returns, it is worth a look rather than a retry.
 
 ## Rollback
 ```bash
