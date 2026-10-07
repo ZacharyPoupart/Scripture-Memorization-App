@@ -6,7 +6,7 @@ import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { handleSync } from '../functions/_lib/sync.js';
 
-const root = fileURLToPath(new URL('../dist/', import.meta.url));
+const root = process.env.DIST_DIR ? join(process.env.DIST_DIR, '/') : fileURLToPath(new URL('../dist/', import.meta.url));
 const port = Number(process.env.PORT || 4173);
 const MIME = {
   '.html': 'text/html; charset=utf-8',
