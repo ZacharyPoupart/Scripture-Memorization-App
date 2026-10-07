@@ -85,6 +85,8 @@ export function defaultSettings(): Settings {
     hapticsOn: false,
     celebrations: 'full',
     seenMilestones: [],
+    reminderTimes: ['08:00', '13:00', '19:00'],
+    nudgeDismissedAt: 0,
   };
 }
 

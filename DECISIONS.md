@@ -3,7 +3,7 @@
 Living log for the overnight/long-running improvement pass (started 2026-10-07). If the session is cut off, **read "Resume here" first**.
 
 ## Resume here
-- **Current stage:** Phase 0 merged (PR #2 save fix v1.1.1, PR #3 baseline). Workstream 1 (visual design, v1.2.0) in review; Workstream 2 (motivation/stats, v1.3.0) in progress on `feature/motivation`.
+- **Current stage:** Phase 0, Workstream 1 (v1.2.0) and Workstream 2 (v1.3.0) are merged and tagged. Workstream 3 (product features, v1.4.0) is in review on `feature/product-polish`; then final docs.
 - **Plan:** merge PR #2 (save-race fix, v1.1.1) → Workstream 1 (visual design, v1.2.0) → Workstream 2 (motivation & stats, v1.3.0) → Workstream 3 (product features, v1.4.0) → final docs/checklist.
 - **Rule:** every stage = branch → PR → CI green → merge → stage tag. Never merge red/skipped. Last green state is always `main`.
 - **Rollback to before this whole pass:** `git checkout v1.1.0-stable` (see "Rollback" below).
@@ -65,6 +65,18 @@ Other notes:
 - **Accessibility bug found by the new tests and fixed:** button groups on Settings were inside a `<label>`, so "Easy" / "Flashcard" were announced with the whole section label as their name. Now a labelled `role="group"`.
 - **Test changes:** none to existing tests. New: `unit/stats.test.ts`, `unit/feedback.test.ts`, `e2e/motivation.spec.ts` (+ a11y test in `comfort.spec.ts`, stats route in `offline-smoke.spec.ts`).
 
+
+### Workstream 3 — product features (v1.4.0)
+Chosen because they are valuable and low-risk; no scheduling/data-shape changes (new fields are device-local settings).
+- **Search, sort, filter** (All verses and each pile): words in text/topic/translation/reference, or a reference like `jn 3:16` / `ps 23:2` (matches ranges). Sort: *Longest in pile first* (default = the documented rule), Bible order, Newest added, Due soonest. "Ready now" filter. Remembered while the app is open. **Starting a pile review ignores the search** (counts and queue always use the whole pile) — covered by an e2e test.
+- **Topic management:** rename/merge/remove a topic across all verses, with Undo; it uses the normal edit timestamp so it syncs like any other edit.
+- **Reminders — honest limits:** an installed iPhone web app can only get push notifications from a server (a push service + keys), which would break "static files, no accounts". Local scheduled notifications aren't available to web apps. So Settings → Daily reminders builds a **calendar file (.ics)**: up to three repeating daily events with an alert; the iPhone Calendar delivers the alerts, offline. Stable event ids mean re-importing updates instead of duplicating. **Needs a real-iPhone check**: downloading a `.ics` from a home-screen web app can be flaky on iOS; the card says "if nothing happens, open this page in Safari".
+- **Friendlier failures:** a calm full-screen message if any screen ever fails to draw (data untouched; reload / export backup / go home). A test-only hook (`window.__mfl.crash`) makes this testable. "Erase all data" now has an **Undo** toast (it previously had only a typed confirmation).
+- **Backup nudge** on Home: only when ≥ 3 verses, sync is off and no export in 30 days; "Not now" silences it for 14 days. Replaces the older one-time tip.
+- **Accessibility:** dialogs now move focus in, trap Tab, close on Escape and return focus to what opened them; each screen sets a page title; e2e checks every visible control has an accessible name. (The Field/label bug is in WS2's notes.)
+- **Walkthrough** text mentions the Stats tab and the kinder freeze wording.
+- **Performance:** no change needed — the production bundle is ~110 KB (≈ 38 KB gzip), everything is local, and per-minute work is a cheap settle. Not measured on a real device.
+- **Tests:** new `unit/organize.test.ts`, `unit/reminders.test.ts`, `unit/nudges.test.ts`, `e2e/polish.spec.ts`; `offline-smoke` now also searches offline. No existing test changed.
 
 ## Open questions for you
 _(none yet)_

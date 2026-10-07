@@ -33,6 +33,8 @@ export interface AppState {
   online: boolean;
   recoveredFrom?: string;
   updateReady: boolean;
+  /** Test hook: makes a screen throw so the friendly error screen can be verified. */
+  debugCrash?: boolean;
 }
 
 const storage = new Storage();
@@ -55,6 +57,8 @@ let state: AppState = {
     hapticsOn: false,
     celebrations: 'full',
     seenMilestones: [],
+    reminderTimes: ['08:00', '13:00', '19:00'],
+    nudgeDismissedAt: 0,
   },
   tick: 0,
   toast: null,
@@ -212,9 +216,20 @@ export async function restoreSnapshot(key: string): Promise<boolean> {
   return true;
 }
 
+/** Erase everything on this device. The previous data is kept in memory and (as always) in the saved
+ *  "previous copy" + daily snapshots, so the toast can offer a real undo. */
 export function resetEverything() {
+  const before = state.data;
   set({ data: createData(Date.now()) });
   persist();
+  showToast('All data erased.', {
+    label: 'Undo',
+    run: () => {
+      set({ data: before });
+      persist();
+      scheduleSync();
+    },
+  });
 }
 
 export { BackupError };
@@ -318,7 +333,7 @@ export async function init(): Promise<void> {
 // For tests / debugging
 declare global {
   interface Window {
-    __mfl?: { getState: typeof getState; flush: typeof flushSaves };
+    __mfl?: { getState: typeof getState; flush: typeof flushSaves; crash: (v: boolean) => void };
   }
 }
-if (typeof window !== 'undefined') window.__mfl = { getState, flush: flushSaves };
+if (typeof window !== 'undefined') window.__mfl = { getState, flush: flushSaves, crash: (v: boolean) => set({ debugCrash: v }) };

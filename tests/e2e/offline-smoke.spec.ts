@@ -35,6 +35,11 @@ test('every screen loads and is clickable with the network off', async ({ page, 
     await page.goto(route);
     await expect(page.locator('main')).toContainText(heading);
   }
+  // searching works offline too
+  await page.goto('/#/piles');
+  await page.getByTestId('search').fill('loved');
+  await expect(page.getByTestId('verse-card')).toHaveCount(1);
+  await page.getByTestId('search').fill('');
   // tab bar is tappable offline
   await page.goto('/#/');
   await page.getByRole('link', { name: 'Settings' }).click();

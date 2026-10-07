@@ -74,12 +74,31 @@ export function CheckMark({ size = 56 }: { size?: number }) {
   );
 }
 
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 export function Overlay({ children, onClose, center, label }: { children: ComponentChildren; onClose?: () => void; center?: boolean; label?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose?.();
+    // Accessibility: move focus into the dialog, keep Tab inside it, and give focus back when it closes.
+    const opener = document.activeElement as HTMLElement | null;
+    const root = ref.current;
+    const items = () => [...(root?.querySelectorAll<HTMLElement>(FOCUSABLE) ?? [])].filter((el) => el.offsetParent !== null || el === document.activeElement);
+    if (root && !root.contains(document.activeElement)) (items().find((el) => el.matches('[autofocus], input')) ?? items()[0] ?? root).focus({ preventScroll: true });
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') return onClose?.();
+      if (e.key !== 'Tab') return;
+      const list = items();
+      if (!list.length) return e.preventDefault();
+      const first = list[0];
+      const last = list[list.length - 1];
+      if (e.shiftKey && (document.activeElement === first || !root?.contains(document.activeElement))) (e.preventDefault(), last.focus());
+      else if (!e.shiftKey && (document.activeElement === last || !root?.contains(document.activeElement))) (e.preventDefault(), first.focus());
+    };
     addEventListener('keydown', onKey);
-    return () => removeEventListener('keydown', onKey);
+    return () => {
+      removeEventListener('keydown', onKey);
+      if (opener && document.contains(opener)) opener.focus({ preventScroll: true });
+    };
   }, [onClose]);
   return (
     <div
@@ -88,6 +107,7 @@ export function Overlay({ children, onClose, center, label }: { children: Compon
       role="dialog"
       aria-modal="true"
       aria-label={label}
+      tabIndex={-1}
       onPointerDown={(e) => e.target === ref.current && onClose?.()}
     >
       {children}

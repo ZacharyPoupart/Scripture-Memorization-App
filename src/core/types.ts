@@ -87,6 +87,10 @@ export interface Settings {
   celebrations: 'full' | 'calm';
   /** Milestone ids already celebrated on this device (e.g. "streak:7:2026-03-01"). */
   seenMilestones: string[];
+  /** Times (HH:MM) used when building the optional calendar reminders file. */
+  reminderTimes: string[];
+  /** Last time the "back up your verses" nudge was dismissed (ms). */
+  nudgeDismissedAt: number;
 }
 
 export const TRANSLATIONS = ['ESV', 'NIV', 'NLT', 'NASB', 'NKJV', 'CSB', 'KJV', 'WEB'] as const;

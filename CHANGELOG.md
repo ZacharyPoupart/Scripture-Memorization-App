@@ -5,6 +5,16 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Added
+- **Search, sort and filter** on All verses and every pile (words, topics, references like "jn 3:16"; sort by longest in pile, Bible order, newest or due soonest; "Ready now"). Searching never changes what a pile review contains.
+- **Topic management:** rename, merge or remove a topic everywhere, with Undo.
+- **Daily reminders** through your Calendar app (a downloadable calendar file with up to three repeating alerts) — the honest way to remind on iPhone without a server.
+- A calm error screen if a screen ever fails to draw (your data is untouched), and **Undo** after "Erase all data".
+- A gentle backup nudge on Home (only with 3+ verses, no sync and no recent export; "Not now" waits two weeks).
+
+### Improved
+- Keyboard and screen-reader support: dialogs trap and restore focus and close with Escape; each screen has a page title.
+
 ## [1.3.0] - 2026-10-07
 
 ### Added
