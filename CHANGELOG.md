@@ -5,6 +5,19 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Added
+- **Stats screen (Progress tab):** current and longest streak, reviews completed, a 26-week calendar heatmap, verses per pile, "nearly there" verses, and streak history. Missed days look like rest days (no blame).
+- Review result card shows progress toward the next pile and today's due reviews; a calm "All done for today" moment ends a finished day.
+- Streak milestones (3, 7, 14, 30, 60, 100 … days) with celebrations that scale with the achievement; Settings → Celebrations: Full or Calm.
+- Optional quiet sounds and vibration on correct answers and finished reviews (both off by default; vibration is unavailable on iPhone web apps and says so).
+- Streak chip on Home opens the Progress screen.
+
+### Changed
+- Gentler wording around freezes ("a short pause, nothing is lost").
+
+### Fixed
+- Screen readers announced segmented buttons ("Easy", "Flashcard"…) with the whole section label; they now have their own names inside a labelled group.
+
 ## [1.2.0] - 2026-10-07
 
 ### Changed
