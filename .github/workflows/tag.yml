@@ -1,0 +1,45 @@
+name: Create stage tag
+
+# Creates a rollback tag (e.g. v1.1.0-stable, v1.2.0-ui) on a commit that is already on main.
+# It can only ADD tags: it refuses to move or replace an existing tag and never deletes anything.
+# Run it from the Actions tab ("Run workflow") or via the API.
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag name, e.g. v1.2.0-ui'
+        required: true
+      sha:
+        description: 'Commit to tag (must be on main)'
+        required: true
+      message:
+        description: 'Tag message'
+        required: false
+        default: 'Stage tag'
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Create the tag (add-only)
+        env:
+          TAG: ${{ inputs.tag }}
+          SHA: ${{ inputs.sha }}
+          MSG: ${{ inputs.message }}
+        run: |
+          set -euo pipefail
+          if ! [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[a-z0-9.]+)?$ ]]; then echo "Bad tag name: $TAG"; exit 1; fi
+          if ! [[ "$SHA" =~ ^[0-9a-f]{40}$ ]]; then echo "Need a full 40-character commit sha"; exit 1; fi
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then echo "Tag $TAG already exists; never moving tags."; exit 1; fi
+          git merge-base --is-ancestor "$SHA" origin/main || { echo "$SHA is not on main"; exit 1; }
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git tag -a "$TAG" "$SHA" -m "$MSG"
+          git push origin "refs/tags/$TAG"
+          echo "Created $TAG at $SHA"

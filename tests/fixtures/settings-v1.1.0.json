@@ -1,0 +1,13 @@
+{
+  "deviceId": "fixture-device",
+  "theme": "dark",
+  "defaultMode": "type",
+  "fillDifficulty": "hard",
+  "onboarded": true,
+  "syncCode": "",
+  "lastExportAt": 1767312000000,
+  "lastSyncAt": 0,
+  "seenLevelUps": [
+    "abc:weekly:2026-04-01"
+  ]
+}
