@@ -52,10 +52,10 @@ Every save keeps `data.prev`; one snapshot per day (7 kept). Imports validate ev
 Semantic versioning in `package.json` (shown in the app via `__APP_VERSION__`). Each PR that ships changes bumps the version and moves notes from `## [Unreleased]` in `CHANGELOG.md` (`npm run release -- patch|minor|major`). Merging to `main` deploys via Cloudflare Pages and `.github/workflows/release.yml` tags `vX.Y.Z` + creates a GitHub release. Rollback: see README ("Rolling back").
 
 ## Secrets
-None are needed to build, test or run. Never commit keys; use environment variables / gitignored `.env` (see `.env.example`).
+None are needed to build, test or run. Never commit keys; use environment variables / gitignored `.env` (see `.env.example`). The only runtime secret is the optional `API_BIBLE_KEY` (Cloudflare secret) used by `functions/api/verse.js` for NIV lookup; the client never sees it. If a key is ever pasted into chat or committed, tell the owner to rotate it.
 
 ## Known limitations / things to verify on a real iPhone
-- Verse lookup uses free public APIs (bible-api.com for KJV/WEB, bolls.life for the rest). They were coded to the documented response shapes but **not exercised against the live services from the build sandbox**; typing the text always works. Copyright of NIV/ESV/etc. text belongs to the publishers — fine for personal study, check terms before making the app public.
+- Verse lookup uses free public APIs (bible-api.com for KJV/WEB, bolls.life for the rest); NIV goes through our `/api/verse` function (API.Bible, needs the owner's key and NIV access, with bolls.life as backup). API.Bible's terms may require copyright display and usage (FUMS) reporting — copyright text is returned by the function but not yet stored or shown, and FUMS reporting is not implemented; the owner should read their terms. They were coded to the documented response shapes but **not exercised against the live services from the build sandbox**; typing the text always works. Copyright of NIV/ESV/etc. text belongs to the publishers — fine for personal study, check terms before making the app public.
 - "Speak it" uses the Web Speech API: experimental, behaviour on iOS home-screen apps varies.
 - On iOS the on-screen keyboard may need a tap on the text to re-open between verses in "Type it out" mode.
 - Playwright runs Chromium only (no WebKit): iOS Safari quirks need a real-device check on every preview.

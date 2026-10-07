@@ -11,3 +11,13 @@ declare module '*/functions/_lib/sync.js' {
     id: string,
   ): Promise<Response>;
 }
+
+declare module '*/functions/_lib/verse.js' {
+  export const USFM: string[];
+  export function clearBibleIdCache(): void;
+  export function handleVerse(
+    request: Request,
+    env: Record<string, string | undefined>,
+    fetchFn?: typeof fetch,
+  ): Promise<Response>;
+}

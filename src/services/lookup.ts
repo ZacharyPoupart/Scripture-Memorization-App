@@ -63,6 +63,35 @@ async function fromBibleApi(ref: Ref, translation: string, fetchFn: typeof fetch
   throw new LookupError('not-found', 'Passage not found.');
 }
 
+/** Licensed translations served by our own /api/verse function (API.Bible; the key stays on the server). */
+const SERVER_TRANSLATIONS = new Set(['NIV']);
+
+async function fromServer(ref: Ref, translation: string, fetchFn: typeof fetch, timeoutMs: number): Promise<string> {
+  const qs = new URLSearchParams({
+    translation,
+    book: String(ref.book),
+    chapter: String(ref.chapter),
+    start: String(ref.start),
+    end: String(ref.end),
+  });
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    const res = await fetchFn(`/api/verse?${qs}`, { signal: ctrl.signal });
+    const type = res.headers.get('content-type') ?? '';
+    // Not set up (501), missing (404 / the app's own page), blocked key, etc.: let the next source try.
+    if (!res.ok || !type.includes('json')) throw new LookupError('unavailable', 'Server lookup not available.');
+    const data = (await res.json()) as { text?: string };
+    if (!data.text) throw new LookupError('not-found', 'Passage not found.');
+    return data.text;
+  } catch (e) {
+    if (e instanceof LookupError) throw e;
+    throw new LookupError('offline', 'Could not reach the lookup service.');
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export async function lookupPassage(
   ref: Ref,
   translation: string,
@@ -72,7 +101,9 @@ export async function lookupPassage(
   const timeoutMs = opts.timeoutMs ?? 10_000;
   const providers = BIBLE_API_CODES[translation]
     ? [() => fromBibleApi(ref, translation, fetchFn, timeoutMs), () => fromBolls(ref, translation, fetchFn, timeoutMs)]
-    : [() => fromBolls(ref, translation, fetchFn, timeoutMs)];
+    : SERVER_TRANSLATIONS.has(translation)
+      ? [() => fromServer(ref, translation, fetchFn, timeoutMs), () => fromBolls(ref, translation, fetchFn, timeoutMs)]
+      : [() => fromBolls(ref, translation, fetchFn, timeoutMs)];
   let last: LookupError | null = null;
   for (const run of providers) {
     try {

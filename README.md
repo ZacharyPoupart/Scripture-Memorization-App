@@ -59,6 +59,13 @@ Sync stores one encrypted blob per link code in Cloudflare KV. In Cloudflare: *W
 
 Privacy: data is encrypted on your device (AES-GCM, key derived from your 20-character code) before upload; the server only stores ciphertext under an id derived from the code. Anyone with the code can read the data, so keep it private. Free-tier KV allows 1,000 writes/day; the app only writes when something changed and batches changes.
 
+### NIV text via API.Bible (optional)
+NIV isn't free to look up, so it goes through API.Bible with *your* key, held server-side:
+1. Get a key at https://scripture.api.bible and make sure your account has access to the NIV (their terms apply, including any copyright/usage-reporting requirements).
+2. Cloudflare → your Pages project → *Settings → Variables and Secrets → Add* → name `API_BIBLE_KEY`, type **Secret**, for Production (and Preview if you want it there) → redeploy.
+3. Add a verse with translation NIV; the text should appear. If the key is missing or the NIV isn't in your account, the app quietly tries its backup source, and you can always paste the text.
+Anyone who finds `/api/verse` can use your quota, so requests are strictly validated and limited to 40 verses; keep an eye on usage in your API.Bible dashboard.
+
 ## Versions and releases
 - Version `MAJOR.MINOR.PATCH` lives in `package.json`, is shown in **Settings → About**, and `CHANGELOG.md` keeps a short history.
 - To release: on your branch add notes under `## [Unreleased]`, run `npm run release -- patch` (or `minor`/`major`), open a PR. When it merges to `main`, Cloudflare deploys it and a GitHub Action tags `vX.Y.Z` and publishes a GitHub release.
