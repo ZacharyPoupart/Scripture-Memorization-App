@@ -5,6 +5,7 @@ import { dayKeyOf } from './core/dates.ts';
 import { mergeData } from './core/merge.ts';
 import { createData, recordReview, settle } from './core/schedule.ts';
 import type { AppData, LevelUp, Settings } from './core/types.ts';
+import { setFeedbackPrefs } from './services/feedback.ts';
 import { Storage, requestPersistence } from './services/storage.ts';
 import { runSync, stable, SyncError } from './services/sync.ts';
 import { generateSyncCode, normalizeSyncCode } from './services/syncCrypto.ts';
@@ -50,6 +51,10 @@ let state: AppState = {
     lastExportAt: 0,
     lastSyncAt: 0,
     seenLevelUps: [],
+    soundOn: false,
+    hapticsOn: false,
+    celebrations: 'full',
+    seenMilestones: [],
   },
   tick: 0,
   toast: null,
@@ -121,6 +126,11 @@ export function updateSettings(patch: Partial<Settings>) {
   set({ settings: { ...state.settings, ...patch } });
   persistSettings();
   applyTheme();
+  setFeedbackPrefs({ sound: state.settings.soundOn, haptics: state.settings.hapticsOn });
+}
+
+export function markMilestoneSeen(id: string) {
+  updateSettings({ seenMilestones: [...state.settings.seenMilestones, id].slice(-300) });
 }
 
 export function markLevelUpsSeen(ids: string[]) {
@@ -285,6 +295,7 @@ export async function init(): Promise<void> {
   settle(next, Date.now());
   state = { ...state, data: next, sync: settings.syncCode ? { kind: 'idle' } : { kind: 'off' } };
   applyTheme();
+  setFeedbackPrefs({ sound: settings.soundOn, haptics: settings.hapticsOn });
   persist();
   set({ ready: true });
   void requestPersistence();

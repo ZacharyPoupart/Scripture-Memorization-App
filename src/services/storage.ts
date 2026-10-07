@@ -81,6 +81,10 @@ export function defaultSettings(): Settings {
     lastExportAt: 0,
     lastSyncAt: 0,
     seenLevelUps: [],
+    soundOn: false,
+    hapticsOn: false,
+    celebrations: 'full',
+    seenMilestones: [],
   };
 }
 

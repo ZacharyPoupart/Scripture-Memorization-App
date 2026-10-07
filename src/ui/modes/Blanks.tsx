@@ -3,6 +3,7 @@ import { formatRef } from '../../core/reference.ts';
 import { difficultyFor, isCorrectChoice, makeBlanks, makeRng } from '../../core/quiz.ts';
 import { useApp } from '../../store.ts';
 import { centerIn, useShake } from '../dom.ts';
+import { feedback } from '../../services/feedback.ts';
 import { Dock, MistakeDots, type ModeProps } from './shared.tsx';
 
 export function Blanks({ verse, onMistake, onDone, mistakes }: ModeProps) {
@@ -27,6 +28,7 @@ export function Blanks({ verse, onMistake, onDone, mistakes }: ModeProps) {
   const choose = (opt: string) => {
     if (!current) return;
     if (isCorrectChoice(current, opt)) {
+      feedback.correct();
       setWrong([]);
       setFilled(filled + 1);
     } else {

@@ -1,6 +1,7 @@
 import { useState } from 'preact/hooks';
 import { formatRef } from '../../core/reference.ts';
 import { mistakesAllowed } from '../../core/quiz.ts';
+import { feedback } from '../../services/feedback.ts';
 import { Dock, MistakeDots, type ModeProps } from './shared.tsx';
 
 export function Flashcard({ verse, onMistake, onDone, onRestart, mistakes }: ModeProps) {
@@ -37,7 +38,14 @@ export function Flashcard({ verse, onMistake, onDone, onRestart, mistakes }: Mod
           </button>
         ) : (
           <div class={canAlmost ? 'grid3' : 'grid2'}>
-            <button class="btn good" onClick={onDone} data-testid="grade-good">
+            <button
+              class="btn good"
+              onClick={() => {
+                feedback.correct();
+                onDone();
+              }}
+              data-testid="grade-good"
+            >
               Nailed it
             </button>
             {canAlmost && (

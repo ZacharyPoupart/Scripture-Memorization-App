@@ -10,6 +10,7 @@ const ROUTES: [string, RegExp][] = [
   ['/#/add', /Add a verse/],
   ['/#/settings', /Settings/],
   ['/#/about', /About/],
+  ['/#/stats', /Progress/],
   ['/#/pile/daily', /Daily/],
 ];
 

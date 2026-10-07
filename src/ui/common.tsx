@@ -24,6 +24,7 @@ const ICONS: Record<string, string> = {
   check: 'M5 12.5l4.5 4.5L19 7.5',
   external: 'M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5',
   more: 'M5 12h.01M12 12h.01M19 12h.01',
+  chart: 'M5 20V11M12 20V4M19 20v-6',
 };
 
 export function Icon({ name, fill }: { name: keyof typeof ICONS | string; fill?: boolean }) {
@@ -47,6 +48,29 @@ export function Seg<T extends string>({ value, options, onChange, label }: { val
         </button>
       ))}
     </div>
+  );
+}
+
+export function Toggle({ label, hint, checked, onChange, disabled, testid }: { label: string; hint?: string; checked: boolean; onChange: (v: boolean) => void; disabled?: boolean; testid?: string }) {
+  return (
+    <div class="row spread toggle-row">
+      <div class="grow">
+        <div>{label}</div>
+        {hint && <div class="hint-text">{hint}</div>}
+      </div>
+      <button type="button" role="switch" aria-checked={checked} aria-label={label} class="switch" disabled={disabled} onClick={() => onChange(!checked)} data-testid={testid}>
+        <i />
+      </button>
+    </div>
+  );
+}
+
+export function CheckMark({ size = 56 }: { size?: number }) {
+  return (
+    <svg class="checkmark" width={size} height={size} viewBox="0 0 52 52" aria-hidden="true">
+      <circle cx="26" cy="26" r="24" fill="none" stroke="currentColor" stroke-width="3" opacity="0.25" />
+      <path d="M15 27l8 8 15-17" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
   );
 }
 
@@ -91,8 +115,8 @@ export function Confirm({ title, body, confirmLabel, danger, onConfirm, onCancel
 }
 
 const CONFETTI_COLORS = ['#e9b44c', '#2f8a8f', '#e07a5f', '#81b29a', '#6c63ff', '#f2cc8f'];
-export function Confetti() {
-  const pieces = Array.from({ length: 46 }, (_, i) => ({
+export function Confetti({ count = 46 }: { count?: number }) {
+  const pieces = Array.from({ length: count }, (_, i) => ({
     left: (i * 37) % 100,
     delay: (i % 12) * 0.08,
     dur: 2.2 + ((i * 13) % 10) / 10,

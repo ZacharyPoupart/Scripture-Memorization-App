@@ -79,6 +79,14 @@ export interface Settings {
   lastExportAt: number;
   lastSyncAt: number;
   seenLevelUps: string[];
+  /** Quiet sound on correct answers / completed reviews. Off by default. */
+  soundOn: boolean;
+  /** Short vibration where the device supports it (not iOS Safari). Off by default. */
+  hapticsOn: boolean;
+  /** 'full' = confetti for big moments; 'calm' = quiet notes only, no confetti. */
+  celebrations: 'full' | 'calm';
+  /** Milestone ids already celebrated on this device (e.g. "streak:7:2026-03-01"). */
+  seenMilestones: string[];
 }
 
 export const TRANSLATIONS = ['ESV', 'NIV', 'NLT', 'NASB', 'NKJV', 'CSB', 'KJV', 'WEB'] as const;

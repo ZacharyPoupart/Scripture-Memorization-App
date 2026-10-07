@@ -9,6 +9,7 @@ import { Onboarding } from './Onboarding.tsx';
 import { PilePage, PilesOverview } from './Piles.tsx';
 import { Review } from './Review.tsx';
 import { Settings } from './Settings.tsx';
+import { Stats } from './Stats.tsx';
 import { TabBar, ToastHost, UpdateBanner, useVisibleViewport } from './Shell.tsx';
 import { VerseDetail } from './VerseDetail.tsx';
 import { PILES, type Pile } from '../core/types.ts';
@@ -31,6 +32,7 @@ export function App({ onReload }: { onReload: () => void }) {
   else if (a === 'add') (screen = <AddVerse key="add" />), (tab = '/add');
   else if (a === 'edit' && b) (screen = <AddVerse key={`edit-${b}`} editId={b} />), (tab = '/piles');
   else if (a === 'review') screen = <Review route={route} key={route.query.toString()} />;
+  else if (a === 'stats') (screen = <Stats />), (tab = '/stats');
   else if (a === 'settings') (screen = <Settings onShowIntro={() => setIntro(true)} />), (tab = '/settings');
   else if (a === 'about') (screen = <About onShowIntro={() => setIntro(true)} />), (tab = '/settings');
   else screen = <Home />;
