@@ -5,8 +5,11 @@ A calm, offline-first app for memorizing Bible verses and **keeping them memoriz
 - Installs to your iPhone home screen and runs full screen; works completely offline once installed.
 - Add a verse or range (book, chapter, verses), pick a translation, text is looked up automatically when online — or type/paste it any time.
 - Four review modes (flashcard, fill in the blank, type first letters, speak it) + recalling *where* the verse is.
-- Streaks, a gentle 3-day freeze, level-up celebrations, light/dark mode.
+- Streaks, a gentle 3-day freeze, a Progress tab (streak history, calendar heatmap, what's nearly ready to move up), level-up and streak celebrations that scale with the achievement, light/dark mode (follows your phone).
+- Search, sort and filter your verses; rename topics; daily reminders through your Calendar app.
 - Export/import backups; optional private sync between your phone and computer with a link code (no email/password).
+
+**Trying a new version on your iPhone?** Use [docs/IOS-CHECKLIST.md](docs/IOS-CHECKLIST.md). Changes and reasoning are logged in [DECISIONS.md](DECISIONS.md).
 
 **Setting it up for the first time?** Follow [docs/SETUP.md](docs/SETUP.md) (GitHub → Cloudflare → install on your phone).
 
@@ -71,6 +74,8 @@ Anyone who finds `/api/verse` can use your quota, so requests are strictly valid
 - To release: on your branch add notes under `## [Unreleased]`, run `npm run release -- patch` (or `minor`/`major`), open a PR. When it merges to `main`, Cloudflare deploys it and a GitHub Action tags `vX.Y.Z` and publishes a GitHub release.
 
 ### Rolling back
+**Stable tags:** `v1.1.0-stable` is the last version before the 2026-10 improvement pass; each stage has a tag (`v1.2.0-ui`, `v1.3.0-motivation`, `v1.4.0-features`, `v1.4.0-final`). Tags are added by the *Create stage tag* workflow (Actions tab → Run workflow).
+
 Roll back first, then fix.
 1. **Fastest (30 seconds):** Cloudflare dashboard → your Pages project → *Deployments* → find the last good deployment → **⋯ → Rollback to this deployment**. The live site is the old version immediately. Your data lives on your devices and isn't touched.
 2. **In Git (so `main` matches what's live):**
