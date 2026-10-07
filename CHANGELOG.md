@@ -14,6 +14,12 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 ### Added
 - Tests: colour-contrast guard, comfort/readability/overlay checks, and an offline smoke test that visits every screen with the network off.
 
+## [1.1.1] - 2026-10-07
+
+### Fixed
+- Saving is now a single atomic write (new data, previous copy and daily snapshot together, with no read first), so closing or reloading the app a moment after finishing a review can no longer lose it.
+- After recovering from a damaged save file, the good copy is kept as the "previous" copy instead of being overwritten by the damaged one.
+
 ## [1.1.0] - 2026-10-07
 
 ### Added

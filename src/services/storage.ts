@@ -9,9 +9,11 @@ import { uid } from '../core/ids.ts';
 const DB_NAME = 'memorize-for-life';
 const STORE = 'kv';
 
-interface Backend {
+export interface Backend {
   get(key: string): Promise<string | undefined>;
   set(key: string, value: string): Promise<void>;
+  /** Write several keys atomically (one transaction): all land or none do. */
+  setMany(entries: [string, string][]): Promise<void>;
   del(key: string): Promise<void>;
   keys(): Promise<string[]>;
 }
@@ -39,6 +41,17 @@ function idbBackend(): Backend | null {
   return {
     get: (k) => run('readonly', (s) => s.get(k) as IDBRequest<string | undefined>),
     set: async (k, v) => void (await run('readwrite', (s) => s.put(v, k))),
+    setMany: async (entries) => {
+      const db = await open();
+      await new Promise<void>((resolve, reject) => {
+        const tx = db.transaction(STORE, 'readwrite');
+        const store = tx.objectStore(STORE);
+        for (const [k, v] of entries) store.put(v, k);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+        tx.onabort = () => reject(tx.error);
+      });
+    },
     del: async (k) => void (await run('readwrite', (s) => s.delete(k))),
     keys: async () => (await run('readonly', (s) => s.getAllKeys())).map(String),
   };
@@ -49,6 +62,9 @@ function localStorageBackend(): Backend {
   return {
     get: async (k) => localStorage.getItem(P + k) ?? undefined,
     set: async (k, v) => localStorage.setItem(P + k, v),
+    setMany: async (entries) => {
+      for (const [k, v] of entries) localStorage.setItem(P + k, v);
+    },
     del: async (k) => localStorage.removeItem(P + k),
     keys: async () => Object.keys(localStorage).filter((k) => k.startsWith(P)).map((k) => k.slice(P.length)),
   };
@@ -103,7 +119,11 @@ export class Storage {
       const raw = await this.backend.get(key);
       if (!raw) continue;
       try {
-        return { data: normalizeData(JSON.parse(raw)), recoveredFrom: key === 'data' ? undefined : key };
+        const data = normalizeData(JSON.parse(raw));
+        // Remember which copy is the good one, so the next save keeps it as "previous" (never a damaged file).
+        this.lastData = raw;
+        this.haveLastData = true;
+        return { data, recoveredFrom: key === 'data' ? undefined : key };
       } catch {
         /* try next */
       }
@@ -111,17 +131,39 @@ export class Storage {
     return { data: createData(now) };
   }
 
+  // What is on disk right now, remembered so a save needs no read first. Every step between
+  // "the user finished something" and "it is on disk" is a chance to lose it if the app closes,
+  // so a save is exactly ONE atomic write: the new data, the previous copy, and (once a day) a snapshot.
+  private lastData: string | undefined;
+  private haveLastData = false;
+  private snapKeys: Set<string> | undefined;
+
   async saveData(data: AppData, today: string): Promise<void> {
-    const prev = await this.backend.get('data');
     const next = JSON.stringify(data);
+    if (!this.haveLastData) {
+      this.lastData = await this.backend.get('data');
+      this.haveLastData = true;
+    }
+    const prev = this.lastData;
     if (prev === next) return;
-    if (prev) await this.backend.set('data.prev', prev);
-    await this.backend.set('data', next);
+    this.snapKeys ??= new Set((await this.backend.keys()).filter((k) => k.startsWith('snap:')));
+
+    const entries: [string, string][] = [['data', next]];
+    if (prev) entries.push(['data.prev', prev]);
     const snapKey = `snap:${today}`;
-    if (!(await this.backend.get(snapKey)) && prev) {
-      await this.backend.set(snapKey, prev);
-      const snaps = (await this.backend.keys()).filter((k) => k.startsWith('snap:')).sort();
-      for (const old of snaps.slice(0, Math.max(0, snaps.length - 7))) await this.backend.del(old);
+    const addSnapshot = !!prev && !this.snapKeys.has(snapKey);
+    if (addSnapshot) entries.push([snapKey, prev as string]);
+
+    await this.backend.setMany(entries); // throws => nothing changed, cache untouched, next save retries
+    this.lastData = next;
+    if (addSnapshot) {
+      this.snapKeys.add(snapKey);
+      // Tidying old snapshots is not urgent; it never delays or endangers the save itself.
+      const old = [...this.snapKeys].sort().slice(0, Math.max(0, this.snapKeys.size - 7));
+      for (const k of old) {
+        this.snapKeys.delete(k);
+        void this.backend.del(k).catch(() => {});
+      }
     }
   }
 

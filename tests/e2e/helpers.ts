@@ -102,3 +102,8 @@ export async function installFakeSpeech(page: Page, transcript: string) {
     (window as any).SpeechRecognition = FakeRecognition;
   }, transcript);
 }
+
+/** Wait until everything the app has done so far is safely on disk (what a real pause between taps does). */
+export async function saved(page: Page) {
+  await page.evaluate(() => (window as any).__mfl.flush());
+}
