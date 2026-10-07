@@ -603,7 +603,9 @@ textarea.input {
   animation: rise 0.2s ease;
 }
 .toast.no-tabs {
-  bottom: calc(var(--safe-bottom) + 14px);
+  /* during a review the bottom belongs to the answer buttons: show messages at the top instead */
+  bottom: auto;
+  top: calc(var(--safe-top) + 64px);
 }
 .toast button {
   background: none;

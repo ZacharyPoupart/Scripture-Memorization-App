@@ -1,0 +1,30 @@
+name: Tag release
+
+# When a merge to main carries a new version in package.json, tag it and create a GitHub release
+# (notes come from CHANGELOG.md). Rolling back = deploying an earlier tag (see README).
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Create tag and release if this version is new
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          TAG="v$VERSION"
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "$TAG already exists; nothing to do."
+            exit 0
+          fi
+          node scripts/release.mjs notes "$VERSION" > release-notes.md
+          gh release create "$TAG" --target "$GITHUB_SHA" --title "Memorize For Life $TAG" --notes-file release-notes.md

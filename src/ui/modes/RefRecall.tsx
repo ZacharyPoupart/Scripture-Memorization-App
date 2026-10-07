@@ -56,7 +56,7 @@ export function RefRecall({ verse, onMistake, onDone, onRestart, mistakes }: Mod
             <div class="grid3">
               <input class="input" type="number" inputMode="numeric" placeholder="Chapter" aria-label="Chapter" value={chapter} onInput={(e) => setChapter(e.currentTarget.value)} data-testid="ref-chapter" />
               <input class="input" type="number" inputMode="numeric" placeholder="Verse" aria-label="Verse" value={start} onInput={(e) => setStart(e.currentTarget.value)} data-testid="ref-start" />
-              <input class="input" type="number" inputMode="numeric" placeholder="to (if range)" aria-label="Last verse of a range" value={end} onInput={(e) => setEnd(e.currentTarget.value)} data-testid="ref-end" />
+              <input class="input" type="number" inputMode="numeric" placeholder="To" aria-label="Last verse of a range" value={end} onInput={(e) => setEnd(e.currentTarget.value)} data-testid="ref-end" />
             </div>
             {message && (
               <div class="error-text" role="alert" data-testid="ref-message">

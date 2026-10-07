@@ -18,7 +18,9 @@
     "test:all": "npm run typecheck && npm run test && npm run build && npm run test:e2e",
     "gen:icons": "node scripts/gen-icons.mjs",
     "gen:versification": "node scripts/gen-versification.mjs",
-    "release": "node scripts/release.mjs"
+    "release": "node scripts/release.mjs bump",
+    "dev:lan": "vite --host 0.0.0.0 --port 5173",
+    "preview:lan": "npm run build && vite preview --host 0.0.0.0 --port 4173"
   },
   "dependencies": {
     "preact": "^11.0.0"
