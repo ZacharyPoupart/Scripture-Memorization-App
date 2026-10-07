@@ -91,6 +91,9 @@ function persist() {
     .catch((e) => console.error('save failed', e));
 }
 
+/** Resolves once everything saved so far is on disk (used by tests and before risky transitions). */
+export const flushSaves = (): Promise<void> => saveChain;
+
 function persistSettings() {
   const s = state.settings;
   saveChain = saveChain.then(() => storage.saveSettings(s)).catch((e) => console.error('settings save failed', e));
@@ -304,7 +307,7 @@ export async function init(): Promise<void> {
 // For tests / debugging
 declare global {
   interface Window {
-    __mfl?: { getState: typeof getState };
+    __mfl?: { getState: typeof getState; flush: typeof flushSaves };
   }
 }
-if (typeof window !== 'undefined') window.__mfl = { getState };
+if (typeof window !== 'undefined') window.__mfl = { getState, flush: flushSaves };

@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { addVerse, answerReference, blockLookups, JOHN316, openApp } from './helpers';
+import { addVerse, answerReference, blockLookups, JOHN316, openApp, saved } from './helpers';
 
 // These drive the real app with a controlled clock to check the day-based rules end to end.
 // (The exhaustive rule tests are unit tests; this proves the UI is wired to them.)
@@ -14,6 +14,7 @@ async function oneReview(page: Page) {
   await page.getByTestId('grade-good').click();
   await answerReference(page, JOHN316);
   await expect(page.getByTestId('verse-result')).toBeVisible();
+  await saved(page);
 }
 
 async function travel(page: Page, iso: string) {

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { addVerse, blockLookups, JOHN316, JOHN_TEXT, openApp, PSALM23_1, ROMANS8_28 } from './helpers';
+import { addVerse, blockLookups, JOHN316, JOHN_TEXT, openApp, PSALM23_1, ROMANS8_28, saved } from './helpers';
 
 test.describe('adding, editing and organizing verses', () => {
   test('first-run walkthrough can be skipped, finished and reopened', async ({ page }) => {
@@ -9,6 +9,7 @@ test.describe('adding, editing and organizing verses', () => {
     for (let i = 0; i < 4; i++) await page.getByTestId('onboarding-next').click();
     await page.getByTestId('onboarding-next').click(); // "Get started"
     await expect(page.getByTestId('onboarding')).toBeHidden();
+    await saved(page);
     await page.reload();
     await expect(page.getByTestId('onboarding')).toBeHidden(); // remembered
     await page.goto('/#/settings');
