@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-10-07
+
 ### Added
 - **Search, sort and filter** on All verses and every pile (words, topics, references like "jn 3:16"; sort by longest in pile, Bible order, newest or due soonest; "Ready now"). Searching never changes what a pile review contains.
 - **Topic management:** rename, merge or remove a topic everywhere, with Undo.
