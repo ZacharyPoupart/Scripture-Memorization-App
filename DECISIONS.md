@@ -89,6 +89,10 @@ Chosen because they are valuable and low-risk; no scheduling/data-shape changes 
 - **Tests:** new `unit/organize.test.ts`, `unit/reminders.test.ts`, `unit/nudges.test.ts`, `e2e/polish.spec.ts`; `offline-smoke` now also searches offline.
 - **Two existing e2e tests were edited (locators only, same assertions) because the UI intentionally changed — please review:** (1) `verses.spec.ts` topic-filter test: the "All" topic chip is now labelled "All topics". (2) `offline-backup-sync.spec.ts` restore test: `getByText('#Gospel')` now also matches the new topic filter chip on the pile page, so it is scoped to the verse card (`getByTestId('verse-card').getByText('#Gospel')`) — still proves the restored verse kept its topic.
 
+### Final stage — docs and a service-worker safety test
+- **New e2e test `update-flow.spec.ts`** (answers "service worker problems that break offline loading"): it builds two real versions (9.0.1 and 9.0.2) into a scratch folder, installs the first, adds a verse, "deploys" the second, and checks: the **Update** bar appears → tapping it loads the new version (About shows it) → the verse is still there → the app **still starts with the network off** afterwards. To support it, `vite.config.ts` accepts an `APP_VERSION_OVERRIDE` env var and `scripts/e2e-server.mjs` accepts `DIST_DIR`/`PORT` (test-only; normal builds are unaffected).
+- Docs: `docs/IOS-CHECKLIST.md`, README, CLAUDE.md (new modules, delegated-merge agreement, tag workflow, data-safety and design guard rails), `docs/SETUP.md` (create a *Pages* project, not a Worker; leave Root directory blank).
+
 ## Open questions for you
 1. **iPhone checks I can't do:** keyboard behaviour in Type mode and the reference step, the `.ics` reminder download from the home-screen app, Speak mode, home-screen install/offline start, and the Update bar. All are on the checklist. Please tell me what you see.
 2. **Reminders:** is the calendar-file approach acceptable? True push notifications would need a small server (push keys + a scheduler), i.e. a new moving part and probably an account. I left that out on purpose.
