@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.8.3] - 2026-10-08
+
 ### Fixed
 - Better support for older iPhones: the app is now built for iOS 14+ browsers, has a fallback for a feature missing before iOS 15.4, and the flashcard "uncover" blocks have a fallback colour before iOS 16.2.
 
