@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
+import { dayKeyOf } from '../core/dates.ts';
+import { isPaused } from '../core/schedule.ts';
 import { TRANSLATIONS, type AppData, type FillDifficulty, type ThemePref } from '../core/types.ts';
 import { cryptoAvailable } from '../services/syncCrypto.ts';
 import { navigate } from '../router.ts';
@@ -14,6 +16,8 @@ import {
   restoreSnapshot,
   setPrefs,
   showToast,
+  startBreak,
+  stopBreak,
   syncNow,
   updateSettings,
   useApp,
@@ -325,6 +329,55 @@ function BackupCard() {
   );
 }
 
+const BREAK_CHOICES = [
+  { days: 3, label: '3 days' },
+  { days: 7, label: 'A week' },
+  { days: 14, label: '2 weeks' },
+  { days: 30, label: 'A month' },
+];
+
+/** "Take a break": nothing is due, the streak waits, nothing freezes, nothing is lost. */
+function BreakCard() {
+  const { data } = useApp();
+  const today = dayKeyOf(Date.now());
+  const active = isPaused(data, today);
+  const [days, setDays] = useState(7);
+  const until = data.pause ? new Date(data.pause.until + 'T12:00:00').toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' }) : '';
+  return (
+    <div class="card stack" data-testid="break-card">
+      <h2>Take a break</h2>
+      {active ? (
+        <>
+          <p style={{ margin: 0 }} data-testid="break-status">
+            On a break until {until}. Nothing is due, your streak waits, and nothing is lost.
+          </p>
+          <button class="btn" onClick={stopBreak} data-testid="break-end">
+            End the break now
+          </button>
+        </>
+      ) : (
+        <>
+          <p class="muted" style={{ margin: 0 }}>
+            Away or busy? Pause for a while: nothing is due, your streak waits, and nothing freezes. Verses just don't move up while you're away.
+          </p>
+          <div class="row">
+            <select class="input grow" aria-label="Length of the break" value={days} onChange={(e) => setDays(Number(e.currentTarget.value))} data-testid="break-length">
+              {BREAK_CHOICES.map((c) => (
+                <option key={c.days} value={c.days}>
+                  {c.label}
+                </option>
+              ))}
+            </select>
+            <button class="btn primary" onClick={() => startBreak(days)} data-testid="break-start">
+              Start break
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 const SPACING_PRESETS = [
   { hours: 0, label: 'No wait' },
   { hours: 0.5, label: '30 minutes' },
@@ -413,6 +466,8 @@ export function Settings({ onShowIntro }: { onShowIntro: () => void }) {
             onChange={(theme) => updateSettings({ theme })}
           />
         </div>
+
+        <BreakCard />
 
         <div class="card stack">
           <h2>Reviewing</h2>

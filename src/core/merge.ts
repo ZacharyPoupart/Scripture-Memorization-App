@@ -78,7 +78,9 @@ export function mergeData(a: AppData, b: AppData): AppData {
 
   const prefs = pickLater(a.prefs.at, b.prefs.at, a.prefs, b.prefs, jsonTie);
 
-  return {
+  const pause = a.pause && b.pause ? pickLater(a.pause.at, b.pause.at, a.pause, b.pause, jsonTie) : (a.pause ?? b.pause);
+
+  const merged: AppData = {
     schema: 1,
     createdDay: a.createdDay <= b.createdDay ? a.createdDay : b.createdDay,
     verses,
@@ -89,4 +91,6 @@ export function mergeData(a: AppData, b: AppData): AppData {
     reviewsByDevice,
     prefs: { value: { ...prefs.value }, at: Math.max(a.prefs.at, b.prefs.at) },
   };
+  if (pause) merged.pause = { ...pause };
+  return merged;
 }

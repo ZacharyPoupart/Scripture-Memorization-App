@@ -1,11 +1,11 @@
-import { formatDuration } from '../core/dates.ts';
+import { dayKeyOf, formatDuration } from '../core/dates.ts';
 import { formatRef } from '../core/reference.ts';
 import { nextReviewInfo } from '../core/today.ts';
-import { daysUntilFreeze, isFrozen, liveVerses, pileVerses, streakInfo, todaySummary, verseStatus } from '../core/schedule.ts';
+import { daysUntilFreeze, isFrozen, isPaused, liveVerses, pileVerses, streakInfo, todaySummary, verseStatus } from '../core/schedule.ts';
 import { PILES } from '../core/types.ts';
 import { navigate } from '../router.ts';
 import { shouldNudgeBackup } from '../core/nudges.ts';
-import { downloadBackup, updateSettings, useApp } from '../store.ts';
+import { downloadBackup, stopBreak, updateSettings, useApp } from '../store.ts';
 import { Icon, PILE_INFO } from './common.tsx';
 import { ModePicker } from './ModePicker.tsx';
 
@@ -15,7 +15,8 @@ export function Home() {
   const verses = liveVerses(data);
   const today = todaySummary(data, now);
   const streak = streakInfo(data, now);
-  const frozen = isFrozen(data, now) && verses.length > 0;
+  const onBreak = isPaused(data, dayKeyOf(now));
+  const frozen = isFrozen(data, now) && verses.length > 0 && !onBreak;
   const untilFreeze = daysUntilFreeze(data, now);
   const readyAll = verses.filter((v) => verseStatus(data, v, now).state === 'ready').length;
   const pct = today.total ? Math.round((today.met / today.total) * 100) : 100;
@@ -31,16 +32,19 @@ export function Home() {
           ? 'Next review: tomorrow.'
           : `Next review: ${new Date(next.day + 'T12:00:00').toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}.`
         : '';
-  const headline =
-    readyAll > 0
+  const breakEnds = data.pause ? new Date(data.pause.until + 'T12:00:00').toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' }) : '';
+  const headline = onBreak
+    ? 'On a break'
+    : readyAll > 0
       ? `${readyAll} verse${readyAll === 1 ? '' : 's'} to review`
       : todayList.some(({ s }) => s.state === 'waiting')
         ? 'Done for now'
         : today.outcome === 'c' || today.total > 0 || todayList.length > 0
         ? 'All done for today!'
         : 'Nothing due today';
-  const subline =
-    readyAll > 0
+  const subline = onBreak
+    ? `Until ${breakEnds}. Your streak and progress are resting; nothing is lost. Review any time you like.`
+    : readyAll > 0
       ? today.remaining > readyAll
         ? `${today.remaining - readyAll} more unlock later today`
         : 'Aim for three a day; one keeps your streak.'
@@ -99,7 +103,7 @@ export function Home() {
               days toward their next pile again.
             </div>
           )}
-          {!frozen && untilFreeze !== null && untilFreeze <= 1 && today.total > 0 && (
+          {!frozen && !onBreak && untilFreeze !== null && untilFreeze <= 1 && today.total > 0 && (
             <div class="banner">A review today keeps your verses moving. (After 3 days without one, progress simply pauses — nothing is lost.)</div>
           )}
 
@@ -123,6 +127,11 @@ export function Home() {
                   </li>
                 ))}
               </ul>
+            )}
+            {onBreak && (
+              <button class="btn ghost small" onClick={stopBreak} data-testid="end-break">
+                End the break
+              </button>
             )}
             <ModePicker />
           </div>
@@ -174,7 +183,7 @@ export function Home() {
           onClick={() => navigate(`/review?today=1&mode=${settings.defaultMode}`)}
           data-testid="start-today"
         >
-          Start today's reviews · {readyAll}
+          {onBreak ? 'Review anyway' : "Start today's reviews"} · {readyAll}
         </button>
       </div>}
     </>

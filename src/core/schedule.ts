@@ -17,6 +17,9 @@
 //    the goal for Daily, one keeps the flame). Practising on a day when nothing was due (e.g. the very
 //    first day) also earns it. Days with nothing due and no practice are neutral. A due verse with no
 //    review breaks the streak. Verses added/moved today are exempt for today.
+//  * Break (pause): on paused days nothing is due and nothing can be missed (the streak waits, no lapse,
+//    no freeze), but no progress day is earned either - unless the user reviews anyway, which counts as
+//    a normal day. Due dates of Weekly/Monthly/Yearly verses are not moved.
 import {
   addDays,
   addMonths,
@@ -72,11 +75,30 @@ const OUTCOME_RANK: Record<DayOutcome, number> = { n: 0, m: 1, c: 2 };
 export function mergeLedgerDay(a: LedgerDay | undefined, b: LedgerDay | undefined): LedgerDay {
   const out: LedgerDay = {};
   if (a?.r || b?.r) out.r = 1;
+  if (a?.p || b?.p) out.p = 1;
   const oa = a?.o;
   const ob = b?.o;
   if (oa && ob) out.o = OUTCOME_RANK[oa] >= OUTCOME_RANK[ob] ? oa : ob;
   else if (oa || ob) out.o = (oa ?? ob) as DayOutcome;
   return out;
+}
+
+/** Is `day` inside the user's current "break"? */
+export function isPaused(data: AppData, day: DayKey): boolean {
+  const p = data.pause;
+  return !!p && day >= p.from && day <= p.until;
+}
+
+/** Start (or change) a break covering from..until inclusive. */
+export function setPause(data: AppData, from: DayKey, until: DayKey, now: number): void {
+  data.pause = { from, until, at: now };
+}
+
+/** End the break today: today is a normal day again; days already paused stay paused. */
+export function endPause(data: AppData, now: number): void {
+  if (!data.pause) return;
+  const lastPausedDay = addDays(dayKeyOf(now), -1);
+  data.pause = { from: data.pause.from, until: data.pause.until < lastPausedDay ? data.pause.until : lastPausedDay, at: now };
 }
 
 const isLapse = (data: AppData, day: DayKey) => {
@@ -87,6 +109,7 @@ const isLapse = (data: AppData, day: DayKey) => {
 /** Does `day` add progress toward graduation? (see Freeze rule at top of file) */
 export function dayGains(data: AppData, day: DayKey): boolean {
   if (data.ledger[day]?.r) return true;
+  if (data.ledger[day]?.p || isPaused(data, day)) return false; // on a break nothing is earned (nothing is lost either)
   return !(
     isLapse(data, addDays(day, -1)) &&
     isLapse(data, addDays(day, -2)) &&
@@ -225,9 +248,10 @@ export function todaySummary(data: AppData, now: number): TodaySummary {
   // For the streak a Daily verse only needs ONE counted review today (aim for 3, but one keeps the flame).
   let streakMet = 0;
   let streakUnmet = 0;
+  const onBreak = isPaused(data, dayKeyOf(now));
   for (const v of liveVerses(data)) {
     const s = verseStatus(data, v, now);
-    if (!s.required) continue;
+    if (!s.required || onBreak) continue;
     if (v.pile === 'daily') {
       total++;
       if (s.state === 'done') met++;
@@ -285,7 +309,7 @@ export function streakInfo(data: AppData, now: number): StreakInfo {
 
 // ---------------------------------------------------------------- settling days & graduation
 
-function computeDay(data: AppData, day: DayKey): { outcome: DayOutcome; reviewed: boolean } {
+function computeDay(data: AppData, day: DayKey): { outcome: DayOutcome; reviewed: boolean; paused: boolean } {
   let met = 0;
   let unmet = 0;
   let reviewed = false;
@@ -301,7 +325,10 @@ function computeDay(data: AppData, day: DayKey): { outcome: DayOutcome; reviewed
       else unmet++;
     }
   }
-  return { outcome: unmet > 0 ? 'm' : met > 0 || reviewed ? 'c' : 'n', reviewed };
+  const paused = isPaused(data, day);
+  // On a break nothing can be missed: a day is either completed anyway ('c') or simply neutral ('n').
+  const outcome: DayOutcome = unmet > 0 ? (paused ? 'n' : 'm') : met > 0 || reviewed ? 'c' : 'n';
+  return { outcome, reviewed, paused };
 }
 
 export interface SettleResult {
@@ -320,9 +347,10 @@ export function settle(data: AppData, now: number): SettleResult {
   let start = addDays(data.settledThrough, 1);
   if (start < data.createdDay) start = data.createdDay;
   for (let d = start; d <= yesterday; d = addDays(d, 1)) {
-    const { outcome, reviewed } = computeDay(data, d);
+    const { outcome, reviewed, paused } = computeDay(data, d);
     const computed: LedgerDay = { o: outcome };
     if (reviewed) computed.r = 1;
+    if (paused) computed.p = 1;
     data.ledger[d] = mergeLedgerDay(data.ledger[d], computed);
   }
   if (data.settledThrough < yesterday) data.settledThrough = yesterday;

@@ -33,6 +33,8 @@ export interface LedgerDay {
   /** 1 when any review (counted or extra practice) happened that day. */
   r?: 1;
   o?: DayOutcome;
+  /** 1 when the day fell inside a "break" (pause): nothing was due, nothing was missed, no progress was earned. */
+  p?: 1;
 }
 
 export interface LevelUp {
@@ -62,6 +64,8 @@ export interface AppData {
   /** Grow-only per-device counters of counted reviews (merge = max per device). */
   reviewsByDevice: Record<string, number>;
   prefs: { value: SyncedPrefs; at: number };
+  /** An optional "break": days from..until (inclusive) are paused. The later decision (`at`) wins when devices sync. */
+  pause?: { from: DayKey; until: DayKey; at: number };
 }
 
 export type ReviewMode = 'flashcard' | 'blanks' | 'type' | 'speak';
