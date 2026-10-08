@@ -13,9 +13,10 @@
 //  * Freeze: a day is frozen when the 3 days before it were all "lapse days" (obligations existed
 //    but nothing at all was reviewed) and nothing has been reviewed yet that day. Frozen days don't
 //    add progress. Verses that already earned their promotion still move up.
-//  * Streak: +1 for each day on which every due review was completed. Days with nothing due are
-//    neutral (don't add, don't break). A day with an unmet obligation breaks the streak.
-//    Verses added/moved today are exempt for today.
+//  * Streak: +1 for each day on which every due verse got at least ONE counted review (three a day is
+//    the goal for Daily, one keeps the flame). Practising on a day when nothing was due (e.g. the very
+//    first day) also earns it. Days with nothing due and no practice are neutral. A due verse with no
+//    review breaks the streak. Verses added/moved today are exempt for today.
 import {
   addDays,
   addMonths,
@@ -221,6 +222,9 @@ export function todaySummary(data: AppData, now: number): TodaySummary {
   let total = 0;
   let met = 0;
   let readyNow = 0;
+  // For the streak a Daily verse only needs ONE counted review today (aim for 3, but one keeps the flame).
+  let streakMet = 0;
+  let streakUnmet = 0;
   for (const v of liveVerses(data)) {
     const s = verseStatus(data, v, now);
     if (!s.required) continue;
@@ -228,19 +232,24 @@ export function todaySummary(data: AppData, now: number): TodaySummary {
       total++;
       if (s.state === 'done') met++;
       else if (s.state === 'ready') readyNow++;
+      if (s.countedToday >= 1) streakMet++;
+      else streakUnmet++;
     } else if (s.state === 'ready') {
       total++;
       readyNow++;
+      streakUnmet++;
     } else if (s.countedToday > 0) {
       // periodic verse reviewed today: obligation met
       total++;
       met++;
+      streakMet++;
     }
   }
   const remaining = total - met;
   const today = dayKeyOf(now);
+  const practiced = !!data.ledger[today]?.r;
   let outcome: TodaySummary['outcome'];
-  if (data.ledger[today]?.o === 'c' || (total > 0 && remaining === 0)) outcome = 'c';
+  if (data.ledger[today]?.o === 'c' || (streakUnmet === 0 && (streakMet > 0 || practiced))) outcome = 'c';
   else if (total === 0) outcome = 'n';
   else outcome = 'pending';
   return { total, met, remaining, readyNow, outcome };
@@ -285,14 +294,14 @@ function computeDay(data: AppData, day: DayKey): { outcome: DayOutcome; reviewed
     if (n > 0) reviewed = true;
     if (v.pileSince >= day) continue; // added / moved that day: exempt
     if (v.pile === 'daily') {
-      if (n >= DAILY_REVIEWS) met++;
+      if (n >= 1) met++; // one counted review keeps the streak; three is the goal
       else unmet++;
     } else if (dueDay(v, day) <= day) {
       if (n > 0) met++;
       else unmet++;
     }
   }
-  return { outcome: unmet > 0 ? 'm' : met > 0 ? 'c' : 'n', reviewed };
+  return { outcome: unmet > 0 ? 'm' : met > 0 || reviewed ? 'c' : 'n', reviewed };
 }
 
 export interface SettleResult {
@@ -471,11 +480,11 @@ export function recordReview(
     data.reviewsByDevice[deviceId] = (data.reviewsByDevice[deviceId] ?? 0) + 1;
   }
   const summary = todaySummary(data, now);
-  if (summary.total > 0 && summary.remaining === 0) {
+  if (summary.outcome === 'c') {
     data.ledger[today] = mergeLedgerDay(data.ledger[today], { o: 'c' });
   }
   data.longestStreak = Math.max(data.longestStreak, streakInfo(data, now).count);
-  return { counted, levelUps: settled.levelUps, todayComplete: summary.outcome === 'c' };
+  return { counted, levelUps: settled.levelUps, todayComplete: summary.total > 0 && summary.remaining === 0 };
 }
 
 export function totalReviews(data: AppData): number {

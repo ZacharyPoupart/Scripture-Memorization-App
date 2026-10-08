@@ -82,6 +82,13 @@ test.describe('feedback and celebrations', () => {
     await addVerse(page, JOHN316);
     await sixDayStreakWithOneReviewLeft(page);
     await page.goto('/#/');
+    // since v1.5.2 one review keeps the streak, so the 7-day milestone arrives as soon as today's
+    // first reviews are in (they already are in this fixture): a quiet card, no confetti
+    await expect(page.getByTestId('milestone')).toBeVisible();
+    await expect(page.getByTestId('milestone')).toContainText('A full week');
+    await expect(page.locator('.confetti')).toHaveCount(0);
+    await page.getByTestId('milestone-close').click();
+    await expect(page.getByTestId('milestone')).toBeHidden();
     await finishOneFlashcard(page);
     await expect(page.getByTestId('verse-result')).toContainText('Review counted');
     await expect(page.getByTestId('result-progress')).toContainText('days toward Weekly');
@@ -90,12 +97,7 @@ test.describe('feedback and celebrations', () => {
     await expect(page.getByTestId('all-done')).toContainText('All done for today');
     await expect(page.getByTestId('all-done')).toContainText('Streak: 7 days');
     await page.getByTestId('session-done').click();
-    // a 7-day streak is a small milestone: a quiet card, no confetti
-    await expect(page.getByTestId('milestone')).toBeVisible();
-    await expect(page.getByTestId('milestone')).toContainText('A full week');
-    await expect(page.locator('.confetti')).toHaveCount(0);
-    await page.getByTestId('milestone-close').click();
-    await expect(page.getByTestId('milestone')).toBeHidden();
+    await expect(page.getByTestId('milestone')).toBeHidden(); // already celebrated once
     await expect(page.locator('.ring.done')).toBeVisible();
     await page.reload();
     await expect(page.getByTestId('milestone')).toBeHidden(); // celebrated once

@@ -38,7 +38,7 @@ export function About({ onShowIntro }: { onShowIntro: () => void }) {
         <div class="card stack">
           <h2>Streaks and freezes</h2>
           <p style={{ margin: 0 }}>
-            <strong>Streak:</strong> it grows by one each day you finish all your due reviews, and resets if you miss a day. Verses you add today don't count against you, and days when nothing is due don't break it.
+            <strong>Streak:</strong> it grows by one each day every due verse gets at least one review (three a day is the goal, but one keeps your flame), and resets if a due verse is missed for a day. Practising on any day, even your first, earns it. Verses you add today don't count against you, and days when nothing is due don't break it.
           </p>
           <p style={{ margin: 0 }}>
             <strong>Freeze:</strong> if you go 3 days without reviewing, your verses stop gaining days toward their next pile until you review again. A freeze only pauses progress — nothing is lost, and a verse that has already earned its promotion still moves up.

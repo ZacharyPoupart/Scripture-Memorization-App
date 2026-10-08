@@ -124,3 +124,10 @@ git checkout v1.1.0-stable        # inspect the old version
 # or revert in git: git checkout -b fix/rollback main && git revert --no-commit v1.1.0-stable..main && git commit -m "Roll back to v1.1.0-stable" && git push -u origin fix/rollback   # then PR + merge
 ```
 Your verses live on the phone, so a rollback never touches them.
+
+## v1.5.2 — owner-requested tweaks (cooldown options, colour, streak rule)
+- **Time between Daily reviews**: Settings offers No wait, 30 min, 1–4 h and Custom minutes (0–720). Same stored value (`prefs.spacingHours`, already validated 0–12 and fractional-safe), so no migration. Tests: unit (0 / 0.5 / 0.75 h) + `tests/e2e/spacing.spec.ts`.
+- **Gentle colour**: soft fixed teal/warm wash on the page background, pile-tinted pile tiles, tinted current tab. CSS only; contrast test still green.
+- **Streak rule changed (owner's request — a core-rule change)**: a day counts when every due verse got at least ONE counted review (3/day is still the Daily goal and still drives graduation progress, the ring and "all done"). Practising on a day where nothing was due (e.g. the very first day) also earns the flame; verses added/moved that day still never count against you. A due verse with zero reviews still breaks the streak. Already-settled ledger days are not rewritten.
+- **Test changes (rule change, reviewed)**: `schedule.test.ts` — the "at risk until last review" test now expects the flame after the first review; "partly finished day breaks the streak" replaced by "one of three keeps it" + "a due verse with no review breaks it"; new first-day-flame test. `motivation.spec.ts` — the 7-day milestone now appears as soon as today's first reviews are in, so the test dismisses it up front instead of after the session.
+- Rollback point before the streamline pass: tag `v1.5.1-stable`.
