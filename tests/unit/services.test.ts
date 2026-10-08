@@ -356,3 +356,31 @@ describe('saving is a single atomic write (closing the app mid-save can never lo
     expect(r.log).toEqual([]);
   });
 });
+
+describe('unreadable saved data is set aside, never overwritten', () => {
+  it('keeps a copy of data that no version can read before starting empty, and later saves leave it alone', async () => {
+    const r = recordingBackend();
+    r.mem.set('data', JSON.stringify({ schema: 2, verses: { x: 1 }, note: 'written by a newer app' }));
+    r.mem.set('data.prev', '{broken');
+    const s = new Storage(r.backend);
+    const loaded = await s.loadData(1_700_000_000_000);
+    expect(Object.keys(loaded.data.verses)).toHaveLength(0);
+    expect(loaded.quarantinedAs).toBe('unreadable:1700000000000');
+    expect(r.mem.get('unreadable:1700000000000')).toContain('written by a newer app');
+    // the app now saves empty data twice; the set-aside copy is untouched
+    await s.saveData(newData(), D0);
+    const d = newData();
+    john316(d, at(D0, '07:00'));
+    await s.saveData(d, day(1));
+    expect(r.mem.get('unreadable:1700000000000')).toContain('written by a newer app');
+  });
+
+  it('does nothing special when data is simply missing (first launch) or readable', async () => {
+    const r = recordingBackend();
+    const s = new Storage(r.backend);
+    expect((await s.loadData(5)).quarantinedAs).toBeUndefined();
+    await s.saveData(newData(), D0);
+    expect((await new Storage(r.backend).loadData(6)).quarantinedAs).toBeUndefined();
+    expect([...r.mem.keys()].some((k) => k.startsWith('unreadable:'))).toBe(false);
+  });
+});

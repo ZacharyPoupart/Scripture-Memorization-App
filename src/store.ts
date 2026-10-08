@@ -306,6 +306,8 @@ export async function init(): Promise<void> {
   const settings = await storage.loadSettings();
   const loaded = await storage.loadData(Date.now());
   state = { ...state, settings, data: loaded.data, recoveredFrom: loaded.recoveredFrom };
+  if (loaded.quarantinedAs)
+    window.setTimeout(() => showToast('Your saved verses could not be read, so a copy was kept safe. You can restore from a backup in Settings.'), 800);
   const next = structuredClone(state.data);
   settle(next, Date.now());
   state = { ...state, data: next, sync: settings.syncCode ? { kind: 'idle' } : { kind: 'off' } };

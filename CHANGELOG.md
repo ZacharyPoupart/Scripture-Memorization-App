@@ -5,6 +5,9 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Fixed
+- Data safety: a damaged backup can no longer tamper with the data object (reserved `__proto__` ids are rejected), and if saved data ever cannot be read (for example after rolling back from a newer version) a copy of it is kept aside instead of being overwritten.
+
 ## [1.8.1] - 2026-10-08
 
 ## [1.8.0] - 2026-10-08
