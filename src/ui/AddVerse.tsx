@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { formatRef, refWarning, validateRef, type Ref } from '../core/reference.ts';
-import { addVerse, editVerse, liveVerses } from '../core/schedule.ts';
+import { addVerse, editVerse, liveVerses, maxDaysIn } from '../core/schedule.ts';
 import { TRANSLATIONS } from '../core/types.ts';
 import { LookupError, lookupPassage } from '../services/lookup.ts';
 import { back, navigate } from '../router.ts';
 import { act, showToast, useApp } from '../store.ts';
-import { Field, Icon } from './common.tsx';
+import { DaysSlider, Field, Icon } from './common.tsx';
 import { VersePicker } from './VersePicker.tsx';
 
 type Lookup = { kind: 'idle' } | { kind: 'loading' } | { kind: 'ok' } | { kind: 'error'; message: string };
@@ -13,6 +13,7 @@ type Lookup = { kind: 'idle' } | { kind: 'loading' } | { kind: 'ok' } | { kind: 
 export function AddVerse({ editId }: { editId?: string }) {
   const { data, online } = useApp();
   const existing = editId ? data.verses[editId] : undefined;
+  const [daysIn, setDaysIn] = useState(0);
   const [book, setBook] = useState<number>(existing?.book ?? 0);
   const [chapter, setChapter] = useState<number>(existing?.chapter ?? 0);
   const [start, setStart] = useState<string>(existing ? String(existing.start) : '');
@@ -76,7 +77,7 @@ export function AddVerse({ editId }: { editId?: string }) {
       showToast('Saved.');
       back(`/verse/${existing.id}`);
     } else {
-      const v = act((d, now) => addVerse(d, { ...ref, translation, text, topic }, now));
+      const v = act((d, now) => addVerse(d, { ...ref, translation, text, topic, daysInPile: daysIn }, now));
       showToast(`Added ${formatRef(v)} to Daily.`, { label: 'Add another', run: () => navigate('/add') });
       navigate('/pile/daily', true);
     }
@@ -141,6 +142,14 @@ export function AddVerse({ editId }: { editId?: string }) {
             ))}
           </datalist>
         </Field>
+
+        {!existing && (
+          <details class="quiet-details" open={daysIn > 0}>
+            <summary>Already know this one? Start partway</summary>
+            <DaysSlider value={daysIn} max={maxDaysIn('daily')} onChange={setDaysIn} testid="days-in" />
+            <div class="hint-text">It counts as that many days already spent in Daily, so it moves up sooner. Leave at 0 for a brand-new verse.</div>
+          </details>
+        )}
 
         {duplicate && <div class="banner info small">You already have {formatRef(duplicate)} ({duplicate.translation}) in {duplicate.pile}. You can still add it.</div>}
         {error && <div class="banner bad" role="alert" data-testid="form-error">{error}</div>}

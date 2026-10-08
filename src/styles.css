@@ -336,6 +336,11 @@ button,
   user-select: none;
   -webkit-user-select: none;
 }
+.btn svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
 .btn:active {
   transform: scale(0.98);
 }
@@ -1574,4 +1579,17 @@ button.streak {
 
 .offline-note {
   margin-top: 2px;
+}
+
+/* ---- "start partway" slider ---- */
+.days-slider {
+  display: grid;
+  gap: 6px;
+  padding: 6px 0;
+}
+.days-slider input[type='range'] {
+  width: 100%;
+  min-height: 44px;
+  accent-color: var(--accent);
+  touch-action: pan-y;
 }
