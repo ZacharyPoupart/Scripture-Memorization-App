@@ -96,17 +96,18 @@ test.describe('review modes', () => {
     await expect(page.getByTestId('mistakes').locator('.dot.used')).toHaveCount(0); // fresh attempt
   });
 
-  test('type it out: first letters reveal words; wrong letters are mistakes', async ({ page }) => {
+  test('type it out: first letters reveal words; a wrong letter shows the word and moves on', async ({ page }) => {
     await startVerseReview(page, 'type');
     const input = page.getByTestId('type-input');
     await input.focus();
-    await page.keyboard.type('x'); // wrong
+    await page.keyboard.type('x'); // wrong: counts as a slip, shows the missed word and carries on
     await expect(page.getByTestId('mistakes').locator('.dot.used')).toHaveCount(1);
-    await expect(page.getByTestId('revealed')).toHaveCount(0);
+    await expect(page.getByTestId('revealed')).toHaveCount(1);
+    await expect(page.locator('.w.missed')).toHaveCount(1);
     const letters = firstLetters(JOHN_TEXT);
-    await page.keyboard.type(letters.slice(0, 4));
-    await expect(page.getByTestId('revealed')).toHaveCount(4);
-    await page.keyboard.type(letters.slice(4));
+    await page.keyboard.type(letters.slice(1, 5)); // continue with the next word
+    await expect(page.getByTestId('revealed')).toHaveCount(5);
+    await page.keyboard.type(letters.slice(5));
     await expect(page.getByTestId('revealed')).toHaveCount(wordsOf(JOHN_TEXT).length);
     await expect(page.getByTestId('ref-verse-text')).toBeVisible({ timeout: 5000 });
     await finishWithReference(page, JOHN316);

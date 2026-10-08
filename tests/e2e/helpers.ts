@@ -162,8 +162,10 @@ export const localDay = (y: number, m0: number, d: number) => {
 /** Fill every blank by reading which word is missing from the visible text. */
 export async function completeBlanks(page: Page, text: string) {
   const words = wordsOf(text);
-  for (let guard = 0; guard < 60; guard++) {
+  for (let guard = 0; guard < 150; guard++) {
     const cur = page.getByTestId('current-blank');
+    // wait for the next blank, or for the screen after the last one (reference step / result)
+    await page.locator('[data-testid=current-blank], [data-testid=ref-verse-text], [data-testid=verse-result]').first().waitFor();
     if (!(await cur.count())) break;
     const idx = await cur.evaluate((el) => {
       const p = el.closest('p')!;

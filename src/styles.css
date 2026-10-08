@@ -1564,3 +1564,9 @@ button.streak {
     animation: none;
   }
 }
+
+/* a word shown after a wrong letter: a soft underline, never alarming */
+.w.missed:not(.hidden) {
+  text-decoration: underline dotted var(--warn);
+  text-underline-offset: 4px;
+}

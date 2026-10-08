@@ -6,6 +6,14 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 ## [Unreleased]
 
 ### Changed
+- Flashcards work like Quizlet: tap the card to flip it. Afterwards there are just two buttons, "Nailed it" and "Needs work". There is no reference-entry step after a flashcard any more (the other modes still end with it). Prefer to build the verse slowly? "Uncover bit by bit" shows it a phrase or word at a time, with "Show all" and "Start over".
+- Type it out: a wrong letter now shows the word you missed (still one slip) and lets you carry on, instead of waiting on that word.
+- Today: the review-mode choice is back out in the open.
+
+### Added
+- A small "Day one" celebration when your streak begins.
+
+### Changed
 - Flashcards are now tap-to-reveal: recite the verse in your head, then tap (or press "Uncover next phrase") to uncover it a phrase at a time. Switch to one word at a time, "Show all", or "Start over" any time. When everything is uncovered you grade yourself exactly as before.
 
 ## [1.6.0] - 2026-10-08
