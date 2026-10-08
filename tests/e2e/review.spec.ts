@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import {
   addVerse,
+  answerReference,
   blockLookups,
   finishWithReference,
   firstLetters,
@@ -14,7 +15,9 @@ import {
   chooseBook,
   finishFlashcard,
   completeBlanks,
-autoDismissMilestones
+  finishBlankReference,
+  typeWholeVerse,
+  autoDismissMilestones,
 } from './helpers';
 
 test.beforeEach(async ({ page }) => {
@@ -72,8 +75,9 @@ test.describe('review modes', () => {
     await expect(wrong).toBeDisabled();
     await expect(page.getByTestId('mistakes').locator('.dot.used')).toHaveCount(1);
     await completeBlanks(page, JOHN_TEXT);
-    await expect(page.getByTestId('ref-verse-text')).toBeVisible({ timeout: 5000 });
-    await finishWithReference(page, JOHN316);
+    // the reference is now blanks of its own: book, chapter, verse (multiple choice)
+    await expect(page.getByTestId('ref-blanks')).toBeVisible();
+    await finishBlankReference(page, JOHN316);
   });
 
   test('fill in the blank: a fourth mistake restarts the verse', async ({ page }) => {
@@ -167,8 +171,8 @@ test.describe('review modes', () => {
   });
 
   test('reference recall: wrong answers are mistakes, no hints, "I don\'t remember" reveals and restarts', async ({ page }) => {
-    await startVerseReview(page, 'blanks');
-    await completeBlanks(page, JOHN_TEXT);
+    await startVerseReview(page, 'type');
+    await typeWholeVerse(page, JOHN_TEXT);
     // the book list shows every book (no narrowing hints)
     await page.getByTestId('ref-book').click();
     await expect(page.getByTestId('book-option')).toHaveCount(66);
@@ -183,7 +187,7 @@ test.describe('review modes', () => {
     await page.getByTestId('ref-giveup').click();
     await expect(page.getByTestId('ref-answer')).toContainText('John 3:16');
     await page.getByTestId('ref-retry').click();
-    await expect(page.getByTestId('current-blank')).toBeVisible(); // the verse restarts in the same mode
+    await expect(page.getByTestId('type-input')).toBeVisible(); // the verse restarts in the same mode
   });
 
   test('reference recall for a range needs the whole range', async ({ page }) => {
@@ -191,8 +195,8 @@ test.describe('review modes', () => {
     await addVerse(page, range);
     await page.goto('/#/pile/daily');
     await page.getByTestId('verse-card').filter({ hasText: 'Psalms 23:1-2' }).click();
-    await page.getByTestId('review-blanks').click();
-    await completeBlanks(page, range.text);
+    await page.getByTestId('review-type').click();
+    await typeWholeVerse(page, range.text);
     await chooseBook(page, 'Psalms');
     await page.getByTestId('ref-chapter').fill('23');
     await page.getByTestId('ref-start').fill('1'); // forgot the range end
@@ -220,5 +224,50 @@ test.describe('review modes', () => {
     await expect(page.getByTestId('verse-result')).toContainText('Extra practice');
     void PSALM23_1;
     void ROMANS8_28;
+  });
+});
+
+test.describe('topic is quizzed too', () => {
+  const withTopic = { ...JOHN316, topic: 'Gospel' };
+  test.beforeEach(async ({ page }) => {
+    await blockLookups(page);
+    await openApp(page);
+    await addVerse(page, withTopic);
+    await addVerse(page, { ...PSALM23_1, topic: 'Trust' });
+    await page.goto('/#/pile/daily');
+    await page.getByTestId('verse-card').filter({ hasText: 'John 3:16' }).click();
+  });
+
+  test('fill in the blank: after book, chapter and verse comes a topic blank', async ({ page }) => {
+    await page.getByTestId('review-blanks').click();
+    await completeBlanks(page, JOHN_TEXT);
+    await expect(page.getByTestId('topic-blank-line')).toBeVisible();
+    await finishBlankReference(page, JOHN316, 'Gospel');
+  });
+
+  test('a wrong topic is a slip (and the other topic you use is among the choices)', async ({ page }) => {
+    await page.getByTestId('review-blanks').click();
+    await completeBlanks(page, JOHN_TEXT);
+    for (const a of ['John', '3', '16']) await page.getByTestId('option').getByText(a, { exact: true }).click();
+    await expect(page.getByTestId('option').getByText('Trust', { exact: true })).toBeVisible();
+    await page.getByTestId('option').getByText('Trust', { exact: true }).click();
+    await expect(page.getByTestId('mistakes').locator('.dot.used')).toHaveCount(1);
+    await page.getByTestId('option').getByText('Gospel', { exact: true }).click();
+    await expect(page.getByTestId('verse-result')).toBeVisible({ timeout: 6000 });
+  });
+
+  test('type it out: typed reference first, then the topic as a choice', async ({ page }) => {
+    await page.getByTestId('review-type').click();
+    await typeWholeVerse(page, JOHN_TEXT);
+    await answerReference(page, JOHN316);
+    await expect(page.getByTestId('topic-options')).toBeVisible();
+    await page.getByTestId('topic-option').filter({ hasText: /^Gospel$/ }).click();
+    await expect(page.getByTestId('verse-result')).toBeVisible({ timeout: 6000 });
+  });
+
+  test('flashcards do not ask for the topic', async ({ page }) => {
+    await page.getByTestId('review-flashcard').click();
+    await finishFlashcard(page);
+    await expect(page.getByTestId('topic-options')).toHaveCount(0);
   });
 });

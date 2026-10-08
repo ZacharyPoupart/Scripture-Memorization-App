@@ -5,6 +5,14 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Changed
+- Fill in the blank no longer shifts as you answer: the words stay exactly where they are.
+- Fill in the blank now asks for the reference as blanks too (book, chapter, verse, chosen from options) instead of typing it.
+- If a verse has a topic, Fill in the blank, Type it out and Speak it ask for it as well (multiple choice). Flashcards do not.
+
+### Fixed
+- Keyboard focus no longer jumps out of an open dialog (like the verse picker) when something behind it refreshes.
+
 ## [1.10.0] - 2026-10-08
 
 ### Added

@@ -79,6 +79,10 @@ const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), selec
 
 export function Overlay({ children, onClose, center, label }: { children: ComponentChildren; onClose?: () => void; center?: boolean; label?: string }) {
   const ref = useRef<HTMLDivElement>(null);
+  // Parents pass a fresh onClose on every render. The effect below must NOT re-run for that (its cleanup gives focus
+  // back to the opener, which would kick keyboard focus out of the dialog on every re-render), so it reads the latest one from here.
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
   useEffect(() => {
     // Accessibility: move focus into the dialog, keep Tab inside it, and give focus back when it closes.
     const opener = document.activeElement as HTMLElement | null;
@@ -88,7 +92,7 @@ export function Overlay({ children, onClose, center, label }: { children: Compon
     // itself does, so opening a picker never pops the on-screen keyboard over the thing you're about to tap.
     if (root && !root.contains(document.activeElement)) (items().find((el) => el.matches('[autofocus]')) ?? root).focus({ preventScroll: true });
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') return onClose?.();
+      if (e.key === 'Escape') return closeRef.current?.();
       if (e.key !== 'Tab') return;
       const list = items();
       if (!list.length) return e.preventDefault();
@@ -100,9 +104,12 @@ export function Overlay({ children, onClose, center, label }: { children: Compon
     addEventListener('keydown', onKey);
     return () => {
       removeEventListener('keydown', onKey);
-      if (opener && document.contains(opener)) opener.focus({ preventScroll: true });
+      // Give focus back, unless it has already moved somewhere deliberate (e.g. into the next dialog that replaced this one).
+      const active = document.activeElement;
+      const stillHere = !active || active === document.body || !!root?.contains(active);
+      if (stillHere && opener && document.contains(opener)) opener.focus({ preventScroll: true });
     };
-  }, [onClose]);
+  }, []);
   return (
     <div
       class={`overlay ${center ? 'center-modal' : ''}`}
@@ -111,7 +118,7 @@ export function Overlay({ children, onClose, center, label }: { children: Compon
       aria-modal="true"
       aria-label={label}
       tabIndex={-1}
-      onPointerDown={(e) => e.target === ref.current && onClose?.()}
+      onPointerDown={(e) => e.target === ref.current && closeRef.current?.()}
     >
       {children}
     </div>

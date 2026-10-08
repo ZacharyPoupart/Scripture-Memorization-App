@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { formatRef } from '../../core/reference.ts';
 import { matchesFirstLetter, tokenize } from '../../core/text.ts';
-import { centerIn, useShake } from '../dom.ts';
+import { keepInView, useShake } from '../dom.ts';
 import { Dock, MistakeDots, type ModeProps } from './shared.tsx';
 
 export function TypeIt({ verse, onMistake, onDone, mistakes }: ModeProps) {
@@ -17,7 +17,7 @@ export function TypeIt({ verse, onMistake, onDone, mistakes }: ModeProps) {
     input.current?.focus({ preventScroll: true });
   }, []);
   useEffect(() => {
-    centerIn(area.current, area.current?.querySelector('.cur') as HTMLElement | null);
+    keepInView(area.current, area.current?.querySelector('.cur') as HTMLElement | null);
     if (pos >= words.length) {
       const t = setTimeout(onDone, 500);
       return () => clearTimeout(t);
