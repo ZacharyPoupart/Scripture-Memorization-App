@@ -120,7 +120,8 @@ export class Storage {
   }
 
   /** Load data; falls back to the previous copy if the main one is unreadable. Never throws on corruption. */
-  async loadData(now: number): Promise<{ data: AppData; recoveredFrom?: string }> {
+  async loadData(now: number): Promise<{ data: AppData; recoveredFrom?: string; quarantinedAs?: string }> {
+    const unreadable: [string, string][] = [];
     for (const key of ['data', 'data.prev']) {
       const raw = await this.backend.get(key);
       if (!raw) continue;
@@ -131,7 +132,19 @@ export class Storage {
         this.haveLastData = true;
         return { data, recoveredFrom: key === 'data' ? undefined : key };
       } catch {
-        /* try next */
+        unreadable.push([key, raw]);
+      }
+    }
+    // Nothing readable. Starting empty must never be what destroys the only copy of someone's verses
+    // (e.g. data written by a newer version, then the app rolled back): keep the unreadable text aside
+    // under its own key, where later saves never touch it, before anything new is written.
+    if (unreadable.length) {
+      const key = `unreadable:${now}`;
+      try {
+        await this.backend.setMany([[key, unreadable[0][1]]]);
+        return { data: createData(now), quarantinedAs: key };
+      } catch {
+        /* if even that fails, carry on with an empty start rather than a blank screen */
       }
     }
     return { data: createData(now) };

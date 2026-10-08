@@ -77,7 +77,11 @@ export function normalizeData(raw: unknown): AppData {
   if (!isStr(raw.createdDay) || !DAY.test(raw.createdDay)) fail('Missing start date.');
   if (!isObj(raw.verses)) fail('Missing verses.');
   const verses: Record<string, Verse> = {};
-  for (const [id, v] of Object.entries(raw.verses)) verses[id] = cleanVerse(id, v);
+  for (const [id, v] of Object.entries(raw.verses)) {
+    // `verses.__proto__ = …` would replace the object's prototype instead of adding a verse
+    if (id === '__proto__') fail('Corrupt data: a verse has a reserved id.');
+    verses[id] = cleanVerse(id, v);
+  }
 
   const ledger: Record<string, LedgerDay> = {};
   if (isObj(raw.ledger)) {
@@ -100,7 +104,7 @@ export function normalizeData(raw: unknown): AppData {
 
   const reviewsByDevice: Record<string, number> = {};
   if (isObj(raw.reviewsByDevice))
-    for (const [k, n] of Object.entries(raw.reviewsByDevice)) if (isNum(n) && n >= 0) reviewsByDevice[k] = n;
+    for (const [k, n] of Object.entries(raw.reviewsByDevice)) if (k !== '__proto__' && isNum(n) && n >= 0) reviewsByDevice[k] = n;
 
   let prefs = { value: { ...DEFAULT_PREFS }, at: 0 };
   if (isObj(raw.prefs) && isObj(raw.prefs.value) && isNum(raw.prefs.at)) {
