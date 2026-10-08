@@ -1,7 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import {
   addVerse,
-  answerReference,
   blockLookups,
   finishWithReference,
   firstLetters,
@@ -13,27 +12,19 @@ import {
   ROMANS8_28,
   wordsOf,
   chooseBook,
+  finishFlashcard,
+  completeBlanks,
+autoDismissMilestones
 } from './helpers';
+
+test.beforeEach(async ({ page }) => {
+  await autoDismissMilestones(page);
+});
 
 async function startVerseReview(page: Page, mode: string, v = JOHN316) {
   await page.getByTestId('verse-card').filter({ hasText: v === JOHN316 ? 'John 3:16' : 'Psalms' }).first().click();
   await page.getByTestId(`review-${mode}`).click();
   await expect(page.getByTestId('review')).toHaveAttribute('data-mode', mode);
-}
-
-/** Fill every blank by reading which word is missing from the visible text. */
-async function completeBlanks(page: Page, text: string) {
-  const words = wordsOf(text);
-  for (let guard = 0; guard < 60; guard++) {
-    const cur = page.getByTestId('current-blank');
-    if (!(await cur.count())) break;
-    const idx = await cur.evaluate((el) => {
-      const p = el.closest('p')!;
-      return [...p.children].findIndex((c) => c.contains(el));
-    });
-    const answer = words[idx].replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '');
-    await page.getByTestId('option').getByText(answer, { exact: true }).click();
-  }
 }
 
 test.describe('review modes', () => {
@@ -43,26 +34,26 @@ test.describe('review modes', () => {
     await addVerse(page, JOHN316);
   });
 
-  test('flashcard: reference first, flip, grade, then recall the reference', async ({ page }) => {
+  test('flashcard: reference first, tap to flip, Nailed it / Needs work (no reference step)', async ({ page }) => {
     await startVerseReview(page, 'flashcard');
     await expect(page.getByTestId('review')).toContainText('John 3:16');
     await expect(page.getByTestId('card-front')).toBeVisible();
-    await expect(page.locator('.reveal-text .rw.on')).toHaveCount(0); // covered until tapped
-    await page.getByTestId('flip').click(); // "Show all"
+    await page.getByTestId('card-front').click(); // tap the card itself to flip, like Quizlet
     await expect(page.getByTestId('card-back')).toContainText('For God so loved the world');
+    await expect(page.getByTestId('grade-good')).toHaveText('Nailed it');
+    await expect(page.getByTestId('grade-missed')).toHaveText('Needs work');
+    await expect(page.getByTestId('grade-almost')).toHaveCount(0);
     await page.getByTestId('grade-good').click();
-    // reference recall: the reference must NOT be visible anywhere on this screen
-    await expect(page.getByTestId('ref-verse-text')).toBeVisible();
-    await expect(page.locator('body')).not.toContainText('John 3:16');
-    await finishWithReference(page, JOHN316);
+    // no reference-recall step after a flashcard
+    await expect(page.getByTestId('ref-verse-text')).toHaveCount(0);
     await expect(page.getByTestId('verse-result')).toContainText('Review counted');
     await expect(page.getByTestId('session-summary')).toBeVisible({ timeout: 5000 });
   });
 
-  test('flashcard: "Missed it" restarts the same verse in the same mode', async ({ page }) => {
+  test('flashcard: "Needs work" restarts the same verse in the same mode', async ({ page }) => {
     await startVerseReview(page, 'flashcard');
     await page.getByTestId('flip').click();
-    await page.getByTestId('grade-missed').click();
+    await page.getByTestId('grade-missed').click(); // "Needs work"
     await expect(page.getByTestId('card-front')).toBeVisible();
     await expect(page.getByTestId('toast')).toContainText('try that verse again');
   });
@@ -175,9 +166,8 @@ test.describe('review modes', () => {
   });
 
   test('reference recall: wrong answers are mistakes, no hints, "I don\'t remember" reveals and restarts', async ({ page }) => {
-    await startVerseReview(page, 'flashcard');
-    await page.getByTestId('flip').click();
-    await page.getByTestId('grade-good').click();
+    await startVerseReview(page, 'blanks');
+    await completeBlanks(page, JOHN_TEXT);
     // the book list shows every book (no narrowing hints)
     await page.getByTestId('ref-book').click();
     await expect(page.getByTestId('book-option')).toHaveCount(66);
@@ -192,7 +182,7 @@ test.describe('review modes', () => {
     await page.getByTestId('ref-giveup').click();
     await expect(page.getByTestId('ref-answer')).toContainText('John 3:16');
     await page.getByTestId('ref-retry').click();
-    await expect(page.getByTestId('card-front')).toBeVisible();
+    await expect(page.getByTestId('current-blank')).toBeVisible(); // the verse restarts in the same mode
   });
 
   test('reference recall for a range needs the whole range', async ({ page }) => {
@@ -200,9 +190,8 @@ test.describe('review modes', () => {
     await addVerse(page, range);
     await page.goto('/#/pile/daily');
     await page.getByTestId('verse-card').filter({ hasText: 'Psalms 23:1-2' }).click();
-    await page.getByTestId('review-flashcard').click();
-    await page.getByTestId('flip').click();
-    await page.getByTestId('grade-good').click();
+    await page.getByTestId('review-blanks').click();
+    await completeBlanks(page, range.text);
     await chooseBook(page, 'Psalms');
     await page.getByTestId('ref-chapter').fill('23');
     await page.getByTestId('ref-start').fill('1'); // forgot the range end
@@ -216,9 +205,7 @@ test.describe('review modes', () => {
   test('extra practice is labelled and does not count', async ({ page }) => {
     await startVerseReview(page, 'flashcard');
     const doIt = async () => {
-      await page.getByTestId('flip').click();
-      await page.getByTestId('grade-good').click();
-      await answerReference(page, JOHN316);
+      await finishFlashcard(page);
       await expect(page.getByTestId('verse-result')).toBeVisible();
     };
     await doIt();

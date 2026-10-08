@@ -1,5 +1,9 @@
 import { expect, test, type Page } from '@playwright/test';
-import { addVerse, answerReference, blockLookups, JOHN316, openApp, saved } from './helpers';
+import { addVerse, blockLookups, JOHN316, openApp, saved, finishFlashcard, autoDismissMilestones } from './helpers';
+
+test.beforeEach(async ({ page }) => {
+  await autoDismissMilestones(page);
+});
 
 // These drive the real app with a controlled clock to check the day-based rules end to end.
 // (The exhaustive rule tests are unit tests; this proves the UI is wired to them.)
@@ -10,9 +14,7 @@ async function oneReview(page: Page) {
   await page.goto('/#/pile/daily');
   await page.getByTestId('verse-card').click();
   await page.getByTestId('review-flashcard').click();
-  await page.getByTestId('flip').click();
-  await page.getByTestId('grade-good').click();
-  await answerReference(page, JOHN316);
+  await finishFlashcard(page);
   await expect(page.getByTestId('verse-result')).toBeVisible();
   await saved(page);
 }

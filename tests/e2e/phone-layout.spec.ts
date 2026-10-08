@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test';
-import { addVerse, blockLookups, firstLetters, openApp, wordsOf } from './helpers';
+import { addVerse, blockLookups, completeBlanks, firstLetters, openApp, wordsOf, autoDismissMilestones } from './helpers';
+
+test.beforeEach(async ({ page }) => {
+  await autoDismissMilestones(page);
+});
 
 const LONG = {
   book: 19,
@@ -79,9 +83,8 @@ test.describe('phone layout and keyboard', () => {
   });
 
   test('reference recall fields stay on screen when the keyboard is up', async ({ page }) => {
-    await page.getByTestId('review-flashcard').click();
-    await page.getByTestId('flip').click();
-    await page.getByTestId('grade-good').click();
+    await page.getByTestId('review-blanks').click();
+    await completeBlanks(page, LONG.text);
     const vp = page.viewportSize()!;
     await page.setViewportSize({ width: vp.width, height: Math.round(vp.height * 0.55) });
     await page.getByTestId('ref-chapter').focus();

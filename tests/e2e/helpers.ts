@@ -93,6 +93,13 @@ export async function answerReference(page: Page, v: VerseInput) {
   await page.getByTestId('ref-check').click();
 }
 
+/** A flashcard: flip the card, say "Nailed it" (no reference step after flashcards). */
+export async function finishFlashcard(page: Page) {
+  await page.getByTestId('flip').click();
+  await page.getByTestId('grade-good').click();
+  await expect(page.getByTestId('verse-result')).toBeVisible();
+}
+
 /** Finishes the reference step and lands on the "result" card. */
 export async function finishWithReference(page: Page, v: VerseInput) {
   await answerReference(page, v);
@@ -151,3 +158,29 @@ export const localDay = (y: number, m0: number, d: number) => {
   const t = new Date(y, m0, d);
   return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`;
 };
+
+/** Fill every blank by reading which word is missing from the visible text. */
+export async function completeBlanks(page: Page, text: string) {
+  const words = wordsOf(text);
+  for (let guard = 0; guard < 60; guard++) {
+    const cur = page.getByTestId('current-blank');
+    if (!(await cur.count())) break;
+    const idx = await cur.evaluate((el) => {
+      const p = el.closest('p')!;
+      return [...p.children].findIndex((c) => c.contains(el));
+    });
+    const answer = words[idx].replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '');
+    await page.getByTestId('option').getByText(new RegExp(`^${answer.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i')).first().click();
+  }
+}
+
+
+/**
+ * The "Day one" streak card (and later milestones) pop up over Today after a review. Tests that are not
+ * about celebrations let Playwright close the card automatically when it blocks a click.
+ */
+export async function autoDismissMilestones(page: Page) {
+  await page.addLocatorHandler(page.getByTestId('milestone-close'), async (btn) => {
+    await btn.click();
+  });
+}

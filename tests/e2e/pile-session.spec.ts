@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test';
-import { addVerse, answerReference, blockLookups, JOHN316, openApp, PSALM23_1, ROMANS8_28 } from './helpers';
+import { addVerse, blockLookups, JOHN316, openApp, PSALM23_1, ROMANS8_28, finishFlashcard, autoDismissMilestones } from './helpers';
+
+test.beforeEach(async ({ page }) => {
+  await autoDismissMilestones(page);
+});
 
 test('reviewing a whole pile flows verse to verse and updates the schedule', async ({ page }) => {
   await blockLookups(page);
@@ -11,11 +15,9 @@ test('reviewing a whole pile flows verse to verse and updates the schedule', asy
   await page.getByTestId('start-pile').click();
 
   const order = [JOHN316, PSALM23_1, ROMANS8_28]; // longest-in-pile first = order added
-  for (const [i, v] of order.entries()) {
+  for (const [i] of order.entries()) {
     await expect(page.getByTestId('review').locator('.sub')).toHaveText(`Verse ${i + 1} of 3`);
-    await page.getByTestId('flip').click();
-    await page.getByTestId('grade-good').click();
-    await answerReference(page, v);
+    await finishFlashcard(page);
     await expect(page.getByTestId('verse-result')).toBeVisible();
     // flows on by itself
   }

@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test';
-import { addVerse, answerReference, blockLookups, JOHN316, openApp } from './helpers';
+import { addVerse, blockLookups, JOHN316, openApp, finishFlashcard, autoDismissMilestones } from './helpers';
+
+test.beforeEach(async ({ page }) => {
+  await autoDismissMilestones(page);
+});
 
 test('Today: one tap starts the queue, then a calm all-done state says when the next review unlocks', async ({ page }) => {
   await blockLookups(page);
@@ -9,9 +13,7 @@ test('Today: one tap starts the queue, then a calm all-done state says when the 
   await expect(page.getByTestId('today-title')).toContainText('1 verse to review');
   await expect(page.getByTestId('today-list')).toContainText('John 3:16');
   await page.getByTestId('start-today').click();
-  await page.getByTestId('flip').click();
-  await page.getByTestId('grade-good').click();
-  await answerReference(page, JOHN316);
+  await finishFlashcard(page);
   await expect(page.getByTestId('verse-result')).toBeVisible();
   await page.goto('/#/');
   // no disabled/empty button: the action bar goes away and the card explains what happens next
@@ -30,13 +32,14 @@ test('verse cards show a progress ring with a readable label', async ({ page }) 
   await expect(ring).toHaveAttribute('data-state', 'progress');
 });
 
-test('flashcards: tap to uncover phrase by phrase, start over, show all, then grade', async ({ page }) => {
+test('flashcards: flip, or uncover bit by bit with start over / show all', async ({ page }) => {
   await blockLookups(page);
   await openApp(page);
   await addVerse(page, JOHN316);
   await page.goto('/#/pile/daily');
   await page.getByTestId('verse-card').click();
   await page.getByTestId('review-flashcard').click();
+  await page.getByTestId('gradual-start').click();
   const shown = () => page.locator('.reveal-text .rw.on').count();
   expect(await shown()).toBe(0);
   await expect(page.getByTestId('grade-good')).toHaveCount(0);
@@ -53,9 +56,8 @@ test('flashcards: tap to uncover phrase by phrase, start over, show all, then gr
   expect(await shown()).toBe(1);
   await page.getByTestId('reveal-reset').click();
   expect(await shown()).toBe(0);
-  await page.getByTestId('flip').click(); // "Show all"
+  await page.getByTestId('show-all').click();
   await expect(page.getByTestId('card-back')).toContainText('For God so loved the world');
   await page.getByTestId('grade-good').click();
-  await answerReference(page, JOHN316);
   await expect(page.getByTestId('verse-result')).toBeVisible();
 });
