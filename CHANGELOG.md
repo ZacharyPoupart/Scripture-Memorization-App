@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-10-08
+
 ### Added
 - **Start partway**: when you move a verse to another pile, or add one you already know, an optional slider lets you say how many days it has already been in that pile, so you do not repeat time you have already put in. Undo works as before.
 
