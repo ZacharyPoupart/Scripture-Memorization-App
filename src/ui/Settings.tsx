@@ -325,6 +325,72 @@ function BackupCard() {
   );
 }
 
+const SPACING_PRESETS = [
+  { hours: 0, label: 'No wait' },
+  { hours: 0.5, label: '30 minutes' },
+  { hours: 1, label: '1 hour' },
+  { hours: 2, label: '2 hours' },
+  { hours: 3, label: '3 hours' },
+  { hours: 4, label: '4 hours' },
+];
+
+/** Time between a Daily verse's counted reviews: presets plus a custom number of minutes. */
+function SpacingField({ hours, onChange }: { hours: number; onChange: (hours: number) => void }) {
+  const isPreset = SPACING_PRESETS.some((p) => p.hours === hours);
+  const [custom, setCustom] = useState(!isPreset);
+  const [minutes, setMinutes] = useState(String(Math.round(hours * 60)));
+  const selected = custom ? 'custom' : String(hours);
+  return (
+    <Field label="Time between Daily reviews" hint="Each Daily verse is reviewed 3 times a day, at least this far apart.">
+      <select
+        class="input"
+        value={selected}
+        data-testid="spacing"
+        onChange={(e) => {
+          const v = e.currentTarget.value;
+          if (v === 'custom') {
+            setCustom(true);
+            setMinutes(String(Math.round(hours * 60)));
+          } else {
+            setCustom(false);
+            onChange(Number(v));
+          }
+        }}
+      >
+        {SPACING_PRESETS.map((p) => (
+          <option key={p.hours} value={p.hours}>
+            {p.label}
+          </option>
+        ))}
+        <option value="custom">Custom…</option>
+      </select>
+      {custom && (
+        <label class="row" style={{ marginTop: 'var(--s-2, 8px)', gap: '8px', alignItems: 'center' }}>
+          <input
+            class="input"
+            type="number"
+            inputMode="numeric"
+            min={0}
+            max={720}
+            step={5}
+            value={minutes}
+            aria-label="Minutes between Daily reviews"
+            data-testid="spacing-custom"
+            style={{ maxWidth: '7rem' }}
+            onInput={(e) => {
+              const raw = e.currentTarget.value;
+              setMinutes(raw);
+              const m = Number(raw);
+              if (raw !== '' && Number.isFinite(m) && m >= 0 && m <= 720) onChange(m / 60);
+            }}
+          />
+          <span>minutes (0–720)</span>
+        </label>
+      )}
+    </Field>
+  );
+}
+
 export function Settings({ onShowIntro }: { onShowIntro: () => void }) {
   const { data, settings } = useApp();
   const [reset, setReset] = useState(false);
@@ -362,20 +428,7 @@ export function Settings({ onShowIntro }: { onShowIntro: () => void }) {
               ))}
             </select>
           </Field>
-          <Field label="Time between Daily reviews" hint="Each Daily verse is reviewed 3 times a day, at least this far apart.">
-            <select
-              class="input"
-              value={data.prefs.value.spacingHours}
-              onChange={(e) => setPrefs({ spacingHours: Number(e.currentTarget.value) })}
-              data-testid="spacing"
-            >
-              {[1, 2, 3, 4].map((h) => (
-                <option key={h} value={h}>
-                  {h} hour{h === 1 ? '' : 's'}
-                </option>
-              ))}
-            </select>
-          </Field>
+          <SpacingField hours={data.prefs.value.spacingHours} onChange={(spacingHours) => setPrefs({ spacingHours })} />
           <Field
             group
             label="Fill-in-the-blank difficulty (Daily verses)"

@@ -79,6 +79,29 @@ describe('Daily pile: 3 reviews a day with spacing', () => {
     expect(verseStatus(data, v, at(day(1), '12:00')).state).toBe('ready');
   });
 
+  it('supports no wait, 30 minutes and custom minute values', () => {
+    const none = newData();
+    none.prefs.value.spacingHours = 0;
+    const a = john316(none, at(D0, '07:00'));
+    expect(recordReview(none, a.id, at(day(1), '08:00'), DEVICE).counted).toBe(true);
+    expect(verseStatus(none, a, at(day(1), '08:00')).state).toBe('ready');
+    expect(recordReview(none, a.id, at(day(1), '08:00'), DEVICE).counted).toBe(true);
+
+    const half = newData();
+    half.prefs.value.spacingHours = 0.5;
+    const b = john316(half, at(D0, '07:00'));
+    recordReview(half, b.id, at(day(1), '08:00'), DEVICE);
+    expect(verseStatus(half, b, at(day(1), '08:29')).state).toBe('waiting');
+    expect(verseStatus(half, b, at(day(1), '08:30')).state).toBe('ready');
+
+    const custom = newData();
+    custom.prefs.value.spacingHours = 45 / 60;
+    const c = john316(custom, at(D0, '07:00'));
+    recordReview(custom, c.id, at(day(1), '08:00'), DEVICE);
+    expect(verseStatus(custom, c, at(day(1), '08:44')).state).toBe('waiting');
+    expect(verseStatus(custom, c, at(day(1), '08:45')).state).toBe('ready');
+  });
+
   it('counts reset at local midnight (reviews at 23:59 and 00:01 are different days)', () => {
     const data = newData();
     const v = john316(data, at(D0, '07:00'));
@@ -254,19 +277,17 @@ describe('Streak', () => {
     }
   });
 
-  it('is at risk, not yet extended, until the last review of the day', () => {
+  it('is at risk, not yet extended, until the first review of the day (one review is enough)', () => {
     const data = newData();
     const v = john316(data, at(D0, '07:00'));
     reviewEverythingDue(data, day(1));
     const now = at(day(2), '08:00');
     settle(data, now);
-    recordReview(data, v.id, now, DEVICE);
-    let s = streakInfo(data, at(day(2), '09:00'));
+    let s = streakInfo(data, at(day(2), '07:30'));
     expect(s.count).toBe(1);
     expect(s.atRisk).toBe(true);
-    recordReview(data, v.id, at(day(2), '10:00'), DEVICE);
-    recordReview(data, v.id, at(day(2), '12:00'), DEVICE);
-    s = streakInfo(data, at(day(2), '12:30'));
+    recordReview(data, v.id, now, DEVICE); // just 1 of the 3 recommended
+    s = streakInfo(data, at(day(2), '09:00'));
     expect(s.count).toBe(2);
     expect(s.atRisk).toBe(false);
     expect(s.todayDone).toBe(true);
@@ -284,14 +305,46 @@ describe('Streak', () => {
     expect(s.longest).toBe(5);
   });
 
-  it('a partly finished day breaks the streak', () => {
+  it('a day with only one of three Daily reviews still keeps the streak', () => {
     const data = newData();
     const v = john316(data, at(D0, '07:00'));
     reviewEverythingDue(data, day(1));
     settle(data, at(day(2), '08:00'));
     recordReview(data, v.id, at(day(2), '08:00'), DEVICE); // only 1 of 3
     settle(data, at(day(3), '08:00'));
+    expect(data.ledger[day(2)].o).toBe('c');
+    expect(streakInfo(data, at(day(3), '08:00')).count).toBe(2);
+  });
+
+  it('a day where a due verse got no review at all breaks the streak', () => {
+    const data = newData();
+    const a = john316(data, at(D0, '07:00'));
+    const b = john316(data, at(D0, '07:05'));
+    reviewEverythingDue(data, day(1));
+    settle(data, at(day(2), '08:00'));
+    recordReview(data, a.id, at(day(2), '08:00'), DEVICE); // b untouched
+    expect(todaySummary(data, at(day(2), '09:00')).outcome).toBe('pending');
+    settle(data, at(day(3), '08:00'));
+    expect(data.ledger[day(2)].o).toBe('m');
     expect(streakInfo(data, at(day(3), '08:00')).count).toBe(0);
+    expect(b.id).not.toBe(a.id);
+  });
+
+  it('practising on the very first day earns a flame (new verses never count against you)', () => {
+    const data = newData();
+    const v = john316(data, at(D0, '07:00'));
+    expect(streakInfo(data, at(D0, '07:30')).count).toBe(0);
+    recordReview(data, v.id, at(D0, '08:00'), DEVICE);
+    const s = streakInfo(data, at(D0, '08:30'));
+    expect(s.count).toBe(1);
+    expect(s.todayDone).toBe(true);
+    settle(data, at(day(1), '08:00'));
+    expect(data.ledger[D0].o).toBe('c');
+    // and a first day with no practice is still neutral
+    const other = newData();
+    john316(other, at(D0, '07:00'));
+    settle(other, at(day(1), '08:00'));
+    expect(other.ledger[D0].o).toBe('n');
   });
 
   it('days with nothing due are neutral: they neither add nor break', () => {
