@@ -1,7 +1,7 @@
 // Celebration sizes scale with the achievement. Streak milestones are celebrated once per streak.
 import { dayKeyOf } from './dates.ts';
 
-export const STREAK_MILESTONES = [3, 7, 14, 30, 60, 100, 150, 200, 365, 500, 730, 1000] as const;
+export const STREAK_MILESTONES = [1, 3, 7, 14, 30, 60, 100, 150, 200, 365, 500, 730, 1000] as const;
 
 export type CelebrationSize = 'small' | 'medium' | 'large';
 
@@ -18,6 +18,7 @@ export function streakMilestoneId(count: number, now: number): string {
 }
 
 export function streakMilestoneText(count: number): { title: string; body: string } {
+  if (count === 1) return { title: 'Day one', body: 'Your flame is lit. Every day you practise it grows.' };
   if (count >= 365) return { title: `${count} days in a row`, body: 'A whole year of showing up. Scripture is becoming part of you.' };
   if (count >= 100) return { title: `${count} days in a row`, body: 'That kind of steadiness changes a person. Well done.' };
   if (count >= 30) return { title: `${count} days in a row`, body: 'A month of daily practice. The habit is real now.' };

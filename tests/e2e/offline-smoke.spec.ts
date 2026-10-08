@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test';
-import { addVerse, answerReference, blockLookups, JOHN316, openApp } from './helpers';
+import { addVerse, blockLookups, JOHN316, openApp, finishFlashcard, autoDismissMilestones } from './helpers';
+
+test.beforeEach(async ({ page }) => {
+  await autoDismissMilestones(page);
+});
 
 // "Does the whole app still boot and respond with the network OFF?" Re-run on every workstream; extend as
 // screens are added. Runs on the phone-sized viewport (and desktop).
@@ -50,9 +54,7 @@ test('every screen loads and is clickable with the network off', async ({ page, 
   await page.goto('/#/pile/daily');
   await page.getByTestId('verse-card').click();
   await page.getByTestId('review-flashcard').click();
-  await page.getByTestId('flip').click();
-  await page.getByTestId('grade-good').click();
-  await answerReference(page, JOHN316);
+  await finishFlashcard(page);
   await expect(page.getByTestId('verse-result')).toContainText('Review counted');
   await context.setOffline(false);
 });

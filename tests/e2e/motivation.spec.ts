@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
-import { addVerse, answerReference, blockLookups, JOHN316, localDay, openApp, replaceDataWith } from './helpers';
+import { autoDismissMilestones, addVerse, blockLookups, JOHN316, localDay, openApp, replaceDataWith, finishFlashcard } from './helpers';
 
 const fixture = JSON.parse(readFileSync(new URL('../fixtures/backup-v1.1.0.json', import.meta.url), 'utf8')).data;
 const TODAY = [2026, 2, 10]; // 10 March 2026 (months are 0-based)
@@ -31,9 +31,7 @@ async function finishOneFlashcard(page: Page) {
   await page.goto('/#/pile/daily');
   await page.getByTestId('verse-card').click();
   await page.getByTestId('review-flashcard').click();
-  await page.getByTestId('flip').click();
-  await page.getByTestId('grade-good').click();
-  await answerReference(page, JOHN316);
+  await finishFlashcard(page);
   await expect(page.getByTestId('verse-result')).toBeVisible();
 }
 
@@ -153,6 +151,7 @@ test.describe('feedback and celebrations', () => {
       };
       navigator.vibrate = () => ((window as any).__vibes++, true);
     });
+    await autoDismissMilestones(page);
     await blockLookups(page);
     await openApp(page);
     await addVerse(page, JOHN316);

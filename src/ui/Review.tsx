@@ -48,7 +48,8 @@ function VerseAttempt({ verse, mode, onFinished, onRestart }: { verse: Verse; mo
     }
     return false;
   };
-  const props = { verse, onMistake, onRestart, mistakes, onDone: () => (step === 'text' ? setStep('ref') : onFinished()) };
+  // A flashcard shows the reference on the card itself, so it has no reference-recall step
+  const props = { verse, onMistake, onRestart, mistakes, onDone: () => (step === 'text' && mode !== 'flashcard' ? setStep('ref') : onFinished()) };
   if (step === 'ref') return <RefRecall {...props} />;
   switch (mode) {
     case 'blanks':

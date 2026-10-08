@@ -102,6 +102,9 @@ describe('piles, totals and what is nearly there', () => {
 describe('milestones', () => {
   it('are celebrated by size and have stable ids', () => {
     expect(STREAK_MILESTONES).toContain(7);
+    expect(isStreakMilestone(1)).toBe(true); // day one gets a small celebration
+    expect(streakMilestoneSize(1)).toBe('small');
+    expect(isStreakMilestone(2)).toBe(false);
     expect(isStreakMilestone(7)).toBe(true);
     expect(isStreakMilestone(8)).toBe(false);
     expect(streakMilestoneSize(7)).toBe('small');

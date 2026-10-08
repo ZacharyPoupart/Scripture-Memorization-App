@@ -7,6 +7,7 @@ import { Dock, MistakeDots, type ModeProps } from './shared.tsx';
 export function TypeIt({ verse, onMistake, onDone, mistakes }: ModeProps) {
   const words = useMemo(() => tokenize(verse.text), [verse.id, verse.text]);
   const [pos, setPos] = useState(0);
+  const [missed, setMissed] = useState<number[]>([]); // words shown after a wrong letter
   const [shakeCls, shake] = useShake();
   const input = useRef<HTMLInputElement>(null);
   const area = useRef<HTMLDivElement>(null);
@@ -36,14 +37,18 @@ export function TypeIt({ verse, onMistake, onDone, mistakes }: ModeProps) {
       if (/\s/.test(ch) || posRef.current >= words.length) continue;
       if (matchesFirstLetter(words[posRef.current], ch)) advance();
       else {
+        // A wrong letter counts as a mistake, shows the word you missed, and lets you carry on.
         shake();
         if (onMistake()) return;
+        setMissed((m) => [...m, posRef.current]);
+        advance();
       }
     }
   };
 
   const reveal = () => {
     if (posRef.current >= words.length) return;
+    setMissed((m) => [...m, posRef.current]);
     advance();
     onMistake();
   };
@@ -56,7 +61,7 @@ export function TypeIt({ verse, onMistake, onDone, mistakes }: ModeProps) {
         <p class="verse-text" data-testid="type-text">
           {words.map((w, i) => (
             <span key={i}>
-              <span class={`w ${i >= pos ? 'hidden' : ''} ${i === pos ? 'cur' : ''}`} data-testid={i < pos ? 'revealed' : undefined}>
+              <span class={`w ${i >= pos ? 'hidden' : ''} ${i === pos ? 'cur' : ''} ${missed.includes(i) ? 'missed' : ''}`} data-testid={i < pos ? 'revealed' : undefined}>
                 {w.raw}
               </span>{' '}
             </span>
@@ -86,7 +91,7 @@ export function TypeIt({ verse, onMistake, onDone, mistakes }: ModeProps) {
           </button>
         </div>
         <div class="hint-text center" style={{ marginTop: '6px' }}>
-          Reveal shows the word but counts as a mistake. Word {Math.min(pos + 1, words.length)} of {words.length}.
+          A wrong letter shows the word (counts as a slip) and you carry on. Word {Math.min(pos + 1, words.length)} of {words.length}.
         </div>
       </Dock>
     </>

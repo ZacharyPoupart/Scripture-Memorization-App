@@ -58,3 +58,24 @@ export function cleanVerseText(input: string): string {
     .replace(/\s+/g, ' ')
     .trim();
 }
+
+export type RevealStep = 'word' | 'phrase';
+
+/**
+ * How a verse is uncovered by tapping: one word at a time, or by phrase (a group ends after
+ * punctuation such as , ; : . ? ! or after 6 words). Returns the word count of each group.
+ */
+export function revealGroups(words: Word[], step: RevealStep): number[] {
+  if (step === 'word') return words.map(() => 1);
+  const groups: number[] = [];
+  let n = 0;
+  for (const w of words) {
+    n++;
+    if (/[,;:.!?…—–)”"'’]$/.test(w.raw.trim()) || n >= 6) {
+      groups.push(n);
+      n = 0;
+    }
+  }
+  if (n) groups.push(n);
+  return groups;
+}

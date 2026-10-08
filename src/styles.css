@@ -1491,3 +1491,82 @@ button.streak {
     transition: none;
   }
 }
+
+/* ---- tap-to-reveal flashcard ---- */
+.flashcard-top {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.reveal-text {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.reveal-text .rw {
+  border-radius: 4px;
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+.reveal-text .rw:not(.on) {
+  color: transparent;
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+.reveal-text .rw.on {
+  color: inherit;
+}
+.reveal-tools {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 6px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal-text .rw {
+    transition: none;
+  }
+}
+.flashcard-face {
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+  width: 100%;
+  min-height: 46vh;
+  align-content: center;
+  padding: 24px 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  color: inherit;
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  animation: flipIn 0.28s ease both;
+}
+.flashcard-face.back {
+  text-align: left;
+  justify-items: start;
+}
+@keyframes flipIn {
+  from {
+    transform: perspective(900px) rotateX(-70deg);
+    opacity: 0.2;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .flashcard-face {
+    animation: none;
+  }
+}
+
+/* a word shown after a wrong letter: a soft underline, never alarming */
+.w.missed:not(.hidden) {
+  text-decoration: underline dotted var(--warn);
+  text-underline-offset: 4px;
+}

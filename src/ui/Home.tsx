@@ -7,7 +7,7 @@ import { navigate } from '../router.ts';
 import { shouldNudgeBackup } from '../core/nudges.ts';
 import { downloadBackup, updateSettings, useApp } from '../store.ts';
 import { Icon, PILE_INFO } from './common.tsx';
-import { MODES, ModePicker } from './ModePicker.tsx';
+import { ModePicker } from './ModePicker.tsx';
 
 export function Home() {
   const { data, settings } = useApp();
@@ -119,12 +119,7 @@ export function Home() {
                 ))}
               </ul>
             )}
-            <details class="quiet-details">
-              <summary>
-                Mode: <strong>{MODES.find((m) => m.value === settings.defaultMode)?.long}</strong>
-              </summary>
-              <ModePicker />
-            </details>
+            <ModePicker />
           </div>
 
           <div>

@@ -1,6 +1,10 @@
 import { expect, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
-import { addVerse, answerReference, blockLookups, JOHN316, openApp, pickRef, PSALM23_1 } from './helpers';
+import { addVerse, blockLookups, JOHN316, openApp, pickRef, PSALM23_1, finishFlashcard, autoDismissMilestones } from './helpers';
+
+test.beforeEach(async ({ page }) => {
+  await autoDismissMilestones(page);
+});
 
 test.describe('offline', () => {
   test('installs, then works with no connection at all', async ({ page, context }) => {
@@ -23,9 +27,7 @@ test.describe('offline', () => {
     await page.goto('/#/pile/daily');
     await page.getByTestId('verse-card').click();
     await page.getByTestId('review-flashcard').click();
-    await page.getByTestId('flip').click();
-    await page.getByTestId('grade-good').click();
-    await answerReference(page, JOHN316);
+    await finishFlashcard(page);
     await expect(page.getByTestId('verse-result')).toContainText('Review counted');
 
     // adding a verse offline: lookup is skipped politely, manual text works
@@ -101,6 +103,8 @@ test.describe('sync between devices', () => {
   test('a phone and a computer link with a code and merge changes from both', async ({ browser }) => {
     const phone = await (await browser.newContext()).newPage();
     const computer = await (await browser.newContext()).newPage();
+    await autoDismissMilestones(phone);
+    await autoDismissMilestones(computer);
     for (const p of [phone, computer]) await blockLookups(p);
 
     await openApp(phone);
@@ -131,9 +135,7 @@ test.describe('sync between devices', () => {
     // a review on the computer shows up on the phone
     await computer.getByTestId('verse-card').first().click();
     await computer.getByTestId('review-flashcard').click();
-    await computer.getByTestId('flip').click();
-    await computer.getByTestId('grade-good').click();
-    await answerReference(computer, JOHN316);
+    await finishFlashcard(computer);
     await expect(computer.getByTestId('verse-result')).toBeVisible();
     await computer.goto('/#/settings');
     await computer.getByTestId('sync-now').click();
