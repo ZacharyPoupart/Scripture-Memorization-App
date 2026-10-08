@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.5.2] - 2026-10-08
+
 ### Changed
 - Streak: a day now counts when every due verse got at least one counted review (three a day is still the goal). Practising on the very first day also earns a flame; verses added that day still never count against you. A little more colour: soft tinted background, pile-coloured tiles and a highlighted current tab.
 
