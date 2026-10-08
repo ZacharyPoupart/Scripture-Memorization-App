@@ -1241,29 +1241,17 @@ button.streak {
   color: var(--text);
 }
 .pick-sheet {
-  max-height: min(86%, 640px);
+  /* use all the room there is (below the status bar) so a normal chapter fits without scrolling */
+  max-height: calc(100% - var(--safe-top) - 10px);
 }
 .pick-head {
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 .pick-head h2 {
   font-size: 1.05rem;
 }
 .pick-head .btn {
   min-width: 64px;
-}
-.pick-chips {
-  gap: 6px;
-  margin-bottom: 10px;
-}
-.pick-chips .chip {
-  min-height: 36px;
-  padding: 0 12px;
-  border: 0;
-}
-.pick-chips .chip[aria-pressed='true'] {
-  background: var(--accent);
-  color: var(--on-accent);
 }
 .pick-scroll {
   flex: 1;
@@ -1275,13 +1263,21 @@ button.streak {
 .pick-grid {
   display: grid;
   gap: 8px;
-  padding: 2px 2px 8px;
+  padding: 2px 2px 6px;
+}
+@media (max-height: 700px) {
+  .pick-btn {
+    min-height: 46px;
+  }
+  .pick-grid {
+    gap: 6px;
+  }
 }
 .pick-grid.books {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 .pick-btn {
-  min-height: 52px;
+  min-height: 50px;
   padding: 6px 4px;
   border-radius: 12px;
   border: 1px solid var(--border);
@@ -1307,11 +1303,6 @@ button.streak {
   background: color-mix(in srgb, var(--accent) 30%, var(--surface-2));
   border-color: transparent;
 }
-.pick-btn.more {
-  color: var(--muted);
-  background: transparent;
-  border-style: dashed;
-}
 .pick-bar {
   display: flex;
   align-items: center;
@@ -1327,6 +1318,12 @@ button.streak {
 .pick-bar .btn {
   min-width: 96px;
   min-height: 52px;
+}
+.pick-bar .more-btn {
+  min-width: 48px;
+  padding: 0 10px;
+  font-size: 1.3rem;
+  color: var(--muted);
 }
 @media (hover: hover) and (pointer: fine) {
   .pick-btn:hover:not([aria-pressed='true']) {

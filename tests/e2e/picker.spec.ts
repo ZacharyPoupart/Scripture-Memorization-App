@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { BOOKS } from '../../src/core/books.ts';
 import { addVerse, blockLookups, JOHN316, openApp, pickRange, pickRef, tapNumber } from './helpers';
 
 /** Wait for slide/fade animations to finish so positions are measured at rest. */
@@ -89,16 +90,15 @@ test.describe('cascading verse picker (Book → Chapter → Verse)', () => {
     await expect(page.getByTestId('pick-chapter')).toContainText('Choose');
   });
 
-  test('quick filters shrink the book list in one tap', async ({ page }) => {
+  test('the book popup is just the books: no shortcuts, no search, canonical order', async ({ page }) => {
     await page.getByTestId('pick-book').click();
     await expect(page.getByTestId('book-option')).toHaveCount(66);
-    for (const [group, n] of [['law', 5], ['history', 12], ['wisdom', 5], ['prophets', 17], ['gospels', 5], ['letters', 22]] as const) {
-      await page.getByTestId(`group-${group}`).click();
-      await expect(page.getByTestId('book-option'), group).toHaveCount(n);
-    }
-    await page.getByRole('button', { name: 'All', exact: true }).click();
-    await expect(page.getByTestId('book-option')).toHaveCount(66);
-    await page.getByTestId('group-letters').click();
+    await expect(page.locator('[data-testid^="group-"], [data-testid="book-search"], .pick-chips')).toHaveCount(0);
+    const names = await page.getByTestId('book-option').allTextContents();
+    expect(names[0]).toBe('Genesis');
+    expect(names[38]).toBe('Malachi');
+    expect(names[39]).toBe('Matthew');
+    expect(names[65]).toBe('Revelation');
     await page.getByTestId('book-option').filter({ hasText: /^1 Corinthians$/ }).click();
     await expect(page.getByTestId('num-option')).toHaveCount(16);
   });
@@ -227,4 +227,41 @@ test.describe('picker ergonomics on a phone', () => {
     await page.getByTestId('pick-done').click();
     for (const id of ['pick-book', 'pick-chapter', 'pick-verse']) expect((await page.getByTestId(id).boundingBox())!.height).toBeGreaterThanOrEqual(56);
   });
+
+  for (const [w, h] of [[390, 780], [375, 667], [430, 932]] as const) {
+    test(`verse grid fits without scrolling for ordinary chapters at ${w}x${h}`, async ({ page, isMobile }) => {
+      test.skip(!isMobile, 'phone project only');
+      await page.setViewportSize({ width: w, height: h });
+      await blockLookups(page);
+      await openApp(page, '/#/add');
+      const cases: [number, number, number][] = [
+        [19, 23, 6], // Psalm 23
+        [43, 3, 36], // John 3
+        [1, 1, 31], // Genesis 1
+        [40, 5, 48], // Matthew 5
+      ];
+      for (const [book, chapter, verses] of cases) {
+        await page.getByTestId('pick-book').click();
+        await page.getByTestId('book-option').filter({ hasText: new RegExp(`^${BOOKS[book - 1].name}$`) }).click();
+        await tapNumber(page, chapter);
+        await atRest(page);
+        await expect(page.getByTestId('num-option')).toHaveCount(verses);
+        const m = await page.evaluate(() => {
+          const sheet = document.querySelector<HTMLElement>('.pick-sheet')!.getBoundingClientRect();
+          const scroll = document.querySelector<HTMLElement>('.pick-scroll')!;
+          const done = document.querySelector<HTMLElement>('[data-testid=pick-done]')!.getBoundingClientRect();
+          return { top: sheet.top, bottom: sheet.bottom, scrolls: scroll.scrollHeight - scroll.clientHeight, doneBottom: done.bottom, innerHeight: window.innerHeight };
+        });
+        const label = `${BOOKS[book - 1].name} ${chapter} at ${w}x${h}`;
+        expect(m.top, label).toBeGreaterThanOrEqual(0);
+        expect(m.bottom, label).toBeLessThanOrEqual(m.innerHeight + 1);
+        expect(m.doneBottom, label).toBeLessThanOrEqual(m.innerHeight + 1); // Done is on screen
+        if (verses <= 36 || h >= 780) expect(m.scrolls, `${label}: nothing should need scrolling`).toBeLessThanOrEqual(1);
+        // the last verse button is fully visible too
+        const last = (await page.getByTestId('num-option').last().boundingBox())!;
+        expect(last.y + last.height, label).toBeLessThanOrEqual(m.innerHeight);
+        await page.getByTestId('verse-grid').getByRole('button', { name: 'Close' }).click();
+      }
+    });
+  }
 });

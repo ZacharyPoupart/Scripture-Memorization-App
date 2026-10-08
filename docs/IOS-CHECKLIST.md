@@ -29,9 +29,9 @@ The automated tests run in Chromium, which behaves differently from iPhone Safar
 - [ ] If the app ever seems stuck on an old version or won't start offline: export a backup, then remove the app from the home screen, re-add it from Safari, and **Import backup**. (Report it — that should not be needed.)
 
 ## Adding a verse (picker)
-- [ ] Add → tap **Book**: a grid of books slides up; the six filters (Law, History…) narrow it. Tap a book → the **chapter** grid opens by itself → tap a chapter → the **verse** grid opens by itself → tap a verse → tap **Done**. No keyboard appears at any point.
+- [ ] Add → tap **Book**: a grid of the 66 books slides up (scroll for the rest). Tap a book → the **chapter** grid opens by itself → tap a chapter → the **verse** grid opens by itself → tap a verse → tap **Done**. No keyboard appears at any point.
 - [ ] Range: in the verse grid tap a first verse, then a later one: the verses between are tinted and the grid closes.
-- [ ] Buttons are easy to hit with a thumb; **Done** is on screen without scrolling; Psalms (150 chapters) and Psalm 119 scroll smoothly and reopening jumps to your current choice.
+- [ ] Buttons are easy to hit with a thumb; **Done** is on screen without scrolling and an ordinary chapter's verse grid (John 3, Matthew 5) fits with no scrolling; Psalms (150 chapters) and Psalm 119 scroll smoothly and reopening jumps to your current choice.
 
 ## Look and feel
 - [ ] Switch iPhone between Light and Dark (Settings → Display): the app follows. Check Settings → Appearance → Light/Dark overrides.
