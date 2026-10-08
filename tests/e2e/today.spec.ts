@@ -61,3 +61,15 @@ test('flashcards: flip, or uncover bit by bit with start over / show all', async
   await page.getByTestId('grade-good').click();
   await expect(page.getByTestId('verse-result')).toBeVisible();
 });
+
+test('a first-day review ends with a warm "Nice work" (streak kept) instead of claiming everything is done', async ({ page }) => {
+  await blockLookups(page);
+  await openApp(page);
+  await addVerse(page, JOHN316);
+  await page.goto('/#/');
+  await page.getByTestId('start-today').click();
+  await finishFlashcard(page);
+  await expect(page.getByTestId('session-summary')).toBeVisible({ timeout: 6000 });
+  await expect(page.getByTestId('streak-kept')).toContainText('Nice work');
+  await expect(page.getByTestId('all-done')).toHaveCount(0);
+});

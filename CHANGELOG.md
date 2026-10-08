@@ -5,6 +5,9 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Fixed
+- The end-of-session screen no longer says "All done for today" when more reviews are still due; it says "Nice work" and shows your streak. Finishing everything for the day adds a small confetti burst (Full celebrations only).
+
 ## [1.8.3] - 2026-10-08
 
 ### Fixed
