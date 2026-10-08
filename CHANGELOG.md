@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.5.1] - 2026-10-08
+
 ### Changed
 - The Book / Chapter / Verse pickers now use all the room on screen, so an ordinary chapter (e.g. John 3, Genesis 1, Matthew 5) fits without scrolling and the Done button is always visible.
 - Removed the quick-filter shortcuts (Law, History, Gospels & Acts…) from the Book picker; it is now just the 66 books in Bible order.
