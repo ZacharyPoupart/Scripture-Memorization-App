@@ -6,7 +6,7 @@ import { PILES } from '../core/types.ts';
 import { navigate } from '../router.ts';
 import { shouldNudgeBackup } from '../core/nudges.ts';
 import { downloadBackup, updateSettings, useApp } from '../store.ts';
-import { GearLink, Icon, PILE_INFO } from './common.tsx';
+import { Icon, PILE_INFO } from './common.tsx';
 import { ModePicker } from './ModePicker.tsx';
 
 export function Home() {
@@ -75,7 +75,6 @@ export function Home() {
               <div class="muted small">{new Date(now).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}</div>
               <h1>{greet}</h1>
             </div>
-            <div class="row">
             <button
               class="streak"
               title={`Longest streak: ${streak.longest}`}
@@ -87,8 +86,6 @@ export function Home() {
               <span>{streak.count}</span>
               {streak.longest > streak.count && <small class="streak-best">best {streak.longest}</small>}
             </button>
-              <GearLink />
-            </div>
           </div>
 
           {frozen && (

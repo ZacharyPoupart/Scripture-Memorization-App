@@ -4,7 +4,7 @@ import { pileVerses, verseStatus } from '../core/schedule.ts';
 import { PILES, type Pile } from '../core/types.ts';
 import { back, navigate } from '../router.ts';
 import { useApp } from '../store.ts';
-import { GearLink, Icon, PILE_INFO, Seg, VerseCard } from './common.tsx';
+import { Icon, PILE_INFO, Seg, VerseCard } from './common.tsx';
 import { filtersActive, ListControls, useListState } from './ListControls.tsx';
 import { ModePicker } from './ModePicker.tsx';
 
@@ -18,15 +18,7 @@ export function PilesOverview() {
   return (
     <div class="scroll">
       <div class="narrow stack">
-        <div class="row spread">
-          <h1>All verses</h1>
-          <span class="row">
-            <button class="btn small" onClick={() => navigate('/add')} data-testid="add-verse">
-              + Add verse
-            </button>
-            <GearLink />
-          </span>
-        </div>
+        <h1>All verses</h1>
         <ListControls state={list} update={update} topics={topics} />
         {filtersActive(list) && (
           <div class="row spread small muted" role="status" data-testid="match-count">

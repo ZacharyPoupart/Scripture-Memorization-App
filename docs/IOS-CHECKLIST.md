@@ -57,6 +57,5 @@ The automated tests run in Chromium, which behaves differently from iPhone Safar
 - [ ] First day: add a verse, review it once: a small **Day one** card appears after you return to Today. Tapping Thank you dismisses it.
 - [ ] Settings → Time between Daily reviews: No wait / 30 minutes / hours / Custom.
 
-## Navigation (v1.8)
-- [ ] The bottom bar has three tabs (Today · Verses · Progress). The small gear (top right of each) opens Settings; **+ Add verse** is at the top of Verses.
-- [ ] Gear and tabs respond to a single tap; the gear is not hidden under the notch/status bar.
+## Navigation
+- [ ] The bottom bar has five tabs: Today · Piles · Add · Stats · Settings. Each responds to a single tap and clears the home indicator.

@@ -42,7 +42,7 @@ test('navigation tabs work and the streak chip is shown', async ({ page }) => {
   await addVerse(page, JOHN316);
   await page.getByRole('link', { name: 'Today' }).click();
   await expect(page.getByTestId('streak')).toBeVisible();
-  await page.getByRole('link', { name: 'Verses' }).click();
+  await page.getByRole('link', { name: 'Piles' }).click();
   await expect(page.getByRole('heading', { name: 'All verses' })).toBeVisible();
   await page.getByRole('link', { name: 'Settings' }).click();
   await expect(page.getByRole('heading', { name: 'Settings' })).toBeVisible();
