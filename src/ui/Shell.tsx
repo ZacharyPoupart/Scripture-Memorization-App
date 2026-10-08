@@ -5,10 +5,8 @@ import { Icon } from './common.tsx';
 
 const TABS = [
   { path: '/', label: 'Today', icon: 'home' },
-  { path: '/piles', label: 'Piles', icon: 'piles' },
-  { path: '/add', label: 'Add', icon: 'plus' },
-  { path: '/stats', label: 'Stats', icon: 'chart' },
-  { path: '/settings', label: 'Settings', icon: 'gear' },
+  { path: '/piles', label: 'Verses', icon: 'piles' },
+  { path: '/stats', label: 'Progress', icon: 'chart' },
 ] as const;
 
 export function TabBar({ current }: { current: string }) {

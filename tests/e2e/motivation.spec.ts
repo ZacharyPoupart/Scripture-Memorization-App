@@ -66,7 +66,7 @@ test.describe('stats screen', () => {
     await page.getByTestId('streak').click();
     await expect(page.getByRole('heading', { name: 'Progress' })).toBeVisible();
     await page.getByRole('link', { name: 'Today' }).click();
-    await page.getByRole('link', { name: 'Stats' }).click();
+    await page.getByRole('link', { name: 'Progress' }).click();
     await expect(page.getByTestId('stats')).toBeVisible();
   });
 });

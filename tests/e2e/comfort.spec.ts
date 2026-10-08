@@ -101,7 +101,9 @@ test.describe('taps are never blocked or sticky', () => {
       });
       expect(ok, id).toBe(true);
     }
-    for (const name of ['Today', 'Piles', 'Add', 'Settings']) {
+    // the "verse added" message sits over the top of the screen (where the gear is) until it fades
+    await expect(page.getByTestId('toast')).toBeHidden({ timeout: 10000 });
+    for (const name of ['Today', 'Verses', 'Progress', 'Settings']) {
       const ok = await page.getByRole('link', { name }).evaluate((el) => {
         const r = el.getBoundingClientRect();
         const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
@@ -120,7 +122,7 @@ test.describe('taps are never blocked or sticky', () => {
       const b = (await page.getByTestId(id).boundingBox())!;
       expect(b.height).toBeGreaterThanOrEqual(44);
     }
-    for (const name of ['Today', 'Piles', 'Add', 'Settings']) {
+    for (const name of ['Today', 'Verses', 'Progress', 'Settings']) {
       const b = (await page.getByRole('link', { name }).boundingBox())!;
       expect(b.height).toBeGreaterThanOrEqual(44);
       expect(b.width).toBeGreaterThanOrEqual(44);

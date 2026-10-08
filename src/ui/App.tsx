@@ -52,12 +52,12 @@ export function App({ onReload }: { onReload: () => void }) {
   else if (a === 'piles') ((screen = <PilesOverview />), (tab = '/piles'));
   else if (a === 'pile' && PILES.includes(b as Pile)) ((screen = <PilePage pile={b as Pile} />), (tab = '/piles'));
   else if (a === 'verse' && b) ((screen = <VerseDetail id={b} />), (tab = '/piles'));
-  else if (a === 'add') ((screen = <AddVerse key="add" />), (tab = '/add'));
+  else if (a === 'add') ((screen = <AddVerse key="add" />), (tab = '/piles'));
   else if (a === 'edit' && b) ((screen = <AddVerse key={`edit-${b}`} editId={b} />), (tab = '/piles'));
   else if (a === 'review') screen = <Review route={route} key={route.query.toString()} />;
   else if (a === 'stats') ((screen = <Stats />), (tab = '/stats'));
-  else if (a === 'settings') ((screen = <Settings onShowIntro={() => setIntro(true)} />), (tab = '/settings'));
-  else if (a === 'about') ((screen = <About onShowIntro={() => setIntro(true)} />), (tab = '/settings'));
+  else if (a === 'settings') ((screen = <Settings onShowIntro={() => setIntro(true)} />), (tab = ''));
+  else if (a === 'about') ((screen = <About onShowIntro={() => setIntro(true)} />), (tab = ''));
   else screen = <Home />;
 
   return (

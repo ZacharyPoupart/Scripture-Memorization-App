@@ -3,7 +3,7 @@ import { streakInfo } from '../core/schedule.ts';
 import { bestRuns, heatmap, nextGraduations, pileCounts, totals } from '../core/stats.ts';
 import { navigate } from '../router.ts';
 import { useApp } from '../store.ts';
-import { PILE_INFO } from './common.tsx';
+import { GearLink, PILE_INFO } from './common.tsx';
 
 const WEEKS = 26;
 const fmt = (day: string) => new Date(`${day}T12:00:00`).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
@@ -26,7 +26,10 @@ export function Stats() {
     return (
       <div class="scroll">
         <div class="narrow stack">
+          <div class="row spread">
           <h1>Progress</h1>
+          <GearLink />
+        </div>
           <div class="card center stack" data-testid="stats-empty">
             <div class="hero">🌱</div>
             <h2>Your progress will grow here</h2>
@@ -41,7 +44,10 @@ export function Stats() {
   return (
     <div class="scroll">
       <div class="narrow stack" data-testid="stats">
-        <h1>Progress</h1>
+        <div class="row spread">
+          <h1>Progress</h1>
+          <GearLink />
+        </div>
 
         <div class="grid2">
           <div class="card stat" data-testid="stat-streak">

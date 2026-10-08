@@ -178,6 +178,15 @@ export function pileProgress(data: AppData, v: Verse, now: number) {
   return { target, days, earned, pct: target ? Math.min(100, Math.round((earned / target) * 100)) : 100 };
 }
 
+/** Settings live behind this small gear (top right of the main screens). */
+export function GearLink() {
+  return (
+    <a class="icon-btn gear-link" href="#/settings" aria-label="Settings" onClick={(e) => (e.preventDefault(), navigate('/settings'))}>
+      <Icon name="gear" />
+    </a>
+  );
+}
+
 /** Glanceable progress toward the next pile. Colour comes from the surrounding .pile-* class. */
 export function ProgressRing({ ring }: { ring: Ring }) {
   const R = 14;
