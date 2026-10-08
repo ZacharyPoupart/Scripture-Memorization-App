@@ -5,6 +5,10 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Changed
+- Today screen is calmer: one big "Start today's reviews" button for everything ready (Daily, Weekly, Monthly, Yearly together), a short list of today's verses showing what is ready / waiting / done, and a plain "Done for now / All done for today" state that says when the next review unlocks. The review-mode choice is tucked behind a quiet "Mode:" line; piles are a compact 2×2 grid.
+- Each verse card shows a small progress ring toward its next pile (e.g. "Day 47 of 90 toward Weekly"), a paused look when progress is frozen, and a finished tick for Yearly. The ring replaces the old bar and the "N days in pile" text.
+
 ## [1.5.2] - 2026-10-08
 
 ### Changed

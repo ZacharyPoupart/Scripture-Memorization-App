@@ -38,6 +38,7 @@ test('"today\'s reviews" from Home runs every ready verse in the chosen mode', a
   await addVerse(page, JOHN316);
   await addVerse(page, PSALM23_1);
   await page.goto('/#/');
+  await page.getByText('Mode:').click(); // the mode picker is tucked behind a quiet "Mode: …" line
   await page.getByRole('button', { name: 'Type', exact: true }).click();
   await page.getByTestId('start-today').click();
   await expect(page.getByTestId('review')).toHaveAttribute('data-mode', 'type');

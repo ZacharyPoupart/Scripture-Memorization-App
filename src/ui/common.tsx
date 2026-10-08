@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'preact/hooks';
 import { formatRef } from '../core/reference.ts';
 import { formatDays, formatDuration } from '../core/dates.ts';
 import { DAILY_REVIEWS, graduationTarget, progressDays, daysInPile, type VerseStatus } from '../core/schedule.ts';
+import { progressRing, type Ring } from '../core/today.ts';
 import type { AppData, Pile, Verse } from '../core/types.ts';
 import { navigate } from '../router.ts';
 
@@ -177,8 +178,28 @@ export function pileProgress(data: AppData, v: Verse, now: number) {
   return { target, days, earned, pct: target ? Math.min(100, Math.round((earned / target) * 100)) : 100 };
 }
 
+/** Glanceable progress toward the next pile. Colour comes from the surrounding .pile-* class. */
+export function ProgressRing({ ring }: { ring: Ring }) {
+  const R = 14;
+  const C = 2 * Math.PI * R;
+  return (
+    <span class={`pring ${ring.state}`} role="img" aria-label={ring.label} title={ring.label} data-testid="progress-ring" data-state={ring.state}>
+      <svg viewBox="0 0 36 36" width="36" height="36" aria-hidden="true">
+        <circle class="pring-track" cx="18" cy="18" r={R} />
+        {ring.state === 'yearly' ? (
+          <path class="pring-check" d="M11.5 18.5l4.5 4.5 8.5-9.5" />
+        ) : (
+          <circle class="pring-arc" cx="18" cy="18" r={R} stroke-dasharray={`${(C * ring.fraction).toFixed(2)} ${C.toFixed(2)}`} transform="rotate(-90 18 18)" />
+        )}
+        {ring.state === 'frozen' && <path class="pring-pause" d="M15 14v8M21 14v8" />}
+      </svg>
+      {ring.state !== 'yearly' && ring.state !== 'frozen' && <b aria-hidden="true">{ring.earned}</b>}
+    </span>
+  );
+}
+
 export function VerseCard({ data, verse, now, status }: { data: AppData; verse: Verse; now: number; status: VerseStatus }) {
-  const p = pileProgress(data, verse, now);
+  const ring = progressRing(data, verse, now);
   const label = statusLabel(status);
   const open = () => navigate(`/verse/${verse.id}`);
   return (
@@ -200,15 +221,8 @@ export function VerseCard({ data, verse, now, status }: { data: AppData; verse: 
       )}
       <div class="row spread small">
         <span class={label.cls} data-testid="status">{label.text}</span>
-        <span class="muted">
-          {p.days === 0 ? 'New in pile' : `${formatDays(p.days)} in ${PILE_INFO[verse.pile].label}`}
-        </span>
+        <ProgressRing ring={ring} />
       </div>
-      {p.target && (
-        <div class="bar" style={{ marginTop: '8px' }} title={`${p.earned} of ${p.target} days toward the next pile`}>
-          <i style={{ width: `${p.pct}%` }} />
-        </div>
-      )}
     </button>
   );
 }
