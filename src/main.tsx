@@ -1,3 +1,4 @@
+import './polyfills.ts';
 import { render } from 'preact';
 import { registerSW } from 'virtual:pwa-register';
 import './styles.css';
