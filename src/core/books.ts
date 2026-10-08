@@ -126,18 +126,3 @@ export function searchBooks(text: string): Book[] {
 export function versesInChapter(bookN: number, chapter: number): number | undefined {
   return VERSE_COUNTS[bookN - 1]?.[chapter - 1];
 }
-
-/** Quick filters for the book picker: one tap narrows 66 books to a handful. Every book is in exactly one group. */
-export const BOOK_GROUPS: { id: string; label: string; from: number; to: number }[] = [
-  { id: 'law', label: 'Law', from: 1, to: 5 },
-  { id: 'history', label: 'History', from: 6, to: 17 },
-  { id: 'wisdom', label: 'Wisdom', from: 18, to: 22 },
-  { id: 'prophets', label: 'Prophets', from: 23, to: 39 },
-  { id: 'gospels', label: 'Gospels & Acts', from: 40, to: 44 },
-  { id: 'letters', label: 'Letters & Revelation', from: 45, to: 66 },
-];
-
-export const booksInGroup = (id: string): Book[] => {
-  const g = BOOK_GROUPS.find((x) => x.id === id);
-  return g ? BOOKS.filter((b) => b.n >= g.from && b.n <= g.to) : BOOKS;
-};

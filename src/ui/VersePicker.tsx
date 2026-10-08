@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
-import { BOOK_GROUPS, BOOKS, booksInGroup, versesInChapter } from '../core/books.ts';
+import { BOOKS, versesInChapter } from '../core/books.ts';
 import { Overlay } from './common.tsx';
 
 export interface RefValue {
@@ -110,23 +110,12 @@ function useScrollToSelected(dep: unknown) {
 }
 
 function BookPanel({ current, onPick, onClose }: { current: number; onPick: (n: number) => void; onClose: () => void }) {
-  const [group, setGroup] = useState('all');
-  const ref = useScrollToSelected(group);
+  const ref = useScrollToSelected('books');
   return (
     <Shell title="Choose a book" onClose={onClose} testid="book-grid">
-      <div class="row wrap pick-chips" role="group" aria-label="Part of the Bible">
-        <button class="chip" aria-pressed={group === 'all'} onClick={() => setGroup('all')}>
-          All
-        </button>
-        {BOOK_GROUPS.map((g) => (
-          <button key={g.id} class="chip" aria-pressed={group === g.id} onClick={() => setGroup(g.id)} data-testid={`group-${g.id}`}>
-            {g.label}
-          </button>
-        ))}
-      </div>
       <div class="pick-scroll" ref={ref}>
         <div class="pick-grid books" role="group" aria-label="Books">
-          {booksInGroup(group).map((b) => (
+          {BOOKS.map((b) => (
             <button key={b.n} class="pick-btn" aria-pressed={b.n === current} onClick={() => onPick(b.n)} data-testid="book-option" data-book={b.n}>
               {b.name}
             </button>
@@ -137,7 +126,7 @@ function BookPanel({ current, onPick, onClose }: { current: number; onPick: (n: 
   );
 }
 
-function NumberGrid({ from, to, selected, between, onPick, cols, extra }: { from: number; to: number; selected: (n: number) => boolean; between?: (n: number) => boolean; onPick: (n: number) => void; cols: number; extra?: preact.ComponentChildren }) {
+function NumberGrid({ from, to, selected, between, onPick, cols }: { from: number; to: number; selected: (n: number) => boolean; between?: (n: number) => boolean; onPick: (n: number) => void; cols: number }) {
   const ref = useScrollToSelected(from + ':' + to);
   const nums = Array.from({ length: Math.max(0, to - from + 1) }, (_, i) => from + i);
   return (
@@ -148,7 +137,6 @@ function NumberGrid({ from, to, selected, between, onPick, cols, extra }: { from
             {n}
           </button>
         ))}
-        {extra}
       </div>
     </div>
   );
@@ -184,8 +172,13 @@ function VersePanel({ title, label, max, start, end, onChange, onBack, onClose }
         <div class="pick-bar" data-testid="pick-bar">
           <div class="grow">
             <div class="pick-bar-ref">{start ? `${label}:${range ? `${start}–${end}` : start}` : label}</div>
-            <div class="muted small">{second && start ? 'Tap another verse to select a range' : 'Tap a verse (tap a second one for a range)'}</div>
+            <div class="muted small">{second && start ? 'Tap a second verse for a range' : 'Tap a verse'}</div>
           </div>
+          {shown < 176 && (
+            <button class="btn ghost more-btn" onClick={() => setShown(Math.min(176, shown + 5))} aria-label="Show 5 more verse numbers" data-testid="more-verses">
+              ＋
+            </button>
+          )}
           <button class="btn primary" disabled={!start} onClick={onClose} data-testid="pick-done">
             Done
           </button>
@@ -199,13 +192,6 @@ function VersePanel({ title, label, max, start, end, onChange, onBack, onClose }
         selected={(n) => n === start || (range && n === end)}
         between={(n) => range && n > start && n < end}
         onPick={tap}
-        extra={
-          shown < 176 ? (
-            <button class="pick-btn num more" onClick={() => setShown(Math.min(176, shown + 5))} aria-label="Show 5 more verse numbers" data-testid="more-verses">
-              ＋
-            </button>
-          ) : null
-        }
       />
     </Shell>
   );
