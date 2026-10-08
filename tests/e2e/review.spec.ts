@@ -45,9 +45,10 @@ test.describe('review modes', () => {
 
   test('flashcard: reference first, flip, grade, then recall the reference', async ({ page }) => {
     await startVerseReview(page, 'flashcard');
-    await expect(page.getByTestId('card-front')).toContainText('John 3:16');
-    await expect(page.getByText('For God so loved')).toBeHidden();
-    await page.getByTestId('flip').click();
+    await expect(page.getByTestId('review')).toContainText('John 3:16');
+    await expect(page.getByTestId('card-front')).toBeVisible();
+    await expect(page.locator('.reveal-text .rw.on')).toHaveCount(0); // covered until tapped
+    await page.getByTestId('flip').click(); // "Show all"
     await expect(page.getByTestId('card-back')).toContainText('For God so loved the world');
     await page.getByTestId('grade-good').click();
     // reference recall: the reference must NOT be visible anywhere on this screen

@@ -1491,3 +1491,38 @@ button.streak {
     transition: none;
   }
 }
+
+/* ---- tap-to-reveal flashcard ---- */
+.flashcard-top {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.reveal-text {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.reveal-text .rw {
+  border-radius: 4px;
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+.reveal-text .rw:not(.on) {
+  color: transparent;
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+.reveal-text .rw.on {
+  color: inherit;
+}
+.reveal-tools {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 6px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal-text .rw {
+    transition: none;
+  }
+}
