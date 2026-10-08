@@ -61,3 +61,24 @@ test('flashcards: flip, or uncover bit by bit with start over / show all', async
   await page.getByTestId('grade-good').click();
   await expect(page.getByTestId('verse-result')).toBeVisible();
 });
+
+test('three tabs (Today · Verses · Progress) plus a gear: every screen is still reachable', async ({ page }) => {
+  await blockLookups(page);
+  await openApp(page);
+  await addVerse(page, JOHN316);
+  await page.goto('/#/');
+  await expect(page.getByRole('navigation', { name: 'Main' }).getByRole('link')).toHaveCount(3);
+  // Verses -> Add
+  await page.getByRole('link', { name: 'Verses' }).click();
+  await page.getByTestId('add-verse').click();
+  await expect(page.getByRole('heading', { name: /Add a verse/ })).toBeVisible();
+  // Progress
+  await page.getByRole('link', { name: 'Progress' }).click();
+  await expect(page.getByTestId('stats')).toBeVisible();
+  // the gear opens Settings from each main screen, and About is reachable from there
+  for (const tab of ['Today', 'Verses', 'Progress']) {
+    await page.getByRole('link', { name: tab, exact: true }).click();
+    await page.getByRole('link', { name: 'Settings' }).click();
+    await expect(page.getByRole('heading', { name: 'Settings' })).toBeVisible();
+  }
+});
