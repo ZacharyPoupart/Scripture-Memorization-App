@@ -89,6 +89,7 @@ export function normalizeData(raw: unknown): AppData {
       if (!DAY.test(day) || !isObj(e)) continue;
       const entry: LedgerDay = {};
       if (e.r === 1) entry.r = 1;
+      if (e.p === 1) entry.p = 1;
       if (e.o === 'c' || e.o === 'm' || e.o === 'n') entry.o = e.o;
       ledger[day] = entry;
     }
@@ -118,7 +119,11 @@ export function normalizeData(raw: unknown): AppData {
     };
   }
 
-  return {
+  let pause: AppData['pause'];
+  if (isObj(raw.pause) && isStr(raw.pause.from) && DAY.test(raw.pause.from) && isStr(raw.pause.until) && DAY.test(raw.pause.until) && isNum(raw.pause.at))
+    pause = { from: raw.pause.from, until: raw.pause.until, at: raw.pause.at };
+
+  const out: AppData = {
     schema: 1,
     createdDay: raw.createdDay,
     verses,
@@ -129,6 +134,8 @@ export function normalizeData(raw: unknown): AppData {
     reviewsByDevice,
     prefs,
   };
+  if (pause) out.pause = pause;
+  return out;
 }
 
 /** Parse the text of a backup file. */

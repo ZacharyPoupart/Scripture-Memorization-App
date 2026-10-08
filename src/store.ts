@@ -1,9 +1,9 @@
 // App-wide state: the data document, device settings, and the glue to storage and sync.
 import { useEffect, useState } from 'preact/hooks';
 import { BackupError, exportBackup, parseBackup } from './core/backup.ts';
-import { dayKeyOf } from './core/dates.ts';
+import { addDays, dayKeyOf } from './core/dates.ts';
 import { mergeData } from './core/merge.ts';
-import { createData, recordReview, settle } from './core/schedule.ts';
+import { createData, endPause, recordReview, setPause, settle } from './core/schedule.ts';
 import type { AppData, LevelUp, Settings } from './core/types.ts';
 import { setFeedbackPrefs } from './services/feedback.ts';
 import { Storage, requestPersistence } from './services/storage.ts';
@@ -159,6 +159,18 @@ export function setPrefs(patch: Partial<AppData['prefs']['value']>) {
   act((d, now) => {
     d.prefs = { value: { ...d.prefs.value, ...patch }, at: now };
   });
+}
+
+/** Take a break: today and the next `days - 1` days are paused (nothing due, nothing lost). */
+export function startBreak(days: number) {
+  act((d, now) => {
+    const today = dayKeyOf(now);
+    setPause(d, today, addDays(today, Math.max(1, Math.floor(days)) - 1), now);
+  });
+}
+
+export function stopBreak() {
+  act((d, now) => endPause(d, now));
 }
 
 // ---------------------------------------------------------------- theme

@@ -59,3 +59,8 @@ The automated tests run in Chromium, which behaves differently from iPhone Safar
 
 ## Navigation
 - [ ] The bottom bar has five tabs: Today · Piles · Add · Stats · Settings. Each responds to a single tap and clears the home indicator.
+
+## Take a break (v1.9)
+- [ ] Settings → Take a break → Start break: Today says **On a break**, the main button reads **Review anyway**, and there is no freeze banner.
+- [ ] End the break from Today (or Settings): Today returns to normal.
+- [ ] After a real break, your streak number is the same as before it.

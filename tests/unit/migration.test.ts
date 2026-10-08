@@ -83,3 +83,22 @@ describe('data written by v1.1.0 still loads with nothing lost', () => {
     expect(st.theme).toBe('dark');
   });
 });
+
+describe('v1.9 data with a break (pause) in it', () => {
+  const text = read('backup-v1.9.0-pause.json');
+  it('loads, keeps the pause and the paused days, and survives a round trip and settling', () => {
+    const data = parseBackup(text);
+    expect(data.pause).toBeDefined();
+    expect(Object.values(data.ledger).some((e) => e.p === 1)).toBe(true);
+    expect(parseBackup(exportBackup(data, '9.9.9', 0))).toEqual(data);
+    expect(normalizeData(JSON.parse(JSON.stringify(data)))).toEqual(data);
+    const before = structuredClone(data);
+    settle(data, Date.parse('2026-02-20T09:00:00'));
+    expect(Object.keys(data.verses)).toEqual(Object.keys(before.verses));
+    for (const [d, e] of Object.entries(before.ledger)) expect(data.ledger[d]).toEqual(e); // settled days are never rewritten
+  });
+  it('an app that does not know about breaks (older data) still loads cleanly with no pause', () => {
+    const old = parseBackup(read('backup-v1.1.0.json'));
+    expect(old.pause).toBeUndefined();
+  });
+});

@@ -7,6 +7,8 @@ import {
   addVerse,
   deleteVerse,
   editVerse,
+  endPause,
+  setPause,
   liveVerses,
   movePile,
   recordReview,
@@ -63,6 +65,8 @@ function randomData(seed: number, device: string, base?: AppData): AppData {
       if (live.length && r.next() < 0.08) editVerse(data, r.pick(live).id, { topic: r.pick(['', 'Gospel', 'Hope']) }, now);
       if (live.length && r.next() < 0.05) movePile(data, r.pick(live).id, r.pick(PILES), now);
       if (live.length && r.next() < 0.04) deleteVerse(data, r.pick(live).id, now);
+      if (r.next() < 0.03) setPause(data, day(d), day(d + r.int(6)), now);
+      if (r.next() < 0.02) endPause(data, now);
       const all = Object.values(data.verses).filter((v) => v.deletedAt !== undefined);
       if (all.length && r.next() < 0.03) restoreVerse(data, r.pick(all).id, now);
     }

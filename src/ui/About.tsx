@@ -43,6 +43,9 @@ export function About({ onShowIntro }: { onShowIntro: () => void }) {
           <p style={{ margin: 0 }}>
             <strong>Freeze:</strong> if you go 3 days without reviewing, your verses stop gaining days toward their next pile until you review again. A freeze only pauses progress — nothing is lost, and a verse that has already earned its promotion still moves up.
           </p>
+          <p style={{ margin: 0 }}>
+            <strong>Breaks:</strong> need time away? Settings has a "Take a break". While it lasts nothing is due, your streak waits and nothing freezes. Verses don't move up while you're away, and nothing is lost. Reviewing anyway is always welcome.
+          </p>
         </div>
 
         <div class="card stack">
