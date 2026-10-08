@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-10-08
+
 ### Changed
 - The bottom bar now has three tabs: **Today**, **Verses** and **Progress**. **Settings** (and About, backup, sync) are behind the small gear at the top right of those screens, and **+ Add verse** is at the top of Verses.
 
