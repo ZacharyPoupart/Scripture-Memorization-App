@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.11.0] - 2026-10-08
+
 ### Changed
 - Fill in the blank no longer shifts as you answer: the words stay exactly where they are.
 - Fill in the blank now asks for the reference as blanks too (book, chapter, verse, chosen from options) instead of typing it.
