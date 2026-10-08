@@ -64,3 +64,8 @@ The automated tests run in Chromium, which behaves differently from iPhone Safar
 - [ ] Settings → Take a break → Start break: Today says **On a break**, the main button reads **Review anyway**, and there is no freeze banner.
 - [ ] End the break from Today (or Settings): Today returns to normal.
 - [ ] After a real break, your streak number is the same as before it.
+
+## Start partway (v1.10)
+- [ ] Verse → Move to another pile → "Already know this one? Start partway": the slider drags smoothly with a thumb (the page does not scroll sideways), the caption updates, and the toast says how many days it carried over; Undo restores it.
+- [ ] Add a verse → "Already know this one?": the slider works the same; the new verse's ring shows that many days.
+- [ ] Verse detail: Edit · Open in Bible · Move · Delete are all the same height.

@@ -178,6 +178,29 @@ export function pileProgress(data: AppData, v: Verse, now: number) {
   return { target, days, earned, pct: target ? Math.min(100, Math.round((earned / target) * 100)) : 100 };
 }
 
+/** "How many days has this verse already been in the pile?" A plain range slider with a live caption. */
+export function DaysSlider({ value, max, onChange, testid }: { value: number; max: number; onChange: (n: number) => void; testid?: string }) {
+  const caption = value === 0 ? 'Starts fresh (day 0)' : `${value} day${value === 1 ? '' : 's'} already in this pile`;
+  return (
+    <div class="days-slider">
+      <input
+        type="range"
+        min={0}
+        max={max}
+        step={1}
+        value={Math.min(value, max)}
+        aria-label="Days already in this pile"
+        aria-valuetext={caption}
+        onInput={(e) => onChange(Number(e.currentTarget.value))}
+        data-testid={testid}
+      />
+      <div class="small muted" aria-live="polite" data-testid={testid ? `${testid}-caption` : undefined}>
+        {caption}
+      </div>
+    </div>
+  );
+}
+
 /** Glanceable progress toward the next pile. Colour comes from the surrounding .pile-* class. */
 export function ProgressRing({ ring }: { ring: Ring }) {
   const R = 14;

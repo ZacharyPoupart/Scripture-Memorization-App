@@ -1,17 +1,18 @@
 import { useState } from 'preact/hooks';
 import { BOOKS } from '../core/books.ts';
 import { bibleGatewayUrl, formatRef } from '../core/reference.ts';
-import { GRADUATION_DAYS, deleteVerse, isFrozen, movePile, nextPile, restorePile, restoreVerse, verseStatus } from '../core/schedule.ts';
+import { GRADUATION_DAYS, deleteVerse, isFrozen, maxDaysIn, movePile, nextPile, restorePile, restoreVerse, verseStatus } from '../core/schedule.ts';
 import { PILES, type Pile } from '../core/types.ts';
 import { back, navigate } from '../router.ts';
 import { act, showToast, useApp } from '../store.ts';
-import { Confirm, Icon, Overlay, PILE_INFO, PileBadge, pileProgress, statusLabel } from './common.tsx';
+import { Confirm, DaysSlider, Icon, Overlay, PILE_INFO, PileBadge, pileProgress, statusLabel } from './common.tsx';
 import { MODES } from './ModePicker.tsx';
 import { formatDays } from '../core/dates.ts';
 
 export function VerseDetail({ id }: { id: string }) {
   const { data } = useApp();
   const [moving, setMoving] = useState(false);
+  const [daysIn, setDaysIn] = useState(0);
   const [deleting, setDeleting] = useState(false);
   const v = data.verses[id];
   const now = Date.now();
@@ -39,8 +40,10 @@ export function VerseDetail({ id }: { id: string }) {
   const doMove = (to: Pile) => {
     setMoving(false);
     if (to === v.pile) return;
-    const snap = act((d, t) => movePile(d, v.id, to, t));
-    showToast(`Moved to ${PILE_INFO[to].label}.`, {
+    const used = Math.min(daysIn, maxDaysIn(to));
+    const snap = act((d, t) => movePile(d, v.id, to, t, used));
+    setDaysIn(0);
+    showToast(`Moved to ${PILE_INFO[to].label}${used ? ` (${used} days in)` : ''}.`, {
       label: 'Undo',
       run: () => act((d, t) => restorePile(d, v.id, snap, t)),
     });
@@ -127,10 +130,15 @@ export function VerseDetail({ id }: { id: string }) {
       </div>
 
       {moving && (
-        <Overlay onClose={() => setMoving(false)} label="Move to pile">
+        <Overlay onClose={() => (setMoving(false), setDaysIn(0))} label="Move to pile">
           <div class="sheet stack">
             <h2>Move to which pile?</h2>
-            <div class="hint-text">Its time-in-pile starts over in the new pile. You can undo right after.</div>
+            <div class="hint-text">Its time-in-pile starts over in the new pile, unless you say it has already been there a while. You can undo right after.</div>
+            <details class="quiet-details" open={daysIn > 0}>
+              <summary>Already know this one? Start partway</summary>
+              <DaysSlider value={daysIn} max={366} onChange={setDaysIn} testid="days-in" />
+              <div class="hint-text">Up to {maxDaysIn('daily')} days for Daily and Weekly, {maxDaysIn('monthly')} for Monthly, {maxDaysIn('yearly')} for Yearly.</div>
+            </details>
             {PILES.map((p2) => (
               <button key={p2} class={`btn block pile-${p2}`} disabled={p2 === v.pile} onClick={() => doMove(p2)} data-testid={`move-${p2}`}>
                 <PileBadge pile={p2} /> {PILE_INFO[p2].blurb}

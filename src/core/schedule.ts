@@ -412,6 +412,8 @@ export interface NewVerse {
   translation: string;
   text: string;
   topic?: string;
+  /** Optional: the verse is already part of your routine; start this many days into Daily (0 = brand new). */
+  daysInPile?: number;
 }
 
 export function addVerse(data: AppData, input: NewVerse, now: number): Verse {
@@ -427,7 +429,7 @@ export function addVerse(data: AppData, input: NewVerse, now: number): Verse {
     topic: (input.topic ?? '').trim(),
     contentAt: now,
     pile: 'daily',
-    pileSince: today,
+    pileSince: addDays(today, -safeDaysIn('daily', input.daysInPile)),
     pileAt: now,
     addedDay: today,
     createdAt: now,
@@ -465,12 +467,27 @@ export interface PileSnapshot {
 }
 
 /** Manually move a verse. Returns what's needed to undo it. Progress restarts in the new pile. */
-export function movePile(data: AppData, id: string, to: Pile, now: number): PileSnapshot {
+/** Most days a verse may be told it has already spent in a pile: just under the graduation target. */
+export function maxDaysIn(pile: Pile): number {
+  return pile === 'daily' || pile === 'weekly' ? GRADUATION_DAYS[pile] - 1 : pile === 'monthly' ? 364 : 366;
+}
+
+/** Whole days in [0, max for that pile]; anything else (negative, NaN, huge) is made safe. */
+function safeDaysIn(pile: Pile, n: number | undefined): number {
+  if (typeof n !== 'number' || !Number.isFinite(n)) return 0;
+  return Math.min(maxDaysIn(pile), Math.max(0, Math.floor(n)));
+}
+
+/**
+ * Move a verse to another pile. Progress restarts (pileSince = today) unless `daysIn` says the verse has
+ * already been in that pile for a while ("start partway"): then pileSince is back-dated by that many days.
+ */
+export function movePile(data: AppData, id: string, to: Pile, now: number, daysIn = 0): PileSnapshot {
   const v = data.verses[id];
   if (!v || v.deletedAt) throw new Error('Verse not found');
   const prev = { pile: v.pile, pileSince: v.pileSince };
   v.pile = to;
-  v.pileSince = dayKeyOf(now);
+  v.pileSince = addDays(dayKeyOf(now), -safeDaysIn(to, daysIn));
   v.pileAt = now;
   return prev;
 }
