@@ -1,4 +1,5 @@
 import { expect, type Page } from '@playwright/test';
+import { BOOKS } from '../../src/core/books.ts';
 
 export const JOHN_TEXT =
   'For God so loved the world, that he gave his only Son, that whoever believes in him should not perish but have eternal life.';
@@ -35,13 +36,42 @@ export async function blockLookups(page: Page) {
   await page.route(/bolls\.life|bible-api\.com/, (r) => r.abort());
 }
 
+const exact = (n: string | number) => new RegExp(`^${n}$`);
+
+/** Pick a number in whichever number grid (chapter / verse / to) is currently open. */
+export async function tapNumber(page: Page, n: number) {
+  await page.getByTestId('num-option').filter({ hasText: exact(n) }).click();
+}
+
+/** Use the cascading picker: Book → Chapter → Verse open one after another. In the verse grid, a second tap makes a range. */
+export async function pickRef(page: Page, v: { book: number; chapter: number; start: number; end?: number }) {
+  await page.getByTestId('pick-book').click();
+  await page.getByTestId('book-option').filter({ hasText: exact(BOOKS[v.book - 1].name) }).click();
+  await tapNumber(page, v.chapter); // the chapter grid opened by itself
+  await tapNumber(page, v.start); // ...and then the verse grid
+  if (v.end) await tapNumber(page, v.end); // second tap = range, and the grid closes
+  else await page.getByTestId('pick-done').click();
+  await expect(page.getByTestId('verse-picker').getByRole('dialog')).toHaveCount(0);
+}
+
+/** Reopen the verse box and choose a single verse. */
+export async function pickVerse(page: Page, n: number) {
+  await page.getByTestId('pick-verse').click();
+  await tapNumber(page, n);
+  await page.getByTestId('pick-done').click();
+}
+
+/** Reopen the verse box and choose a range (first tap, last tap). */
+export async function pickRange(page: Page, start: number, end: number) {
+  await page.getByTestId('pick-verse').click();
+  await tapNumber(page, start);
+  await tapNumber(page, end);
+}
+
 export async function addVerse(page: Page, v: VerseInput) {
   await page.goto('/#/add');
-  await page.getByTestId('book').selectOption(String(v.book));
-  await page.getByTestId('chapter').selectOption(String(v.chapter));
   if (v.translation) await page.getByTestId('translation').selectOption(v.translation);
-  await page.getByTestId('start').fill(String(v.start));
-  if (v.end) await page.getByTestId('end').fill(String(v.end));
+  await pickRef(page, v);
   await page.getByTestId('text').fill(v.text);
   if (v.topic) await page.getByTestId('topic').fill(v.topic);
   await page.getByTestId('save-verse').click();

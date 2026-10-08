@@ -83,7 +83,9 @@ export function Overlay({ children, onClose, center, label }: { children: Compon
     const opener = document.activeElement as HTMLElement | null;
     const root = ref.current;
     const items = () => [...(root?.querySelectorAll<HTMLElement>(FOCUSABLE) ?? [])].filter((el) => el.offsetParent !== null || el === document.activeElement);
-    if (root && !root.contains(document.activeElement)) (items().find((el) => el.matches('[autofocus], input')) ?? items()[0] ?? root).focus({ preventScroll: true });
+    // Only a field explicitly marked autofocus takes focus (it may raise the keyboard on purpose); otherwise the dialog
+    // itself does, so opening a picker never pops the on-screen keyboard over the thing you're about to tap.
+    if (root && !root.contains(document.activeElement)) (items().find((el) => el.matches('[autofocus]')) ?? root).focus({ preventScroll: true });
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') return onClose?.();
       if (e.key !== 'Tab') return;

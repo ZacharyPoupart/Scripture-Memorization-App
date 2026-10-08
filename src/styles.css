@@ -1189,3 +1189,159 @@ button.streak {
     background: color-mix(in srgb, var(--good) 28%, transparent);
   }
 }
+
+/* ---- cascading verse picker ---- */
+.pick-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+  width: 100%;
+  min-height: 60px;
+  padding: 8px 14px;
+  text-align: left;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  position: relative;
+}
+.pick-box::after {
+  content: '▾';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+.pick-box[disabled] {
+  opacity: 0.5;
+}
+.pick-box:active:not([disabled]) {
+  background: var(--surface-2);
+}
+.pick-label {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--muted);
+  line-height: 1.1;
+}
+.pick-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--muted);
+  padding-right: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.pick-box.filled .pick-value {
+  color: var(--text);
+}
+.pick-sheet {
+  max-height: min(86%, 640px);
+}
+.pick-head {
+  margin-bottom: 6px;
+}
+.pick-head h2 {
+  font-size: 1.05rem;
+}
+.pick-head .btn {
+  min-width: 64px;
+}
+.pick-chips {
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.pick-chips .chip {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 0;
+}
+.pick-chips .chip[aria-pressed='true'] {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.pick-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.pick-grid {
+  display: grid;
+  gap: 8px;
+  padding: 2px 2px 8px;
+}
+.pick-grid.books {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.pick-btn {
+  min-height: 52px;
+  padding: 6px 4px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+.pick-btn.num {
+  font-size: 1.1rem;
+  font-variant-numeric: tabular-nums;
+}
+.pick-btn:active {
+  background: var(--border);
+}
+.pick-btn[aria-pressed='true'] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+.pick-btn.between {
+  background: color-mix(in srgb, var(--accent) 30%, var(--surface-2));
+  border-color: transparent;
+}
+.pick-btn.more {
+  color: var(--muted);
+  background: transparent;
+  border-style: dashed;
+}
+.pick-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+.pick-bar-ref {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+.pick-bar .btn {
+  min-width: 96px;
+  min-height: 52px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .pick-btn:hover:not([aria-pressed='true']) {
+    background: var(--border);
+  }
+  .pick-box:hover:not([disabled]) {
+    background: var(--surface-2);
+  }
+}
+@media (min-width: 560px) {
+  .pick-grid.books {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.overlay:focus {
+  outline: none;
+}
