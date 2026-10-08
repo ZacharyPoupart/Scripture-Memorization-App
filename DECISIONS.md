@@ -149,3 +149,17 @@ Chosen: the whole verse is laid out from the start with unrevealed words transpa
 - **Mode picker**: back in the open on Today (the "Mode:" disclosure from v1.6.0 was reverted at the owner's request).
 - **Day-one celebration**: streak milestone 1 added (small card, no confetti), plus the existing 3/7/… ones. It also appears after the first practice on the very first day.
 - **Test changes**: flashcard flows no longer answer the reference (`finishFlashcard` helper); tests that exercise reference recall now reach it through Fill-in-the-blank (`completeBlanks`, made robust against render timing and case); tests unrelated to celebrations auto-close the milestone card (`autoDismissMilestones`, a Playwright locator handler); the Type-it-out e2e test now expects the missed word to be shown and the run to continue; `stats.test.ts` asserts milestone 1. The "fresh-attempt" and flashcard-front assertions were reworded as described in the v1.7.0 stage notes.
+
+
+## Streamline pass — summary, audit, ideas not built, open questions (v1.5.2 – v1.7.0)
+**Tags / rollback**: `v1.5.1-stable` (before the pass), `v1.6.0-today`, `v1.7.0-flashcards`. To undo the whole pass, roll Cloudflare back to the v1.5.1 deployment or `git revert --no-commit v1.5.1-stable..main` (see README, "Rolling back"). No stored-data shape changed in this pass (no migration needed; `migration.test.ts` fixtures still green).
+**Screen audit** (serves practising = P, progress = G):
+- Today — P+G. Streamlined (v1.6.0): one primary button, what's left listed, calm done state.
+- Piles / pile page — P (browse + per-pile review). Kept; per-pile review is secondary to Today's button.
+- Verse detail — P (review modes) + management. Kept as is.
+- Add — setup, one primary action (picker). Kept.
+- Stats — G. Kept.
+- Settings — setup; rarely used. Kept (not yet collapsed — see below).
+**Not done / deliberately conservative**: the tab bar still has Today · Piles · Add · Stats · Settings (a 3-tab restructure would touch most e2e tests and every move needs logging; the Today screen, which is where the owner lives, is already down to one action). Settings sections are not yet collapsed. Streak milestones list still has extras (14/60/150/200/500/730/1000) beyond the requested 1/7/30/100/365. Scaled celebrations already exist (one verse = result card; all of today = all-done card; graduation / Yearly / 100+ streaks = confetti). Candidates for a follow-up.
+**Ideas not built** (non-goals): AI chat or AI-suggested verses, groups/leaderboards/social features, mascots/pets, guilt-based notifications, streak purchases/currency, lock-screen widgets, new accounts or paid services.
+**Open questions**: (1) Remove reference recall from the other three modes too? (2) Apply the Home freeze-banner softer wording? (still the older firm text). (3) Move to a 3-tab bar (Today | Verses | Progress, settings behind a gear)?

@@ -74,7 +74,7 @@ Anyone who finds `/api/verse` can use your quota, so requests are strictly valid
 - To release: on your branch add notes under `## [Unreleased]`, run `npm run release -- patch` (or `minor`/`major`), open a PR. When it merges to `main`, Cloudflare deploys it and a GitHub Action tags `vX.Y.Z` and publishes a GitHub release.
 
 ### Rolling back
-**Stable tags:** `v1.1.0-stable` is the last version before the 2026-10 improvement pass; each stage has a tag (`v1.2.0-ui`, `v1.3.0-motivation`, `v1.4.0-features`, `v1.4.0-final`). Tags are added by the *Create stage tag* workflow (Actions tab → Run workflow).
+**Stable tags:** `v1.5.1-stable` is the last version before the Today-screen / flashcard pass (`v1.6.0-today`, `v1.7.0-flashcards`); `v1.1.0-stable` is the last version before the earlier 2026-10 improvement pass. Older stage tags: `v1.2.0-ui`, `v1.3.0-motivation`, `v1.4.0-features`, `v1.4.0-final`. Tags are added by the *Create stage tag* workflow (Actions tab → Run workflow).
 
 Roll back first, then fix.
 1. **Fastest (30 seconds):** Cloudflare dashboard → your Pages project → *Deployments* → find the last good deployment → **⋯ → Rollback to this deployment**. The live site is the old version immediately. Your data lives on your devices and isn't touched.
