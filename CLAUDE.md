@@ -26,7 +26,7 @@ Preact + TypeScript + Vite, installable PWA (vite-plugin-pwa / Workbox). Data in
 
 ## THE RULES (single source of truth: `src/core/schedule.ts`; these bugs bit us before)
 - **Days** are local calendar days (`YYYY-MM-DD`) and roll over at local midnight. Day math uses UTC day numbers so DST never causes off-by-one. Never compare timestamps to decide "same day"; use `dayKeyOf`.
-- **Daily pile**: 3 *counted* reviews per day, at least `spacingHours` (default 2, setting 1–4) apart. Spacing resets at midnight (the first review of a new day is always available).
+- **Daily pile**: 3 *counted* reviews per day, at least `spacingHours` (default 2; Settings offers No wait, 30 min, 1–4 h or a custom number of minutes, stored as hours 0–12) apart. Spacing resets at midnight (the first review of a new day is always available).
 - **Weekly / Monthly / Yearly**: one counted review once due. Due = 7 days / 1 calendar month / 1 calendar year after the later of the last counted review and the day the verse entered the pile (month/year math clamps, e.g. Jan 31 + 1 month = Feb 28).
 - **Extra practice** is always allowed and never counted or stored; it only marks the day as "reviewed" (keeps the freeze away).
 - **Graduation**: Daily→Weekly after 90 progress days, Weekly→Monthly after 90, Monthly→Yearly after 365. Yearly is permanent. A progress day is a day after entering the pile that isn't frozen. Graduation is derived from the ledger and can cascade through several piles in one settle. The level-up id is deterministic (`verseId:to:day`) so devices agree.

@@ -79,6 +79,29 @@ describe('Daily pile: 3 reviews a day with spacing', () => {
     expect(verseStatus(data, v, at(day(1), '12:00')).state).toBe('ready');
   });
 
+  it('supports no wait, 30 minutes and custom minute values', () => {
+    const none = newData();
+    none.prefs.value.spacingHours = 0;
+    const a = john316(none, at(D0, '07:00'));
+    expect(recordReview(none, a.id, at(day(1), '08:00'), DEVICE).counted).toBe(true);
+    expect(verseStatus(none, a, at(day(1), '08:00')).state).toBe('ready');
+    expect(recordReview(none, a.id, at(day(1), '08:00'), DEVICE).counted).toBe(true);
+
+    const half = newData();
+    half.prefs.value.spacingHours = 0.5;
+    const b = john316(half, at(D0, '07:00'));
+    recordReview(half, b.id, at(day(1), '08:00'), DEVICE);
+    expect(verseStatus(half, b, at(day(1), '08:29')).state).toBe('waiting');
+    expect(verseStatus(half, b, at(day(1), '08:30')).state).toBe('ready');
+
+    const custom = newData();
+    custom.prefs.value.spacingHours = 45 / 60;
+    const c = john316(custom, at(D0, '07:00'));
+    recordReview(custom, c.id, at(day(1), '08:00'), DEVICE);
+    expect(verseStatus(custom, c, at(day(1), '08:44')).state).toBe('waiting');
+    expect(verseStatus(custom, c, at(day(1), '08:45')).state).toBe('ready');
+  });
+
   it('counts reset at local midnight (reviews at 23:59 and 00:01 are different days)', () => {
     const data = newData();
     const v = john316(data, at(D0, '07:00'));

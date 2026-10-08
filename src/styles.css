@@ -116,6 +116,10 @@ body {
   position: fixed;
   inset: 0;
   overflow: hidden;
+  /* A very soft wash of colour: teal glow at the top, warm glow at the bottom. Fixed, so it never shifts. */
+  background-image: radial-gradient(120% 60% at 0% 0%, color-mix(in srgb, var(--accent) 11%, transparent), transparent 70%),
+    radial-gradient(110% 55% at 100% 100%, color-mix(in srgb, var(--daily) 9%, transparent), transparent 70%);
+  background-attachment: fixed;
 }
 #app {
   position: absolute;
@@ -270,6 +274,8 @@ button,
 .tab[aria-current='page'] {
   color: var(--accent-strong);
   font-weight: 600;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-radius: var(--radius-sm);
 }
 
 /* ---- surfaces ---- */
@@ -528,6 +534,7 @@ textarea.input {
 }
 .pile-tile {
   border-left: 6px solid var(--pile);
+  background: color-mix(in srgb, var(--pile) 9%, var(--surface));
 }
 .pile-tile .count {
   font-size: 1.7rem;

@@ -5,6 +5,9 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Added
+- More choices for the time between Daily reviews: No wait, 30 minutes, 1–4 hours, or a custom number of minutes (Settings → Reviewing). Existing settings are unchanged (same stored value, hours).
+
 ## [1.5.1] - 2026-10-08
 
 ### Changed
