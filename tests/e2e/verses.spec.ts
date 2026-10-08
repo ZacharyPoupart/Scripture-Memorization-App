@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { addVerse, blockLookups, JOHN316, JOHN_TEXT, openApp, PSALM23_1, ROMANS8_28, saved } from './helpers';
+import { addVerse, blockLookups, tapNumber, JOHN316, JOHN_TEXT, openApp, pickRange, pickRef, pickVerse, PSALM23_1, ROMANS8_28, saved } from './helpers';
 
 test.describe('adding, editing and organizing verses', () => {
   test('first-run walkthrough can be skipped, finished and reopened', async ({ page }) => {
@@ -42,10 +42,7 @@ test.describe('adding, editing and organizing verses', () => {
     );
     await openApp(page);
     await page.goto('/#/add');
-    await page.getByTestId('book').selectOption('19');
-    await page.getByTestId('chapter').selectOption('23');
-    await page.getByTestId('start').fill('1');
-    await page.getByTestId('end').fill('2');
+    await pickRef(page, { book: 19, chapter: 23, start: 1, end: 2 });
     await expect(page.getByTestId('text')).toHaveValue('The LORD is my shepherd; I shall not want. He makes me lie down in green pastures.');
     await expect(page.getByTestId('lookup-status')).toContainText('Found it');
     await page.getByTestId('save-verse').click();
@@ -56,12 +53,10 @@ test.describe('adding, editing and organizing verses', () => {
     await blockLookups(page);
     await openApp(page);
     await page.goto('/#/add');
-    await page.getByTestId('book').selectOption('43');
-    await page.getByTestId('chapter').selectOption('3');
-    await page.getByTestId('start').fill('16');
+    await pickRef(page, { book: 43, chapter: 3, start: 16 });
     await expect(page.getByTestId('lookup-status')).toContainText("Couldn't look it up");
     await page.getByTestId('text').fill('my own words');
-    await page.getByTestId('end').fill('17');
+    await pickRange(page, 16, 17);
     await page.waitForTimeout(700);
     await expect(page.getByTestId('text')).toHaveValue('my own words');
   });
@@ -72,13 +67,15 @@ test.describe('adding, editing and organizing verses', () => {
     await page.goto('/#/add');
     await page.getByTestId('save-verse').click();
     await expect(page.getByTestId('form-error')).toContainText('Choose a book');
-    await page.getByTestId('book').selectOption('43');
-    await page.getByTestId('chapter').selectOption('3');
-    await page.getByTestId('start').fill('16');
+    await pickRef(page, { book: 43, chapter: 3, start: 16 });
     await page.getByTestId('save-verse').click();
     await expect(page.getByTestId('form-error')).toContainText('Add the verse text');
-    await page.getByTestId('end').fill('15');
-    await expect(page.getByText('same as or after')).toBeVisible();
+    // a range can't end before it starts: tapping an earlier verse just moves the start
+    await page.getByTestId('pick-verse').click();
+    await tapNumber(page, 18);
+    await tapNumber(page, 15);
+    await expect(page.getByTestId('pick-bar')).toContainText('John 3:15');
+    await page.getByTestId('pick-done').click();
   });
 
   test('edit, move between piles with undo, delete with undo, topic filter', async ({ page }) => {
@@ -150,10 +147,8 @@ test.describe('adding, editing and organizing verses', () => {
     });
     await openApp(page);
     await page.goto('/#/add');
-    await page.getByTestId('book').selectOption('43');
-    await page.getByTestId('chapter').selectOption('3');
     await page.getByTestId('translation').selectOption('NIV');
-    await page.getByTestId('start').fill('16');
+    await pickRef(page, { book: 43, chapter: 3, start: 16 });
     await expect(page.getByTestId('text')).toHaveValue('For God so loved the world (NIV text).');
     await expect(page.getByTestId('niv-note')).toContainText('Biblica');
     expect(calls).toBeGreaterThan(0);
@@ -162,7 +157,7 @@ test.describe('adding, editing and organizing verses', () => {
     await page.unroute('**/api/verse*');
     await page.route('**/api/verse*', (route) => route.fulfill({ status: 501, json: { error: 'not-configured' } }));
     await page.route(/bolls\.life/, (route) => route.fulfill({ json: [{ verse: 17, text: 'From the backup source.' }] }));
-    await page.getByTestId('start').fill('17');
+    await pickVerse(page, 17);
     await expect(page.getByTestId('text')).toHaveValue('From the backup source.');
   });
 });

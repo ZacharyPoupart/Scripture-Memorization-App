@@ -5,6 +5,12 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Changed
+- **Adding a verse is now a quick tap-through instead of a long list:** three boxes — Book, Chapter, Verse — each open a compact grid of big buttons, and each pick opens the next box by itself (John 3:16 is Book → John → 3 → 16 → Done). A row of quick filters (Law, History, Wisdom, Prophets, Gospels & Acts, Letters & Revelation) narrows the 66 books to a handful. No search box and no typing, so the keyboard never appears.
+- **Ranges are picked in the same grid:** tap the first verse, then the last — the verses in between are highlighted. (The separate "To" box is gone.)
+- A "＋" at the end of the verse grid reveals a few more numbers for translations that number more verses than the common list (e.g. 3 John 15).
+- Dialogs no longer put the cursor in the first text field when they open (that raised the phone keyboard); fields that should take focus ask for it explicitly.
+
 ## [1.4.0] - 2026-10-07
 
 ### Added

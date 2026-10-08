@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
-import { BOOKS, versesInChapter } from '../core/books.ts';
 import { formatRef, refWarning, validateRef, type Ref } from '../core/reference.ts';
 import { addVerse, editVerse, liveVerses } from '../core/schedule.ts';
 import { TRANSLATIONS } from '../core/types.ts';
@@ -7,6 +6,7 @@ import { LookupError, lookupPassage } from '../services/lookup.ts';
 import { back, navigate } from '../router.ts';
 import { act, showToast, useApp } from '../store.ts';
 import { Field, Icon } from './common.tsx';
+import { VersePicker } from './VersePicker.tsx';
 
 type Lookup = { kind: 'idle' } | { kind: 'loading' } | { kind: 'ok' } | { kind: 'error'; message: string };
 
@@ -82,9 +82,6 @@ export function AddVerse({ editId }: { editId?: string }) {
     }
   };
 
-  const chapters = book ? BOOKS[book - 1].chapters : 0;
-  const maxV = book && chapter ? versesInChapter(book, chapter) : undefined;
-
   return (
     <div class="scroll">
       <div class="narrow stack">
@@ -97,37 +94,16 @@ export function AddVerse({ editId }: { editId?: string }) {
           <h1>{existing ? 'Edit verse' : 'Add a verse'}</h1>
         </div>
 
-        <Field label="Book">
-          <select class="input" value={book} onChange={(e) => { setBook(Number(e.currentTarget.value)); setChapter(0); setStart(''); setEnd(''); if (!existing) setManual(false); }} data-testid="book">
-            <option value={0}>Choose a book…</option>
-            <optgroup label="Old Testament">
-              {BOOKS.slice(0, 39).map((b) => (
-                <option key={b.n} value={b.n}>{b.name}</option>
-              ))}
-            </optgroup>
-            <optgroup label="New Testament">
-              {BOOKS.slice(39).map((b) => (
-                <option key={b.n} value={b.n}>{b.name}</option>
-              ))}
-            </optgroup>
-          </select>
-        </Field>
-        <div class="grid3">
-          <Field label="Chapter">
-            <select class="input" value={chapter} disabled={!book} onChange={(e) => { setChapter(Number(e.currentTarget.value)); if (!existing) setManual(false); }} data-testid="chapter">
-              <option value={0}>—</option>
-              {Array.from({ length: chapters }, (_, i) => (
-                <option key={i + 1} value={i + 1}>{i + 1}</option>
-              ))}
-            </select>
-          </Field>
-          <Field label="Verse">
-            <input class="input" type="number" inputMode="numeric" min={1} max={maxV} placeholder={maxV ? `1–${maxV}` : ''} value={start} disabled={!chapter} onInput={(e) => { setStart(e.currentTarget.value); if (!existing) setManual(false); }} data-testid="start" />
-          </Field>
-          <Field label="To (optional)">
-            <input class="input" type="number" inputMode="numeric" min={1} max={maxV} value={end} disabled={!start} onInput={(e) => { setEnd(e.currentTarget.value); if (!existing) setManual(false); }} data-testid="end" />
-          </Field>
-        </div>
+        <VersePicker
+          value={{ book, chapter, start: Number(start) || 0, end: Number(end) || 0 }}
+          onChange={(v) => {
+            setBook(v.book);
+            setChapter(v.chapter);
+            setStart(v.start ? String(v.start) : '');
+            setEnd(v.end ? String(v.end) : '');
+            if (!existing) setManual(false);
+          }}
+        />
         {problem && problem.message && <div class="error-text">{problem.message}</div>}
         {warning && <div class="hint-text">{warning}</div>}
 

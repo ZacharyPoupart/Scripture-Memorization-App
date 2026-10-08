@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { readFileSync } from 'node:fs';
-import { addVerse, answerReference, blockLookups, JOHN316, openApp, PSALM23_1 } from './helpers';
+import { addVerse, answerReference, blockLookups, JOHN316, openApp, pickRef, PSALM23_1 } from './helpers';
 
 test.describe('offline', () => {
   test('installs, then works with no connection at all', async ({ page, context }) => {
@@ -30,9 +30,7 @@ test.describe('offline', () => {
 
     // adding a verse offline: lookup is skipped politely, manual text works
     await page.goto('/#/add');
-    await page.getByTestId('book').selectOption('19');
-    await page.getByTestId('chapter').selectOption('23');
-    await page.getByTestId('start').fill('1');
+    await pickRef(page, { book: 19, chapter: 23, start: 1 });
     await expect(page.getByTestId('lookup-status')).toContainText('Offline');
     await page.getByTestId('text').fill(PSALM23_1.text);
     await page.getByTestId('save-verse').click();
