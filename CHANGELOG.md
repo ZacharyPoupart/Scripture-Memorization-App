@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-10-08
+
 ### Changed
 - Flashcards work like Quizlet: tap the card to flip it. Afterwards there are just two buttons, "Nailed it" and "Needs work". There is no reference-entry step after a flashcard any more (the other modes still end with it). Prefer to build the verse slowly? "Uncover bit by bit" shows it a phrase or word at a time, with "Show all" and "Start over".
 - Type it out: a wrong letter now shows the word you missed (still one slip) and lets you carry on, instead of waiting on that word.
