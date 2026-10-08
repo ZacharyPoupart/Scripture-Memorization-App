@@ -165,7 +165,7 @@ export async function completeBlanks(page: Page, text: string) {
   for (let guard = 0; guard < 150; guard++) {
     const cur = page.getByTestId('current-blank');
     // wait for the next blank, or for the screen after the last one (reference step / result)
-    await page.locator('[data-testid=current-blank], [data-testid=ref-verse-text], [data-testid=verse-result]').first().waitFor();
+    await page.locator('[data-testid=current-blank], [data-testid=current-ref-blank], [data-testid=ref-verse-text], [data-testid=verse-result]').first().waitFor();
     if (!(await cur.count())) break;
     const idx = await cur.evaluate((el) => {
       const p = el.closest('p')!;
@@ -185,4 +185,22 @@ export async function autoDismissMilestones(page: Page) {
   await page.addLocatorHandler(page.getByTestId('milestone-close'), async (btn) => {
     await btn.click();
   });
+}
+
+/** Fill-in-the-blank, second half: choose book, chapter, verse (and topic, if the verse has one) from the options. */
+export async function finishBlankReference(page: Page, v: VerseInput, topic?: string) {
+  const answers = [BOOK_NAMES[v.book], String(v.chapter), v.end && v.end > v.start ? `${v.start}–${v.end}` : String(v.start)];
+  if (topic) answers.push(topic);
+  for (const a of answers) {
+    await expect(page.getByTestId('current-ref-blank')).toBeVisible();
+    await page.getByTestId('option').getByText(a, { exact: true }).click();
+  }
+  await expect(page.getByTestId('verse-result')).toBeVisible({ timeout: 6000 });
+}
+
+/** Type it out: type every first letter, ending at the typed reference step. */
+export async function typeWholeVerse(page: Page, text: string) {
+  await page.getByTestId('type-input').focus();
+  await page.keyboard.type(firstLetters(text));
+  await expect(page.getByTestId('ref-verse-text')).toBeVisible({ timeout: 6000 });
 }

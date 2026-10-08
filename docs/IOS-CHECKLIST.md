@@ -69,3 +69,9 @@ The automated tests run in Chromium, which behaves differently from iPhone Safar
 - [ ] Verse → Move to another pile → "Already know this one? Start partway": the slider drags smoothly with a thumb (the page does not scroll sideways), the caption updates, and the toast says how many days it carried over; Undo restores it.
 - [ ] Add a verse → "Already know this one?": the slider works the same; the new verse's ring shows that many days.
 - [ ] Verse detail: Edit · Open in Bible · Move · Delete are all the same height.
+
+## Fill-in-the-blank, reference and topic (v1.11)
+- [ ] Choose answers in a long verse: the words do not shift sideways or re-wrap as blanks fill in.
+- [ ] After the last word, the top line becomes blanks for book, chapter and verse; pick from the options. A verse with a topic also asks for it.
+- [ ] Type it out / Speak it: after the typed reference a verse with a topic asks for the topic as a choice.
+- [ ] With a Bluetooth keyboard (if you have one): open a picker, Tab to an item and press Enter; focus stays where you put it.

@@ -1,4 +1,5 @@
 // Fill-in-the-blank generation, mistake policy and reference checking.
+import { BOOKS, bookByNumber, versesInChapter } from './books.ts';
 import type { Ref } from './reference.ts';
 import { tokenize, type Word } from './text.ts';
 import type { FillDifficulty, Pile } from './types.ts';
@@ -128,4 +129,88 @@ export function checkReference(answer: RefAnswer, truth: Ref): RefCheck {
   const end = answer.end ?? answer.start;
   if (answer.start !== truth.start || end !== truth.end) wrong.push('verse');
   return { ok: wrong.length === 0, wrong };
+}
+
+// ------------------------------------------------------------- multiple-choice "where is it?" and "what topic?"
+
+export interface ChoiceStep {
+  kind: 'book' | 'chapter' | 'verse' | 'topic';
+  answer: string;
+  /** Shuffled, includes the answer, no duplicates. */
+  options: string[];
+}
+
+/** Used to pad topic choices when you have few topics of your own. */
+export const COMMON_TOPICS = [
+  'Faith', 'Hope', 'Love', 'Grace', 'Peace', 'Prayer', 'Wisdom', 'Forgiveness', 'Trust', 'Joy', 'Strength', 'Salvation',
+  'Anxiety', 'Obedience', 'Gospel', 'Courage', 'Comfort', 'Patience',
+];
+
+/** Up to `count` numbers near `answer` inside [1, max], always including `answer`. */
+function nearbyNumbers(answer: number, max: number, count: number, rng: () => number): number[] {
+  const pool: number[] = [];
+  for (let n = 1; n <= max; n++) if (n !== answer) pool.push(n);
+  pool.sort((a, b) => Math.abs(a - answer) + (rng() - 0.5) * 4 - (Math.abs(b - answer) + (rng() - 0.5) * 4));
+  return shuffle([answer, ...pool.slice(0, count - 1)], rng);
+}
+
+const range = (a: number, b: number) => (b > a ? `${a}–${b}` : `${a}`);
+
+/** Book, chapter and verse questions for a passage (chapter is skipped for one-chapter books). */
+export function makeReferenceSteps(truth: Ref, level: FillDifficulty, rng: () => number): ChoiceStep[] {
+  const want = LEVELS[level].options;
+  const steps: ChoiceStep[] = [];
+
+  // Book: mostly books from the same testament, so the choice is not trivially easy.
+  const sameTestament = (n: number) => (n <= 39) === (truth.book <= 39);
+  const others = shuffle(
+    BOOKS.filter((b) => b.n !== truth.book),
+    rng,
+  ).sort((a, b) => Number(sameTestament(b.n)) - Number(sameTestament(a.n)) + (rng() - 0.5) * 1.2);
+  const bookName = bookByNumber(truth.book).name;
+  steps.push({ kind: 'book', answer: bookName, options: shuffle([bookName, ...others.slice(0, want - 1).map((b) => b.name)], rng) });
+
+  const chapters = bookByNumber(truth.book).chapters;
+  if (chapters > 1) {
+    const options = nearbyNumbers(truth.chapter, chapters, Math.min(want, chapters), rng).map(String);
+    steps.push({ kind: 'chapter', answer: String(truth.chapter), options });
+  }
+
+  const max = versesInChapter(truth.book, truth.chapter) ?? truth.end;
+  const answer = range(truth.start, truth.end);
+  const span = truth.end - truth.start;
+  const seen = new Set([answer]);
+  const verseOptions = [answer];
+  const starts = nearbyNumbers(truth.start, Math.max(1, max - span), want * 2, rng);
+  for (const s of starts) {
+    const opt = range(s, s + span);
+    if (!seen.has(opt) && s + span <= max) {
+      seen.add(opt);
+      verseOptions.push(opt);
+    }
+    if (verseOptions.length >= Math.min(want, Math.max(2, max))) break;
+  }
+  // very short chapters: fall back to single verses so there is always a real choice
+  for (let n = 1; n <= max && verseOptions.length < Math.min(want, 2); n++) {
+    const opt = range(n, n);
+    if (!seen.has(opt)) (seen.add(opt), verseOptions.push(opt));
+  }
+  steps.push({ kind: 'verse', answer, options: shuffle(verseOptions, rng) });
+  return steps;
+}
+
+/** "What is this verse's topic?" Distractors come from your other topics, padded with common ones. */
+export function makeTopicStep(topic: string, otherTopics: string[], level: FillDifficulty, rng: () => number): ChoiceStep {
+  const want = LEVELS[level].options;
+  const key = topic.trim().toLowerCase();
+  const seen = new Set([key]);
+  const distractors: string[] = [];
+  for (const t of [...shuffle(otherTopics, rng), ...shuffle(COMMON_TOPICS, rng)]) {
+    const k = t.trim().toLowerCase();
+    if (!k || seen.has(k)) continue;
+    seen.add(k);
+    distractors.push(t.trim());
+    if (distractors.length >= want - 1) break;
+  }
+  return { kind: 'topic', answer: topic.trim(), options: shuffle([topic.trim(), ...distractors], rng) };
 }

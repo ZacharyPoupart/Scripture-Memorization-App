@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { addVerse, blockLookups, completeBlanks, firstLetters, openApp, wordsOf, autoDismissMilestones } from './helpers';
+import { addVerse, blockLookups, typeWholeVerse, firstLetters, openApp, wordsOf, autoDismissMilestones } from './helpers';
 
 test.beforeEach(async ({ page }) => {
   await autoDismissMilestones(page);
@@ -83,8 +83,8 @@ test.describe('phone layout and keyboard', () => {
   });
 
   test('reference recall fields stay on screen when the keyboard is up', async ({ page }) => {
-    await page.getByTestId('review-blanks').click();
-    await completeBlanks(page, LONG.text);
+    await page.getByTestId('review-type').click();
+    await typeWholeVerse(page, LONG.text);
     const vp = page.viewportSize()!;
     await page.setViewportSize({ width: vp.width, height: Math.round(vp.height * 0.55) });
     await page.getByTestId('ref-chapter').focus();
@@ -101,5 +101,30 @@ test.describe('phone layout and keyboard', () => {
     await page.getByTestId('ref-check').click();
     await expect(page.getByTestId('ref-message')).toBeVisible();
     await expect(page.getByTestId('ref-chapter')).toHaveValue('5');
+  });
+});
+
+test.describe('fill in the blank stays put', () => {
+  test('choosing an answer never moves the other words (no refitting)', async ({ page }) => {
+    await blockLookups(page);
+    await openApp(page);
+    await addVerse(page, LONG);
+    await page.goto('/#/pile/daily');
+    await page.getByTestId('verse-card').click();
+    await page.getByTestId('review-blanks').click();
+    const positions = () =>
+      page.locator('[data-testid=blank-text] > span').evaluateAll((els) => els.map((e) => { const r = e.getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top), Math.round(r.width)]; }));
+    for (let i = 0; i < 6; i++) {
+      const before = await positions();
+      const answer = (await page.locator('[data-testid=current-blank] > span[aria-hidden]').first().textContent())!;
+      await page.getByTestId('option').getByText(answer, { exact: true }).click();
+      await page.waitForTimeout(350); // let the scroll/settle animation finish
+      const after = await positions();
+      // same layout: every word has the same left edge, width and line (vertical scroll aside, everything moves together)
+      expect(after.map((p) => p[0])).toEqual(before.map((p) => p[0]));
+      expect(after.map((p) => p[2])).toEqual(before.map((p) => p[2]));
+      const dy = after[0][1] - before[0][1];
+      expect(after.map((p, k) => p[1] - before[k][1]).every((d) => d === dy)).toBe(true);
+    }
   });
 });

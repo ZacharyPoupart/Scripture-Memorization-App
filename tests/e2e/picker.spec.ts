@@ -176,6 +176,18 @@ test.describe('cascading verse picker (Book → Chapter → Verse)', () => {
     expect(b!.y + b!.height).toBeLessThanOrEqual(area!.y + area!.height + 1);
   });
 
+  test('keyboard focus stays on the item you focused even when the screen re-renders behind the dialog', async ({ page }) => {
+    await page.getByTestId('pick-book').click();
+    const mark = page.getByTestId('book-option').filter({ hasText: /^Mark$/ });
+    await mark.focus();
+    await expect(mark).toBeFocused();
+    // anything that re-renders the Add screen (here: the connection state changing) used to kick focus back out of the dialog
+    await page.evaluate(() => window.dispatchEvent(new Event('offline')));
+    await page.evaluate(() => window.dispatchEvent(new Event('online')));
+    await page.waitForTimeout(300);
+    await expect(mark).toBeFocused();
+  });
+
   test('works with the keyboard: boxes open with Enter, items activate with Enter/Space', async ({ page }) => {
     await page.getByTestId('pick-book').focus();
     await page.keyboard.press('Enter');

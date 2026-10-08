@@ -48,8 +48,8 @@ function VerseAttempt({ verse, mode, onFinished, onRestart }: { verse: Verse; mo
     }
     return false;
   };
-  // A flashcard shows the reference on the card itself, so it has no reference-recall step
-  const props = { verse, onMistake, onRestart, mistakes, onDone: () => (step === 'text' && mode !== 'flashcard' ? setStep('ref') : onFinished()) };
+  // A flashcard shows the reference on the card itself, and Fill-in-the-blank asks for the reference (and topic) as blanks of its own; Type and Speak finish with typed reference recall
+  const props = { verse, onMistake, onRestart, mistakes, onDone: () => (step === 'text' && mode !== 'flashcard' && mode !== 'blanks' ? setStep('ref') : onFinished()) };
   if (step === 'ref') return <RefRecall {...props} />;
   switch (mode) {
     case 'blanks':

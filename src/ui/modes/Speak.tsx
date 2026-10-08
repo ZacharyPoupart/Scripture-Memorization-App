@@ -3,7 +3,7 @@ import { formatRef } from '../../core/reference.ts';
 import { alignSpeech, tokenizeSpeech } from '../../core/speech.ts';
 import { tokenize } from '../../core/text.ts';
 import { navigate } from '../../router.ts';
-import { centerIn } from '../dom.ts';
+import { keepInView } from '../dom.ts';
 import { Dock, MistakeDots, type ModeProps } from './shared.tsx';
 
 interface RecognitionLike {
@@ -38,7 +38,7 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
   const align = alignSpeech(expected, tokenizeSpeech(transcript), finished);
 
   useEffect(() => {
-    centerIn(area.current, area.current?.querySelector('.cur') as HTMLElement | null);
+    keepInView(area.current, area.current?.querySelector('.cur') as HTMLElement | null);
   }, [align.progress, finished]);
   useEffect(() => () => {
     wantListening.current = false;
