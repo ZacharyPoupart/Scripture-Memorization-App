@@ -5,6 +5,9 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Added
+- A calm "Offline" line on Today when there is no connection, so it is clear that reviewing and progress keep working.
+
 ## [1.8.4] - 2026-10-08
 
 ### Fixed

@@ -1571,3 +1571,7 @@ button.streak {
   text-decoration: underline dotted var(--warn);
   text-underline-offset: 4px;
 }
+
+.offline-note {
+  margin-top: 2px;
+}

@@ -73,3 +73,18 @@ test('a first-day review ends with a warm "Nice work" (streak kept) instead of c
   await expect(page.getByTestId('streak-kept')).toContainText('Nice work');
   await expect(page.getByTestId('all-done')).toHaveCount(0);
 });
+
+test('with no connection, Today says so calmly and everything keeps working', async ({ page, context }) => {
+  await blockLookups(page);
+  await openApp(page);
+  await addVerse(page, JOHN316);
+  await page.goto('/#/');
+  await expect(page.getByTestId('offline-note')).toHaveCount(0);
+  await context.setOffline(true);
+  await expect(page.getByTestId('offline-note')).toContainText('Offline');
+  await page.getByTestId('start-today').click();
+  await finishFlashcard(page);
+  await context.setOffline(false);
+  await page.goto('/#/');
+  await expect(page.getByTestId('offline-note')).toHaveCount(0);
+});

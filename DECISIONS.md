@@ -194,3 +194,8 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 - **Evaluated and skipped**: collapsing Settings into sections. It would touch ~25 e2e steps for a screen that is not part of practising or progress, so the risk outweighs the gain; revisit if Settings keeps growing. Graduation (level-up) and streak-milestone celebrations already scale small → large and were left as they are (all 13 milestones kept at the owner's request).
 
 **Flake watch (v1.8.4 run)**: `picker.spec.ts › works with the keyboard…` (phone) failed once in a full local run (an `expect().toBeVisible()` timeout) but passed 3/3 alone and 40/40 with `--repeat-each=40 --workers=6`. Nothing was skipped or loosened. If it recurs in CI, treat it as real and capture a trace.
+
+## v1.8.5 — speed & offline (overnight project 4)
+- **Measured**: the whole app is one 138 KB JS file (≈49 KB gzipped), 23 KB CSS, 16 precached files (299 KB total). Nothing to trim; a bundle splitter would add requests for no gain. Start-up is dominated by reading the saved data, which is a single small IndexedDB read.
+- **Added**: when the device has no connection, Today shows a quiet line under the greeting ("Offline. Reviewing and your progress all work as normal."), so being offline never feels like a problem. It disappears as soon as the connection returns. e2e test: `today.spec.ts › with no connection…`.
+- **Already in place**: the service worker precaches everything (offline start tested on every release), the Update bar only appears when a new version is ready and never interrupts a review, and the app looks for updates whenever you come back to it.

@@ -10,7 +10,7 @@ import { Icon, PILE_INFO } from './common.tsx';
 import { ModePicker } from './ModePicker.tsx';
 
 export function Home() {
-  const { data, settings } = useApp();
+  const { data, settings, online } = useApp();
   const now = Date.now();
   const verses = liveVerses(data);
   const today = todaySummary(data, now);
@@ -74,6 +74,11 @@ export function Home() {
             <div>
               <div class="muted small">{new Date(now).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}</div>
               <h1>{greet}</h1>
+              {!online && (
+                <div class="offline-note small muted" data-testid="offline-note">
+                  Offline. Reviewing and your progress all work as normal.
+                </div>
+              )}
             </div>
             <button
               class="streak"
