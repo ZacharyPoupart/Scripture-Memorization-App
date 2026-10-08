@@ -46,3 +46,13 @@ The automated tests run in Chromium, which behaves differently from iPhone Safar
 - [ ] **Speak it** (experimental): the microphone prompt appears; words colour as you speak. If it can't work in the home-screen app, the screen offers Type mode instead.
 - [ ] **Sync** (needs the Cloudflare KV setup): link a second device with the code; changes appear on both.
 - [ ] **Export backup** and **Import backup** work from the Files / share sheet.
+
+## Today, rings and flashcards (v1.6–1.7)
+- [ ] Today: one big **Start today's reviews** button at the bottom; the list above it shows what is ready / waiting / done. After finishing, the button disappears and the card says when the next review unlocks (no greyed-out button).
+- [ ] The mode choice (Flashcard / Blanks / Type / Speak) is visible on Today and sticks.
+- [ ] Verse cards show a small ring ("Day N of 90 toward Weekly"); a verse in a frozen period looks dashed and paused; Yearly shows a tick.
+- [ ] Flashcard: tap the card (or **Flip**) to turn it; tap again to flip back; **Nailed it** / **Needs work** only; no reference-entry step afterwards.
+- [ ] **Uncover bit by bit**: tapping the covered text or the big button reveals a phrase at a time; **By word**, **Show all**, **Start over** work; the page never jumps and a long verse (Psalm 23:1-6) scrolls inside its area.
+- [ ] Type it out: a wrong letter shows the missed word (dotted underline) and carries on; the keyboard stays up.
+- [ ] First day: add a verse, review it once: a small **Day one** card appears after you return to Today. Tapping Thank you dismisses it.
+- [ ] Settings → Time between Daily reviews: No wait / 30 minutes / hours / Custom.
