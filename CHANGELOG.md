@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-10-08
+
 ### Added
 - **Take a break** (Settings): pause for 3 days, a week, 2 weeks or a month. Nothing is due, your streak waits, nothing freezes and nothing is lost; verses just do not move up while you are away. You can still review anyway, and end the break early from Settings or Today.
 
