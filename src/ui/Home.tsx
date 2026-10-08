@@ -1,11 +1,13 @@
-import { dayKeyOf, daysBetween, formatDays } from '../core/dates.ts';
+import { formatDuration } from '../core/dates.ts';
+import { formatRef } from '../core/reference.ts';
+import { nextReviewInfo } from '../core/today.ts';
 import { daysUntilFreeze, isFrozen, liveVerses, pileVerses, streakInfo, todaySummary, verseStatus } from '../core/schedule.ts';
 import { PILES } from '../core/types.ts';
 import { navigate } from '../router.ts';
 import { shouldNudgeBackup } from '../core/nudges.ts';
 import { downloadBackup, updateSettings, useApp } from '../store.ts';
 import { Icon, PILE_INFO } from './common.tsx';
-import { ModePicker } from './ModePicker.tsx';
+import { MODES, ModePicker } from './ModePicker.tsx';
 
 export function Home() {
   const { data, settings } = useApp();
@@ -17,6 +19,32 @@ export function Home() {
   const untilFreeze = daysUntilFreeze(data, now);
   const readyAll = verses.filter((v) => verseStatus(data, v, now).state === 'ready').length;
   const pct = today.total ? Math.round((today.met / today.total) * 100) : 100;
+  const todayList = verses
+    .map((v) => ({ v, s: verseStatus(data, v, now) }))
+    .filter(({ v, s }) => s.state === 'ready' || s.state === 'waiting' || (s.state === 'done' && v.pile === 'daily') || (s.countedToday > 0 && v.pile !== 'daily'));
+  const next = nextReviewInfo(data, now);
+  const nextText =
+    next.kind === 'soon'
+      ? `Next review in ${formatDuration(next.waitMs)}.`
+      : next.kind === 'day'
+        ? next.daysAway <= 1
+          ? 'Next review: tomorrow.'
+          : `Next review: ${new Date(next.day + 'T12:00:00').toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}.`
+        : '';
+  const headline =
+    readyAll > 0
+      ? `${readyAll} verse${readyAll === 1 ? '' : 's'} to review`
+      : todayList.some(({ s }) => s.state === 'waiting')
+        ? 'Done for now'
+        : today.outcome === 'c' || today.total > 0 || todayList.length > 0
+        ? 'All done for today!'
+        : 'Nothing due today';
+  const subline =
+    readyAll > 0
+      ? today.remaining > readyAll
+        ? `${today.remaining - readyAll} more unlock later today`
+        : 'Aim for three a day; one keeps your streak.'
+      : [streak.count > 0 ? `Streak ${streak.count} day${streak.count === 1 ? '' : 's'}.` : '', nextText].filter(Boolean).join(' ') || 'Newly added verses are optional on their first day.';
   const hour = new Date(now).getHours();
   const greet = hour < 5 ? 'Still up?' : hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
 
@@ -56,6 +84,7 @@ export function Home() {
             >
               <Icon name="flame" fill />
               <span>{streak.count}</span>
+              {streak.longest > streak.count && <small class="streak-best">best {streak.longest}</small>}
             </button>
           </div>
 
@@ -69,51 +98,48 @@ export function Home() {
             <div class="banner">A review today keeps your verses moving. (After 3 days without one, progress simply pauses — nothing is lost.)</div>
           )}
 
-          <div class="card stack">
+          <div class="card stack today-card">
             <div class="row">
-              <div class={`ring ${today.outcome === 'c' ? 'done' : ''}`} style={{ '--p': pct } as never}>
+              <div class={`ring ${today.outcome === 'c' && readyAll === 0 ? 'done' : ''}`} style={{ '--p': pct } as never}>
                 <div data-testid="today-ring">{today.total ? `${today.met}/${today.total}` : '✓'}</div>
               </div>
               <div class="grow">
-                <h2>{today.outcome === 'c' ? 'All done for today!' : today.total === 0 ? 'Nothing required today' : "Today's reviews"}</h2>
-                <div class="muted small">
-                  {today.outcome === 'c'
-                    ? streak.count > 0
-                      ? `Streak: ${streak.count} day${streak.count === 1 ? '' : 's'}. Longest: ${streak.longest}.`
-                      : 'Nice work.'
-                    : today.total === 0
-                      ? 'Newly added verses are optional on their first day.'
-                      : today.readyNow > 0
-                        ? `${today.readyNow} ready now · ${today.remaining} to go today`
-                        : `${today.remaining} to go — next ones unlock soon`}
-                </div>
+                <h2 data-testid="today-title">{headline}</h2>
+                <div class="muted small" data-testid="today-sub">{subline}</div>
               </div>
             </div>
-            <ModePicker />
+            {todayList.length > 0 && (
+              <ul class="today-list" aria-label="Verses for today" data-testid="today-list">
+                {todayList.map(({ v, s }) => (
+                  <li key={v.id} class={`pile-${v.pile} ${s.state}`}>
+                    <i aria-hidden="true" />
+                    <span>{formatRef(v)}</span>
+                    <small class="muted">{s.state === 'ready' ? (s.countedToday ? `${s.countedToday}/3` : 'ready') : s.state === 'waiting' ? `in ${formatDuration(s.waitMs ?? 0)}` : 'done'}</small>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <details class="quiet-details">
+              <summary>
+                Mode: <strong>{MODES.find((m) => m.value === settings.defaultMode)?.long}</strong>
+              </summary>
+              <ModePicker />
+            </details>
           </div>
 
           <div>
-            <h2 style={{ margin: '4px 0 10px' }}>Your piles</h2>
-            <div class="list">
+            <h2 class="section-title">Your piles</h2>
+            <div class="pile-grid">
               {PILES.map((p) => {
                 const vs = pileVerses(data, p);
                 const ready = vs.filter((v) => verseStatus(data, v, now).state === 'ready').length;
-                const oldest = vs[0];
                 return (
-                  <button key={p} class={`card tap pile-tile pile-${p}`} onClick={() => navigate(`/pile/${p}`)} data-testid={`pile-${p}`}>
-                    <div class="row spread">
-                      <div>
-                        <h3>{PILE_INFO[p].label}</h3>
-                        <div class="muted small">{PILE_INFO[p].blurb}</div>
-                        {oldest && <div class="muted small">Longest: {formatDays(Math.max(0, daysBetween(oldest.pileSince, dayKeyOf(now))))}</div>}
-                      </div>
-                      <div class="center">
-                        <div class="count" data-testid={`count-${p}`}>
-                          {vs.length}
-                        </div>
-                        <div class={`small ${ready ? 'status-ready' : 'muted'}`}>{ready ? `${ready} ready` : 'none due'}</div>
-                      </div>
+                  <button key={p} class={`card tap pile-tile pile-${p}`} onClick={() => navigate(`/pile/${p}`)} data-testid={`pile-${p}`} aria-label={`${PILE_INFO[p].label}: ${vs.length} verses, ${ready} ready`}>
+                    <h3>{PILE_INFO[p].label}</h3>
+                    <div class="count" data-testid={`count-${p}`}>
+                      {vs.length}
                     </div>
+                    <div class={`small ${ready ? 'status-ready' : 'muted'}`}>{ready ? `${ready} ready` : 'none due'}</div>
                   </button>
                 );
               })}
@@ -142,16 +168,15 @@ export function Home() {
           )}
         </div>
       </div>
-      <div class="action-bar">
+      {readyAll > 0 && <div class="action-bar">
         <button
           class="btn primary block"
-          disabled={readyAll === 0}
           onClick={() => navigate(`/review?today=1&mode=${settings.defaultMode}`)}
           data-testid="start-today"
         >
-          {readyAll > 0 ? `Review ${readyAll} ready` : 'Nothing ready right now'}
+          Start today's reviews · {readyAll}
         </button>
-      </div>
+      </div>}
     </>
   );
 }

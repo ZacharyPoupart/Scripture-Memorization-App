@@ -15,11 +15,13 @@ import { RefRecall } from './modes/RefRecall.tsx';
 import { Speak } from './modes/Speak.tsx';
 import { TypeIt } from './modes/TypeIt.tsx';
 
+import { buildTodayQueue } from '../core/today.ts';
+
 function buildQueue(data: AppData, q: URLSearchParams, now: number): string[] {
   const one = q.get('verse');
   if (one) return data.verses[one] && !data.verses[one].deletedAt ? [one] : [];
   const ready = (v: Verse) => verseStatus(data, v, now).state === 'ready';
-  if (q.get('today')) return PILES.flatMap((p) => pileVerses(data, p).filter(ready)).map((v) => v.id);
+  if (q.get('today')) return buildTodayQueue(data, now);
   const pile = q.get('pile');
   if (pile && (PILES as string[]).includes(pile)) {
     const vs = pileVerses(data, pile as (typeof PILES)[number]);

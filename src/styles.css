@@ -1349,3 +1349,145 @@ button.streak {
 .overlay:focus {
   outline: none;
 }
+
+/* ---- Today screen ---- */
+.section-title {
+  margin: 4px 0 10px;
+  font-size: 1rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+.today-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+}
+.today-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 2px;
+  min-height: 36px;
+}
+.today-list li > span {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.today-list i {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--pile);
+  flex: none;
+}
+.today-list li.done i {
+  background: var(--pile);
+}
+.today-list li.waiting i {
+  background: linear-gradient(90deg, var(--pile) 50%, transparent 50%);
+}
+.today-list li.done > span {
+  color: var(--muted);
+}
+.quiet-details > summary {
+  cursor: pointer;
+  list-style: none;
+  color: var(--muted);
+  font-size: 0.9rem;
+  padding: 8px 0;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+.quiet-details > summary::-webkit-details-marker {
+  display: none;
+}
+.quiet-details > summary::after {
+  content: '▾';
+  margin-left: 6px;
+}
+.quiet-details[open] > summary::after {
+  content: '▴';
+}
+.pile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.pile-grid .pile-tile {
+  border-left: 0;
+  border-top: 5px solid var(--pile);
+  padding: 12px 14px;
+  display: grid;
+  gap: 2px;
+}
+.streak-best {
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+/* ---- progress ring on verse cards ---- */
+.pring {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex: none;
+  color: var(--pile, var(--accent));
+}
+.pring svg {
+  grid-area: 1 / 1;
+}
+.pring b {
+  grid-area: 1 / 1;
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.pring-track {
+  fill: none;
+  stroke: var(--surface-2);
+  stroke-width: 4;
+}
+.pring-arc {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 4;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.4s ease;
+}
+.pring-check {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.pring.yearly .pring-track {
+  stroke: currentColor;
+  opacity: 0.35;
+}
+.pring.frozen {
+  opacity: 0.75;
+}
+.pring.frozen .pring-arc {
+  stroke-dasharray: 3 4 !important;
+}
+.pring-pause {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pring-arc {
+    transition: none;
+  }
+}
