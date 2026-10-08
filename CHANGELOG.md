@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.7.1] - 2026-10-08
+
 ## [1.7.0] - 2026-10-08
 
 ### Changed
