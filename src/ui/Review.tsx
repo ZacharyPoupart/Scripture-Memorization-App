@@ -7,7 +7,7 @@ import { tooManyMistakes } from '../core/quiz.ts';
 import { PILES, type AppData, type LevelUp, type ReviewMode, type Verse } from '../core/types.ts';
 import { back, navigate, type Route } from '../router.ts';
 import { completeReview, showToast, useApp } from '../store.ts';
-import { CheckMark, Icon, PileBadge, PILE_INFO, pileProgress } from './common.tsx';
+import { CheckMark, Confetti, Icon, PileBadge, PILE_INFO, pileProgress } from './common.tsx';
 import { MODES } from './ModePicker.tsx';
 import { Blanks } from './modes/Blanks.tsx';
 import { Flashcard } from './modes/Flashcard.tsx';
@@ -154,15 +154,25 @@ export function Review({ route }: { route: Route }) {
     const nowT = Date.now();
     const sum = todaySummary(data, nowT);
     const streak = streakInfo(data, nowT);
+    const fullyDone = sum.total > 0 && sum.remaining === 0; // every review of today finished (not just enough for the streak)
     return (
       <div class="review" data-testid="session-summary">
         <div class="verse-area center stack" style={{ paddingTop: '48px' }}>
-          {sum.outcome === 'c' ? (
+          {fullyDone ? (
             <div class="alldone" data-testid="all-done">
+              {settings.celebrations === 'full' && <Confetti count={36} />}
               <CheckMark size={72} />
               <h1>All done for today</h1>
               <p class="muted" style={{ margin: 0 }}>
                 {streak.count > 0 ? `Streak: ${streak.count} day${streak.count === 1 ? '' : 's'}. See you tomorrow.` : 'See you tomorrow.'}
+              </p>
+            </div>
+          ) : sum.outcome === 'c' ? (
+            <div class="alldone" data-testid="streak-kept">
+              <CheckMark size={64} />
+              <h1>Nice work</h1>
+              <p class="muted" style={{ margin: 0 }}>
+                {streak.count > 0 ? `Your streak is ${streak.count} day${streak.count === 1 ? '' : 's'}.` : 'Your flame is lit.'}
               </p>
             </div>
           ) : (
@@ -175,7 +185,7 @@ export function Review({ route }: { route: Route }) {
             {queue.length} verse{queue.length === 1 ? '' : 's'} reviewed · {tally.counted} counted
             {tally.practice > 0 ? ` · ${tally.practice} extra practice` : ''}
           </p>
-          {sum.outcome !== 'c' && sum.remaining > 0 && (
+          {!fullyDone && sum.remaining > 0 && (
             <p class="muted small" data-testid="more-later">
               {sum.remaining} more due today — {sum.readyNow > 0 ? 'ready whenever you are.' : 'the next one unlocks a little later.'}
             </p>

@@ -115,6 +115,11 @@ export function PilePage({ pile }: { pile: Pile }) {
             {!all.length && (
               <div class="card center muted">
                 No verses in {PILE_INFO[pile].label} yet.
+                {pile !== 'daily' && (
+                  <div class="small" style={{ marginTop: '6px' }}>
+                    Verses move here by themselves after enough steady practice — nothing to do.
+                  </div>
+                )}
                 {pile === 'daily' && (
                   <div style={{ marginTop: '10px' }}>
                     <button class="btn primary" onClick={() => navigate('/add')}>

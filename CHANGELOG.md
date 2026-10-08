@@ -5,6 +5,21 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.8.5] - 2026-10-08
+
+### Added
+- A calm "Offline" line on Today when there is no connection, so it is clear that reviewing and progress keep working.
+
+## [1.8.4] - 2026-10-08
+
+### Fixed
+- The end-of-session screen no longer says "All done for today" when more reviews are still due; it says "Nice work" and shows your streak. Finishing everything for the day adds a small confetti burst (Full celebrations only).
+
+## [1.8.3] - 2026-10-08
+
+### Fixed
+- Better support for older iPhones: the app is now built for iOS 14+ browsers, has a fallback for a feature missing before iOS 15.4, and the flashcard "uncover" blocks have a fallback colour before iOS 16.2.
+
 ## [1.8.2] - 2026-10-08
 
 ### Fixed

@@ -39,5 +39,5 @@ export default defineConfig({
       },
     }),
   ],
-  build: { target: 'es2022' },
+  build: { target: 'safari14' }, // older iPhones (iOS 14+) must still be able to run the bundle
 });
