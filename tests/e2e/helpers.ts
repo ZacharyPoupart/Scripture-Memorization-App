@@ -198,9 +198,32 @@ export async function finishBlankReference(page: Page, v: VerseInput, topic?: st
   await expect(page.getByTestId('verse-result')).toBeVisible({ timeout: 6000 });
 }
 
-/** Type it out: type every first letter, ending at the typed reference step. */
+/** Type it out: type every first letter of the verse; the screen then asks for the reference. */
 export async function typeWholeVerse(page: Page, text: string) {
   await page.getByTestId('type-input').focus();
   await page.keyboard.type(firstLetters(text));
+  await expect(page.getByTestId('type-ref')).toBeVisible({ timeout: 6000 });
+}
+
+/** Type it out, second half: the first letter of the book, then chapter:verse(-verse). */
+export async function typeReference(page: Page, v: VerseInput) {
+  const verse = v.end && v.end > v.start ? `${v.start}-${v.end}` : `${v.start}`;
+  await page.keyboard.type(`${BOOK_NAMES[v.book][0]}${v.chapter}:${verse}`);
+}
+
+/** Speak it with a pretend microphone, ending at the typed reference step. */
+export async function speakToReference(page: Page, text: string, cardText?: string | RegExp) {
+  await installFakeSpeech(page, text.replace(/[,.;]/g, '').toLowerCase());
+  await page.goto('/#/pile/daily');
+  await page.reload(); // so the init script is in place
+  const cards = page.getByTestId('verse-card');
+  await (cardText ? cards.filter({ hasText: cardText }) : cards).first().click();
+  await page.getByTestId('review-speak').click();
+  await page.getByTestId('speak-start').click();
+  await expect(page.getByTestId('speak-text').locator('.w.ok').first()).toBeVisible();
+  await page.waitForTimeout(400); // the pretend microphone sends the second half a moment later
+  await page.getByTestId('speak-done').click();
+  await expect(page.getByTestId('speak-result')).toContainText('Perfect');
+  await page.getByTestId('speak-continue').click();
   await expect(page.getByTestId('ref-verse-text')).toBeVisible({ timeout: 6000 });
 }

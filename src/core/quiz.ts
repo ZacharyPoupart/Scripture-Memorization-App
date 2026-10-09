@@ -214,3 +214,60 @@ export function makeTopicStep(topic: string, otherTopics: string[], level: FillD
   }
   return { kind: 'topic', answer: topic.trim(), options: shuffle([topic.trim(), ...distractors], rng) };
 }
+
+// ------------------------------------------------------------- typing the reference ("Type it out")
+
+export interface RefToken {
+  /** What is revealed on screen once this token is typed. */
+  show: string;
+  /** The (lower-case) character that is expected. */
+  expect: string;
+  kind: 'book' | 'digit' | 'sep';
+}
+
+/**
+ * The reference as typed characters: the first letter of the book (a leading number such as the 1 in
+ * "1 John" is typed too), then chapter, ":", verse, and "-" and the last verse for a range.
+ */
+export function referenceTokens(ref: Ref): RefToken[] {
+  const parts = bookByNumber(ref.book).name.split(' ');
+  const tokens: RefToken[] = [];
+  if (/^\d+$/.test(parts[0]) && parts.length > 1) {
+    tokens.push({ show: `${parts[0]} `, expect: parts[0].toLowerCase(), kind: 'book' });
+    tokens.push({ show: `${parts.slice(1).join(' ')} `, expect: parts[1][0].toLowerCase(), kind: 'book' });
+  } else {
+    tokens.push({ show: `${parts.join(' ')} `, expect: parts[0][0].toLowerCase(), kind: 'book' });
+  }
+  const digits = (n: number, kind: RefToken['kind'] = 'digit') => [...String(n)].map((c) => ({ show: c, expect: c, kind }) as RefToken);
+  tokens.push(...digits(ref.chapter));
+  tokens.push({ show: ':', expect: ':', kind: 'sep' });
+  tokens.push(...digits(ref.start));
+  if (ref.end > ref.start) {
+    tokens.push({ show: '-', expect: '-', kind: 'sep' });
+    tokens.push(...digits(ref.end));
+  }
+  return tokens;
+}
+
+const strip = (c: string) => c.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const SEPARATORS = ':.-–—,;';
+const matches = (t: RefToken, ch: string) => strip(ch) === t.expect;
+
+/** Feed one typed character. Separators are optional: typing the next digit straight away is fine. */
+export function advanceRef(tokens: RefToken[], pos: number, ch: string): { ok: boolean; pos: number } {
+  const t = tokens[pos];
+  if (!t) return { ok: false, pos };
+  if (t.kind === 'sep') {
+    if (SEPARATORS.includes(ch)) return { ok: true, pos: pos + 1 };
+    const next = tokens[pos + 1];
+    if (next && matches(next, ch)) return { ok: true, pos: pos + 2 };
+    return { ok: false, pos };
+  }
+  return matches(t, ch) ? { ok: true, pos: pos + 1 } : { ok: false, pos };
+}
+
+/** After a wrong character (or "Reveal"): show the missed character and move on (a separator goes with the character after it). */
+export function skipRef(tokens: RefToken[], pos: number): number {
+  if (pos >= tokens.length) return pos;
+  return Math.min(tokens.length, tokens[pos].kind === 'sep' ? pos + 2 : pos + 1);
+}
