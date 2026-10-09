@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.12.0] - 2026-10-09
+
 ### Changed
 - Type it out now asks for the reference too: after the verse, type the first letter of the book and then the chapter and verse (e.g. J3:16 or J316; the colon and dash are optional). A wrong character is shown and you carry on, like the words. Speak it still uses the typed reference screen.
 
