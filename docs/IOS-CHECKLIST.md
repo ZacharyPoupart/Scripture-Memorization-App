@@ -75,3 +75,7 @@ The automated tests run in Chromium, which behaves differently from iPhone Safar
 - [ ] After the last word, the top line becomes blanks for book, chapter and verse; pick from the options. A verse with a topic also asks for it.
 - [ ] Type it out / Speak it: after the typed reference a verse with a topic asks for the topic as a choice.
 - [ ] With a Bluetooth keyboard (if you have one): open a picker, Tab to an item and press Enter; focus stays where you put it.
+
+## Type it out: the reference (v1.12)
+- [ ] After the last word, the top line becomes the reference: type the first letter of the book, then the numbers (e.g. J316 or J3:16). The keyboard changes to numbers after the letter (or at least digits are easy to reach).
+- [ ] A wrong character shows the right one and you carry on.

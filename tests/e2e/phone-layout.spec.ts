@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { addVerse, blockLookups, typeWholeVerse, firstLetters, openApp, wordsOf, autoDismissMilestones } from './helpers';
+import { addVerse, blockLookups, speakToReference, firstLetters, openApp, wordsOf, autoDismissMilestones } from './helpers';
 
 test.beforeEach(async ({ page }) => {
   await autoDismissMilestones(page);
@@ -83,8 +83,7 @@ test.describe('phone layout and keyboard', () => {
   });
 
   test('reference recall fields stay on screen when the keyboard is up', async ({ page }) => {
-    await page.getByTestId('review-type').click();
-    await typeWholeVerse(page, LONG.text);
+    await speakToReference(page, LONG.text);
     const vp = page.viewportSize()!;
     await page.setViewportSize({ width: vp.width, height: Math.round(vp.height * 0.55) });
     await page.getByTestId('ref-chapter').focus();

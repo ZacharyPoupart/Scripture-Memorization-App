@@ -10,7 +10,7 @@ import { feedback } from '../../services/feedback.ts';
 import { Dock, MistakeDots, type ModeProps } from './shared.tsx';
 
 /** After the verse itself: where is it found? Nothing on screen hints at the answer. */
-export function RefRecall({ verse, onMistake, onDone, onRestart, mistakes }: ModeProps) {
+export function RefRecall({ verse, onMistake, onDone, onRestart, mistakes, topicOnly }: ModeProps) {
   const [book, setBook] = useState<number | null>(null);
   const [chapter, setChapter] = useState('');
   const [start, setStart] = useState('');
@@ -22,7 +22,7 @@ export function RefRecall({ verse, onMistake, onDone, onRestart, mistakes }: Mod
   const [revealed, setRevealed] = useState(false);
   // If the verse has a topic, it is quizzed too (multiple choice) once the reference is right.
   const { data, settings } = useApp();
-  const [stage, setStage] = useState<'ref' | 'topic'>('ref');
+  const [stage, setStage] = useState<'ref' | 'topic'>(topicOnly ? 'topic' : 'ref');
   const [wrongTopics, setWrongTopics] = useState<string[]>([]);
   const topicStep = useMemo(
     () => (verse.topic ? makeTopicStep(verse.topic, topicsOf(data).filter((t) => t !== verse.topic), difficultyFor(verse.pile, settings.fillDifficulty), makeRng(Date.now() ^ (Math.random() * 1e9))) : null),

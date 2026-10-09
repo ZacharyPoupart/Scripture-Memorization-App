@@ -17,6 +17,8 @@ import {
   completeBlanks,
   finishBlankReference,
   typeWholeVerse,
+  typeReference,
+  speakToReference,
   autoDismissMilestones,
 } from './helpers';
 
@@ -113,8 +115,25 @@ test.describe('review modes', () => {
     await expect(page.getByTestId('revealed')).toHaveCount(5);
     await page.keyboard.type(letters.slice(5));
     await expect(page.getByTestId('revealed')).toHaveCount(wordsOf(JOHN_TEXT).length);
-    await expect(page.getByTestId('ref-verse-text')).toBeVisible({ timeout: 5000 });
-    await finishWithReference(page, JOHN316);
+    // then the reference: the first letter of the book, then chapter:verse
+    await expect(page.getByTestId('type-ref')).toBeVisible({ timeout: 5000 });
+    await typeReference(page, JOHN316);
+    await expect(page.getByTestId('verse-result')).toBeVisible({ timeout: 6000 });
+  });
+
+  test('type it out: the reference is typed as a letter and numbers; colon and dash are optional; a wrong character is shown and counts as a slip', async ({ page }) => {
+    await startVerseReview(page, 'type');
+    await typeWholeVerse(page, JOHN_TEXT);
+    await page.keyboard.type('j316'); // no colon needed
+    await expect(page.getByTestId('verse-result')).toBeVisible({ timeout: 6000 });
+  });
+
+  test('type it out: a wrong chapter digit is shown and typing carries on', async ({ page }) => {
+    await startVerseReview(page, 'type');
+    await typeWholeVerse(page, JOHN_TEXT);
+    await page.keyboard.type('j9:16');
+    await expect(page.getByTestId('mistakes').locator('.dot.used')).toHaveCount(1);
+    await expect(page.getByTestId('verse-result')).toBeVisible({ timeout: 6000 });
   });
 
   test('type it out: too many mistakes restarts; Reveal counts as a mistake', async ({ page }) => {
@@ -171,8 +190,7 @@ test.describe('review modes', () => {
   });
 
   test('reference recall: wrong answers are mistakes, no hints, "I don\'t remember" reveals and restarts', async ({ page }) => {
-    await startVerseReview(page, 'type');
-    await typeWholeVerse(page, JOHN_TEXT);
+    await speakToReference(page, JOHN_TEXT);
     // the book list shows every book (no narrowing hints)
     await page.getByTestId('ref-book').click();
     await expect(page.getByTestId('book-option')).toHaveCount(66);
@@ -187,16 +205,14 @@ test.describe('review modes', () => {
     await page.getByTestId('ref-giveup').click();
     await expect(page.getByTestId('ref-answer')).toContainText('John 3:16');
     await page.getByTestId('ref-retry').click();
-    await expect(page.getByTestId('type-input')).toBeVisible(); // the verse restarts in the same mode
+    await expect(page.getByTestId('speak-start')).toBeVisible(); // the verse restarts in the same mode
   });
 
   test('reference recall for a range needs the whole range', async ({ page }) => {
     const range = { book: 19, chapter: 23, start: 1, end: 2, text: 'The LORD is my shepherd; I shall not want. He makes me lie down in green pastures.' };
     await addVerse(page, range);
     await page.goto('/#/pile/daily');
-    await page.getByTestId('verse-card').filter({ hasText: 'Psalms 23:1-2' }).click();
-    await page.getByTestId('review-type').click();
-    await typeWholeVerse(page, range.text);
+    await speakToReference(page, range.text, 'Psalms 23:1-2');
     await chooseBook(page, 'Psalms');
     await page.getByTestId('ref-chapter').fill('23');
     await page.getByTestId('ref-start').fill('1'); // forgot the range end
@@ -256,9 +272,17 @@ test.describe('topic is quizzed too', () => {
     await expect(page.getByTestId('verse-result')).toBeVisible({ timeout: 6000 });
   });
 
-  test('type it out: typed reference first, then the topic as a choice', async ({ page }) => {
+  test('type it out: the typed reference comes first, then the topic as a choice', async ({ page }) => {
     await page.getByTestId('review-type').click();
     await typeWholeVerse(page, JOHN_TEXT);
+    await typeReference(page, JOHN316);
+    await expect(page.getByTestId('topic-options')).toBeVisible();
+    await page.getByTestId('topic-option').filter({ hasText: /^Gospel$/ }).click();
+    await expect(page.getByTestId('verse-result')).toBeVisible({ timeout: 6000 });
+  });
+
+  test('speak it: typed reference, then the topic', async ({ page }) => {
+    await speakToReference(page, JOHN_TEXT);
     await answerReference(page, JOHN316);
     await expect(page.getByTestId('topic-options')).toBeVisible();
     await page.getByTestId('topic-option').filter({ hasText: /^Gospel$/ }).click();

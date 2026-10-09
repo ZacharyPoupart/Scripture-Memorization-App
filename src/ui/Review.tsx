@@ -48,8 +48,8 @@ function VerseAttempt({ verse, mode, onFinished, onRestart }: { verse: Verse; mo
     }
     return false;
   };
-  // A flashcard shows the reference on the card itself, and Fill-in-the-blank asks for the reference (and topic) as blanks of its own; Type and Speak finish with typed reference recall
-  const props = { verse, onMistake, onRestart, mistakes, onDone: () => (step === 'text' && mode !== 'flashcard' && mode !== 'blanks' ? setStep('ref') : onFinished()) };
+  // A flashcard shows the reference on the card itself, and Fill-in-the-blank and Type it out ask for the reference as part of their own flow (blanks / typed characters); Speak finishes with typed reference recall; every mode but flashcards then quizzes the topic if there is one
+  const props = { verse, onMistake, onRestart, mistakes, onDone: () => (step === 'text' && (mode === 'speak' || (mode === 'type' && !!verse.topic)) ? setStep('ref') : onFinished()), topicOnly: mode === 'type' };
   if (step === 'ref') return <RefRecall {...props} />;
   switch (mode) {
     case 'blanks':

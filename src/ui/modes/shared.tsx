@@ -9,6 +9,8 @@ export interface ModeProps {
   onDone: () => void;
   onRestart: () => void;
   mistakes: number;
+  /** Reference recall: skip the typed reference and ask only the topic (modes that already asked for the reference). */
+  topicOnly?: boolean;
 }
 
 export function MistakeDots({ verse, mistakes }: { verse: Verse; mistakes: number }) {
