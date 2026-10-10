@@ -533,6 +533,13 @@ export function Settings({ onShowIntro }: { onShowIntro: () => void }) {
             }}
             testid="toggle-haptics"
           />
+          <Toggle
+            label="Avatar and seeds"
+            hint="Earn seeds for reviewing and dress your avatar. Hides it from Today when off; nothing is lost."
+            checked={settings.avatarOn}
+            onChange={(avatarOn) => updateSettings({ avatarOn })}
+            testid="toggle-avatar"
+          />
           <Field
             group
             label="Celebrations"

@@ -5,7 +5,9 @@ import { daysUntilFreeze, isFrozen, isPaused, liveVerses, pileVerses, streakInfo
 import { PILES } from '../core/types.ts';
 import { navigate } from '../router.ts';
 import { shouldNudgeBackup } from '../core/nudges.ts';
+import { currentLook, seedsBalance } from '../core/avatar.ts';
 import { downloadBackup, stopBreak, updateSettings, useApp } from '../store.ts';
+import { AvatarFigure } from './AvatarFigure.tsx';
 import { Icon, PILE_INFO } from './common.tsx';
 import { ModePicker } from './ModePicker.tsx';
 
@@ -84,6 +86,13 @@ export function Home() {
                 </div>
               )}
             </div>
+            <div class="row" style={{ gap: '8px' }}>
+            {settings.avatarOn && (
+              <button class="avatar-bubble" onClick={() => navigate('/avatar')} aria-label={`Your avatar. ${seedsBalance(data)} seeds.`} data-testid="avatar-bubble">
+                <AvatarFigure look={currentLook(data)} size={44} />
+                <span class="seeds-chip" data-testid="seeds-chip">🌱 {seedsBalance(data)}</span>
+              </button>
+            )}
             <button
               class="streak"
               title={`Longest streak: ${streak.longest}`}
@@ -95,6 +104,7 @@ export function Home() {
               <span>{streak.count}</span>
               {streak.longest > streak.count && <small class="streak-best">best {streak.longest}</small>}
             </button>
+            </div>
           </div>
 
           {frozen && (

@@ -1,6 +1,7 @@
 // App-wide state: the data document, device settings, and the glue to storage and sync.
 import { useEffect, useState } from 'preact/hooks';
 import { BackupError, exportBackup, parseBackup } from './core/backup.ts';
+import { buyItem, equipItem, seedsEarned, type BuyResult } from './core/avatar.ts';
 import { addDays, dayKeyOf } from './core/dates.ts';
 import { mergeData } from './core/merge.ts';
 import { createData, endPause, recordReview, setPause, settle } from './core/schedule.ts';
@@ -59,6 +60,7 @@ let state: AppState = {
     seenMilestones: [],
     reminderTimes: ['08:00', '13:00', '19:00'],
     nudgeDismissedAt: 0,
+    avatarOn: true,
   },
   tick: 0,
   toast: null,
@@ -122,8 +124,26 @@ export function act<T>(fn: (data: AppData, now: number, deviceId: string) => T):
   return result;
 }
 
-export function completeReview(verseId: string): { counted: boolean; levelUps: LevelUp[]; todayComplete: boolean } {
-  return act((d, now, device) => recordReview(d, verseId, now, device));
+export function completeReview(verseId: string): { counted: boolean; levelUps: LevelUp[]; todayComplete: boolean; seeds: number } {
+  return act((d, now, device) => {
+    const before = seedsEarned(d);
+    const r = recordReview(d, verseId, now, device);
+    return { ...r, seeds: Math.max(0, seedsEarned(d) - before) };
+  });
+}
+
+/** Spend seeds on an item and wear it right away. */
+export function buyAndWear(id: string): BuyResult {
+  return act((d, now) => {
+    const r = buyItem(d, id, now);
+    if (r.ok) equipItem(d, id, now);
+    return r;
+  });
+}
+
+/** Wear an item you already have (or one an achievement has unlocked). */
+export function wearItem(id: string): boolean {
+  return act((d, now) => equipItem(d, id, now));
 }
 
 export function updateSettings(patch: Partial<Settings>) {

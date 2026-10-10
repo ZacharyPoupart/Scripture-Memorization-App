@@ -66,6 +66,8 @@ export interface AppData {
   prefs: { value: SyncedPrefs; at: number };
   /** An optional "break": days from..until (inclusive) are paused. The later decision (`at`) wins when devices sync. */
   pause?: { from: DayKey; until: DayKey; at: number };
+  /** Optional avatar: items bought (grow-only, merged by union) and what is being worn (last decision `lookAt` wins). */
+  avatar?: { owned: string[]; look: Partial<Record<string, string>>; lookAt: number };
 }
 
 export type ReviewMode = 'flashcard' | 'blanks' | 'type' | 'speak';
@@ -95,6 +97,8 @@ export interface Settings {
   reminderTimes: string[];
   /** Last time the "back up your verses" nudge was dismissed (ms). */
   nudgeDismissedAt: number;
+  /** Show the avatar and seeds on Today. On by default; switching off only hides them. */
+  avatarOn: boolean;
 }
 
 export const TRANSLATIONS = ['ESV', 'NIV', 'NLT', 'NASB', 'NKJV', 'CSB', 'KJV', 'WEB'] as const;
