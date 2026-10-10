@@ -3,7 +3,9 @@ import { formatRef } from '../../core/reference.ts';
 import { alignSpeech, tokenizeSpeech } from '../../core/speech.ts';
 import { tokenize } from '../../core/text.ts';
 import { navigate } from '../../router.ts';
+import { updateSettings, useApp } from '../../store.ts';
 import { keepInView } from '../dom.ts';
+import { Seg } from '../common.tsx';
 import { Dock, MistakeDots, type ModeProps } from './shared.tsx';
 
 interface RecognitionLike {
@@ -24,6 +26,8 @@ export function speechSupported(): boolean {
 }
 
 export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModeProps) {
+  const { settings } = useApp();
+  const showWords = settings.speakWords;
   const words = useMemo(() => tokenize(verse.text), [verse.id, verse.text]);
   const expected = useMemo(() => words.map((w) => w.key), [words]);
   const [listening, setListening] = useState(false);
@@ -123,19 +127,39 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
   return (
     <>
       <div class="verse-area" ref={area}>
-        <div class="muted small center">Say the verse aloud</div>
+        <div class="muted small center">{showWords ? 'Say the verse aloud' : 'Say the verse from memory'}</div>
         <div class="prompt-ref" style={{ fontSize: '1.3rem' }}>{formatRef(verse)}</div>
-        <p class="verse-text" data-testid="speak-text">
-          {words.map((w, i) => {
-            const r = align.results[i];
-            const cur = !finished && i === align.progress;
-            return (
-              <span key={i}>
-                <span class={`w ${r === 'pending' || r === undefined ? (listening || finished ? 'pending' : 'hidden') : r} ${cur ? 'cur' : ''}`}>{w.raw}</span>{' '}
-              </span>
-            );
-          })}
-        </p>
+        {!listening && !finished && (
+          <div style={{ maxWidth: '320px', margin: '8px auto' }}>
+            <Seg<'show' | 'hide'>
+              label="Show the words?"
+              value={showWords ? 'show' : 'hide'}
+              options={[
+                { value: 'show', label: 'Read along' },
+                { value: 'hide', label: 'From memory' },
+              ]}
+              onChange={(v) => updateSettings({ speakWords: v === 'show' })}
+            />
+          </div>
+        )}
+        {(showWords || finished) && (
+          <p class="verse-text" data-testid="speak-text">
+            {words.map((w, i) => {
+              const r = align.results[i];
+              const cur = listening && !finished && i === align.progress;
+              return (
+                <span key={i}>
+                  <span class={`w ${r === 'pending' || r === undefined ? 'pending' : r} ${cur ? 'cur' : ''}`}>{w.raw}</span>{' '}
+                </span>
+              );
+            })}
+          </p>
+        )}
+        {!showWords && !finished && (
+          <div class="muted center" style={{ margin: '14px 0' }} data-testid="speak-hidden">
+            {listening ? 'Listening… the words will appear when you finish.' : 'The words stay hidden until you finish.'}
+          </div>
+        )}
         {finished && (
           <div class={`banner ${align.mistakes === 0 ? 'good' : 'info'}`} data-testid="speak-result">
             {align.mistakes === 0 ? 'Perfect — every word!' : `${align.mistakes} word${align.mistakes === 1 ? '' : 's'} missed or different.`}

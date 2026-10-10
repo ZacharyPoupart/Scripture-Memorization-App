@@ -255,3 +255,8 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 ## v1.15.1 — Armor free while the owner tests (TEMPORARY)
 **What:** `testing.armorFree` in `core/avatar.ts` makes every armor piece wearable without seeds or a streak. Nothing is bought or recorded (the `owned` list and seeds are untouched), so switching it off cannot leave debts or lost seeds; unearned armor simply stops being worn (the look falls back to the default for anything not owned).
 **To end the test:** set `armorFree: false` (one line) and delete the banner in `ui/AvatarScreen.tsx`. Unit and e2e tests that check the real prices switch it off themselves.
+
+## v1.16.0 — Speak it: read along or from memory (owner request)
+**What:** a switch on the Speak it screen (before Start) chooses between "Read along" (the words are visible, highlighted as you speak) and "From memory" (nothing shown until you tap "I'm done", then the usual word-by-word feedback). Remembered per device as `settings.speakWords` (default: read along, which is what the screen showed before). Mistakes, slips allowed, and the reference-recall step that follows are unchanged in both modes.
+**Why a device setting and not part of the verse:** it is a preference about how you like to practise, not about the verse, and it needs no change to the synced data.
+**Open question for the owner:** should From memory be the default for the Weekly/Monthly/Yearly piles (where no slips are allowed)?
