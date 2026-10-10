@@ -5,6 +5,9 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Changed
+- The knight is slimmer and more human: a smaller head, narrower body, longer arms and legs. The painted armor, shield, sword and boots were refitted to the new shape, and the face bubbles and tiles were re-cropped.
+
 ## [1.15.0] - 2026-10-10
 
 ### Changed
