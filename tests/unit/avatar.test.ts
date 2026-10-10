@@ -1,6 +1,6 @@
 // Avatar + seeds: seeds are EARNED from real, counted practice (never lost, never expire); items are bought with them or
 // unlocked by achievements. Everything is derived from synced data so devices agree and nothing can be taken away.
-import { describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { exportBackup, normalizeData, parseBackup } from '../../src/core/backup.ts';
 import {
   buyItem,
@@ -14,6 +14,7 @@ import {
   seedsBalance,
   seedsEarned,
   SLOTS,
+  testing,
   ARMOR_SETS,
   ARMOR_SLOTS,
   completedSet,
@@ -25,6 +26,14 @@ import { mergeData } from '../../src/core/merge.ts';
 import { recordReview, settle } from '../../src/core/schedule.ts';
 import { STREAK_MILESTONES } from '../../src/core/milestones.ts';
 import { at, D0, day, DEVICE, john316, newData, reviewEverythingDue } from './helpers.ts';
+
+// the real rules are tested with the temporary "armor is free" switch off
+beforeAll(() => {
+  testing.armorFree = false;
+});
+afterAll(() => {
+  testing.armorFree = true;
+});
 
 const rich = () => {
   const d = newData();
@@ -285,5 +294,24 @@ describe('sync and backup', () => {
     const n = normalizeData(bad);
     expect(n.avatar === undefined || Array.isArray(n.avatar.owned)).toBe(true);
     if (n.avatar) expect(n.avatar.owned.every((s) => typeof s === 'string' && s.length < 80)).toBe(true);
+  });
+});
+
+describe('temporary "armor is free" testing switch', () => {
+  it('while on, any armor can be worn with no seeds and no streak, nothing is recorded, and it falls off again when switched off', () => {
+    const d = newData();
+    const legend = itemById('sword-legend')!;
+    testing.armorFree = true;
+    try {
+      expect(owns(d, legend)).toBe(true);
+      expect(equipItem(d, legend.id, 1)).toBe(true);
+      expect(currentLook(d).sword).toBe(legend.id);
+      expect(seedsBalance(d)).toBe(0);
+      expect(d.avatar?.owned ?? []).toEqual([]); // nothing was bought
+      expect(owns(d, itemById('cape-gold')!)).toBe(false); // only armor is free
+    } finally {
+      testing.armorFree = false;
+    }
+    expect(currentLook(d).sword).toBe(defaultLook().sword);
   });
 });
