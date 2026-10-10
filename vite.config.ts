@@ -14,7 +14,7 @@ export default defineConfig({
     preact(),
     VitePWA({
       registerType: 'prompt',
-      includeAssets: ['icon.svg', 'apple-touch-icon.png'],
+      includeAssets: ['favicon-128.png', 'apple-touch-icon.png'],
       manifest: {
         name: 'Memorize For Life',
         short_name: 'Memorize',
