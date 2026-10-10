@@ -23,6 +23,7 @@ test.describe('avatar and seeds', () => {
     await autoDismissMilestones(page);
     await blockLookups(page);
     await openApp(page);
+    await page.evaluate(() => (window as any).__mfl.armorFree(false));
     await replaceDataWith(page, fixture);
     await page.goto('/#/');
     await page.getByTestId('avatar-bubble').click();
@@ -69,10 +70,25 @@ test.describe('avatar and seeds', () => {
     await expect(page.getByTestId('item-beard-full')).toContainText('Wearing');
   });
 
+  test('while testing, all armor is free to wear with no seeds and no streak', async ({ page }) => {
+    await autoDismissMilestones(page);
+    await blockLookups(page);
+    await openApp(page);
+    await addVerse(page, JOHN316);
+    await page.goto('/#/avatar');
+    await expect(page.getByTestId('armor-free-banner')).toBeVisible();
+    await page.getByTestId('group-armor').click();
+    await page.getByTestId('item-helmet-legend').click(); // a Legend piece: costs seeds and a 365-day streak when not testing; now one tap wears it
+    await expect(page.getByTestId('item-helmet-legend')).toContainText('Wearing');
+    await expect(page.getByTestId('armor-meter')).toContainText('1 of 6');
+    await expect(page.getByTestId('seeds-balance')).toContainText('0'); // nothing was spent
+  });
+
   test('earned items explain how to get them, and the avatar can be hidden', async ({ page }) => {
     await autoDismissMilestones(page);
     await blockLookups(page);
     await openApp(page);
+    await page.evaluate(() => (window as any).__mfl.armorFree(false));
     await addVerse(page, JOHN316);
     await page.goto('/#/avatar');
     await page.getByTestId('group-armor').click();

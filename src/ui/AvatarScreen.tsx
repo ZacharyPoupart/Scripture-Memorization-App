@@ -14,6 +14,7 @@ import {
   seedsBalance,
   SLOT_GROUPS,
   SLOT_LABELS,
+  testing,
   type Item,
   type Slot,
 } from "../core/avatar.ts";
@@ -86,6 +87,12 @@ export function AvatarScreen() {
               🌱 {balance}
             </span>
           </div>
+
+          {testing.armorFree && (
+            <div class="banner info" data-testid="armor-free-banner">
+              <strong>Testing:</strong> every piece of armor is free to wear right now. Nothing is bought, and seeds are not touched.
+            </div>
+          )}
 
           <div class="card center stack avatar-stage">
             <AvatarFigure look={shown} size={200} title="Your knight" />
