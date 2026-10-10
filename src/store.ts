@@ -1,7 +1,7 @@
 // App-wide state: the data document, device settings, and the glue to storage and sync.
 import { useEffect, useState } from 'preact/hooks';
 import { BackupError, exportBackup, parseBackup } from './core/backup.ts';
-import { buyItem, equipItem, seedsEarned, type BuyResult } from './core/avatar.ts';
+import { buyItem, equipItem, seedsEarned, testing, type BuyResult } from './core/avatar.ts';
 import { addDays, dayKeyOf } from './core/dates.ts';
 import { mergeData } from './core/merge.ts';
 import { createData, endPause, recordReview, setPause, settle } from './core/schedule.ts';
@@ -367,7 +367,7 @@ export async function init(): Promise<void> {
 // For tests / debugging
 declare global {
   interface Window {
-    __mfl?: { getState: typeof getState; flush: typeof flushSaves; crash: (v: boolean) => void };
+    __mfl?: { getState: typeof getState; flush: typeof flushSaves; crash: (v: boolean) => void; armorFree: (v: boolean) => void };
   }
 }
-if (typeof window !== 'undefined') window.__mfl = { getState, flush: flushSaves, crash: (v: boolean) => set({ debugCrash: v }) };
+if (typeof window !== 'undefined') window.__mfl = { getState, flush: flushSaves, crash: (v: boolean) => set({ debugCrash: v }), armorFree: (v: boolean) => void (testing.armorFree = v) };

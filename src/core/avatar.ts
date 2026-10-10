@@ -369,12 +369,21 @@ export function isUnlocked(data: AppData, item: Item): boolean {
 }
 
 /** Bought items that still need an achievement (e.g. a long streak) before they can be bought. */
+/**
+ * TEMPORARY, for testing: while `armorFree` is on, every armor piece can be worn for free (and a streak is not needed).
+ * Nothing is bought or recorded, so seeds are untouched, and turning it off simply takes the unearned armor off again.
+ * To end the test, set `armorFree` to false (one line) and remove the banner on the avatar screen.
+ */
+export const testing = { armorFree: true };
+
 export function isGated(data: AppData, item: Item): boolean {
+  if (testing.armorFree && item.set) return false;
   return !!item.requires && !meets(data, item.requires);
 }
 
 /** Free items, bought items, and earned items that have been unlocked. */
 export function owns(data: AppData, item: Item): boolean {
+  if (testing.armorFree && item.set) return true;
   if (item.unlock) return isUnlocked(data, item);
   return item.cost === 0 || (data.avatar?.owned ?? []).includes(item.id);
 }

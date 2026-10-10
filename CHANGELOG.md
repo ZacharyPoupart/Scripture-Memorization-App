@@ -8,6 +8,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 ### Changed
 - The knight is slimmer and more human: a smaller head, narrower body, longer arms and legs. The painted armor, shield, sword and boots were refitted to the new shape, and the face bubbles and tiles were re-cropped.
 
+## [1.15.1] - 2026-10-10
+
+### Changed
+- Temporary, for testing: every piece of armor is free to wear (no seeds, no streak needed). A note on the avatar screen says so. Nothing is bought or recorded, so your seeds are untouched, and the unearned armor comes off again when this is switched off.
+
 ## [1.15.0] - 2026-10-10
 
 ### Changed
