@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.14.0] - 2026-10-10
+
 ### Changed
 - The avatar is now a knight who can put on the full armor of God (Ephesians 6): helmet of salvation, breastplate of righteousness, belt of truth, shoes of peace, shield of faith and sword of the Spirit. Everything that makes the knight look like you (skin, hair, hair colour, eyes, beard, glasses, tunic) is free.
 - Armor comes in tiers: Leather, Iron, Steel and Royal blue are bought with seeds; Silver, Gold and Radiant are unlocked by streak length, and the Radiant set (up to a 1,000-day streak) is the hardest of all. Wear all six pieces for a golden glow.
