@@ -102,3 +102,17 @@ describe('v1.9 data with a break (pause) in it', () => {
     expect(old.pause).toBeUndefined();
   });
 });
+
+describe('data written by v1.13.0 (avatar) keeps its avatar', () => {
+  const av = JSON.parse(read('backup-v1.13.0-avatar.json')).data;
+  it('normalizing changes nothing and the avatar survives an export/import round trip', () => {
+    expect(normalizeData(av)).toEqual(av);
+    const back = parseBackup(exportBackup(av, '1.13.0', 0));
+    expect(back.avatar).toEqual(av.avatar);
+  });
+  it('older data without an avatar stays without one, and merging keeps the owned items', () => {
+    expect(normalizeData(old).avatar).toBeUndefined();
+    const merged = mergeData(old, av);
+    expect(merged.avatar?.owned).toEqual(['hair-bun', 'out-hoodie-sky']);
+  });
+});

@@ -3,6 +3,7 @@ import { useRoute } from '../router.ts';
 import { updateSettings, useApp } from '../store.ts';
 import { About } from './About.tsx';
 import { ErrorBoundary } from './ErrorBoundary.tsx';
+import { AvatarScreen } from './AvatarScreen.tsx';
 import { AddVerse } from './AddVerse.tsx';
 import { Celebrations } from './Celebrations.tsx';
 import { Home } from './Home.tsx';
@@ -25,6 +26,7 @@ const TITLES: Record<string, string> = {
   review: 'Review',
   stats: 'Progress',
   settings: 'Settings',
+  avatar: 'Your avatar',
   about: 'About',
 };
 
@@ -56,6 +58,7 @@ export function App({ onReload }: { onReload: () => void }) {
   else if (a === 'edit' && b) ((screen = <AddVerse key={`edit-${b}`} editId={b} />), (tab = '/piles'));
   else if (a === 'review') screen = <Review route={route} key={route.query.toString()} />;
   else if (a === 'stats') ((screen = <Stats />), (tab = '/stats'));
+  else if (a === 'avatar') ((screen = <AvatarScreen />), (tab = '/'));
   else if (a === 'settings') ((screen = <Settings onShowIntro={() => setIntro(true)} />), (tab = '/settings'));
   else if (a === 'about') ((screen = <About onShowIntro={() => setIntro(true)} />), (tab = '/settings'));
   else screen = <Home />;

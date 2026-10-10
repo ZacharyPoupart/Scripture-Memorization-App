@@ -161,7 +161,7 @@ Chosen: the whole verse is laid out from the start with unrevealed words transpa
 - Stats — G. Kept.
 - Settings — setup; rarely used. Kept (not yet collapsed — see below).
 **Not done / deliberately conservative**: the tab bar still has Today · Piles · Add · Stats · Settings (a 3-tab restructure would touch most e2e tests and every move needs logging; the Today screen, which is where the owner lives, is already down to one action). Settings sections are not yet collapsed. Streak milestones list still has extras (14/60/150/200/500/730/1000) beyond the requested 1/7/30/100/365. Scaled celebrations already exist (one verse = result card; all of today = all-done card; graduation / Yearly / 100+ streaks = confetti). Candidates for a follow-up.
-**Ideas not built** (non-goals): AI chat or AI-suggested verses, groups/leaderboards/social features, mascots/pets, guilt-based notifications, streak purchases/currency, lock-screen widgets, new accounts or paid services.
+**Ideas not built** (non-goals): AI chat or AI-suggested verses, groups/leaderboards/social features, mascots/pets (a calm avatar with seeds was added in v1.13.0 at the owner's request), guilt-based notifications, lock-screen widgets, new accounts or paid services.
 **Open questions**: (1) Remove reference recall from the other three modes too? (2) Apply the Home freeze-banner softer wording? (still the older firm text). (3) Move to a 3-tab bar (Today | Verses | Progress, settings behind a gear)?
 
 
@@ -226,3 +226,12 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 - After the last word's letter, the top line becomes the hidden reference and you type **the first letter of the book, then chapter:verse** (`J3:16`, `j316`, `J3:16-18`). Numbered books need the number and the letter (`1J4:8`); multi-word names such as Song of Solomon need just the first letter. Colon/dash are optional (any of `: . - – — , ;` are accepted, or just carry on with the next digit). Any book starting with that letter is accepted (that is what "first letter" means; John/Judges/Joshua are indistinguishable by design). A wrong character is a slip, is shown, and typing carries on (a separator that is skipped goes with the next character), like the words. `Reveal` works there too. The on-screen keyboard switches to the numeric pad once the book letter is typed (best effort on iOS).
 - If the verse has a topic, Type it out then asks for it as multiple choice (`topicOnly` mode of `RefRecall`); **Speak it keeps the typed book/chapter/verse screen** (a voice mode cannot type letters); Fill-in-the-blank is unchanged.
 - Tests: `tests/unit/ref-typing.test.ts` (8, written first); the e2e that used Type it out as the way to reach the typed-reference screen now use Speak it with the pretend microphone (`speakToReference`, which waits for the recogniser's second half before pressing Done).
+
+
+## v1.13.0 — Avatar and seeds (owner request)
+**What:** a customizable avatar (outfit, hair, hair colour, skin, extras, hat, scene, companion) and **seeds** you earn by reviewing and spend on items. Earn items free by achievements (streak, review count, level-ups, a Yearly verse).
+**Seeds are derived, never stored:** 1 per counted review, 5 per finished day, 25 per level-up, plus bonuses the first time the longest streak reaches 3/7/14/30/... Balance = earned − cost of owned items, never below 0. Owned items only grow (union on merge); the look is last-writer-wins. Extra practice and "Start partway" earn nothing, so seeds can't be farmed.
+**Calm by design:** nothing is ever taken away, no timers, no loot boxes; a missed day costs nothing. Settings → "Avatar and seeds" hides it all.
+**Data:** additive optional `avatar` field, `schema` stays 1; fixture `backup-v1.13.0-avatar.json`.
+**Ideas not built:** gifting, daily-login rewards, shop rotation, seed decay, leaderboards (all conflict with the calm goals).
+**Open question for the owner:** want more items, or seeds shown in the review result only on finished days?

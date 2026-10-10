@@ -87,6 +87,7 @@ export function defaultSettings(): Settings {
     seenMilestones: [],
     reminderTimes: ['08:00', '13:00', '19:00'],
     nudgeDismissedAt: 0,
+    avatarOn: true,
   };
 }
 

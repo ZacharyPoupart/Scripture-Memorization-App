@@ -123,6 +123,16 @@ export function normalizeData(raw: unknown): AppData {
   if (isObj(raw.pause) && isStr(raw.pause.from) && DAY.test(raw.pause.from) && isStr(raw.pause.until) && DAY.test(raw.pause.until) && isNum(raw.pause.at))
     pause = { from: raw.pause.from, until: raw.pause.until, at: raw.pause.at };
 
+  let avatar: AppData['avatar'];
+  if (isObj(raw.avatar)) {
+    // keep only short strings; unknown ids are kept (they may come from a newer version) but capped
+    const short = (x: unknown): x is string => isStr(x) && x.length > 0 && x.length < 80;
+    const owned = Array.isArray(raw.avatar.owned) ? [...new Set(raw.avatar.owned.filter(short))].sort().slice(0, 500) : [];
+    const look: Record<string, string> = {};
+    if (isObj(raw.avatar.look)) for (const [k, v] of Object.entries(raw.avatar.look)) if (k !== '__proto__' && short(k) && short(v)) look[k] = v;
+    avatar = { owned, look, lookAt: isNum(raw.avatar.lookAt) && raw.avatar.lookAt >= 0 ? raw.avatar.lookAt : 0 };
+  }
+
   const out: AppData = {
     schema: 1,
     createdDay: raw.createdDay,
@@ -135,6 +145,7 @@ export function normalizeData(raw: unknown): AppData {
     prefs,
   };
   if (pause) out.pause = pause;
+  if (avatar && (avatar.owned.length || Object.keys(avatar.look).length)) out.avatar = avatar;
   return out;
 }
 
