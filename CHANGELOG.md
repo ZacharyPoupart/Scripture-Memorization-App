@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.15.1] - 2026-10-10
+
 ### Changed
 - Temporary, for testing: every piece of armor is free to wear (no seeds, no streak needed). A note on the avatar screen says so. Nothing is bought or recorded, so your seeds are untouched, and the unearned armor comes off again when this is switched off.
 
