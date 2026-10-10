@@ -5,6 +5,9 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Changed
+- New app icon: a gold flame over an open book on deep blue (home-screen icon, installed app and browser tab). The master picture is in `design/app-icon-master.png`.
+
 ## [1.12.0] - 2026-10-09
 
 ### Changed

@@ -101,7 +101,7 @@ functions/     Cloudflare Pages Function for sync
 tests/unit     Vitest        tests/e2e   Playwright
 scripts/       icons, versification generator, release, e2e server
 ```
-Icons: `npm run gen:icons` re-renders PNGs from `public/icon.svg`.
+Icons: `npm run gen:icons` re-renders the PNGs from `design/app-icon-master.png`.
 
 ## Notes
 - Verse text comes from public APIs (bible-api.com, bolls.life); translations such as NIV/ESV are © their publishers — for personal study. If lookup is unavailable, just type or paste the text.
