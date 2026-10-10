@@ -1,20 +1,39 @@
 import { useState } from 'preact/hooks';
-import { currentLook, describeUnlock, isUnlocked, itemsIn, itemById, owns, seedsBalance, SLOTS, SLOT_LABELS, type Item, type Slot } from '../core/avatar.ts';
+import {
+  ARMOR_NAMES,
+  ARMOR_SLOTS,
+  armorWorn,
+  currentLook,
+  describeUnlock,
+  isUnlocked,
+  itemById,
+  itemsIn,
+  owns,
+  seedsBalance,
+  SLOT_GROUPS,
+  SLOT_LABELS,
+  type Item,
+  type Slot,
+} from '../core/avatar.ts';
 import { back } from '../router.ts';
 import { buyAndWear, showToast, useApp, wearItem } from '../store.ts';
 import { AvatarFigure } from './AvatarFigure.tsx';
 import { Icon } from './common.tsx';
 
-/** Your avatar: try things on, spend seeds, wear what you own. Seeds only ever come from reviewing. */
+/** Your knight: look like yourself for free, then put on the armor of God and earn the rest with seeds and streaks. */
 export function AvatarScreen() {
   const { data } = useApp();
-  const [slot, setSlot] = useState<Slot>('outfit');
+  const [group, setGroup] = useState<(typeof SLOT_GROUPS)[number]['key']>('me');
+  const [slot, setSlot] = useState<Slot>('skin');
   const [pick, setPick] = useState<string | null>(null);
   const look = currentLook(data);
   const balance = seedsBalance(data);
   const picked = pick ? itemById(pick) : undefined;
   const shown = picked ? { ...look, [picked.slot]: picked.id } : look;
   const items = itemsIn(slot);
+  const grp = SLOT_GROUPS.find((g) => g.key === group)!;
+  const worn = armorWorn(look);
+  const armorInfo = (ARMOR_SLOTS as readonly string[]).includes(slot) ? ARMOR_NAMES[slot as (typeof ARMOR_SLOTS)[number]] : null;
 
   const choose = (item: Item) => {
     if (owns(data, item) && look[item.slot] !== item.id) {
@@ -50,36 +69,70 @@ export function AvatarScreen() {
           </div>
 
           <div class="card center stack avatar-stage">
-            <AvatarFigure look={shown} size={168} title="Your avatar" />
+            <AvatarFigure look={shown} size={200} title="Your knight" />
+            <div class="armor-meter" data-testid="armor-meter">
+              <strong>
+                {worn === ARMOR_SLOTS.length ? 'Full armor of God' : `Armor of God: ${worn} of ${ARMOR_SLOTS.length}`}
+              </strong>
+              <span class="armor-pips" aria-hidden="true">
+                {ARMOR_SLOTS.map((s) => (
+                  <i key={s} class={look[s].endsWith('-none') ? '' : 'on'} />
+                ))}
+              </span>
+            </div>
             <p class="muted small" style={{ margin: 0 }}>
-              Seeds come from reviewing: 1 per review, 5 for a finished day, 25 when a verse moves up. They are never taken away.
+              Looking like yourself is always free. Armor, capes and companions come from seeds (1 per review, 5 for a finished day, 25 when a verse
+              moves up) or from long streaks. Seeds are never taken away.
             </p>
           </div>
 
-          <div class="slot-chips" role="tablist" aria-label="What to change">
-            {SLOTS.map((s) => (
-              <button key={s} role="tab" aria-selected={s === slot} class={`chip-btn ${s === slot ? 'on' : ''}`} onClick={() => (setSlot(s), setPick(null))} data-testid={`slot-${s}`}>
+          <div class="seg" role="group" aria-label="Part of the avatar">
+            {SLOT_GROUPS.map((g) => (
+              <button
+                key={g.key}
+                aria-pressed={g.key === group}
+                onClick={() => {
+                  setGroup(g.key);
+                  setSlot(g.slots[0]);
+                  setPick(null);
+                }}
+                data-testid={`group-${g.key}`}
+              >
+                {g.label}
+              </button>
+            ))}
+          </div>
+          <div class="slot-chips" role="group" aria-label="What to change">
+            {grp.slots.map((s) => (
+              <button key={s} aria-pressed={s === slot} class={`chip-btn ${s === slot ? 'on' : ''}`} onClick={() => (setSlot(s), setPick(null))} data-testid={`slot-${s}`}>
                 {SLOT_LABELS[s]}
               </button>
             ))}
           </div>
+          {armorInfo && (
+            <p class="muted small" style={{ margin: 0 }} data-testid="armor-verse">
+              {armorInfo.title} · {armorInfo.verse}
+            </p>
+          )}
 
           <div class="item-grid" data-testid="item-grid">
             {items.map((item) => {
               const have = owns(data, item);
-              const worn = look[item.slot] === item.id;
+              const isWorn = look[item.slot] === item.id;
               const lockedItem = !!item.unlock && !have;
               return (
                 <button
                   key={item.id}
-                  class={`item-tile ${worn ? 'worn' : ''} ${pick === item.id ? 'picked' : ''} ${have ? '' : 'unowned'}`}
+                  class={`item-tile ${isWorn ? 'worn' : ''} ${pick === item.id ? 'picked' : ''} ${have ? '' : 'unowned'}`}
                   onClick={() => choose(item)}
                   data-testid={`item-${item.id}`}
-                  aria-pressed={worn || pick === item.id}
+                  aria-pressed={isWorn || pick === item.id}
                 >
-                  <AvatarFigure look={{ ...look, [item.slot]: item.id }} size={64} />
+                  <AvatarFigure look={{ ...look, [item.slot]: item.id }} size={72} view={group === 'me' || slot === 'helmet' || slot === 'crown' ? 'face' : 'full'} />
                   <span class="item-name">{item.name}</span>
-                  <small class="muted">{worn ? 'Wearing' : have ? 'Owned' : lockedItem ? 'Earn it' : `🌱 ${item.cost}`}</small>
+                  <small class="muted">
+                    {isWorn ? 'Wearing' : have ? 'Owned' : lockedItem ? `🔒 ${describeUnlock(item.unlock!).replace('Reach a ', '').replace(' streak', '')}` : `🌱 ${item.cost}`}
+                  </small>
                 </button>
               );
             })}

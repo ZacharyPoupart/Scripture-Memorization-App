@@ -34,20 +34,39 @@ test.describe('avatar and seeds', () => {
     await page.getByTestId('item-hair-long').click();
     await expect(page.getByTestId('item-hair-long')).toContainText('Wearing');
     // a paid item previews first, then is bought
-    await page.getByTestId('slot-outfit').click();
-    await page.getByTestId('item-out-hoodie-sky').click();
-    await expect(page.getByTestId('item-out-hoodie-sky')).not.toContainText('Wearing');
+    await expect(page.getByTestId('armor-meter')).toContainText('0 of 6');
+    await page.getByTestId('group-armor').click();
+    await page.getByTestId('item-helmet-iron').click();
+    await expect(page.getByTestId('item-helmet-iron')).not.toContainText('Wearing');
     await page.getByTestId('buy').click();
-    await expect(page.getByTestId('item-out-hoodie-sky')).toContainText('Wearing');
+    await expect(page.getByTestId('item-helmet-iron')).toContainText('Wearing');
     const after = Number((await page.getByTestId('seeds-balance').innerText()).replace(/\D/g, ''));
-    expect(after).toBe(before - 30);
+    expect(after).toBe(before - 60);
+    await expect(page.getByTestId('armor-meter')).toContainText('1 of 6');
     await saved(page);
     await context.setOffline(true);
     await page.reload();
-    await expect(page.getByTestId('item-out-hoodie-sky')).toContainText('Wearing');
+    await page.getByTestId('group-armor').click();
+    await expect(page.getByTestId('item-helmet-iron')).toContainText('Wearing');
     const bal = Number((await page.getByTestId('seeds-balance').innerText()).replace(/\D/g, ''));
     expect(bal).toBe(after);
     await context.setOffline(false);
+  });
+
+  test('everything that makes the knight look like you is free', async ({ page }) => {
+    await autoDismissMilestones(page);
+    await blockLookups(page);
+    await openApp(page);
+    await addVerse(page, JOHN316);
+    await page.goto('/#/avatar');
+    for (const slot of ['skin', 'hair', 'hairColor', 'eyes', 'beard', 'glasses', 'tunic']) {
+      await page.getByTestId(`slot-${slot}`).click();
+      await expect(page.getByTestId('item-grid').getByText('🌱'), slot).toHaveCount(0);
+      await expect(page.getByTestId('item-grid').getByText('🔒'), slot).toHaveCount(0);
+    }
+    await page.getByTestId('slot-beard').click();
+    await page.getByTestId('item-beard-full').click();
+    await expect(page.getByTestId('item-beard-full')).toContainText('Wearing');
   });
 
   test('earned items explain how to get them, and the avatar can be hidden', async ({ page }) => {
@@ -56,8 +75,14 @@ test.describe('avatar and seeds', () => {
     await openApp(page);
     await addVerse(page, JOHN316);
     await page.goto('/#/avatar');
-    await page.getByTestId('slot-hat').click();
-    await page.getByTestId('item-hat-laurel').click();
+    await page.getByTestId('group-armor').click();
+    await page.getByTestId('slot-sword').click();
+    await page.getByTestId('item-sword-radiant').click();
+    await expect(page.getByTestId('unlock-hint')).toContainText('1000-day streak'); // the finest armor is the longest road
+    await expect(page.getByTestId('armor-verse')).toContainText('Ephesians 6:17');
+    await page.getByTestId('group-extras').click();
+    await page.getByTestId('slot-crown').click();
+    await page.getByTestId('item-crown-laurel').click();
     await expect(page.getByTestId('unlock-hint')).toContainText('14-day streak');
     await page.goto('/#/settings');
     await page.getByTestId('toggle-avatar').click();

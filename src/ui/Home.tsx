@@ -89,7 +89,7 @@ export function Home() {
             <div class="row" style={{ gap: '8px' }}>
             {settings.avatarOn && (
               <button class="avatar-bubble" onClick={() => navigate('/avatar')} aria-label={`Your avatar. ${seedsBalance(data)} seeds.`} data-testid="avatar-bubble">
-                <AvatarFigure look={currentLook(data)} size={44} />
+                <AvatarFigure look={currentLook(data)} size={44} view="face" />
                 <span class="seeds-chip" data-testid="seeds-chip">🌱 {seedsBalance(data)}</span>
               </button>
             )}
