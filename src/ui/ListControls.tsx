@@ -1,7 +1,12 @@
-import { useState } from 'preact/hooks';
-import { renameTopic, restoreTopics, SORT_LABELS, type SortKey } from '../core/organize.ts';
-import { act, showToast } from '../store.ts';
-import { Field, Overlay } from './common.tsx';
+import { useState } from "preact/hooks";
+import {
+  renameTopic,
+  restoreTopics,
+  SORT_LABELS,
+  type SortKey,
+} from "../core/organize.ts";
+import { act, showToast } from "../store.ts";
+import { Field, Overlay } from "./common.tsx";
 
 export interface ListState {
   query: string;
@@ -11,8 +16,16 @@ export interface ListState {
 }
 
 /** Remembered while the app is open, so coming back from a verse keeps your search and sort. */
-let remembered: ListState = { query: '', sort: 'longest', ready: false, topic: '' };
-export const useListState = (): [ListState, (p: Partial<ListState>) => void] => {
+let remembered: ListState = {
+  query: "",
+  sort: "longest",
+  ready: false,
+  topic: "",
+};
+export const useListState = (): [
+  ListState,
+  (p: Partial<ListState>) => void,
+] => {
   const [state, setState] = useState<ListState>(remembered);
   return [
     state,
@@ -22,12 +35,25 @@ export const useListState = (): [ListState, (p: Partial<ListState>) => void] => 
     },
   ];
 };
-export const filtersActive = (s: ListState) => !!(s.query || s.ready || s.topic);
+export const filtersActive = (s: ListState) =>
+  !!(s.query || s.ready || s.topic);
 
-export function ListControls({ state, update, topics }: { state: ListState; update: (p: Partial<ListState>) => void; topics: string[] }) {
+export function ListControls({
+  state,
+  update,
+  topics,
+}: {
+  state: ListState;
+  update: (p: Partial<ListState>) => void;
+  topics: string[];
+}) {
   const [renaming, setRenaming] = useState(false);
-  const [name, setName] = useState('');
-  const chip = (active: boolean) => ({ border: 0, background: active ? 'var(--accent)' : undefined, color: active ? 'var(--on-accent)' : undefined });
+  const [name, setName] = useState("");
+  const chip = (active: boolean) => ({
+    border: 0,
+    background: active ? "var(--accent)" : undefined,
+    color: active ? "var(--on-accent)" : undefined,
+  });
 
   const save = () => {
     const from = state.topic;
@@ -35,13 +61,16 @@ export function ListControls({ state, update, topics }: { state: ListState; upda
     const before = act((d, now) => renameTopic(d, from, to, now));
     setRenaming(false);
     update({ topic: to });
-    showToast(to ? `Topic renamed to “${to}”.` : `Removed the topic “${from}”.`, {
-      label: 'Undo',
-      run: () => {
-        act((d, now) => restoreTopics(d, before, now));
-        update({ topic: from });
+    showToast(
+      to ? `Topic renamed to “${to}”.` : `Removed the topic “${from}”.`,
+      {
+        label: "Undo",
+        run: () => {
+          act((d, now) => restoreTopics(d, before, now));
+          update({ topic: from });
+        },
       },
-    });
+    );
   };
 
   return (
@@ -65,7 +94,7 @@ export function ListControls({ state, update, topics }: { state: ListState; upda
           value={state.sort}
           onChange={(e) => update({ sort: e.currentTarget.value as SortKey })}
           data-testid="sort"
-          style={{ minHeight: '44px' }}
+          style={{ minHeight: "44px" }}
         >
           {(Object.keys(SORT_LABELS) as SortKey[]).map((k) => (
             <option key={k} value={k}>
@@ -75,7 +104,7 @@ export function ListControls({ state, update, topics }: { state: ListState; upda
         </select>
         <button
           class="chip"
-          style={{ ...chip(state.ready), minHeight: '44px', padding: '0 14px' }}
+          style={{ ...chip(state.ready), minHeight: "44px", padding: "0 14px" }}
           aria-pressed={state.ready}
           onClick={() => update({ ready: !state.ready })}
           data-testid="ready-only"
@@ -87,9 +116,9 @@ export function ListControls({ state, update, topics }: { state: ListState; upda
         <div class="row wrap" role="group" aria-label="Filter by topic">
           <button
             class="chip"
-            style={{ ...chip(state.topic === ''), minHeight: '36px' }}
-            aria-pressed={state.topic === ''}
-            onClick={() => update({ topic: '' })}
+            style={{ ...chip(state.topic === ""), minHeight: "36px" }}
+            aria-pressed={state.topic === ""}
+            onClick={() => update({ topic: "" })}
           >
             All topics
           </button>
@@ -97,7 +126,7 @@ export function ListControls({ state, update, topics }: { state: ListState; upda
             <button
               key={t}
               class="chip"
-              style={{ ...chip(state.topic === t), minHeight: '36px' }}
+              style={{ ...chip(state.topic === t), minHeight: "36px" }}
               aria-pressed={state.topic === t}
               onClick={() => update({ topic: t })}
             >
@@ -107,7 +136,7 @@ export function ListControls({ state, update, topics }: { state: ListState; upda
           {state.topic && (
             <button
               class="chip"
-              style={{ minHeight: '36px' }}
+              style={{ minHeight: "36px" }}
               onClick={() => {
                 setName(state.topic);
                 setRenaming(true);
@@ -127,14 +156,24 @@ export function ListControls({ state, update, topics }: { state: ListState; upda
               label="New name"
               hint="Verses with this topic get the new name. Use an existing topic's name to merge them, or leave it empty to remove the topic. You can undo right after."
             >
-              <input class="input" value={name} onInput={(e) => setName(e.currentTarget.value)} autofocus data-testid="topic-name" />
+              <input
+                class="input"
+                value={name}
+                onInput={(e) => setName(e.currentTarget.value)}
+                autofocus
+                data-testid="topic-name"
+              />
             </Field>
             <div class="row">
               <button class="btn grow" onClick={() => setRenaming(false)}>
                 Cancel
               </button>
-              <button class="btn primary grow" onClick={save} data-testid="topic-save">
-                {name.trim() ? 'Rename' : 'Remove topic'}
+              <button
+                class="btn primary grow"
+                onClick={save}
+                data-testid="topic-save"
+              >
+                {name.trim() ? "Rename" : "Remove topic"}
               </button>
             </div>
           </div>

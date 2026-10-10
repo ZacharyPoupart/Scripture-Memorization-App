@@ -1,14 +1,28 @@
-import { useEffect, useRef, useState } from 'preact/hooks';
-import { formatRef, refWarning, validateRef, type Ref } from '../core/reference.ts';
-import { addVerse, editVerse, liveVerses, maxDaysIn } from '../core/schedule.ts';
-import { TRANSLATIONS } from '../core/types.ts';
-import { LookupError, lookupPassage } from '../services/lookup.ts';
-import { back, navigate } from '../router.ts';
-import { act, showToast, useApp } from '../store.ts';
-import { DaysSlider, Field, Icon } from './common.tsx';
-import { VersePicker } from './VersePicker.tsx';
+import { useEffect, useRef, useState } from "preact/hooks";
+import {
+  formatRef,
+  refWarning,
+  validateRef,
+  type Ref,
+} from "../core/reference.ts";
+import {
+  addVerse,
+  editVerse,
+  liveVerses,
+  maxDaysIn,
+} from "../core/schedule.ts";
+import { TRANSLATIONS } from "../core/types.ts";
+import { LookupError, lookupPassage } from "../services/lookup.ts";
+import { back, navigate } from "../router.ts";
+import { act, showToast, useApp } from "../store.ts";
+import { DaysSlider, Field, Icon } from "./common.tsx";
+import { VersePicker } from "./VersePicker.tsx";
 
-type Lookup = { kind: 'idle' } | { kind: 'loading' } | { kind: 'ok' } | { kind: 'error'; message: string };
+type Lookup =
+  | { kind: "idle" }
+  | { kind: "loading" }
+  | { kind: "ok" }
+  | { kind: "error"; message: string };
 
 export function AddVerse({ editId }: { editId?: string }) {
   const { data, online } = useApp();
@@ -16,43 +30,77 @@ export function AddVerse({ editId }: { editId?: string }) {
   const [daysIn, setDaysIn] = useState(0);
   const [book, setBook] = useState<number>(existing?.book ?? 0);
   const [chapter, setChapter] = useState<number>(existing?.chapter ?? 0);
-  const [start, setStart] = useState<string>(existing ? String(existing.start) : '');
-  const [end, setEnd] = useState<string>(existing && existing.end > existing.start ? String(existing.end) : '');
-  const [translation, setTranslation] = useState<string>(existing?.translation ?? data.prefs.value.defaultTranslation);
-  const [text, setText] = useState<string>(existing?.text ?? '');
-  const [topic, setTopic] = useState<string>(existing?.topic ?? '');
+  const [start, setStart] = useState<string>(
+    existing ? String(existing.start) : "",
+  );
+  const [end, setEnd] = useState<string>(
+    existing && existing.end > existing.start ? String(existing.end) : "",
+  );
+  const [translation, setTranslation] = useState<string>(
+    existing?.translation ?? data.prefs.value.defaultTranslation,
+  );
+  const [text, setText] = useState<string>(existing?.text ?? "");
+  const [topic, setTopic] = useState<string>(existing?.topic ?? "");
   const [manual, setManual] = useState<boolean>(!!existing);
-  const [lookup, setLookup] = useState<Lookup>({ kind: 'idle' });
+  const [lookup, setLookup] = useState<Lookup>({ kind: "idle" });
   const [error, setError] = useState<string | null>(null);
   const reqId = useRef(0);
 
-  const ref: Ref = { book, chapter, start: Number(start) || 0, end: Number(end) || Number(start) || 0 };
-  const problem = book && chapter && start ? validateRef(ref) : { field: 'start', message: '' };
+  const ref: Ref = {
+    book,
+    chapter,
+    start: Number(start) || 0,
+    end: Number(end) || Number(start) || 0,
+  };
+  const problem =
+    book && chapter && start
+      ? validateRef(ref)
+      : { field: "start", message: "" };
   const refOk = !problem;
   const warning = refOk ? refWarning(ref) : null;
-  const topics = [...new Set(liveVerses(data).map((v) => v.topic).filter(Boolean))];
+  const topics = [
+    ...new Set(
+      liveVerses(data)
+        .map((v) => v.topic)
+        .filter(Boolean),
+    ),
+  ];
   const duplicate = refOk
-    ? liveVerses(data).find((v) => v.id !== editId && v.book === ref.book && v.chapter === ref.chapter && v.start === ref.start && v.end === ref.end && v.translation === translation)
+    ? liveVerses(data).find(
+        (v) =>
+          v.id !== editId &&
+          v.book === ref.book &&
+          v.chapter === ref.chapter &&
+          v.start === ref.start &&
+          v.end === ref.end &&
+          v.translation === translation,
+      )
     : undefined;
 
   const doLookup = async (force = false) => {
     if (!refOk) return;
     const id = ++reqId.current;
     if (!online) {
-      setLookup({ kind: 'error', message: "You're offline. Type or paste the verse text below." });
+      setLookup({
+        kind: "error",
+        message: "You're offline. Type or paste the verse text below.",
+      });
       return;
     }
-    setLookup({ kind: 'loading' });
+    setLookup({ kind: "loading" });
     try {
       const t = await lookupPassage(ref, translation);
       if (id !== reqId.current) return;
       setText(t);
       setManual(false);
-      setLookup({ kind: 'ok' });
+      setLookup({ kind: "ok" });
     } catch (e) {
       if (id !== reqId.current) return;
-      const msg = e instanceof LookupError && e.code === 'not-found' ? "Couldn't find that passage in this translation. Check the verse numbers, or type the text." : "Couldn't look it up right now. Type or paste the verse text below.";
-      setLookup({ kind: 'error', message: msg });
+      const msg =
+        e instanceof LookupError && e.code === "not-found"
+          ? "Couldn't find that passage in this translation. Check the verse numbers, or type the text."
+          : "Couldn't look it up right now. Type or paste the verse text below.";
+      setLookup({ kind: "error", message: msg });
     }
     void force;
   };
@@ -68,18 +116,36 @@ export function AddVerse({ editId }: { editId?: string }) {
   const save = () => {
     setError(null);
     const p = validateRef(ref);
-    if (!book) return setError('Choose a book.');
-    if (!chapter) return setError('Choose a chapter.');
-    if (p) return setError(p.message || 'Check the verse numbers.');
-    if (!text.trim()) return setError('Add the verse text — look it up, or type/paste it.');
+    if (!book) return setError("Choose a book.");
+    if (!chapter) return setError("Choose a chapter.");
+    if (p) return setError(p.message || "Check the verse numbers.");
+    if (!text.trim())
+      return setError("Add the verse text — look it up, or type/paste it.");
     if (existing) {
-      act((d, now) => void editVerse(d, existing.id, { ...ref, translation, text, topic }, now));
-      showToast('Saved.');
+      act(
+        (d, now) =>
+          void editVerse(
+            d,
+            existing.id,
+            { ...ref, translation, text, topic },
+            now,
+          ),
+      );
+      showToast("Saved.");
       back(`/verse/${existing.id}`);
     } else {
-      const v = act((d, now) => addVerse(d, { ...ref, translation, text, topic, daysInPile: daysIn }, now));
-      showToast(`Added ${formatRef(v)} to Daily.`, { label: 'Add another', run: () => navigate('/add') });
-      navigate('/pile/daily', true);
+      const v = act((d, now) =>
+        addVerse(
+          d,
+          { ...ref, translation, text, topic, daysInPile: daysIn },
+          now,
+        ),
+      );
+      showToast(`Added ${formatRef(v)} to Daily.`, {
+        label: "Add another",
+        run: () => navigate("/add"),
+      });
+      navigate("/pile/daily", true);
     }
   };
 
@@ -88,54 +154,110 @@ export function AddVerse({ editId }: { editId?: string }) {
       <div class="narrow stack">
         <div class="page-head">
           {existing && (
-            <button class="icon-btn" aria-label="Back" onClick={() => back('/')}>
+            <button
+              class="icon-btn"
+              aria-label="Back"
+              onClick={() => back("/")}
+            >
               <Icon name="back" />
             </button>
           )}
-          <h1>{existing ? 'Edit verse' : 'Add a verse'}</h1>
+          <h1>{existing ? "Edit verse" : "Add a verse"}</h1>
         </div>
 
         <VersePicker
-          value={{ book, chapter, start: Number(start) || 0, end: Number(end) || 0 }}
+          value={{
+            book,
+            chapter,
+            start: Number(start) || 0,
+            end: Number(end) || 0,
+          }}
           onChange={(v) => {
             setBook(v.book);
             setChapter(v.chapter);
-            setStart(v.start ? String(v.start) : '');
-            setEnd(v.end ? String(v.end) : '');
+            setStart(v.start ? String(v.start) : "");
+            setEnd(v.end ? String(v.end) : "");
             if (!existing) setManual(false);
           }}
         />
-        {problem && problem.message && <div class="error-text">{problem.message}</div>}
+        {problem && problem.message && (
+          <div class="error-text">{problem.message}</div>
+        )}
         {warning && <div class="hint-text">{warning}</div>}
 
         <Field label="Translation">
-          <select class="input" value={translation} onChange={(e) => { setTranslation(e.currentTarget.value); if (!existing) setManual(false); }} data-testid="translation">
+          <select
+            class="input"
+            value={translation}
+            onChange={(e) => {
+              setTranslation(e.currentTarget.value);
+              if (!existing) setManual(false);
+            }}
+            data-testid="translation"
+          >
             {TRANSLATIONS.map((t) => (
-              <option key={t} value={t}>{t}</option>
+              <option key={t} value={t}>
+                {t}
+              </option>
             ))}
           </select>
         </Field>
 
-        <Field label="Verse text" hint="Looked up automatically when you're online. You can always type or paste your own.">
-          <textarea class="input" value={text} placeholder="The verse text appears here…" onInput={(e) => { setText(e.currentTarget.value); setManual(true); }} data-testid="text" />
+        <Field
+          label="Verse text"
+          hint="Looked up automatically when you're online. You can always type or paste your own."
+        >
+          <textarea
+            class="input"
+            value={text}
+            placeholder="The verse text appears here…"
+            onInput={(e) => {
+              setText(e.currentTarget.value);
+              setManual(true);
+            }}
+            data-testid="text"
+          />
         </Field>
         <div class="row">
-          <button class="btn small" disabled={!refOk || lookup.kind === 'loading'} onClick={() => void doLookup(true)} data-testid="lookup">
-            {lookup.kind === 'loading' ? 'Looking up…' : 'Look up text'}
+          <button
+            class="btn small"
+            disabled={!refOk || lookup.kind === "loading"}
+            onClick={() => void doLookup(true)}
+            data-testid="lookup"
+          >
+            {lookup.kind === "loading" ? "Looking up…" : "Look up text"}
           </button>
-          <span class={`small ${lookup.kind === 'error' ? 'error-text' : 'muted'}`} data-testid="lookup-status" role="status">
-            {lookup.kind === 'ok' ? 'Found it.' : lookup.kind === 'error' ? lookup.message : !online ? "Offline — type or paste the text." : ''}
+          <span
+            class={`small ${lookup.kind === "error" ? "error-text" : "muted"}`}
+            data-testid="lookup-status"
+            role="status"
+          >
+            {lookup.kind === "ok"
+              ? "Found it."
+              : lookup.kind === "error"
+                ? lookup.message
+                : !online
+                  ? "Offline — type or paste the text."
+                  : ""}
           </span>
         </div>
 
-        {translation === 'NIV' && (
+        {translation === "NIV" && (
           <div class="hint-text" data-testid="niv-note">
-            NIV® © Biblica, Inc. Used for personal study; text may come from API.Bible.
+            NIV® © Biblica, Inc. Used for personal study; text may come from
+            API.Bible.
           </div>
         )}
 
         <Field label="Topic or label (optional)">
-          <input class="input" list="topics" placeholder="e.g. Faith, Anxiety, Gospel" value={topic} onInput={(e) => setTopic(e.currentTarget.value)} data-testid="topic" />
+          <input
+            class="input"
+            list="topics"
+            placeholder="e.g. Faith, Anxiety, Gospel"
+            value={topic}
+            onInput={(e) => setTopic(e.currentTarget.value)}
+            data-testid="topic"
+          />
           <datalist id="topics">
             {topics.map((t) => (
               <option key={t} value={t} />
@@ -146,15 +268,36 @@ export function AddVerse({ editId }: { editId?: string }) {
         {!existing && (
           <details class="quiet-details" open={daysIn > 0}>
             <summary>Already know this one? Start partway</summary>
-            <DaysSlider value={daysIn} max={maxDaysIn('daily')} onChange={setDaysIn} testid="days-in" />
-            <div class="hint-text">It counts as that many days already spent in Daily, so it moves up sooner. Leave at 0 for a brand-new verse.</div>
+            <DaysSlider
+              value={daysIn}
+              max={maxDaysIn("daily")}
+              onChange={setDaysIn}
+              testid="days-in"
+            />
+            <div class="hint-text">
+              It counts as that many days already spent in Daily, so it moves up
+              sooner. Leave at 0 for a brand-new verse.
+            </div>
           </details>
         )}
 
-        {duplicate && <div class="banner info small">You already have {formatRef(duplicate)} ({duplicate.translation}) in {duplicate.pile}. You can still add it.</div>}
-        {error && <div class="banner bad" role="alert" data-testid="form-error">{error}</div>}
-        <button class="btn primary block" onClick={save} data-testid="save-verse">
-          {existing ? 'Save changes' : 'Add to Daily'}
+        {duplicate && (
+          <div class="banner info small">
+            You already have {formatRef(duplicate)} ({duplicate.translation}) in{" "}
+            {duplicate.pile}. You can still add it.
+          </div>
+        )}
+        {error && (
+          <div class="banner bad" role="alert" data-testid="form-error">
+            {error}
+          </div>
+        )}
+        <button
+          class="btn primary block"
+          onClick={save}
+          data-testid="save-verse"
+        >
+          {existing ? "Save changes" : "Add to Daily"}
         </button>
       </div>
     </div>
