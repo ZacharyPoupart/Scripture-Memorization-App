@@ -5,6 +5,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.16.0] - 2026-10-10
+
+### Added
+- Speak it now has two modes, chosen with a switch above the Start button: "Read along" shows the verse's words so you can follow them as you speak, and "From memory" hides them until you finish (the word-by-word feedback then appears). The choice is remembered on this device.
+
 ## [1.15.2] - 2026-10-10
 
 ### Changed

@@ -176,6 +176,32 @@ test.describe('review modes', () => {
     await finishWithReference(page, JOHN316);
   });
 
+  test('speak it: "Read along" shows the words from the start, "From memory" hides them until you finish (and remembers the choice)', async ({ page }) => {
+    await installFakeSpeech(page, JOHN_TEXT.replace(/[,.]/g, '').toLowerCase());
+    await page.goto('/#/pile/daily');
+    await page.reload();
+    await startVerseReview(page, 'speak');
+    // read along (the default): the words are there before and while you speak
+    await expect(page.getByRole('button', { name: 'Read along' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByTestId('speak-text')).toContainText('For God so loved the world');
+    // from memory: nothing is shown until you finish
+    await page.getByRole('button', { name: 'From memory' }).click();
+    await expect(page.getByTestId('speak-text')).toHaveCount(0);
+    await expect(page.getByTestId('speak-hidden')).toBeVisible();
+    await page.getByTestId('speak-start').click();
+    await expect(page.getByTestId('speak-done')).toBeVisible();
+    await page.waitForTimeout(600); // the pretend microphone sends the second half a moment later
+    await expect(page.getByTestId('speak-text')).toHaveCount(0);
+    await page.getByTestId('speak-done').click();
+    await expect(page.getByTestId('speak-result')).toContainText('Perfect');
+    await expect(page.getByTestId('speak-text')).toContainText('For God so loved the world'); // the words appear for feedback
+    // the choice is remembered on this device
+    await page.reload();
+    await page.goto('/#/pile/daily');
+    await startVerseReview(page, 'speak');
+    await expect(page.getByRole('button', { name: 'From memory' })).toHaveAttribute('aria-pressed', 'true');
+  });
+
   test('speak it: says so when speech recognition is unavailable', async ({ page }) => {
     await page.addInitScript(() => {
       delete (window as any).SpeechRecognition;

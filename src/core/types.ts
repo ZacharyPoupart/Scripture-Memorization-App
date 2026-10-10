@@ -97,6 +97,8 @@ export interface Settings {
   reminderTimes: string[];
   /** Last time the "back up your verses" nudge was dismissed (ms). */
   nudgeDismissedAt: number;
+  /** Speak it: show the verse's words while you speak (read along), or keep them hidden until you finish (from memory). */
+  speakWords: boolean;
   /** Show the avatar and seeds on Today. On by default; switching off only hides them. */
   avatarOn: boolean;
 }
