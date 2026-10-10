@@ -1718,3 +1718,15 @@ button.streak {
 .item-tile.unowned small {
   font-weight: 600;
 }
+.piece-img {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  border-radius: 14px;
+  background: var(--surface-2);
+  padding: 5px;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+}

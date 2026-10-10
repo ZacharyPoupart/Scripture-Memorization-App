@@ -87,29 +87,54 @@ export interface Item {
   unlock?: Unlock;
   /** Main colour (skin tone, hair colour, metal, scene) for the drawing. */
   color?: string;
+  /** Armor sets: which set a piece belongs to, and how rare it is. */
+  set?: string;
+  rarity?: ArmorSet['rarity'];
+  /** Must be reached before this item can be bought (it still costs seeds). */
+  requires?: Unlock;
 }
 
 const I = (slot: Slot, id: string, name: string, cost = 0, extra: Partial<Item> = {}): Item => ({ id, slot, name, cost, ...extra });
 const streak = (days: number): Unlock => ({ kind: 'streak', days });
 
-// Armor comes in tiers. Leather → Royal blue are bought with seeds; Silver, Gold and Radiant are earned by streak length,
-// and each piece asks a little more than the last, so the finest set (Radiant) is the longest road of all.
-const NOUN: Record<(typeof ARMOR_SLOTS)[number], string> = { belt: 'belt', breastplate: 'breastplate', shoes: 'boots', shield: 'shield', helmet: 'helmet', sword: 'sword' };
-const BOUGHT_TIERS = [
-  { key: 'leather', name: 'Leather', cost: 20, color: '#a47a4c' },
-  { key: 'iron', name: 'Iron', cost: 60, color: '#7f8996' },
-  { key: 'steel', name: 'Steel', cost: 150, color: '#c3ccd8' },
-  { key: 'royal', name: 'Royal blue', cost: 350, color: '#3f5fae' },
+// Armor comes in ten sets, from The Initiate to The Legend, each costing more than the one before. Every set has a piece for
+// each of the six slots, so you can mix and match or complete a set. The last three sets also ask for a long streak.
+export interface ArmorSet {
+  key: string;
+  name: string;
+  tagline: string;
+  rarity: 'Basic' | 'Common' | 'Rare' | 'Epic' | 'Legendary';
+  /** Seeds for each piece of the set. */
+  price: number;
+  /** A streak (in days) you must have reached before the set can be bought. */
+  streak?: number;
+  /** What the helmet slot is called for this set. */
+  helm?: string;
+  color: string;
+}
+export const ARMOR_SETS: ArmorSet[] = [
+  { key: 'initiate', name: 'The Initiate', tagline: 'Every legend starts somewhere.', rarity: 'Basic', price: 15, color: '#3f62a8' },
+  { key: 'soldier', name: 'The Soldier', tagline: 'Stronger. Braver. Farther.', rarity: 'Basic', price: 35, color: '#7f8996' },
+  { key: 'vanguard', name: 'The Vanguard', tagline: 'Discipline builds strength.', rarity: 'Common', price: 70, color: '#aab5c4' },
+  { key: 'paladin', name: 'The Paladin', tagline: 'Faith. Courage. Purpose.', rarity: 'Common', price: 120, color: '#e8e2cf' },
+  { key: 'warden', name: 'The Warden', tagline: 'Hold the line.', rarity: 'Rare', price: 190, color: '#4a4348' },
+  { key: 'ranger', name: 'The Ranger', tagline: 'Swift. Silent. Ready.', rarity: 'Rare', price: 280, helm: 'hood', color: '#4f7a4a' },
+  { key: 'crusader', name: 'The Crusader', tagline: 'For a greater tomorrow.', rarity: 'Epic', price: 400, color: '#b5483f' },
+  { key: 'shadow', name: 'The Shadow', tagline: 'Move unseen. Strike true.', rarity: 'Epic', price: 560, streak: 90, helm: 'hood', color: '#5b3f86' },
+  { key: 'storm', name: 'The Storm', tagline: 'Power in motion.', rarity: 'Legendary', price: 780, streak: 180, color: '#4a78c9' },
+  { key: 'legend', name: 'The Legend', tagline: 'All that you’ve become.', rarity: 'Legendary', price: 1100, streak: 365, color: '#e2b53c' },
 ];
-const EARNED_TIERS: { key: string; name: string; color: string; days: Record<(typeof ARMOR_SLOTS)[number], number> }[] = [
-  { key: 'silver', name: 'Silver', color: '#e8edf4', days: { belt: 40, shoes: 50, helmet: 60, breastplate: 75, shield: 90, sword: 100 } },
-  { key: 'gold', name: 'Gold', color: '#e2b53c', days: { belt: 120, shoes: 140, helmet: 160, breastplate: 180, shield: 200, sword: 250 } },
-  { key: 'radiant', name: 'Radiant', color: '#fff0a8', days: { belt: 300, shoes: 365, helmet: 450, breastplate: 550, shield: 730, sword: 1000 } },
-];
+const NOUN: Record<(typeof ARMOR_SLOTS)[number], string> = { belt: 'belt', breastplate: 'armor', shoes: 'boots', shield: 'shield', helmet: 'helm', sword: 'sword' };
 const armor: Item[] = ARMOR_SLOTS.flatMap((slot) => [
   I(slot, `${slot}-none`, 'None'),
-  ...BOUGHT_TIERS.map((t) => I(slot, `${slot}-${t.key}`, `${t.name} ${NOUN[slot]}`, t.cost, { color: t.color })),
-  ...EARNED_TIERS.map((t) => I(slot, `${slot}-${t.key}`, `${t.name} ${NOUN[slot]}`, 0, { color: t.color, unlock: streak(t.days[slot]) })),
+  ...ARMOR_SETS.map((t) =>
+    I(slot, `${slot}-${t.key}`, `${t.name.replace('The ', '')} ${slot === 'helmet' && t.helm ? t.helm : NOUN[slot]}`, t.price, {
+      color: t.color,
+      set: t.key,
+      rarity: t.rarity,
+      ...(t.streak ? { requires: streak(t.streak) } : {}),
+    }),
+  ),
 ]);
 
 export const ITEMS: Item[] = [
@@ -258,6 +283,12 @@ export function armorWorn(look: Look): number {
   return ARMOR_SLOTS.filter((s) => !look[s].endsWith('-none')).length;
 }
 
+/** The set being worn if all six pieces belong to the same one. */
+export function completedSet(look: Look): ArmorSet | undefined {
+  const keys = ARMOR_SLOTS.map((slot) => itemById(look[slot])?.set);
+  return keys.every((k) => k && k === keys[0]) ? ARMOR_SETS.find((x) => x.key === keys[0]) : undefined;
+}
+
 export function describeUnlock(u: Unlock): string {
   switch (u.kind) {
     case 'streak':
@@ -319,9 +350,8 @@ export function seedsBalance(data: AppData): number {
 
 // ---------------------------------------------------------------- owning, buying, wearing
 
-export function isUnlocked(data: AppData, item: Item): boolean {
-  const u = item.unlock;
-  if (!u) return false;
+/** Has the achievement behind an unlock been reached? */
+export function meets(data: AppData, u: Unlock): boolean {
   switch (u.kind) {
     case 'streak':
       return data.longestStreak >= u.days;
@@ -332,6 +362,15 @@ export function isUnlocked(data: AppData, item: Item): boolean {
     case 'yearly':
       return data.levelUps.some((l) => l.to === 'yearly') || Object.values(data.verses).some((v) => !v.deletedAt && v.pile === 'yearly');
   }
+}
+
+export function isUnlocked(data: AppData, item: Item): boolean {
+  return item.unlock ? meets(data, item.unlock) : false;
+}
+
+/** Bought items that still need an achievement (e.g. a long streak) before they can be bought. */
+export function isGated(data: AppData, item: Item): boolean {
+  return !!item.requires && !meets(data, item.requires);
 }
 
 /** Free items, bought items, and earned items that have been unlocked. */
@@ -347,6 +386,7 @@ export function buyItem(data: AppData, id: string, now: number): BuyResult {
   if (!item) return { ok: false, reason: 'unknown' };
   if (item.unlock) return { ok: false, reason: isUnlocked(data, item) ? 'owned' : 'locked' };
   if (owns(data, item)) return { ok: false, reason: 'owned' };
+  if (isGated(data, item)) return { ok: false, reason: 'locked' };
   if (seedsBalance(data) < item.cost) return { ok: false, reason: 'funds' };
   const avatar = data.avatar ?? { owned: [], look: {}, lookAt: 0 };
   data.avatar = { ...avatar, owned: [...avatar.owned, id] };

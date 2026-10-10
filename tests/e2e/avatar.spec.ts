@@ -36,18 +36,18 @@ test.describe('avatar and seeds', () => {
     // a paid item previews first, then is bought
     await expect(page.getByTestId('armor-meter')).toContainText('0 of 6');
     await page.getByTestId('group-armor').click();
-    await page.getByTestId('item-helmet-iron').click();
-    await expect(page.getByTestId('item-helmet-iron')).not.toContainText('Wearing');
+    await page.getByTestId('item-helmet-soldier').click();
+    await expect(page.getByTestId('item-helmet-soldier')).not.toContainText('Wearing');
     await page.getByTestId('buy').click();
-    await expect(page.getByTestId('item-helmet-iron')).toContainText('Wearing');
+    await expect(page.getByTestId('item-helmet-soldier')).toContainText('Wearing');
     const after = Number((await page.getByTestId('seeds-balance').innerText()).replace(/\D/g, ''));
-    expect(after).toBe(before - 60);
+    expect(after).toBe(before - 35);
     await expect(page.getByTestId('armor-meter')).toContainText('1 of 6');
     await saved(page);
     await context.setOffline(true);
     await page.reload();
     await page.getByTestId('group-armor').click();
-    await expect(page.getByTestId('item-helmet-iron')).toContainText('Wearing');
+    await expect(page.getByTestId('item-helmet-soldier')).toContainText('Wearing');
     const bal = Number((await page.getByTestId('seeds-balance').innerText()).replace(/\D/g, ''));
     expect(bal).toBe(after);
     await context.setOffline(false);
@@ -77,8 +77,8 @@ test.describe('avatar and seeds', () => {
     await page.goto('/#/avatar');
     await page.getByTestId('group-armor').click();
     await page.getByTestId('slot-sword').click();
-    await page.getByTestId('item-sword-radiant').click();
-    await expect(page.getByTestId('unlock-hint')).toContainText('1000-day streak'); // the finest armor is the longest road
+    await page.getByTestId('item-sword-legend').click();
+    await expect(page.getByTestId('unlock-hint')).toContainText('365-day streak'); // the finest armor also asks for the longest streak
     await expect(page.getByTestId('armor-verse')).toContainText('Ephesians 6:17');
     await page.getByTestId('group-extras').click();
     await page.getByTestId('slot-crown').click();
