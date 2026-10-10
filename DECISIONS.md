@@ -248,6 +248,10 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Data:** no shape change. Old tier item ids are ignored; since seeds are derived, whatever was bought is refunded automatically.
 **Open question for the owner:** prices (a full Legend set is 6,600 seeds, roughly two years of daily reviewing) and the streak gates are guesses and live in `ARMOR_SETS`.
 
+## v1.15.2 — A slimmer, more human knight (owner request)
+**What:** the first knight had big-head, short-body "chibi" proportions that looked chubby. The face is now drawn at half size on a taller body (about 5 heads tall): narrower shoulders, longer legs, human-length arms. The painted armor pieces keep their art but sit in new boxes in `ui/ArmorArt.tsx`; neck and chest extras (scarf, bow tie, medal, sash) are scaled to fit; the "face" crop used for the Today bubble and the You tiles was re-aimed.
+**Limits:** the face, hair and extras are still the simple cartoon style next to the painted armor.
+
 ## v1.15.1 — Armor free while the owner tests (TEMPORARY)
 **What:** `testing.armorFree` in `core/avatar.ts` makes every armor piece wearable without seeds or a streak. Nothing is bought or recorded (the `owned` list and seeds are untouched), so switching it off cannot leave debts or lost seeds; unearned armor simply stops being worn (the look falls back to the default for anything not owned).
 **To end the test:** set `armorFree: false` (one line) and delete the banner in `ui/AvatarScreen.tsx`. Unit and e2e tests that check the real prices switch it off themselves.

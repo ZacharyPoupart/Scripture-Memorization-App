@@ -1,26 +1,22 @@
-import type { ComponentChildren } from "preact";
-import { ARMOR_SLOTS, armorWorn, itemById, type Look } from "../core/avatar.ts";
-import { ArmorPiece, armorUrl } from "./ArmorArt.tsx";
+import type { ComponentChildren } from 'preact';
+import { ARMOR_SLOTS, armorWorn, itemById, type Look } from '../core/avatar.ts';
+import { ArmorPiece, armorUrl } from './ArmorArt.tsx';
 
 const col = (id: string, fallback: string) => itemById(id)?.color ?? fallback;
-const INK = "#2b2522";
+const INK = '#2b2522';
 
 /** A shade of `hex`, darker (negative) or lighter (positive), for simple shading without extra colours in the catalog. */
 function shade(hex: string, amt: number): string {
   const n = parseInt(hex.slice(1), 16);
-  const f = (v: number) =>
-    Math.max(
-      0,
-      Math.min(255, Math.round(v + (amt < 0 ? v * amt : (255 - v) * amt))),
-    );
-  return `#${[(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => f(v).toString(16).padStart(2, "0")).join("")}`;
+  const f = (v: number) => Math.max(0, Math.min(255, Math.round(v + (amt < 0 ? v * amt : (255 - v) * amt))));
+  return `#${[(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => f(v).toString(16).padStart(2, '0')).join('')}`;
 }
 
 function Background({ id }: { id: string }) {
-  const c = col(id, "#cfe6ea");
+  const c = col(id, '#cfe6ea');
   const base = <rect width="120" height="120" fill={c} />;
   switch (id) {
-    case "bg-meadow":
+    case 'bg-meadow':
       return (
         <g>
           {base}
@@ -29,7 +25,7 @@ function Background({ id }: { id: string }) {
           <circle cx="92" cy="22" r="9" fill="#fff6c9" />
         </g>
       );
-    case "bg-sunrise":
+    case 'bg-sunrise':
       return (
         <g>
           {base}
@@ -38,7 +34,7 @@ function Background({ id }: { id: string }) {
           <rect y="90" width="120" height="30" fill="#e9a77b" />
         </g>
       );
-    case "bg-dusk":
+    case 'bg-dusk':
       return (
         <g>
           {base}
@@ -47,7 +43,7 @@ function Background({ id }: { id: string }) {
           <circle cx="96" cy="24" r="8" fill={c} />
         </g>
       );
-    case "bg-garden":
+    case 'bg-garden':
       return (
         <g>
           {base}
@@ -55,17 +51,12 @@ function Background({ id }: { id: string }) {
           {[14, 34, 98, 110].map((x, i) => (
             <g key={x}>
               <rect x={x - 0.8} y="88" width="1.6" height="14" fill="#5f9a70" />
-              <circle
-                cx={x}
-                cy="86"
-                r="4"
-                fill={["#e58f8f", "#f4d06f", "#fff", "#b79bea"][i]}
-              />
+              <circle cx={x} cy="86" r="4" fill={['#e58f8f', '#f4d06f', '#fff', '#b79bea'][i]} />
             </g>
           ))}
         </g>
       );
-    case "bg-night":
+    case 'bg-night':
       return (
         <g>
           {base}
@@ -77,19 +68,13 @@ function Background({ id }: { id: string }) {
             [20, 44],
             [84, 30],
           ].map(([x, y], i) => (
-            <circle
-              key={i}
-              cx={x}
-              cy={y}
-              r={i % 2 ? 1.2 : 1.8}
-              fill="#fff6c9"
-            />
+            <circle key={i} cx={x} cy={y} r={i % 2 ? 1.2 : 1.8} fill="#fff6c9" />
           ))}
           <circle cx="100" cy="18" r="8" fill="#fdf4d8" />
           <circle cx="104" cy="16" r="7" fill={c} />
         </g>
       );
-    case "bg-library":
+    case 'bg-library':
       return (
         <g>
           {base}
@@ -103,18 +88,14 @@ function Background({ id }: { id: string }) {
                   y={y + (i % 3) * 2}
                   width={i % 2 ? 7 : 9}
                   height={14 - (i % 3) * 2}
-                  fill={
-                    ["#a6574b", "#5b7aa6", "#7d9a5b", "#c9a24f", "#8a6aa6"][
-                      i % 5
-                    ]
-                  }
+                  fill={['#a6574b', '#5b7aa6', '#7d9a5b', '#c9a24f', '#8a6aa6'][i % 5]}
                 />
               ))}
             </g>
           ))}
         </g>
       );
-    case "bg-castle":
+    case 'bg-castle':
       return (
         <g>
           {base}
@@ -128,21 +109,13 @@ function Background({ id }: { id: string }) {
             [72, 84],
             [100, 92],
           ].map(([x, y]) => (
-            <rect
-              key={x}
-              x={x}
-              y={y}
-              width="16"
-              height="6"
-              rx="1"
-              fill="#8e929e"
-            />
+            <rect key={x} x={x} y={y} width="16" height="6" rx="1" fill="#8e929e" />
           ))}
           <rect x="84" y="20" width="2" height="22" fill="#6b6f7a" />
           <path d="M86 20 L102 26 L86 32 Z" fill="#b5483f" />
         </g>
       );
-    case "bg-mountain":
+    case 'bg-mountain':
       return (
         <g>
           {base}
@@ -152,18 +125,12 @@ function Background({ id }: { id: string }) {
           <circle cx="96" cy="24" r="8" fill="#fff6c9" />
         </g>
       );
-    case "bg-gold":
+    case 'bg-gold':
       return (
         <g>
           {base}
           {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
-            <polygon
-              key={i}
-              points="60,60 40,-20 80,-20"
-              fill="#fff0b8"
-              opacity="0.5"
-              transform={`rotate(${i * 45} 60 60)`}
-            />
+            <polygon key={i} points="60,60 40,-20 80,-20" fill="#fff0b8" opacity="0.5" transform={`rotate(${i * 45} 60 60)`} />
           ))}
         </g>
       );
@@ -179,25 +146,10 @@ function Background({ id }: { id: string }) {
 }
 
 function HairBack({ id, color }: { id: string; color: string }) {
-  if (id === "hair-long")
-    return (
-      <path
-        d="M33 50 C28 80 34 96 42 100 L78 100 C86 96 92 80 87 50 Z"
-        fill={color}
-      />
-    );
-  if (id === "hair-wave")
-    return (
-      <path
-        d="M33 50 C30 70 33 80 40 84 C44 78 48 74 60 74 C72 74 76 78 80 84 C87 80 90 70 87 50 Z"
-        fill={color}
-      />
-    );
-  if (id === "hair-ponytail")
-    return (
-      <path d="M80 40 C102 42 104 72 92 84 C90 72 88 58 80 52 Z" fill={color} />
-    );
-  if (id === "hair-afro")
+  if (id === 'hair-long') return <path d="M33 50 C28 80 34 96 42 100 L78 100 C86 96 92 80 87 50 Z" fill={color} />;
+  if (id === 'hair-wave') return <path d="M33 50 C30 70 33 80 40 84 C44 78 48 74 60 74 C72 74 76 78 80 84 C87 80 90 70 87 50 Z" fill={color} />;
+  if (id === 'hair-ponytail') return <path d="M80 40 C102 42 104 72 92 84 C90 72 88 58 80 52 Z" fill={color} />;
+  if (id === 'hair-afro')
     return (
       <g fill={color}>
         {[
@@ -219,17 +171,11 @@ function HairBack({ id, color }: { id: string; color: string }) {
 
 function HairFront({ id, color }: { id: string; color: string }) {
   switch (id) {
-    case "hair-none":
+    case 'hair-none':
       return null;
-    case "hair-buzz":
-      return (
-        <path
-          d="M37 48 C37 32 47 27 60 27 C73 27 83 32 83 48 C77 40 70 38 60 38 C50 38 43 40 37 48 Z"
-          fill={color}
-          opacity="0.85"
-        />
-      );
-    case "hair-curly":
+    case 'hair-buzz':
+      return <path d="M37 48 C37 32 47 27 60 27 C73 27 83 32 83 48 C77 40 70 38 60 38 C50 38 43 40 37 48 Z" fill={color} opacity="0.85" />;
+    case 'hair-curly':
       return (
         <g fill={color}>
           {[
@@ -245,66 +191,39 @@ function HairFront({ id, color }: { id: string; color: string }) {
           ))}
         </g>
       );
-    case "hair-bun":
+    case 'hair-bun':
       return (
         <g fill={color}>
           <circle cx="60" cy="19" r="9" />
           <path d="M36 50 C36 32 47 26 60 26 C73 26 84 32 84 50 C78 40 70 36 60 36 C50 36 42 40 36 50 Z" />
         </g>
       );
-    case "hair-spiky":
-      return (
-        <path
-          d="M36 50 L39 28 L48 37 L54 19 L62 35 L70 21 L74 36 L82 27 L84 50 C76 41 68 37 60 37 C52 37 44 41 36 50 Z"
-          fill={color}
-        />
-      );
-    case "hair-afro":
-      return (
-        <path
-          d="M38 46 C40 34 50 30 60 30 C70 30 80 34 82 46 C76 40 70 37 60 37 C50 37 44 40 38 46 Z"
-          fill={color}
-        />
-      );
-    case "hair-wave":
-    case "hair-long":
-    case "hair-ponytail":
-      return (
-        <path
-          d="M35 52 C33 32 46 25 60 25 C74 25 87 32 85 52 C82 42 76 36 66 35 C58 40 46 40 35 52 Z"
-          fill={color}
-        />
-      );
+    case 'hair-spiky':
+      return <path d="M36 50 L39 28 L48 37 L54 19 L62 35 L70 21 L74 36 L82 27 L84 50 C76 41 68 37 60 37 C52 37 44 41 36 50 Z" fill={color} />;
+    case 'hair-afro':
+      return <path d="M38 46 C40 34 50 30 60 30 C70 30 80 34 82 46 C76 40 70 37 60 37 C50 37 44 40 38 46 Z" fill={color} />;
+    case 'hair-wave':
+    case 'hair-long':
+    case 'hair-ponytail':
+      return <path d="M35 52 C33 32 46 25 60 25 C74 25 87 32 85 52 C82 42 76 36 66 35 C58 40 46 40 35 52 Z" fill={color} />;
     default: // short
-      return (
-        <path
-          d="M36 50 C36 32 47 25 60 25 C73 25 84 32 84 50 C78 40 70 36 60 36 C50 36 42 40 36 50 Z"
-          fill={color}
-        />
-      );
+      return <path d="M36 50 C36 32 47 25 60 25 C73 25 84 32 84 50 C78 40 70 36 60 36 C50 36 42 40 36 50 Z" fill={color} />;
   }
 }
 
 function Companion({ id }: { id: string }) {
-  const g = (children: ComponentChildren) => (
-    <g transform="translate(2 86)">{children}</g>
-  );
+  const g = (children: ComponentChildren) => <g transform="translate(2 88) scale(0.88)">{children}</g>;
   switch (id) {
-    case "pet-sprout":
+    case 'pet-sprout':
       return g(
         <g>
           <path d="M8 34 L10 26 L24 26 L26 34 Z" fill="#b87c52" />
-          <path
-            d="M17 26 C17 18 17 14 17 10"
-            stroke="#5f9a70"
-            stroke-width="2.4"
-            fill="none"
-          />
+          <path d="M17 26 C17 18 17 14 17 10" stroke="#5f9a70" stroke-width="2.4" fill="none" />
           <path d="M17 14 C10 14 8 8 9 5 C15 5 17 9 17 14 Z" fill="#7fb98a" />
           <path d="M17 12 C24 12 27 6 25 3 C19 3 17 7 17 12 Z" fill="#8fc19e" />
         </g>,
       );
-    case "pet-lamb":
+    case 'pet-lamb':
       return g(
         <g>
           {[
@@ -322,34 +241,28 @@ function Companion({ id }: { id: string }) {
           <rect x="21" y="32" width="3" height="6" rx="1.2" fill="#4a4040" />
         </g>,
       );
-    case "pet-dove":
+    case 'pet-dove':
       return g(
         <g>
           <ellipse cx="17" cy="26" rx="12" ry="8" fill="#f4efe6" />
           <circle cx="27" cy="19" r="6" fill="#f4efe6" />
           <path d="M32 19 L37 20.5 L32 22 Z" fill="#e6a95a" />
           <circle cx="28.5" cy="18" r="1.1" fill={INK} />
-          <path
-            d="M8 24 C14 12 24 14 24 24 C18 26 12 26 8 24 Z"
-            fill="#d9e3ec"
-          />
+          <path d="M8 24 C14 12 24 14 24 24 C18 26 12 26 8 24 Z" fill="#d9e3ec" />
         </g>,
       );
-    case "pet-kitten":
+    case 'pet-kitten':
       return g(
         <g>
           <ellipse cx="16" cy="29" rx="11" ry="8" fill="#e6a35a" />
           <circle cx="17" cy="19" r="8" fill="#e6a35a" />
-          <path
-            d="M10 14 L11 7 L16 12 Z M24 14 L23 7 L18 12 Z"
-            fill="#e6a35a"
-          />
+          <path d="M10 14 L11 7 L16 12 Z M24 14 L23 7 L18 12 Z" fill="#e6a35a" />
           <circle cx="14" cy="19" r="1.3" fill={INK} />
           <circle cx="20" cy="19" r="1.3" fill={INK} />
           <path d="M16 21.5 L17 22.8 L18 21.5 Z" fill="#c4647a" />
         </g>,
       );
-    case "pet-puppy":
+    case 'pet-puppy':
       return g(
         <g>
           <ellipse cx="16" cy="29" rx="11" ry="8" fill="#c99a6a" />
@@ -361,7 +274,7 @@ function Companion({ id }: { id: string }) {
           <ellipse cx="17" cy="22" rx="2.4" ry="1.7" fill={INK} />
         </g>,
       );
-    case "pet-owl":
+    case 'pet-owl':
       return g(
         <g>
           <ellipse cx="16" cy="26" rx="10" ry="12" fill="#8d6a4a" />
@@ -373,7 +286,7 @@ function Companion({ id }: { id: string }) {
           <path d="M16 24 L14.5 27 L17.5 27 Z" fill="#e6a95a" />
         </g>,
       );
-    case "pet-lion":
+    case 'pet-lion':
       return g(
         <g>
           <ellipse cx="16" cy="29" rx="11" ry="8" fill="#d9a85b" />
@@ -384,65 +297,38 @@ function Companion({ id }: { id: string }) {
           <path d="M16 22 L17 23.2 L18 22 Z" fill="#c4647a" />
         </g>,
       );
-    case "pet-eagle":
+    case 'pet-eagle':
       return g(
         <g>
           <ellipse cx="16" cy="28" rx="10" ry="11" fill="#7a5638" />
-          <path
-            d="M6 24 C-2 18 0 34 8 34 Z M26 24 C34 18 32 34 24 34 Z"
-            fill="#5d4129"
-          />
+          <path d="M6 24 C-2 18 0 34 8 34 Z M26 24 C34 18 32 34 24 34 Z" fill="#5d4129" />
           <circle cx="17" cy="14" r="7" fill="#f4efe6" />
           <path d="M22 14 L29 16.5 L22 18.5 Z" fill="#e6a95a" />
           <circle cx="19" cy="12.5" r="1.3" fill={INK} />
-          <path
-            d="M12 38 L10 42 M22 38 L24 42"
-            stroke="#e6a95a"
-            stroke-width="2"
-            stroke-linecap="round"
-          />
+          <path d="M12 38 L10 42 M22 38 L24 42" stroke="#e6a95a" stroke-width="2" stroke-linecap="round" />
         </g>,
       );
-    case "pet-dragon":
+    case 'pet-dragon':
       return g(
         <g>
-          <path
-            d="M26 30 C36 28 38 18 34 14 C34 22 30 24 24 26 Z"
-            fill="#4f9a62"
-          />
+          <path d="M26 30 C36 28 38 18 34 14 C34 22 30 24 24 26 Z" fill="#4f9a62" />
           <ellipse cx="15" cy="29" rx="11" ry="8" fill="#5fae6f" />
           <circle cx="12" cy="17" r="8" fill="#5fae6f" />
           <path d="M7 12 L5 5 L11 9 Z M17 10 L19 3 L21 11 Z" fill="#e6a95a" />
-          <path
-            d="M20 24 C28 12 38 14 34 24 C30 22 24 24 20 24 Z"
-            fill="#3f8250"
-          />
+          <path d="M20 24 C28 12 38 14 34 24 C30 22 24 24 20 24 Z" fill="#3f8250" />
           <circle cx="9.5" cy="16" r="1.4" fill={INK} />
           <circle cx="15" cy="16" r="1.4" fill={INK} />
           <circle cx="8" cy="20" r="0.9" fill="#3f8250" />
           <circle cx="12" cy="20" r="0.9" fill="#3f8250" />
         </g>,
       );
-    case "pet-angel":
+    case 'pet-angel':
       return g(
         <g>
-          <path
-            d="M4 22 C-2 12 6 6 12 18 Z M28 22 C34 12 26 6 20 18 Z"
-            fill="#fffaf0"
-            stroke="#e3dcc8"
-            stroke-width="0.8"
-          />
+          <path d="M4 22 C-2 12 6 6 12 18 Z M28 22 C34 12 26 6 20 18 Z" fill="#fffaf0" stroke="#e3dcc8" stroke-width="0.8" />
           <path d="M9 36 C9 24 23 24 23 36 Z" fill="#fffaf0" />
           <circle cx="16" cy="19" r="6" fill="#f6d6bd" />
-          <ellipse
-            cx="16"
-            cy="11"
-            rx="6"
-            ry="1.8"
-            fill="none"
-            stroke="#f2c94c"
-            stroke-width="1.6"
-          />
+          <ellipse cx="16" cy="11" rx="6" ry="1.8" fill="none" stroke="#f2c94c" stroke-width="1.6" />
           <circle cx="14" cy="19" r="0.9" fill={INK} />
           <circle cx="18" cy="19" r="0.9" fill={INK} />
         </g>,
@@ -453,40 +339,23 @@ function Companion({ id }: { id: string }) {
 }
 // ---------------------------------------------------------------- the knight
 
-const none = (id: string) => id.endsWith("-none");
+const none = (id: string) => id.endsWith('-none');
 
 function Cape({ id }: { id: string }) {
   if (none(id)) return null;
-  if (id === "cape-wings")
+  if (id === 'cape-wings')
     return (
-      <g fill="#fffaf0" stroke="#e3dcc8" stroke-width="1">
+      <g fill="#fffaf0" stroke="#e3dcc8" stroke-width="1" transform="translate(0 -30)">
         <path d="M44 72 C20 58 4 62 6 88 C14 80 20 84 22 92 C28 86 34 90 38 98 C40 90 42 82 46 78 Z" />
         <path d="M76 72 C100 58 116 62 114 88 C106 80 100 84 98 92 C92 86 86 90 82 98 C80 90 78 82 74 78 Z" />
       </g>
     );
-  const c = col(id, "#b5483f");
+  const c = col(id, '#b5483f');
   return (
     <g>
-      <path
-        d="M40 70 C26 90 26 108 32 118 L88 118 C94 108 94 90 80 70 Z"
-        fill={c}
-        stroke={shade(c, -0.3)}
-        stroke-width="1.2"
-      />
-      <path
-        d="M60 72 L60 118"
-        stroke={shade(c, -0.25)}
-        stroke-width="1.2"
-        opacity="0.6"
-      />
-      {id === "cape-gold" && (
-        <path
-          d="M36 112 L84 112"
-          stroke="#fff0b8"
-          stroke-width="3"
-          opacity="0.8"
-        />
-      )}
+      <path d="M43 40 C32 66 32 94 36 110 L84 110 C88 94 88 66 77 40 Z" fill={c} stroke={shade(c, -0.3)} stroke-width="1.2" />
+      <path d="M60 42 L60 110" stroke={shade(c, -0.25)} stroke-width="1.2" opacity="0.6" />
+      {id === 'cape-gold' && <path d="M38 104 L82 104" stroke="#fff0b8" stroke-width="3" opacity="0.8" />}
     </g>
   );
 }
@@ -494,26 +363,13 @@ function Cape({ id }: { id: string }) {
 function Beard({ id, color }: { id: string; color: string }) {
   const hole = <ellipse cx="60" cy="67" rx="7.5" ry="3.6" />;
   switch (id) {
-    case "beard-stubble":
-      return (
-        <path
-          d="M37 56 C37 82 83 82 83 56 C80 68 72 72 60 72 C48 72 40 68 37 56 Z"
-          fill={color}
-          opacity="0.28"
-        />
-      );
-    case "beard-moustache":
-      return (
-        <path
-          d="M49 63 C53 59 58 60 60 63 C62 60 67 59 71 63 C67 67 62 65 60 65.5 C58 65 53 67 49 63 Z"
-          fill={color}
-        />
-      );
-    case "beard-goatee":
-      return (
-        <path d="M53 71 C54 82 66 82 67 71 C64 74 56 74 53 71 Z" fill={color} />
-      );
-    case "beard-short":
+    case 'beard-stubble':
+      return <path d="M37 56 C37 82 83 82 83 56 C80 68 72 72 60 72 C48 72 40 68 37 56 Z" fill={color} opacity="0.28" />;
+    case 'beard-moustache':
+      return <path d="M49 63 C53 59 58 60 60 63 C62 60 67 59 71 63 C67 67 62 65 60 65.5 C58 65 53 67 49 63 Z" fill={color} />;
+    case 'beard-goatee':
+      return <path d="M53 71 C54 82 66 82 67 71 C64 74 56 74 53 71 Z" fill={color} />;
+    case 'beard-short':
       return (
         <path
           fill-rule="evenodd"
@@ -521,7 +377,7 @@ function Beard({ id, color }: { id: string; color: string }) {
           fill={color}
         />
       );
-    case "beard-full":
+    case 'beard-full':
       return (
         <g>
           <path
@@ -538,7 +394,7 @@ function Beard({ id, color }: { id: string; color: string }) {
 }
 
 function Glasses({ id }: { id: string }) {
-  if (id === "gl-round")
+  if (id === 'gl-round')
     return (
       <g fill="none" stroke={INK} stroke-width="2">
         <circle cx="50" cy="54" r="8" />
@@ -546,7 +402,7 @@ function Glasses({ id }: { id: string }) {
         <path d="M58 54 L62 54" />
       </g>
     );
-  if (id === "gl-square")
+  if (id === 'gl-square')
     return (
       <g fill="none" stroke={INK} stroke-width="2">
         <rect x="41" y="48" width="16" height="12" rx="3" />
@@ -559,51 +415,26 @@ function Glasses({ id }: { id: string }) {
 
 function Crown({ id, lift }: { id: string; lift: number }) {
   if (none(id)) return null;
-  if (id === "crown-halo")
-    return (
-      <ellipse
-        cx="60"
-        cy={18 - lift}
-        rx="17"
-        ry="5"
-        fill="none"
-        stroke="#f2c94c"
-        stroke-width="3.5"
-      />
-    );
+  if (id === 'crown-halo') return <ellipse cx="60" cy={18 - lift} rx="17" ry="5" fill="none" stroke="#f2c94c" stroke-width="3.5" />;
   return (
     <g transform={`translate(0 ${-lift})`}>
-      {id === "crown-flower" && (
+      {id === 'crown-flower' && (
         <g transform="translate(79 32)">
           {[0, 72, 144, 216, 288].map((a) => (
-            <ellipse
-              key={a}
-              cx="0"
-              cy="-5"
-              rx="3.4"
-              ry="5"
-              fill="#f2b8c6"
-              transform={`rotate(${a})`}
-            />
+            <ellipse key={a} cx="0" cy="-5" rx="3.4" ry="5" fill="#f2b8c6" transform={`rotate(${a})`} />
           ))}
           <circle r="3" fill="#f2c94c" />
         </g>
       )}
-      {id === "crown-royal" && (
+      {id === 'crown-royal' && (
         <g>
-          <path
-            d="M40 38 L40 20 L50 29 L60 14 L70 29 L80 20 L80 38 Z"
-            fill="#f2c94c"
-            stroke="#c9962c"
-            stroke-width="1.6"
-            stroke-linejoin="round"
-          />
+          <path d="M40 38 L40 20 L50 29 L60 14 L70 29 L80 20 L80 38 Z" fill="#f2c94c" stroke="#c9962c" stroke-width="1.6" stroke-linejoin="round" />
           <circle cx="60" cy="22" r="2.4" fill="#c4647a" />
           <circle cx="45" cy="30" r="1.8" fill="#5b8fc7" />
           <circle cx="75" cy="30" r="1.8" fill="#5b8fc7" />
         </g>
       )}
-      {id === "crown-life" && (
+      {id === 'crown-life' && (
         <g>
           <path
             d="M38 38 L36 16 L47 27 L54 10 L60 24 L66 10 L73 27 L84 16 L82 38 Z"
@@ -613,56 +444,26 @@ function Crown({ id, lift }: { id: string; lift: number }) {
             stroke-linejoin="round"
           />
           {[
-            [60, 18, "#c4647a"],
-            [46, 31, "#5b8fc7"],
-            [74, 31, "#5fae6f"],
+            [60, 18, '#c4647a'],
+            [46, 31, '#5b8fc7'],
+            [74, 31, '#5fae6f'],
           ].map(([x, y, f]) => (
-            <circle
-              key={String(x)}
-              cx={Number(x)}
-              cy={Number(y)}
-              r="2.4"
-              fill={String(f)}
-              stroke="#e2b53c"
-              stroke-width="0.8"
-            />
+            <circle key={String(x)} cx={Number(x)} cy={Number(y)} r="2.4" fill={String(f)} stroke="#e2b53c" stroke-width="0.8" />
           ))}
-          <path
-            d="M60 6 L61.6 10 L66 10.4 L62.6 13 L63.6 17 L60 14.8 L56.4 17 L57.4 13 L54 10.4 L58.4 10 Z"
-            fill="#fff6c9"
-            opacity="0.95"
-          />
+          <path d="M60 6 L61.6 10 L66 10.4 L62.6 13 L63.6 17 L60 14.8 L56.4 17 L57.4 13 L54 10.4 L58.4 10 Z" fill="#fff6c9" opacity="0.95" />
         </g>
       )}
-      {id === "crown-laurel" && (
+      {id === 'crown-laurel' && (
         <g fill="#6f9a5a">
           {[-66, -50, -34, -18].map((a, i) => {
             const cx = 60 + 24 * Math.cos(((a - 90) * Math.PI) / 180) - 2;
             const cy = 46 + 24 * Math.sin(((a - 90) * Math.PI) / 180);
-            return (
-              <ellipse
-                key={i}
-                cx={cx}
-                cy={cy}
-                rx="2.6"
-                ry="5.4"
-                transform={`rotate(${a} ${cx} ${cy})`}
-              />
-            );
+            return <ellipse key={i} cx={cx} cy={cy} rx="2.6" ry="5.4" transform={`rotate(${a} ${cx} ${cy})`} />;
           })}
           {[66, 50, 34, 18].map((a, i) => {
             const cx = 60 + 24 * Math.cos(((a - 90) * Math.PI) / 180) + 2;
             const cy = 46 + 24 * Math.sin(((a - 90) * Math.PI) / 180);
-            return (
-              <ellipse
-                key={i}
-                cx={cx}
-                cy={cy}
-                rx="2.6"
-                ry="5.4"
-                transform={`rotate(${a} ${cx} ${cy})`}
-              />
-            );
+            return <ellipse key={i} cx={cx} cy={cy} rx="2.6" ry="5.4" transform={`rotate(${a} ${cx} ${cy})`} />;
           })}
         </g>
       )}
@@ -672,16 +473,10 @@ function Crown({ id, lift }: { id: string; lift: number }) {
 
 /** Things worn at the neck or head (inside the head group) and things that float or stand beside the knight. */
 function ExtraHead({ id }: { id: string }) {
-  if (id === "ex-headphones")
+  if (id === 'ex-headphones')
     return (
       <g>
-        <path
-          d="M33 56 C31 28 89 28 87 56"
-          fill="none"
-          stroke="#3b3b44"
-          stroke-width="4"
-          stroke-linecap="round"
-        />
+        <path d="M33 56 C31 28 89 28 87 56" fill="none" stroke="#3b3b44" stroke-width="4" stroke-linecap="round" />
         <rect x="29" y="50" width="9" height="16" rx="4" fill="#3b3b44" />
         <rect x="82" y="50" width="9" height="16" rx="4" fill="#3b3b44" />
       </g>
@@ -689,8 +484,19 @@ function ExtraHead({ id }: { id: string }) {
   return null;
 }
 function ExtraBody({ id }: { id: string }) {
+  // neck and chest extras were drawn for a bigger body: fit them onto the slimmer one
+  if (['ex-bowtie', 'ex-scarf', 'ex-medal', 'ex-scholar'].includes(id))
+    return (
+      <g transform="translate(60 40) scale(0.88) translate(-60 -72)">
+        <ExtraBodyInner id={id} />
+      </g>
+    );
+  return <ExtraBodyInner id={id} />;
+}
+
+function ExtraBodyInner({ id }: { id: string }) {
   switch (id) {
-    case "ex-bowtie":
+    case 'ex-bowtie':
       return (
         <g fill="#c4647a">
           <path d="M60 72 L50 67 L50 77 Z" />
@@ -698,106 +504,47 @@ function ExtraBody({ id }: { id: string }) {
           <circle cx="60" cy="72" r="2.6" fill="#a24a5f" />
         </g>
       );
-    case "ex-scarf":
+    case 'ex-scarf':
       return (
         <g fill="#c4647a">
           <path d="M46 66 C52 74 68 74 74 66 L76 74 C68 80 52 80 44 74 Z" />
           <path d="M68 76 L74 94 L66 92 L62 78 Z" fill="#a24a5f" />
         </g>
       );
-    case "ex-medal":
+    case 'ex-medal':
       return (
         <g>
-          <path
-            d="M54 70 L60 82 L66 70"
-            fill="none"
-            stroke="#c4647a"
-            stroke-width="2.6"
-          />
-          <circle
-            cx="60"
-            cy="86"
-            r="5"
-            fill="#f2c94c"
-            stroke="#c9962c"
-            stroke-width="1.3"
-          />
+          <path d="M54 70 L60 82 L66 70" fill="none" stroke="#c4647a" stroke-width="2.6" />
+          <circle cx="60" cy="86" r="5" fill="#f2c94c" stroke="#c9962c" stroke-width="1.3" />
         </g>
       );
-    case "ex-scholar":
+    case 'ex-scholar':
       return (
         <g>
-          <path
-            d="M44 72 L76 98"
-            stroke="#f2c94c"
-            stroke-width="4"
-            stroke-linecap="round"
-            opacity="0.9"
-          />
-          <path
-            d="M44 72 L76 98"
-            stroke="#2f3e63"
-            stroke-width="1.4"
-            stroke-linecap="round"
-            opacity="0.5"
-          />
+          <path d="M44 72 L76 98" stroke="#f2c94c" stroke-width="4" stroke-linecap="round" opacity="0.9" />
+          <path d="M44 72 L76 98" stroke="#2f3e63" stroke-width="1.4" stroke-linecap="round" opacity="0.5" />
         </g>
       );
-    case "ex-lantern":
+    case 'ex-lantern':
       return (
         <g transform="translate(94 12)">
           <circle cx="8" cy="12" r="12" fill="#ffe9a0" opacity="0.35" />
-          <path
-            d="M3 4 Q8 -2 13 4"
-            fill="none"
-            stroke="#6b5a3a"
-            stroke-width="1.6"
-          />
-          <rect
-            x="3"
-            y="4"
-            width="10"
-            height="14"
-            rx="2.5"
-            fill="#f2c94c"
-            stroke="#8a6a2a"
-            stroke-width="1.3"
-          />
+          <path d="M3 4 Q8 -2 13 4" fill="none" stroke="#6b5a3a" stroke-width="1.6" />
+          <rect x="3" y="4" width="10" height="14" rx="2.5" fill="#f2c94c" stroke="#8a6a2a" stroke-width="1.3" />
           <rect x="6" y="8" width="4" height="6" rx="2" fill="#fff6c9" />
         </g>
       );
-    case "ex-butterfly":
+    case 'ex-butterfly':
       return (
         <g transform="translate(96 20)">
-          <ellipse
-            cx="-4"
-            cy="-2"
-            rx="5"
-            ry="4"
-            fill="#9b8be0"
-            transform="rotate(-20 -4 -2)"
-          />
-          <ellipse
-            cx="4"
-            cy="-2"
-            rx="5"
-            ry="4"
-            fill="#b7a8ee"
-            transform="rotate(20 4 -2)"
-          />
+          <ellipse cx="-4" cy="-2" rx="5" ry="4" fill="#9b8be0" transform="rotate(-20 -4 -2)" />
+          <ellipse cx="4" cy="-2" rx="5" ry="4" fill="#b7a8ee" transform="rotate(20 4 -2)" />
           <ellipse cx="-3" cy="4" rx="3.4" ry="3" fill="#f2b8c6" />
           <ellipse cx="3" cy="4" rx="3.4" ry="3" fill="#f2b8c6" />
-          <rect
-            x="-0.8"
-            y="-4"
-            width="1.6"
-            height="10"
-            rx="0.8"
-            fill="#4a4040"
-          />
+          <rect x="-0.8" y="-4" width="1.6" height="10" rx="0.8" fill="#4a4040" />
         </g>
       );
-    case "ex-star":
+    case 'ex-star':
       return (
         <path
           transform="translate(96 22)"
@@ -808,39 +555,21 @@ function ExtraBody({ id }: { id: string }) {
           stroke-linejoin="round"
         />
       );
-    case "ex-scroll":
+    case 'ex-scroll':
       return (
-        <g transform="translate(88 12) rotate(12)">
-          <rect
-            x="0"
-            y="2"
-            width="22"
-            height="14"
-            rx="2"
-            fill="#f4efe6"
-            stroke="#c9b88f"
-            stroke-width="1"
-          />
+        <g transform="translate(94 8) rotate(12)">
+          <rect x="0" y="2" width="22" height="14" rx="2" fill="#f4efe6" stroke="#c9b88f" stroke-width="1" />
           <rect x="-2" y="0" width="4" height="18" rx="2" fill="#c9a66b" />
           <rect x="20" y="0" width="4" height="18" rx="2" fill="#c9a66b" />
-          <path
-            d="M5 7 H18 M5 11 H15"
-            stroke="#b9a678"
-            stroke-width="1.3"
-            stroke-linecap="round"
-          />
+          <path d="M5 7 H18 M5 11 H15" stroke="#b9a678" stroke-width="1.3" stroke-linecap="round" />
         </g>
       );
-    case "ex-banner":
+    case 'ex-banner':
       return (
         <g>
           <rect x="106" y="50" width="2.2" height="68" fill="#6b5a3a" />
           <path d="M108 52 L120 58 L108 66 Z" fill="#b5483f" />
-          <path
-            d="M111 58 L115 58 M113 56 L113 61"
-            stroke="#fff0b8"
-            stroke-width="1.2"
-          />
+          <path d="M111 58 L115 58 M113 56 L113 61" stroke="#fff0b8" stroke-width="1.2" />
         </g>
       );
     default:
@@ -849,118 +578,82 @@ function ExtraBody({ id }: { id: string }) {
 }
 
 /** The knight: drawn from simple shapes so it works offline, scales sharply and follows the theme. */
-export function AvatarFigure({
-  look,
-  size = 120,
-  title,
-  view = "full",
-}: {
-  look: Look;
-  size?: number;
-  title?: string;
-  view?: "full" | "face";
-}) {
-  const skin = col(look.skin, "#efc09a");
-  const hair = col(look.hairColor, "#6a4630");
-  const eye = col(look.eyes, "#5a3a24");
-  const tunic = col(look.tunic, "#2a6569");
+export function AvatarFigure({ look, size = 120, title, view = 'full' }: { look: Look; size?: number; title?: string; view?: 'full' | 'face' }) {
+  const skin = col(look.skin, '#efc09a');
+  const hair = col(look.hairColor, '#6a4630');
+  const eye = col(look.eyes, '#5a3a24');
+  const tunic = col(look.tunic, '#2a6569');
   const helmeted = !!armorUrl(look.helmet);
   const plated = !!armorUrl(look.breastplate);
-  const dressed = plated || !!armorUrl(look.belt) || !!armorUrl(look.shoes);
-  const under = "#3a3f4a"; // the padded clothes under armor
-  const hose = dressed ? "#2d3038" : shade(tunic, -0.4);
+  const booted = !!armorUrl(look.shoes);
+  const dressed = plated || !!armorUrl(look.belt) || booted;
+  const hose = dressed ? '#2d3038' : shade(tunic, -0.4);
   const full = armorWorn(look) === ARMOR_SLOTS.length;
+  const HEAD = 'translate(60 22) scale(0.5) translate(-60 -52)'; // the friendly face, scaled to sit on a human-proportioned body
+  const face = view === 'face';
   return (
     <svg
-      viewBox={view === "face" ? "26 4 68 68" : "0 0 120 120"}
+      viewBox={face ? '40 2 40 40' : '0 0 120 120'}
       width={size}
       height={size}
       role="img"
-      aria-label={title ?? "Your avatar"}
+      aria-label={title ?? 'Your avatar'}
       data-look={JSON.stringify(look)}
       data-armor={armorWorn(look)}
-      style={{ display: "block" }}
+      style={{ display: 'block' }}
     >
       <defs>
-        <clipPath id={`avc-${view}${size}`}>
-          {view === "face" ? (
-            <rect x="26" y="4" width="68" height="68" rx="15" />
-          ) : (
-            <rect width="120" height="120" rx="26" />
-          )}
-        </clipPath>
+        <clipPath id={`avc-${view}${size}`}>{face ? <rect x="40" y="2" width="40" height="40" rx="9" /> : <rect width="120" height="120" rx="26" />}</clipPath>
       </defs>
       <g clip-path={`url(#avc-${view}${size})`}>
         <Background id={look.background} />
-        {full && <circle cx="60" cy="66" r="50" fill="#fff6c9" opacity="0.4" />}
+        {full && <circle cx="60" cy="64" r="52" fill="#fff6c9" opacity="0.4" />}
         <Cape id={look.cape} />
         <Companion id={look.companion} />
         {!helmeted && (
-          <g transform="translate(60 41) scale(0.86) translate(-60 -52)">
+          <g transform={HEAD}>
             <HairBack id={look.hair} color={hair} />
           </g>
         )}
-        {/* legs and shoes */}
-        {!armorUrl(look.shoes) && (
-          <rect x="47" y="98" width="10" height="14" rx="3" fill={hose} />
+        {/* legs and feet */}
+        {!booted && (
+          <g>
+            <rect x="49" y="68" width="9" height="42" rx="3.5" fill={hose} />
+            <rect x="62" y="68" width="9" height="42" rx="3.5" fill={hose} />
+            <ellipse cx="52.5" cy="112" rx="6.2" ry="3" fill="#d9b59a" />
+            <ellipse cx="67.5" cy="112" rx="6.2" ry="3" fill="#d9b59a" />
+          </g>
         )}
-        {!armorUrl(look.shoes) && (
-          <rect x="63" y="98" width="10" height="14" rx="3" fill={hose} />
-        )}
-        {!armorUrl(look.shoes) && (
-          <g fill="#d9b59a">
-            <ellipse cx="50" cy="115" rx="7" ry="3.6" />
-            <ellipse cx="70" cy="115" rx="7" ry="3.6" />
+        {booted && (
+          <g>
+            <rect x="49" y="68" width="9" height="30" rx="3.5" fill={hose} />
+            <rect x="62" y="68" width="9" height="30" rx="3.5" fill={hose} />
           </g>
         )}
         {/* arms, torso, neck */}
-        <path
-          d="M44 74 L34 86"
-          stroke={plated ? under : tunic}
-          stroke-width="8"
-          stroke-linecap="round"
-        />
-        <path
-          d="M76 74 L88 84"
-          stroke={plated ? under : tunic}
-          stroke-width="8"
-          stroke-linecap="round"
-        />
         {!plated && (
-          <path
-            d="M40 100 C40 76 48 68 60 68 C72 68 80 76 80 100 Z"
-            fill={tunic}
-          />
+          <g>
+            <path d="M43.5 43 L36 66" stroke={tunic} stroke-width="6.5" stroke-linecap="round" />
+            <path d="M76.5 43 L84 69" stroke={tunic} stroke-width="6.5" stroke-linecap="round" />
+          </g>
         )}
-        <rect
-          x="55"
-          y="58"
-          width="10"
-          height="13"
-          rx="4"
-          fill={shade(skin, -0.1)}
-        />
+        {!plated && <path d="M42 74 C42 46 47 38 60 38 C73 38 78 46 78 74 Z" fill={tunic} />}
+        <rect x="55.5" y="30" width="9" height="12" rx="4" fill={shade(skin, -0.1)} />
         <ArmorPiece slot="breastplate" id={look.breastplate} />
         <ArmorPiece slot="belt" id={look.belt} />
         <ArmorPiece slot="shoes" id={look.shoes} />
         <ExtraBody id={look.extra} />
-        <circle cx="33.5" cy="87" r="3.6" fill={plated ? "#4a3a2c" : skin} />
-        <circle cx="89" cy="86" r="3.6" fill={plated ? "#4a3a2c" : skin} />
+        {!plated && <circle cx="36" cy="67" r="3.2" fill={skin} />}
+        <circle cx="84" cy="70" r="3.2" fill={plated ? '#4a3a2c' : skin} />
         <ArmorPiece slot="shield" id={look.shield} />
         <ArmorPiece slot="sword" id={look.sword} />
-        {/* head (drawn big and friendly, then scaled down onto the body) */}
+        {/* head: the same friendly face, drawn big and scaled down */}
         {!helmeted && (
-          <g transform="translate(60 41) scale(0.86) translate(-60 -52)">
+          <g transform={HEAD}>
             <circle cx="35" cy="55" r="4.4" fill={skin} />
             <circle cx="85" cy="55" r="4.4" fill={skin} />
             <circle cx="60" cy="52" r="25" fill={skin} />
-            {!helmeted && <HairFront id={look.hair} color={hair} />}
-            {helmeted && look.hair !== "hair-none" && (
-              <path
-                d="M44 46 C50 42 70 42 76 46 C70 44 50 44 44 46 Z"
-                fill={hair}
-              />
-            )}
+            <HairFront id={look.hair} color={hair} />
             <circle cx="51" cy="54" r="3.2" fill={eye} />
             <circle cx="69" cy="54" r="3.2" fill={eye} />
             <circle cx="51" cy="54" r="1.5" fill={INK} />
@@ -970,20 +663,14 @@ export function AvatarFigure({
             <circle cx="45" cy="62" r="4" fill="#e58f8f" opacity="0.35" />
             <circle cx="75" cy="62" r="4" fill="#e58f8f" opacity="0.35" />
             <Beard id={look.beard} color={hair} />
-            <path
-              d="M52 64 Q60 72 68 64"
-              fill="none"
-              stroke={INK}
-              stroke-width="2.2"
-              stroke-linecap="round"
-            />
+            <path d="M52 64 Q60 72 68 64" fill="none" stroke={INK} stroke-width="2.4" stroke-linecap="round" />
             <Glasses id={look.glasses} />
             <ExtraHead id={look.extra} />
           </g>
         )}
         <ArmorPiece slot="helmet" id={look.helmet} />
-        <g transform="translate(60 41) scale(0.86) translate(-60 -52)">
-          <Crown id={look.crown} lift={helmeted ? 5 : 0} />
+        <g transform={HEAD}>
+          <Crown id={look.crown} lift={helmeted ? 6 : 0} />
         </g>
       </g>
     </svg>

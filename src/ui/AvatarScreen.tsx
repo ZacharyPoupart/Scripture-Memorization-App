@@ -1,4 +1,4 @@
-import { useState } from "preact/hooks";
+import { useState } from 'preact/hooks';
 import {
   ARMOR_NAMES,
   ARMOR_SLOTS,
@@ -17,18 +17,18 @@ import {
   testing,
   type Item,
   type Slot,
-} from "../core/avatar.ts";
-import { back } from "../router.ts";
-import { buyAndWear, showToast, useApp, wearItem } from "../store.ts";
-import { armorUrl } from "./ArmorArt.tsx";
-import { AvatarFigure } from "./AvatarFigure.tsx";
-import { Icon } from "./common.tsx";
+} from '../core/avatar.ts';
+import { back } from '../router.ts';
+import { buyAndWear, showToast, useApp, wearItem } from '../store.ts';
+import { armorUrl } from './ArmorArt.tsx';
+import { AvatarFigure } from './AvatarFigure.tsx';
+import { Icon } from './common.tsx';
 
 /** Your knight: look like yourself for free, then put on the armor of God and earn the rest with seeds and streaks. */
 export function AvatarScreen() {
   const { data } = useApp();
-  const [group, setGroup] = useState<(typeof SLOT_GROUPS)[number]["key"]>("me");
-  const [slot, setSlot] = useState<Slot>("skin");
+  const [group, setGroup] = useState<(typeof SLOT_GROUPS)[number]['key']>('me');
+  const [slot, setSlot] = useState<Slot>('skin');
   const [pick, setPick] = useState<string | null>(null);
   const look = currentLook(data);
   const balance = seedsBalance(data);
@@ -38,9 +38,7 @@ export function AvatarScreen() {
   const grp = SLOT_GROUPS.find((g) => g.key === group)!;
   const worn = armorWorn(look);
   const set = completedSet(look);
-  const armorInfo = (ARMOR_SLOTS as readonly string[]).includes(slot)
-    ? ARMOR_NAMES[slot as (typeof ARMOR_SLOTS)[number]]
-    : null;
+  const armorInfo = (ARMOR_SLOTS as readonly string[]).includes(slot) ? ARMOR_NAMES[slot as (typeof ARMOR_SLOTS)[number]] : null;
 
   const choose = (item: Item) => {
     if (owns(data, item) && look[item.slot] !== item.id) {
@@ -55,13 +53,11 @@ export function AvatarScreen() {
     if (r.ok) {
       showToast(`${picked.name} is yours.`);
       setPick(null);
-    } else if (r.reason === "funds")
-      showToast("Not enough seeds yet — every review plants more.");
+    } else if (r.reason === 'funds') showToast('Not enough seeds yet — every review plants more.');
   };
 
   const gated = !!picked && !owns(data, picked) && isGated(data, picked);
-  const locked =
-    (!!picked && !!picked.unlock && !isUnlocked(data, picked)) || gated;
+  const locked = (!!picked && !!picked.unlock && !isUnlocked(data, picked)) || gated;
   const canBuy = !!picked && !picked.unlock && !owns(data, picked);
 
   return (
@@ -69,21 +65,13 @@ export function AvatarScreen() {
       <div class="scroll">
         <div class="narrow stack">
           <div class="row spread">
-            <button
-              class="icon-btn"
-              aria-label="Back"
-              onClick={() => back("/")}
-            >
+            <button class="icon-btn" aria-label="Back" onClick={() => back('/')}>
               <Icon name="back" />
             </button>
             <h1 class="grow" style={{ margin: 0 }}>
               Your avatar
             </h1>
-            <span
-              class="chip seeds-chip"
-              data-testid="seeds-balance"
-              aria-label={`${balance} seeds`}
-            >
+            <span class="chip seeds-chip" data-testid="seeds-balance" aria-label={`${balance} seeds`}>
               🌱 {balance}
             </span>
           </div>
@@ -98,31 +86,22 @@ export function AvatarScreen() {
             <AvatarFigure look={shown} size={200} title="Your knight" />
             <div class="armor-meter" data-testid="armor-meter">
               <strong>
-                {set
-                  ? `${set.name} — set complete`
-                  : worn === ARMOR_SLOTS.length
-                    ? "Full armor of God"
-                    : `Armor of God: ${worn} of ${ARMOR_SLOTS.length}`}
+                {set ? `${set.name} — set complete` : worn === ARMOR_SLOTS.length ? 'Full armor of God' : `Armor of God: ${worn} of ${ARMOR_SLOTS.length}`}
               </strong>
               <span class="armor-pips" aria-hidden="true">
                 {ARMOR_SLOTS.map((s) => (
-                  <i key={s} class={look[s].endsWith("-none") ? "" : "on"} />
+                  <i key={s} class={look[s].endsWith('-none') ? '' : 'on'} />
                 ))}
               </span>
             </div>
             {set && (
-              <p
-                class="muted small"
-                style={{ margin: 0 }}
-                data-testid="set-tagline"
-              >
+              <p class="muted small" style={{ margin: 0 }} data-testid="set-tagline">
                 {set.tagline}
               </p>
             )}
             <p class="muted small" style={{ margin: 0 }}>
-              Looking like yourself is always free. Armor, capes and companions
-              come from seeds (1 per review, 5 for a finished day, 25 when a
-              verse moves up) or from long streaks. Seeds are never taken away.
+              Looking like yourself is always free. Armor, capes and companions come from seeds (1 per review, 5 for a finished day, 25 when a verse moves up)
+              or from long streaks. Seeds are never taken away.
             </p>
           </div>
 
@@ -147,7 +126,7 @@ export function AvatarScreen() {
               <button
                 key={s}
                 aria-pressed={s === slot}
-                class={`chip-btn ${s === slot ? "on" : ""}`}
+                class={`chip-btn ${s === slot ? 'on' : ''}`}
                 onClick={() => (setSlot(s), setPick(null))}
                 data-testid={`slot-${s}`}
               >
@@ -156,11 +135,7 @@ export function AvatarScreen() {
             ))}
           </div>
           {armorInfo && (
-            <p
-              class="muted small"
-              style={{ margin: 0 }}
-              data-testid="armor-verse"
-            >
+            <p class="muted small" style={{ margin: 0 }} data-testid="armor-verse">
               {armorInfo.title} · {armorInfo.verse}
             </p>
           )}
@@ -169,54 +144,35 @@ export function AvatarScreen() {
             {items.map((item) => {
               const have = owns(data, item);
               const isWorn = look[item.slot] === item.id;
-              const lockedItem =
-                (!!item.unlock || isGated(data, item)) && !have;
+              const lockedItem = (!!item.unlock || isGated(data, item)) && !have;
               return (
                 <button
                   key={item.id}
-                  class={`item-tile ${isWorn ? "worn" : ""} ${pick === item.id ? "picked" : ""} ${have ? "" : "unowned"}`}
+                  class={`item-tile ${isWorn ? 'worn' : ''} ${pick === item.id ? 'picked' : ''} ${have ? '' : 'unowned'}`}
                   onClick={() => choose(item)}
                   data-testid={`item-${item.id}`}
                   aria-pressed={isWorn || pick === item.id}
                 >
                   {armorUrl(item.id) ? (
-                    <img
-                      class="piece-img"
-                      src={armorUrl(item.id)!}
-                      alt=""
-                      width="72"
-                      height="72"
-                      loading="lazy"
-                    />
-                  ) : item.id.endsWith("-none") && group === "armor" ? (
+                    <img class="piece-img" src={armorUrl(item.id)!} alt="" width="72" height="72" loading="lazy" />
+                  ) : item.id.endsWith('-none') && group === 'armor' ? (
                     <span class="piece-img piece-none" aria-hidden="true">
                       —
                     </span>
                   ) : (
-                    <AvatarFigure
-                      look={{ ...look, [item.slot]: item.id }}
-                      size={72}
-                      view={
-                        group === "me" || slot === "crown" ? "face" : "full"
-                      }
-                    />
+                    <AvatarFigure look={{ ...look, [item.slot]: item.id }} size={72} view={group === 'me' || slot === 'crown' ? 'face' : 'full'} />
                   )}
                   <span class="item-name">{item.name}</span>
                   <small class="muted">
-                    {item.rarity ? `${item.rarity} · ` : ""}
+                    {item.rarity ? `${item.rarity} · ` : ''}
                     {isWorn
-                      ? "Wearing"
+                      ? 'Wearing'
                       : have
-                        ? "Owned"
+                        ? 'Owned'
                         : lockedItem
-                          ? `🔒 ${describeUnlock(
-                              (item.unlock ?? item.requires)!,
-                            )
-                              .replace("Reach a ", "")
-                              .replace(
-                                " streak",
-                                "",
-                              )}${item.cost ? ` + 🌱 ${item.cost}` : ""}`
+                          ? `🔒 ${describeUnlock((item.unlock ?? item.requires)!)
+                              .replace('Reach a ', '')
+                              .replace(' streak', '')}${item.cost ? ` + 🌱 ${item.cost}` : ''}`
                           : `🌱 ${item.cost}`}
                   </small>
                 </button>
@@ -228,32 +184,17 @@ export function AvatarScreen() {
       {picked && (
         <div class="action-bar">
           {locked ? (
-            <p
-              class="muted center"
-              style={{ margin: 0 }}
-              data-testid="unlock-hint"
-            >
+            <p class="muted center" style={{ margin: 0 }} data-testid="unlock-hint">
               {gated
                 ? `${picked.name}: ${describeUnlock(picked.requires!).toLowerCase()} first, then it costs 🌱 ${picked.cost}.`
                 : `${picked.name}: ${describeUnlock(picked.unlock!)}.`}
             </p>
           ) : canBuy ? (
-            <button
-              class="btn primary block"
-              onClick={buy}
-              disabled={balance < picked.cost}
-              data-testid="buy"
-            >
-              {balance < picked.cost
-                ? `${picked.name} · 🌱 ${picked.cost} (need ${picked.cost - balance} more)`
-                : `Get ${picked.name} · 🌱 ${picked.cost}`}
+            <button class="btn primary block" onClick={buy} disabled={balance < picked.cost} data-testid="buy">
+              {balance < picked.cost ? `${picked.name} · 🌱 ${picked.cost} (need ${picked.cost - balance} more)` : `Get ${picked.name} · 🌱 ${picked.cost}`}
             </button>
           ) : (
-            <button
-              class="btn primary block"
-              onClick={() => (wearItem(picked.id), setPick(null))}
-              data-testid="wear"
-            >
+            <button class="btn primary block" onClick={() => (wearItem(picked.id), setPick(null))} data-testid="wear">
               Wear {picked.name}
             </button>
           )}
