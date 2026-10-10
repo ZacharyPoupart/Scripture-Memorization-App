@@ -5,6 +5,12 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Changed
+- The armor of God now comes in ten sets, from concept art: The Initiate, Soldier, Vanguard, Paladin, Warden, Ranger, Crusader, Shadow, Storm and Legend. Each set has a helmet (or hood), armor, belt, boots, shield and sword with its own look; mix and match or complete a whole set.
+- Each set costs more than the one before (15 seeds a piece for the Initiate up to 1,100 for the Legend). The last three sets also ask for a streak first (90, 180 and 365 days).
+- The armor is drawn in much more detail (shading, rivets, plates, trims, a lion crest on every shield).
+- The earlier Leather / Iron / Steel / Silver / Gold / Radiant armor is replaced; seeds spent on it are refunded automatically.
+
 ## [1.14.0] - 2026-10-10
 
 ### Changed

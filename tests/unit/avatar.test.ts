@@ -14,7 +14,9 @@ import {
   seedsBalance,
   seedsEarned,
   SLOTS,
+  ARMOR_SETS,
   ARMOR_SLOTS,
+  completedSet,
   armorWorn,
   SLOT_GROUPS,
   STREAK_SEED_BONUS,
@@ -63,41 +65,53 @@ describe('the knight', () => {
     expect(ITEMS.filter((i) => i.slot === 'hair').length).toBeGreaterThanOrEqual(8);
   });
 
-  it('has all six pieces of the armor of God in tiers, and the finest armor takes the longest streaks', () => {
-    expect(ARMOR_SLOTS.length).toBe(6);
-    const days = (id: string) => (itemById(id)?.unlock as { days: number } | undefined)?.days ?? 0;
-    for (const slot of ARMOR_SLOTS) {
-      const bought = ['leather', 'iron', 'steel', 'royal'].map((t) => itemById(`${slot}-${t}`)!.cost);
-      expect(bought, slot).toEqual([...bought].sort((a, b) => a - b));
-      expect(bought[0]).toBeGreaterThan(0);
-      const [silver, gold, radiant] = ['silver', 'gold', 'radiant'].map((t) => days(`${slot}-${t}`));
-      expect(silver).toBeGreaterThan(0);
-      expect(gold).toBeGreaterThan(silver);
-      expect(radiant).toBeGreaterThan(gold);
-      expect(radiant).toBeGreaterThanOrEqual(300);
+  it('has ten armor sets with a piece for each of the six slots, each set costing more than the one before', () => {
+    expect(ARMOR_SETS.length).toBe(10);
+    const prices = ARMOR_SETS.map((x) => x.price);
+    expect(prices).toEqual([...prices].sort((a, b) => a - b));
+    expect(new Set(prices).size).toBe(10);
+    for (const set of ARMOR_SETS) for (const slot of ARMOR_SLOTS) {
+      const item = itemById(`${slot}-${set.key}`)!;
+      expect(item, `${slot}-${set.key}`).toBeDefined();
+      expect(item.cost).toBe(set.price);
+      expect(item.set).toBe(set.key);
     }
-    const longest = Math.max(...ARMOR_SLOTS.map((s) => days(`${s}-radiant`)));
-    expect(longest).toBeGreaterThanOrEqual(1000);
+    // the coolest sets are the hardest to get: they also need a long streak, and the streaks only go up
+    const streaks = ARMOR_SETS.map((x) => x.streak ?? 0);
+    expect(streaks).toEqual([...streaks].sort((a, b) => a - b));
+    expect(ARMOR_SETS[9].streak).toBeGreaterThanOrEqual(365);
+    expect(ARMOR_SETS.slice(0, 7).every((x) => !x.streak)).toBe(true);
+  });
+
+  it('a set that needs a streak cannot be bought early, however many seeds you have, and costs seeds once reached', () => {
+    const d = rich();
+    d.reviewsByDevice = { x: 100000 };
+    const legend = itemById('sword-legend')!;
+    d.longestStreak = 364;
+    expect(buyItem(d, legend.id, 1)).toMatchObject({ ok: false, reason: 'locked' });
+    d.longestStreak = 365;
+    const before = seedsBalance(d);
+    expect(buyItem(d, legend.id, 2)).toEqual({ ok: true });
+    expect(seedsBalance(d)).toBe(before - legend.cost);
+  });
+
+  it('notices when a whole set is worn', () => {
+    const look = defaultLook();
+    expect(completedSet(look)).toBeUndefined();
+    for (const s of ARMOR_SLOTS) look[s] = `${s}-paladin`;
+    expect(completedSet(look)?.key).toBe('paladin');
+    look.shield = 'shield-storm';
+    expect(completedSet(look)).toBeUndefined();
   });
 
   it('counts how many pieces are worn', () => {
     const look = defaultLook();
     expect(armorWorn(look)).toBe(0);
-    look.shield = 'shield-iron';
-    look.sword = 'sword-gold';
+    look.shield = 'shield-soldier';
+    look.sword = 'sword-paladin';
     expect(armorWorn(look)).toBe(2);
-    for (const s of ARMOR_SLOTS) look[s] = `${s}-iron`;
+    for (const s of ARMOR_SLOTS) look[s] = `${s}-soldier`;
     expect(armorWorn(look)).toBe(6);
-  });
-
-  it('armor earned by streak is free to wear the moment the streak is reached, and never before', () => {
-    const d = newData();
-    const gold = itemById('helmet-gold')!;
-    d.longestStreak = 159;
-    expect(equipItem(d, gold.id, 1)).toBe(false);
-    d.longestStreak = 160;
-    expect(equipItem(d, gold.id, 2)).toBe(true);
-    expect(seedsBalance(d)).toBe(seedsEarned(d));
   });
 });
 

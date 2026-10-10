@@ -241,3 +241,9 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Data:** no shape change. Old item ids that no longer exist (or are now free) are simply ignored, and since seeds are derived, anything bought earlier is refunded automatically. Wearing an unknown or unowned id falls back to the default.
 **Not built:** a seed bonus for full armor, selling items back, random rewards, time-limited items.
 **Open question for the owner:** are the prices and streak lengths right? They are all in one place (`BOUGHT_TIERS` / `EARNED_TIERS` in `core/avatar.ts`).
+
+## v1.15.0 — Ten armor sets from the owner's concept art
+**What:** the Leather/Iron/Steel/Royal/Silver/Gold/Radiant tiers became ten sets named and styled after the concept sheet (Initiate, Soldier, Vanguard, Paladin, Warden, Ranger, Crusader, Shadow, Storm, Legend). Per piece: 15, 35, 70, 120, 190, 280, 400, 560, 780, 1100 seeds (a whole set is six pieces). Shadow, Storm and Legend need a 90/180/365-day streak first. Pieces can be mixed; wearing a whole set shows its name and motto.
+**How it is drawn:** as vector shapes, not copies of the painting, so it stays sharp at any size, works offline and keeps the avatar's face, hair and beard visible (the concept knights wear closed helmets). Open-face helmets and hoods replace the closed ones.
+**Data:** no shape change. Old tier item ids are ignored; since seeds are derived, whatever was bought is refunded automatically.
+**Open question for the owner:** prices (a full Legend set is 6,600 seeds, roughly two years of daily reviewing) and the streak gates are guesses and live in `ARMOR_SETS`.

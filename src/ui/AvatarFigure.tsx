@@ -1,15 +1,9 @@
 import type { ComponentChildren } from 'preact';
 import { ARMOR_SLOTS, armorWorn, itemById, type Look } from '../core/avatar.ts';
+import { Belt, Breastplate, Helmet, shade, Shield, Shoes, sleeveOf, Sword } from './ArmorArt.tsx';
 
 const col = (id: string, fallback: string) => itemById(id)?.color ?? fallback;
 const INK = '#2b2522';
-
-/** A shade of `hex`, darker (negative) or lighter (positive), for simple shading without extra colours in the catalog. */
-function shade(hex: string, amt: number): string {
-  const n = parseInt(hex.slice(1), 16);
-  const f = (v: number) => Math.max(0, Math.min(255, Math.round(v + (amt < 0 ? v * amt : (255 - v) * amt))));
-  return `#${[(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => f(v).toString(16).padStart(2, '0')).join('')}`;
-}
 
 function Background({ id }: { id: string }) {
   const c = col(id, '#cfe6ea');
@@ -297,35 +291,6 @@ function Companion({ id }: { id: string }) {
 }
 // ---------------------------------------------------------------- the knight
 
-const tierOf = (id: string) => id.split('-').slice(1).join('-');
-interface Metal {
-  c: string;
-  dark: string;
-  light: string;
-  trim: string;
-  rad: boolean;
-}
-function metal(id: string): Metal {
-  const c = col(id, '#9aa3ae');
-  const tier = tierOf(id);
-  return {
-    c,
-    dark: shade(c, -0.32),
-    light: shade(c, 0.45),
-    trim: tier === 'royal' ? '#e2b53c' : tier === 'radiant' ? '#ffd45a' : shade(c, -0.32),
-    rad: tier === 'radiant',
-  };
-}
-/** A path in a metal's colours; the Radiant tier also gets a soft golden glow around it. */
-function Piece({ d, m, extra }: { d: string; m: Metal; extra?: ComponentChildren }) {
-  return (
-    <g>
-      {m.rad && <path d={d} fill="none" stroke="#ffe27a" stroke-width="4.5" stroke-linejoin="round" opacity="0.55" />}
-      <path d={d} fill={m.c} stroke={m.dark} stroke-width="1.3" stroke-linejoin="round" />
-      {extra}
-    </g>
-  );
-}
 const none = (id: string) => id.endsWith('-none');
 
 function Cape({ id }: { id: string }) {
@@ -388,25 +353,6 @@ function Glasses({ id }: { id: string }) {
       </g>
     );
   return null;
-}
-
-/** Helmet of salvation: an open-face knight's helm (so the face and beard still show). Higher tiers get a plume. */
-function Helmet({ id }: { id: string }) {
-  if (none(id)) return null;
-  const m = metal(id);
-  const tier = tierOf(id);
-  const plume = tier === 'royal' || tier === 'gold' || tier === 'radiant' || tier === 'silver';
-  return (
-    <g>
-      {plume && <path d="M54 26 C54 10 74 8 82 14 C74 14 68 18 66 26 Z" fill={tier === 'royal' ? '#e2b53c' : tier === 'radiant' ? '#fff6c9' : '#b5483f'} stroke={m.dark} stroke-width="1" />}
-      <Piece d="M33 50 C33 22 87 22 87 50 Z" m={m} />
-      <path d="M33 44 L87 44 L87 50 L33 50 Z" fill={m.trim} opacity="0.9" />
-      <Piece d="M33 48 L41 48 L41 66 L35 62 Z" m={m} />
-      <Piece d="M87 48 L79 48 L79 66 L85 62 Z" m={m} />
-      <path d="M58.5 44 L61.5 44 L61.5 58 L58.5 58 Z" fill={m.c} stroke={m.dark} stroke-width="1" />
-      <path d="M48 36 C54 30 66 30 72 36" fill="none" stroke={m.light} stroke-width="2" stroke-linecap="round" opacity="0.8" />
-    </g>
-  );
 }
 
 function Crown({ id, lift }: { id: string; lift: number }) {
@@ -543,80 +489,6 @@ function ExtraBody({ id }: { id: string }) {
   }
 }
 
-function Shoes({ id }: { id: string }) {
-  const m = none(id) ? null : metal(id);
-  const d = (x: number, dir: 1 | -1) => `M${x} 108 L${x + 10 * dir} 108 L${x + 10 * dir} 114 C${x + 16 * dir} 114 ${x + 18 * dir} 117 ${x + 16 * dir} 119 L${x - 1 * dir} 119 Z`;
-  return (
-    <g>
-      {m ? (
-        <>
-          <Piece d={d(47, -1)} m={m} />
-          <Piece d={d(73, 1)} m={m} />
-        </>
-      ) : (
-        <>
-          <ellipse cx="50" cy="115" rx="7" ry="3.6" fill="#d9b59a" />
-          <ellipse cx="70" cy="115" rx="7" ry="3.6" fill="#d9b59a" />
-        </>
-      )}
-    </g>
-  );
-}
-
-function Belt({ id }: { id: string }) {
-  if (none(id)) return null;
-  const m = metal(id);
-  return (
-    <g>
-      {m.rad && <rect x="40" y="93" width="40" height="8" rx="2" fill="none" stroke="#ffe27a" stroke-width="4" opacity="0.5" />}
-      <rect x="40.5" y="93.5" width="39" height="7" rx="2" fill={m.c} stroke={m.dark} stroke-width="1.2" />
-      <rect x="55.5" y="92" width="9" height="10" rx="2" fill={m.trim === m.dark ? '#e2b53c' : m.trim} stroke={m.dark} stroke-width="1" />
-      <rect x="58" y="95" width="4" height="4" rx="1" fill={m.dark} opacity="0.6" />
-    </g>
-  );
-}
-
-function Breastplate({ id }: { id: string }) {
-  if (none(id)) return null;
-  const m = metal(id);
-  return (
-    <g>
-      <Piece d="M44 72 C50 67 70 67 76 72 L79 94 L41 94 Z" m={m} />
-      <circle cx="41" cy="73" r="6.5" fill={m.c} stroke={m.dark} stroke-width="1.3" />
-      <circle cx="79" cy="73" r="6.5" fill={m.c} stroke={m.dark} stroke-width="1.3" />
-      <path d="M48 74 C54 72 66 72 72 74" fill="none" stroke={m.light} stroke-width="2" stroke-linecap="round" opacity="0.8" />
-      <path d="M60 76 V90 M54 81 H66" stroke={m.trim === m.dark ? m.light : m.trim} stroke-width="2.6" stroke-linecap="round" />
-    </g>
-  );
-}
-
-function Shield({ id }: { id: string }) {
-  if (none(id)) return null;
-  const m = metal(id);
-  return (
-    <g>
-      <Piece d="M17 60 H43 V74 C43 84 37 90 30 94 C23 90 17 84 17 74 Z" m={m} />
-      <path d="M21 63 H39 V74 C39 81 35 86 30 89 C25 86 21 81 21 74 Z" fill="none" stroke={m.light} stroke-width="1" opacity="0.7" />
-      <path d="M30 65 V84 M23.5 72 H36.5" stroke={m.trim === m.dark ? m.light : m.trim} stroke-width="3" stroke-linecap="round" />
-    </g>
-  );
-}
-
-function Sword({ id }: { id: string }) {
-  if (none(id)) return null;
-  const m = metal(id);
-  const blade = 'M86.5 84 L86.5 52 L89.5 44 L92.5 52 L92.5 84 Z';
-  return (
-    <g>
-      <Piece d={blade} m={{ ...m, c: shade(m.c, 0.1) }} />
-      <path d="M89.5 48 V82" stroke={m.light} stroke-width="1" opacity="0.8" />
-      <rect x="82" y="83" width="15" height="3.4" rx="1.4" fill={m.trim === m.dark ? '#c9a24f' : m.trim} stroke={m.dark} stroke-width="1" />
-      <rect x="88" y="86" width="3" height="7" fill="#6b4a2a" />
-      <circle cx="89.5" cy="95" r="2" fill={m.trim === m.dark ? '#c9a24f' : m.trim} stroke={m.dark} stroke-width="0.8" />
-    </g>
-  );
-}
-
 /** The knight: drawn from simple shapes so it works offline, scales sharply and follows the theme. */
 export function AvatarFigure({ look, size = 120, title, view = 'full' }: { look: Look; size?: number; title?: string; view?: 'full' | 'face' }) {
   const skin = col(look.skin, '#efc09a');
@@ -624,6 +496,7 @@ export function AvatarFigure({ look, size = 120, title, view = 'full' }: { look:
   const eye = col(look.eyes, '#5a3a24');
   const tunic = col(look.tunic, '#2a6569');
   const hose = shade(tunic, -0.4);
+  const sleeve = sleeveOf(look.breastplate) ?? tunic;
   const helmeted = !none(look.helmet);
   const full = armorWorn(look) === ARMOR_SLOTS.length;
   return (
@@ -646,8 +519,8 @@ export function AvatarFigure({ look, size = 120, title, view = 'full' }: { look:
         <rect x="63" y="98" width="10" height="14" rx="3" fill={hose} />
         <Shoes id={look.shoes} />
         {/* arms, torso, neck */}
-        <path d="M44 74 L34 86" stroke={tunic} stroke-width="8" stroke-linecap="round" />
-        <path d="M76 74 L88 84" stroke={tunic} stroke-width="8" stroke-linecap="round" />
+        <path d="M44 74 L34 86" stroke={sleeve} stroke-width="8" stroke-linecap="round" />
+        <path d="M76 74 L88 84" stroke={sleeve} stroke-width="8" stroke-linecap="round" />
         <path d="M40 100 C40 76 48 68 60 68 C72 68 80 76 80 100 Z" fill={tunic} />
         <rect x="55" y="58" width="10" height="13" rx="4" fill={shade(skin, -0.1)} />
         <Belt id={look.belt} />
