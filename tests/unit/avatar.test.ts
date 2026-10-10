@@ -14,6 +14,9 @@ import {
   seedsBalance,
   seedsEarned,
   SLOTS,
+  ARMOR_SLOTS,
+  armorWorn,
+  SLOT_GROUPS,
   STREAK_SEED_BONUS,
 } from '../../src/core/avatar.ts';
 import { mergeData } from '../../src/core/merge.ts';
@@ -49,6 +52,52 @@ describe('catalog', () => {
       expect(item.cost).toBe(0);
       expect(item.unlock).toBeUndefined();
     }
+  });
+});
+
+describe('the knight', () => {
+  it('everything that makes the knight look like you is free', () => {
+    const me = SLOT_GROUPS.find((g) => g.key === 'me')!.slots;
+    for (const slot of me) for (const i of ITEMS.filter((x) => x.slot === slot)) expect(i.cost + (i.unlock ? 1 : 0), i.id).toBe(0);
+    expect(ITEMS.filter((i) => i.slot === 'skin').length).toBeGreaterThanOrEqual(6);
+    expect(ITEMS.filter((i) => i.slot === 'hair').length).toBeGreaterThanOrEqual(8);
+  });
+
+  it('has all six pieces of the armor of God in tiers, and the finest armor takes the longest streaks', () => {
+    expect(ARMOR_SLOTS.length).toBe(6);
+    const days = (id: string) => (itemById(id)?.unlock as { days: number } | undefined)?.days ?? 0;
+    for (const slot of ARMOR_SLOTS) {
+      const bought = ['leather', 'iron', 'steel', 'royal'].map((t) => itemById(`${slot}-${t}`)!.cost);
+      expect(bought, slot).toEqual([...bought].sort((a, b) => a - b));
+      expect(bought[0]).toBeGreaterThan(0);
+      const [silver, gold, radiant] = ['silver', 'gold', 'radiant'].map((t) => days(`${slot}-${t}`));
+      expect(silver).toBeGreaterThan(0);
+      expect(gold).toBeGreaterThan(silver);
+      expect(radiant).toBeGreaterThan(gold);
+      expect(radiant).toBeGreaterThanOrEqual(300);
+    }
+    const longest = Math.max(...ARMOR_SLOTS.map((s) => days(`${s}-radiant`)));
+    expect(longest).toBeGreaterThanOrEqual(1000);
+  });
+
+  it('counts how many pieces are worn', () => {
+    const look = defaultLook();
+    expect(armorWorn(look)).toBe(0);
+    look.shield = 'shield-iron';
+    look.sword = 'sword-gold';
+    expect(armorWorn(look)).toBe(2);
+    for (const s of ARMOR_SLOTS) look[s] = `${s}-iron`;
+    expect(armorWorn(look)).toBe(6);
+  });
+
+  it('armor earned by streak is free to wear the moment the streak is reached, and never before', () => {
+    const d = newData();
+    const gold = itemById('helmet-gold')!;
+    d.longestStreak = 159;
+    expect(equipItem(d, gold.id, 1)).toBe(false);
+    d.longestStreak = 160;
+    expect(equipItem(d, gold.id, 2)).toBe(true);
+    expect(seedsBalance(d)).toBe(seedsEarned(d));
   });
 });
 
@@ -119,7 +168,7 @@ describe('earning seeds', () => {
 });
 
 describe('buying, unlocking and equipping', () => {
-  const hat = ITEMS.find((i) => i.slot === 'hat' && i.cost > 0)!;
+  const hat = ITEMS.find((i) => i.slot === 'helmet' && i.cost > 0)!;
   const locked = ITEMS.find((i) => i.unlock?.kind === 'streak')!;
 
   it('buying spends exactly the price, once, and the item is yours for good', () => {
@@ -136,7 +185,7 @@ describe('buying, unlocking and equipping', () => {
     const d = newData();
     expect(buyItem(d, hat.id, 1)).toMatchObject({ ok: false, reason: 'funds' });
     expect(buyItem(rich(), 'nope', 1)).toMatchObject({ ok: false, reason: 'unknown' });
-    expect(buyItem(rich(), defaultLook().hat, 1)).toMatchObject({ ok: false, reason: 'owned' });
+    expect(buyItem(rich(), defaultLook().helmet, 1)).toMatchObject({ ok: false, reason: 'owned' });
     expect(buyItem(rich(), locked.id, 1)).toMatchObject({ ok: false, reason: 'locked' });
     expect(d.avatar).toBeUndefined(); // failed purchases change nothing
   });
@@ -160,17 +209,17 @@ describe('buying, unlocking and equipping', () => {
     expect(equipItem(d, hat.id, 1)).toBe(false);
     buyItem(d, hat.id, 2);
     expect(equipItem(d, hat.id, 3)).toBe(true);
-    expect(currentLook(d).hat).toBe(hat.id);
-    expect(equipItem(d, defaultLook().hat, 4)).toBe(true);
-    expect(currentLook(d).hat).toBe(defaultLook().hat);
+    expect(currentLook(d).helmet).toBe(hat.id);
+    expect(equipItem(d, defaultLook().helmet, 4)).toBe(true);
+    expect(currentLook(d).helmet).toBe(defaultLook().helmet);
   });
 
   it('an unknown or unowned item in the data (e.g. from a newer version) falls back to the default instead of breaking', () => {
     const d = newData();
-    d.avatar = { owned: [], look: { hat: 'future-hat', outfit: hat.id }, lookAt: 1 };
+    d.avatar = { owned: [], look: { helmet: 'future-helmet', tunic: hat.id }, lookAt: 1 };
     const look = currentLook(d);
-    expect(look.hat).toBe(defaultLook().hat);
-    expect(look.outfit).toBe(defaultLook().outfit);
+    expect(look.helmet).toBe(defaultLook().helmet);
+    expect(look.tunic).toBe(defaultLook().tunic);
   });
 
   it('a balance can never show below zero, and no item is ever removed (two devices spending the same seeds)', () => {
@@ -190,7 +239,7 @@ describe('buying, unlocking and equipping', () => {
 });
 
 describe('sync and backup', () => {
-  const hat = ITEMS.find((i) => i.slot === 'hat' && i.cost > 0)!;
+  const hat = ITEMS.find((i) => i.slot === 'helmet' && i.cost > 0)!;
   const bg = ITEMS.find((i) => i.slot === 'background' && i.cost > 0)!;
   it('owned items are unioned, the look is last-writer-wins, and merge stays commutative / associative / idempotent', () => {
     const base = rich();
@@ -218,7 +267,7 @@ describe('sync and backup', () => {
     equipItem(d, hat.id, 2);
     expect(parseBackup(exportBackup(d, '9.9.9', 0))).toEqual(d);
     const bad = JSON.parse(JSON.stringify(d));
-    bad.avatar = { owned: [1, null, 'ok', 'x'.repeat(500)], look: { hat: 5, outfit: 'fine' }, lookAt: 'no' };
+    bad.avatar = { owned: [1, null, 'ok', 'x'.repeat(500)], look: { hat: 5, tunic: 'fine' }, lookAt: 'no' };
     const n = normalizeData(bad);
     expect(n.avatar === undefined || Array.isArray(n.avatar.owned)).toBe(true);
     if (n.avatar) expect(n.avatar.owned.every((s) => typeof s === 'string' && s.length < 80)).toBe(true);

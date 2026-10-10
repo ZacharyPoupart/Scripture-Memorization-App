@@ -235,3 +235,9 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Data:** additive optional `avatar` field, `schema` stays 1; fixture `backup-v1.13.0-avatar.json`.
 **Ideas not built:** gifting, daily-login rewards, shop rotation, seed decay, leaderboards (all conflict with the calm goals).
 **Open question for the owner:** want more items, or seeds shown in the review result only on finished days?
+
+## v1.14.0 — Knight avatar and the armor of God (owner request)
+**What:** the avatar became a knight. Free: skin, hair style/colour, eyes, beard, glasses, tunic colour, so it can look like the owner. The armor of God (Eph 6:14-17: belt of truth, breastplate of righteousness, shoes of peace, shield of faith, helmet of salvation, sword of the Spirit) comes in seven tiers per piece: Leather 20, Iron 60, Steel 150, Royal blue 350 seeds; Silver (streaks 40-100), Gold (120-250) and Radiant (300-1000) unlock by longest streak, so the coolest armor is the hardest to get. Wearing all six gives a soft golden glow and a "Full armor of God" label (no extra seeds). Also capes, crowns, extras, companions and scenes, a mix of seeds and streak unlocks.
+**Data:** no shape change. Old item ids that no longer exist (or are now free) are simply ignored, and since seeds are derived, anything bought earlier is refunded automatically. Wearing an unknown or unowned id falls back to the default.
+**Not built:** a seed bonus for full armor, selling items back, random rewards, time-limited items.
+**Open question for the owner:** are the prices and streak lengths right? They are all in one place (`BOUGHT_TIERS` / `EARNED_TIERS` in `core/avatar.ts`).

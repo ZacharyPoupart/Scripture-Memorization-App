@@ -1694,3 +1694,27 @@ button.streak {
 .avatar-stage svg {
   margin: 0 auto;
 }
+.armor-meter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+}
+.armor-pips {
+  display: inline-flex;
+  gap: 4px;
+}
+.armor-pips i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+.armor-pips i.on {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.item-tile.unowned small {
+  font-weight: 600;
+}
