@@ -1608,3 +1608,89 @@ button.streak {
   accent-color: var(--accent);
   touch-action: pan-y;
 }
+
+/* ---- avatar and seeds ---- */
+.avatar-bubble {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px 2px 2px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 0;
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+.avatar-bubble svg,
+.item-tile svg,
+.avatar-stage svg {
+  border-radius: 14px;
+  display: block;
+}
+.avatar-bubble svg {
+  border-radius: 50%;
+}
+.seeds-chip {
+  font-weight: 700;
+  white-space: nowrap;
+}
+.seeds-gain {
+  color: var(--accent-strong);
+  font-weight: 700;
+}
+.slot-chips {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.chip-btn {
+  flex: none;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.chip-btn.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent, #fff);
+}
+.item-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: 10px;
+}
+.item-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px;
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+.item-tile.worn {
+  border-color: var(--accent);
+}
+.item-tile.picked {
+  border-color: var(--accent-strong);
+  background: var(--surface-2);
+}
+.item-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+}
+.avatar-stage svg {
+  margin: 0 auto;
+}

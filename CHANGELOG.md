@@ -5,6 +5,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.13.0] - 2026-10-10
+
+### Added
+- An avatar you can customize. Earn seeds by reviewing (1 per review, 5 for a finished day, 25 when a verse moves up, bonuses for streak milestones) and spend them on outfits, hair, hats, scenes and companions; some items unlock free from achievements. Seeds are never taken away. Turn it off in Settings.
+
 ## [1.12.0] - 2026-10-09
 
 ### Changed

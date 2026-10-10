@@ -92,5 +92,13 @@ export function mergeData(a: AppData, b: AppData): AppData {
     prefs: { value: { ...prefs.value }, at: Math.max(a.prefs.at, b.prefs.at) },
   };
   if (pause) merged.pause = { ...pause };
+  if (a.avatar || b.avatar) {
+    // items are only ever added (union); what is worn is the later decision
+    const owned = [...new Set([...(a.avatar?.owned ?? []), ...(b.avatar?.owned ?? [])])].sort();
+    const aAt = a.avatar?.lookAt ?? -1;
+    const bAt = b.avatar?.lookAt ?? -1;
+    const wearing = aAt > bAt ? a.avatar : bAt > aAt ? b.avatar : jsonTie(a.avatar ?? { owned: [], look: {}, lookAt: 0 }, b.avatar ?? { owned: [], look: {}, lookAt: 0 });
+    merged.avatar = { owned, look: { ...(wearing?.look ?? {}) }, lookAt: Math.max(a.avatar?.lookAt ?? 0, b.avatar?.lookAt ?? 0) };
+  }
   return merged;
 }

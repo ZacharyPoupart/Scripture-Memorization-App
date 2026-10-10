@@ -79,3 +79,5 @@ The automated tests run in Chromium, which behaves differently from iPhone Safar
 ## Type it out: the reference (v1.12)
 - [ ] After the last word, the top line becomes the reference: type the first letter of the book, then the numbers (e.g. J316 or J3:16). The keyboard changes to numbers after the letter (or at least digits are easy to reach).
 - [ ] A wrong character shows the right one and you carry on.
+
+- [ ] Avatar: open it from Today, try on and buy an item, see it in the Today bubble; the scene and item tiles look sharp and the bottom Buy bar clears the home indicator.

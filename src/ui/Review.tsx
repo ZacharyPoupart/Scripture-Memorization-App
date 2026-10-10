@@ -102,7 +102,7 @@ export function Review({ route }: { route: Route }) {
   const queue = useMemo(() => buildQueue(data, route.query, Date.now()), []);
   const [idx, setIdx] = useState(0);
   const [attempt, setAttempt] = useState(0);
-  const [result, setResult] = useState<{ counted: boolean; levelUps: LevelUp[]; todayComplete: boolean } | null>(null);
+  const [result, setResult] = useState<{ counted: boolean; levelUps: LevelUp[]; todayComplete: boolean; seeds: number } | null>(null);
   const [tally, setTally] = useState({ counted: 0, practice: 0, ups: 0 });
   const advanceTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
@@ -139,7 +139,7 @@ export function Review({ route }: { route: Route }) {
   const onFinished = () => {
     if (!verse) return;
     const r = completeReview(verse.id);
-    setResult({ counted: r.counted, levelUps: r.levelUps, todayComplete: r.todayComplete });
+    setResult({ counted: r.counted, levelUps: r.levelUps, todayComplete: r.todayComplete, seeds: r.seeds });
     feedback.complete();
     setTally((t) => ({ counted: t.counted + (r.counted ? 1 : 0), practice: t.practice + (r.counted ? 0 : 1), ups: t.ups + r.levelUps.length }));
     advanceTimer.current = setTimeout(next, 1100);
@@ -228,6 +228,11 @@ export function Review({ route }: { route: Route }) {
             <p class="muted">{result.counted ? `Review counted. ${doneLine(tally.counted)}` : 'Extra practice — it doesn’t change the schedule.'}</p>
             <ResultProgress verse={verse} data={data} />
             {result.levelUps.length > 0 && <p>Level up! Now in {PILE_INFO[result.levelUps[result.levelUps.length - 1].to].label}.</p>}
+            {result.seeds > 0 && settings.avatarOn && (
+              <p class="seeds-gain" data-testid="seeds-gain">
+                +{result.seeds} seed{result.seeds === 1 ? '' : 's'} 🌱
+              </p>
+            )}
             {result.todayComplete && <p class="status-ready">That’s everything for today.</p>}
           </div>
         </div>
