@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.20.0] - 2026-10-20
+
 ### Changed
 - Speak it: hearing 85% or more of the words right now passes, since the microphone sometimes mishears. Nothing is counted as a slip then, and the result says "Close enough". Below 85% the missed words count as slips like before.
 - In a run of several verses, the seeds are saved for the end: no "+seeds" after each verse, so you can keep going quickly, and the total shows once on the summary.
