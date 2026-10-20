@@ -28,12 +28,15 @@ function Piece({ id, spot }: { id: string; spot: Spot }) {
 }
 
 const S = 0.85; // every piece was painted to one scale, so one factor sizes them all
+const HELM_S = 0.8;
 const HELM_BOTTOM = 84;
+const CHEST_S = 0.95; // a little bigger than the rest so its sides reach past the legs
 const CHEST_TOP = 70; // where the top of the chest plate sits
-const BELT_S = 0.72; // the belt covers the belt painted on the chest plate
-const BELT_TOP = 116;
+const BELT_S = 0.78; // the front of the belt covers the belt painted on the chest plate
+const BELT_TOP = 119;
 const HIP = 146; // where pouches and the like hang
 const HAND_Y = 138;
+const SHIELD_S = 1.55; // a shield is about as wide as the body
 /** Where each weapon is held, as a fraction of its length from the top. */
 const GRIP: Record<string, number> = {
   'weapon-1': 0.82,
@@ -49,19 +52,15 @@ const GRIP: Record<string, number> = {
   'weapon-11': 0.5,
 };
 
-/** The leg armor is not chosen separately: it is the legs of the same number as the boots. */
-export const legsFor = (boots: string): string => boots.replace('boots-', 'legs-');
-
 /** All the painted layers, back to front. */
 export function ArmorLayers({ look }: { look: Look }) {
   const weaponH = (SIZE[look.weapon]?.[1] ?? 110) * 1.2;
-  const shieldH = (SIZE[look.shield]?.[1] ?? 90) * 1.0;
+  const shieldH = (SIZE[look.shield]?.[1] ?? 90) * SHIELD_S;
   return (
     <g>
       <Piece id={look.cape} spot={{ s: 1.2, top: CHEST_TOP - 4 }} />
-      <Piece id={legsFor(look.boots)} spot={{ s: S, bottom: 250 }} />
       <Piece id={look.boots} spot={{ s: S, bottom: 250 }} />
-      <Piece id={look.chest} spot={{ s: S, top: CHEST_TOP }} />
+      <Piece id={look.chest} spot={{ s: CHEST_S, top: CHEST_TOP }} />
       <Piece id={look.belt} spot={{ s: BELT_S, top: BELT_TOP }} />
       {look.extra === 'ex-amulet' && <Piece id="ex-amulet" spot={{ s: 0.8, top: CHEST_TOP + 10 }} />}
       {look.extra === 'ex-medal' && <Piece id="ex-medal" spot={{ s: 0.7, cx: -20, top: CHEST_TOP + 24 }} />}
@@ -70,8 +69,8 @@ export function ArmorLayers({ look }: { look: Look }) {
       {look.extra === 'ex-charm' && <Piece id="ex-charm" spot={{ s: 0.7, cx: -30, top: HIP + 22 }} />}
       {look.extra === 'ex-gloves' && <Piece id="ex-gloves" spot={{ s: 0.75, cx: 32, top: HIP + 22 }} />}
       {look.extra === 'ex-ring' && <Piece id="ex-ring" spot={{ s: 0.7, cx: -46, top: HAND_Y + 6 }} />}
-      <Piece id={look.helmet} spot={{ s: S, bottom: HELM_BOTTOM }} />
-      <Piece id={look.shield} spot={{ s: 1.0, cx: -54, top: HAND_Y - shieldH / 2 }} />
+      <Piece id={look.helmet} spot={{ s: HELM_S, bottom: HELM_BOTTOM }} />
+      <Piece id={look.shield} spot={{ s: SHIELD_S, cx: -58, top: HAND_Y - shieldH / 2 }} />
       <Piece id={look.weapon} spot={{ s: 1.2, cx: 50, top: HAND_Y + 4 - (GRIP[look.weapon] ?? 0.75) * weaponH }} />
     </g>
   );

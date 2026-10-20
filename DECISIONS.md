@@ -278,3 +278,11 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 ## v1.18.1 — Legs follow the boots, belt at the waist, two tabs (owner request)
 **What:** `legs-N` is drawn with `boots-N` instead of `chest-N`; the belt is smaller and moved up to cover the belt painted on the chest plate; the Weapons tab is gone and its shield and sword sit in the Armor tab with the other four pieces.
 **Note:** the belt is placed at one fixed height, so it lines up best with chest plates whose painted belt is at the usual spot; if one looks off on your phone, tell me which.
+
+## v1.18.2 — Belt front only, legs and boots as one piece (owner request)
+**What:** belts are cut to the front band (the top rim and the turned-away ends are removed in `design/cut-armor.py`). `boots-N` now uses the sheet's Leg Armor picture, which already includes the boots, so there is no separate legs layer and the sheet's Boots row is unused.
+**Note:** the picture shown for each Boots choice is therefore the full leg-and-boot piece. Prices are unchanged.
+**Also (same PR):** belt scale 0.85 -> 0.78, helmet 0.85 -> 0.80, and a plain grey `Underlayer` behind the armor in `ui/ArmorArt.tsx` fills the gaps (no detail, just a filler shape).
+**And:** shield scale 1.0 -> 1.55; the two bows (`weapon-8`, `weapon-11`) have their pale smudge/checkerboard cleared in the cut script (`BOW_CLEAN`). The scimitar (`weapon-9`) is complete as drawn on the sheet: its art is a blade with no hilt, so I left it; a version with a hilt would need new art.
+**Also:** chest plate scale 0.85 -> 0.95 (`CHEST_S`) so its sides extend past the legs.
+**Removed:** the grey `Underlayer` behind the armor was tried and taken out again at the owner's request; nothing is drawn behind the armor now.
