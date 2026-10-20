@@ -103,7 +103,7 @@ export function Review({ route }: { route: Route }) {
   const [idx, setIdx] = useState(0);
   const [attempt, setAttempt] = useState(0);
   const [result, setResult] = useState<{ counted: boolean; levelUps: LevelUp[]; todayComplete: boolean; seeds: number } | null>(null);
-  const [tally, setTally] = useState({ counted: 0, practice: 0, ups: 0 });
+  const [tally, setTally] = useState({ counted: 0, practice: 0, ups: 0, seeds: 0 });
   const advanceTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   if (!queue.length) {
@@ -141,7 +141,7 @@ export function Review({ route }: { route: Route }) {
     const r = completeReview(verse.id);
     setResult({ counted: r.counted, levelUps: r.levelUps, todayComplete: r.todayComplete, seeds: r.seeds });
     feedback.complete();
-    setTally((t) => ({ counted: t.counted + (r.counted ? 1 : 0), practice: t.practice + (r.counted ? 0 : 1), ups: t.ups + r.levelUps.length }));
+    setTally((t) => ({ counted: t.counted + (r.counted ? 1 : 0), practice: t.practice + (r.counted ? 0 : 1), ups: t.ups + r.levelUps.length, seeds: t.seeds + r.seeds }));
     advanceTimer.current = setTimeout(next, 1100);
   };
 
@@ -185,6 +185,11 @@ export function Review({ route }: { route: Route }) {
             {queue.length} verse{queue.length === 1 ? '' : 's'} reviewed · {tally.counted} counted
             {tally.practice > 0 ? ` · ${tally.practice} extra practice` : ''}
           </p>
+          {tally.seeds > 0 && settings.avatarOn && (
+            <p class="seeds-gain" data-testid="session-seeds">
+              +{tally.seeds} seed{tally.seeds === 1 ? '' : 's'} 🌱
+            </p>
+          )}
           {!fullyDone && sum.remaining > 0 && (
             <p class="muted small" data-testid="more-later">
               {sum.remaining} more due today — {sum.readyNow > 0 ? 'ready whenever you are.' : 'the next one unlocks a little later.'}
@@ -228,7 +233,7 @@ export function Review({ route }: { route: Route }) {
             <p class="muted">{result.counted ? `Review counted. ${doneLine(tally.counted)}` : 'Extra practice — it doesn’t change the schedule.'}</p>
             <ResultProgress verse={verse} data={data} />
             {result.levelUps.length > 0 && <p>Level up! Now in {PILE_INFO[result.levelUps[result.levelUps.length - 1].to].label}.</p>}
-            {result.seeds > 0 && settings.avatarOn && (
+            {result.seeds > 0 && settings.avatarOn && queue.length === 1 && (
               <p class="seeds-gain" data-testid="seeds-gain">
                 +{result.seeds} seed{result.seeds === 1 ? '' : 's'} 🌱
               </p>

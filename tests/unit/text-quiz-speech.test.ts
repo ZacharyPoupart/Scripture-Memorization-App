@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { checkReference, difficultyFor, isCorrectChoice, LEVELS, makeBlanks, makeRng, mistakesAllowed, tooManyMistakes } from '../../src/core/quiz.ts';
-import { alignSpeech, tokenizeSpeech, wordsMatch } from '../../src/core/speech.ts';
+import { alignSpeech, speechAccuracy, speechPassed, SPEECH_PASS, tokenizeSpeech, wordsMatch } from '../../src/core/speech.ts';
 import { cleanVerseText, matchesFirstLetter, tokenize } from '../../src/core/text.ts';
 import { findBook, searchBooks, BOOKS } from '../../src/core/books.ts';
 import { formatRef, parseRef, refWarning, validateRef } from '../../src/core/reference.ts';
@@ -160,5 +160,36 @@ describe('books and references', () => {
     expect(validateRef({ book: 57, chapter: 2, start: 1, end: 1 })?.field).toBe('chapter');
     expect(refWarning({ book: 43, chapter: 3, start: 16, end: 99 })).toMatch(/36 verses/);
     expect(refWarning({ book: 43, chapter: 3, start: 16, end: 16 })).toBeNull();
+  });
+});
+
+describe('speech accuracy (close is enough)', () => {
+  const expected = tokenize(JOHN).map((w) => w.key);
+  const n = expected.length;
+  /** What was heard when `k` words, spaced apart, were left out. */
+  const without = (k: number) => tokenizeSpeech(JOHN).filter((_, i) => !(i % 3 === 1 && (i - 1) / 3 < k));
+
+  it('85% of the words or better passes', () => {
+    expect(SPEECH_PASS).toBe(0.85);
+    const perfect = alignSpeech(expected, tokenizeSpeech(JOHN), true);
+    expect(speechAccuracy(perfect)).toBe(1);
+    expect(speechPassed(perfect)).toBe(true);
+    const close = alignSpeech(expected, without(3), true);
+    expect(close.mistakes).toBe(3);
+    expect(speechAccuracy(close)).toBeCloseTo((n - 3) / n);
+    expect(speechPassed(close)).toBe(true);
+  });
+
+  it('below 85% does not pass', () => {
+    const far = alignSpeech(expected, without(6), true);
+    expect(far.mistakes).toBe(6);
+    expect(speechAccuracy(far)).toBeCloseTo((n - 6) / n);
+    expect(speechPassed(far)).toBe(false);
+  });
+
+  it('extra spoken words do not count against it, and an empty verse is a pass', () => {
+    const extra = alignSpeech(expected, tokenizeSpeech('um ' + JOHN + ' amen'), true);
+    expect(speechPassed(extra)).toBe(true);
+    expect(speechAccuracy(alignSpeech([], [], true))).toBe(1);
   });
 });

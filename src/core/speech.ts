@@ -90,3 +90,14 @@ export function alignSpeech(expected: string[], spoken: string[], final: boolean
   const mistakes = results.filter((r) => r === 'wrong' || r === 'missed').length;
   return { results, mistakes, progress: endI };
 }
+
+/** The share of the verse's words that were heard (extra spoken words do not count against it). */
+export function speechAccuracy(a: Alignment): number {
+  const n = a.results.length;
+  if (n === 0) return 1;
+  return a.results.filter((r) => r === 'ok').length / n;
+}
+
+/** The recognizer sometimes mishears, so close is enough: this much of the verse, heard right, passes. */
+export const SPEECH_PASS = 0.85;
+export const speechPassed = (a: Alignment): boolean => speechAccuracy(a) >= SPEECH_PASS;
