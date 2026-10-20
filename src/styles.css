@@ -868,15 +868,22 @@ textarea.input {
 .option[disabled] {
   opacity: 0.35;
 }
+.type-dock {
+  position: relative;
+}
+/* The keyboard types straight into this field; it is there only to catch the letters, so it takes no room and shows nothing. */
 .type-input {
-  width: 100%;
-  min-height: 52px;
-  text-align: center;
-  font-size: 1.4rem; /* >=16px: no iOS zoom */
-  border: 2px solid var(--accent);
-  border-radius: 14px;
-  background: var(--surface);
-  text-transform: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  font-size: 16px; /* >=16px: no iOS zoom */
+  caret-color: transparent;
+  pointer-events: none;
 }
 .mistakes {
   display: flex;
