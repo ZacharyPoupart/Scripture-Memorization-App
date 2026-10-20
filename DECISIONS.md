@@ -288,5 +288,5 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Removed:** the grey `Underlayer` behind the armor was tried and taken out again at the owner's request; nothing is drawn behind the armor now.
 
 ## v1.18.3 — Smaller shield, no glowing red eyes (owner request)
-**What:** shield scale 1.55 -> 1.3; `helmet-4` (shadow) and `helmet-7` (spiked) have the red glow in the eye area turned dark by the cut script (`EYES` in `design/cut-armor.py`). The red cracks on the shadow helmet and the red shadow chest plate were left alone, since only the eyes were mentioned.
+**What:** shield scale 1.55 -> 1.3; the dark pieces with a red glow are flipped from red to blue by the cut script (`BLUE_FLIP` in `design/cut-armor.py`, hue only, so gold and metal are untouched): helmets 4 and 7, chest 4, belt 3, boots 3 and 12, cape 6, shield 5, weapon 3. The genuinely red pieces (the Crimson set, the red lion capes) stay red.
 **Swapping art:** new art with the same size and layout as the sheet only needs `design/armor-sheet.webp` replaced (with its background removed) and `python3 design/cut-armor.py` run again; if any piece moves, edit its box in that script.

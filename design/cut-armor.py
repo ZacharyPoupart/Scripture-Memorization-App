@@ -6,7 +6,7 @@
 # Belts are painted as a full ring; only the front band is kept (see BELT_FRONT); then weapon-1..11, shield-1..6 and the accessories. (The sheet's shoulders/arms
 # row is not used: the chest pieces already have sleeves.)
 from PIL import Image
-import json, os
+import colorsys, json, os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, '..', 'public', 'armor')
@@ -14,8 +14,8 @@ SIZES = os.path.join(HERE, '..', 'src', 'ui', 'armorSizes.json')
 
 BELT_FRONT = (0.08, 0.36, 0.92)  # left, top and right of the front band, as fractions of the belt picture
 BOW_CLEAN = {'weapon-8': 120, 'weapon-11': 175}  # the two bows, and how bright a colourless pixel must be to be cleared
-# The shadow and spiked helmets have glowing red eyes; the eye area (left, top, right, bottom as fractions of the picture) is turned dark
-EYES = {'helmet-4': (0.12, 0.45, 0.88, 0.66), 'helmet-7': (0.12, 0.38, 0.88, 0.72)}
+# The dark pieces with red glow (including the helmets' glowing eyes) are flipped from red to blue
+BLUE_FLIP = ['helmet-4', 'helmet-7', 'chest-4', 'belt-3', 'boots-3', 'boots-12', 'cape-6', 'shield-5', 'weapon-3']
 ACCESSORIES = ['ring', 'amulet', 'gloves', 'scroll', 'pouch', 'lantern', 'charm', 'banner', 'medal']
 
 BOXES = {
@@ -47,14 +47,17 @@ for f in os.listdir(OUT):
 sizes = {}
 for name, box in sorted(names.items()):
     piece = sheet.crop(tuple(box))
-    if name in EYES:
+    if name in BLUE_FLIP:
         px = piece.load()
-        x0, y0, x1, y1 = (round(f * d) for f, d in zip(EYES[name], (piece.width, piece.height, piece.width, piece.height)))
-        for y in range(y0, y1):
-            for x in range(x0, x1):
+        for y in range(piece.height):
+            for x in range(piece.width):
                 r, g, b, a = px[x, y]
-                if a and r > 60 and r > g * 1.4 and r > b * 1.4:
-                    px[x, y] = (18, 14, 16, a)
+                if not a:
+                    continue
+                h, sat, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
+                if sat > 0.35 and (h < 0.045 or h > 0.94):  # a strong red: turn it to blue, keeping its brightness and depth
+                    r, g, b = (round(c * 255) for c in colorsys.hsv_to_rgb(0.6, sat, v))
+                    px[x, y] = (r, g, b, a)
     if name in BOW_CLEAN:
         # the sheet leaves a pale smudge (and a checkerboard) between the wood and the string: clear every pale, colourless pixel
         floor = BOW_CLEAN[name]
