@@ -5,6 +5,10 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Changed
+- The belt shows only its front band, not the whole ring.
+- The boots are now the sheet's leg-and-boot pieces drawn as one picture, instead of boots laid over separate legs.
+
 ## [1.18.1] - 2026-10-20
 
 ### Changed

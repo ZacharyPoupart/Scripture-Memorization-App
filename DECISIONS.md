@@ -278,3 +278,7 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 ## v1.18.1 — Legs follow the boots, belt at the waist, two tabs (owner request)
 **What:** `legs-N` is drawn with `boots-N` instead of `chest-N`; the belt is smaller and moved up to cover the belt painted on the chest plate; the Weapons tab is gone and its shield and sword sit in the Armor tab with the other four pieces.
 **Note:** the belt is placed at one fixed height, so it lines up best with chest plates whose painted belt is at the usual spot; if one looks off on your phone, tell me which.
+
+## v1.18.2 — Belt front only, legs and boots as one piece (owner request)
+**What:** belts are cut to the front band (the top rim and the turned-away ends are removed in `design/cut-armor.py`). `boots-N` now uses the sheet's Leg Armor picture, which already includes the boots, so there is no separate legs layer and the sheet's Boots row is unused.
+**Note:** the picture shown for each Boots choice is therefore the full leg-and-boot piece. Prices are unchanged.
