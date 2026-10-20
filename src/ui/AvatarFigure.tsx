@@ -1,16 +1,10 @@
 import type { ComponentChildren } from 'preact';
-import { ARMOR_SLOTS, armorWorn, itemById, type Look } from '../core/avatar.ts';
-import { ArmorPiece, armorUrl } from './ArmorArt.tsx';
+import { armorWorn, itemById, type Look } from '../core/avatar.ts';
+import { ArmorExtras, ArmorLayers } from './ArmorArt.tsx';
 
 const col = (id: string, fallback: string) => itemById(id)?.color ?? fallback;
 const INK = '#2b2522';
-
-/** A shade of `hex`, darker (negative) or lighter (positive), for simple shading without extra colours in the catalog. */
-function shade(hex: string, amt: number): string {
-  const n = parseInt(hex.slice(1), 16);
-  const f = (v: number) => Math.max(0, Math.min(255, Math.round(v + (amt < 0 ? v * amt : (255 - v) * amt))));
-  return `#${[(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => f(v).toString(16).padStart(2, '0')).join('')}`;
-}
+const none = (id: string) => id.endsWith('-none');
 
 function Background({ id }: { id: string }) {
   const c = col(id, '#cfe6ea');
@@ -145,72 +139,6 @@ function Background({ id }: { id: string }) {
   }
 }
 
-function HairBack({ id, color }: { id: string; color: string }) {
-  if (id === 'hair-long') return <path d="M33 50 C28 80 34 96 42 100 L78 100 C86 96 92 80 87 50 Z" fill={color} />;
-  if (id === 'hair-wave') return <path d="M33 50 C30 70 33 80 40 84 C44 78 48 74 60 74 C72 74 76 78 80 84 C87 80 90 70 87 50 Z" fill={color} />;
-  if (id === 'hair-ponytail') return <path d="M80 40 C102 42 104 72 92 84 C90 72 88 58 80 52 Z" fill={color} />;
-  if (id === 'hair-afro')
-    return (
-      <g fill={color}>
-        {[
-          [34, 44],
-          [40, 30],
-          [52, 22],
-          [68, 22],
-          [80, 30],
-          [86, 44],
-          [31, 58],
-          [89, 58],
-        ].map(([x, y], i) => (
-          <circle key={i} cx={x} cy={y} r="12" />
-        ))}
-      </g>
-    );
-  return null;
-}
-
-function HairFront({ id, color }: { id: string; color: string }) {
-  switch (id) {
-    case 'hair-none':
-      return null;
-    case 'hair-buzz':
-      return <path d="M37 48 C37 32 47 27 60 27 C73 27 83 32 83 48 C77 40 70 38 60 38 C50 38 43 40 37 48 Z" fill={color} opacity="0.85" />;
-    case 'hair-curly':
-      return (
-        <g fill={color}>
-          {[
-            [40, 38],
-            [50, 29],
-            [62, 26],
-            [74, 29],
-            [83, 38],
-            [36, 50],
-            [84, 50],
-          ].map(([x, y], i) => (
-            <circle key={i} cx={x} cy={y} r="9" />
-          ))}
-        </g>
-      );
-    case 'hair-bun':
-      return (
-        <g fill={color}>
-          <circle cx="60" cy="19" r="9" />
-          <path d="M36 50 C36 32 47 26 60 26 C73 26 84 32 84 50 C78 40 70 36 60 36 C50 36 42 40 36 50 Z" />
-        </g>
-      );
-    case 'hair-spiky':
-      return <path d="M36 50 L39 28 L48 37 L54 19 L62 35 L70 21 L74 36 L82 27 L84 50 C76 41 68 37 60 37 C52 37 44 41 36 50 Z" fill={color} />;
-    case 'hair-afro':
-      return <path d="M38 46 C40 34 50 30 60 30 C70 30 80 34 82 46 C76 40 70 37 60 37 C50 37 44 40 38 46 Z" fill={color} />;
-    case 'hair-wave':
-    case 'hair-long':
-    case 'hair-ponytail':
-      return <path d="M35 52 C33 32 46 25 60 25 C74 25 87 32 85 52 C82 42 76 36 66 35 C58 40 46 40 35 52 Z" fill={color} />;
-    default: // short
-      return <path d="M36 50 C36 32 47 25 60 25 C73 25 84 32 84 50 C78 40 70 36 60 36 C50 36 42 40 36 50 Z" fill={color} />;
-  }
-}
-
 function Companion({ id }: { id: string }) {
   const g = (children: ComponentChildren) => <g transform="translate(2 88) scale(0.88)">{children}</g>;
   switch (id) {
@@ -337,95 +265,12 @@ function Companion({ id }: { id: string }) {
       return null;
   }
 }
-// ---------------------------------------------------------------- the knight
-
-const none = (id: string) => id.endsWith('-none');
-
-function Cape({ id }: { id: string }) {
-  if (none(id)) return null;
-  if (id === 'cape-wings')
-    return (
-      <g fill="#fffaf0" stroke="#e3dcc8" stroke-width="1" transform="translate(0 -30)">
-        <path d="M44 72 C20 58 4 62 6 88 C14 80 20 84 22 92 C28 86 34 90 38 98 C40 90 42 82 46 78 Z" />
-        <path d="M76 72 C100 58 116 62 114 88 C106 80 100 84 98 92 C92 86 86 90 82 98 C80 90 78 82 74 78 Z" />
-      </g>
-    );
-  const c = col(id, '#b5483f');
-  return (
-    <g>
-      <path d="M43 40 C32 66 32 94 36 110 L84 110 C88 94 88 66 77 40 Z" fill={c} stroke={shade(c, -0.3)} stroke-width="1.2" />
-      <path d="M60 42 L60 110" stroke={shade(c, -0.25)} stroke-width="1.2" opacity="0.6" />
-      {id === 'cape-gold' && <path d="M38 104 L82 104" stroke="#fff0b8" stroke-width="3" opacity="0.8" />}
-    </g>
-  );
-}
-
-function Beard({ id, color }: { id: string; color: string }) {
-  const hole = <ellipse cx="60" cy="67" rx="7.5" ry="3.6" />;
-  switch (id) {
-    case 'beard-stubble':
-      return <path d="M37 56 C37 82 83 82 83 56 C80 68 72 72 60 72 C48 72 40 68 37 56 Z" fill={color} opacity="0.28" />;
-    case 'beard-moustache':
-      return <path d="M49 63 C53 59 58 60 60 63 C62 60 67 59 71 63 C67 67 62 65 60 65.5 C58 65 53 67 49 63 Z" fill={color} />;
-    case 'beard-goatee':
-      return <path d="M53 71 C54 82 66 82 67 71 C64 74 56 74 53 71 Z" fill={color} />;
-    case 'beard-short':
-      return (
-        <path
-          fill-rule="evenodd"
-          d={`M36 54 C34 82 86 82 84 54 C82 62 76 64 72 64 L48 64 C44 64 38 62 36 54 Z M52.5 67 a7.5 3.6 0 1 0 15 0 a7.5 3.6 0 1 0 -15 0`}
-          fill={color}
-        />
-      );
-    case 'beard-full':
-      return (
-        <g>
-          <path
-            fill-rule="evenodd"
-            d="M35 52 C32 92 88 92 85 52 C83 62 77 64 72 64 L48 64 C43 64 37 62 35 52 Z M52.5 68 a7.5 3.6 0 1 0 15 0 a7.5 3.6 0 1 0 -15 0"
-            fill={color}
-          />
-        </g>
-      );
-    default:
-      void hole;
-      return null;
-  }
-}
-
-function Glasses({ id }: { id: string }) {
-  if (id === 'gl-round')
-    return (
-      <g fill="none" stroke={INK} stroke-width="2">
-        <circle cx="50" cy="54" r="8" />
-        <circle cx="70" cy="54" r="8" />
-        <path d="M58 54 L62 54" />
-      </g>
-    );
-  if (id === 'gl-square')
-    return (
-      <g fill="none" stroke={INK} stroke-width="2">
-        <rect x="41" y="48" width="16" height="12" rx="3" />
-        <rect x="63" y="48" width="16" height="12" rx="3" />
-        <path d="M57 54 L63 54" />
-      </g>
-    );
-  return null;
-}
 
 function Crown({ id, lift }: { id: string; lift: number }) {
   if (none(id)) return null;
   if (id === 'crown-halo') return <ellipse cx="60" cy={18 - lift} rx="17" ry="5" fill="none" stroke="#f2c94c" stroke-width="3.5" />;
   return (
     <g transform={`translate(0 ${-lift})`}>
-      {id === 'crown-flower' && (
-        <g transform="translate(79 32)">
-          {[0, 72, 144, 216, 288].map((a) => (
-            <ellipse key={a} cx="0" cy="-5" rx="3.4" ry="5" fill="#f2b8c6" transform={`rotate(${a})`} />
-          ))}
-          <circle r="3" fill="#f2c94c" />
-        </g>
-      )}
       {id === 'crown-royal' && (
         <g>
           <path d="M40 38 L40 20 L50 29 L60 14 L70 29 L80 20 L80 38 Z" fill="#f2c94c" stroke="#c9962c" stroke-width="1.6" stroke-linejoin="round" />
@@ -453,225 +298,56 @@ function Crown({ id, lift }: { id: string; lift: number }) {
           <path d="M60 6 L61.6 10 L66 10.4 L62.6 13 L63.6 17 L60 14.8 L56.4 17 L57.4 13 L54 10.4 L58.4 10 Z" fill="#fff6c9" opacity="0.95" />
         </g>
       )}
-      {id === 'crown-laurel' && (
-        <g fill="#6f9a5a">
-          {[-66, -50, -34, -18].map((a, i) => {
-            const cx = 60 + 24 * Math.cos(((a - 90) * Math.PI) / 180) - 2;
-            const cy = 46 + 24 * Math.sin(((a - 90) * Math.PI) / 180);
-            return <ellipse key={i} cx={cx} cy={cy} rx="2.6" ry="5.4" transform={`rotate(${a} ${cx} ${cy})`} />;
-          })}
-          {[66, 50, 34, 18].map((a, i) => {
-            const cx = 60 + 24 * Math.cos(((a - 90) * Math.PI) / 180) + 2;
-            const cy = 46 + 24 * Math.sin(((a - 90) * Math.PI) / 180);
-            return <ellipse key={i} cx={cx} cy={cy} rx="2.6" ry="5.4" transform={`rotate(${a} ${cx} ${cy})`} />;
-          })}
-        </g>
-      )}
     </g>
   );
 }
 
-/** Things worn at the neck or head (inside the head group) and things that float or stand beside the knight. */
-function ExtraHead({ id }: { id: string }) {
-  if (id === 'ex-headphones')
-    return (
-      <g>
-        <path d="M33 56 C31 28 89 28 87 56" fill="none" stroke="#3b3b44" stroke-width="4" stroke-linecap="round" />
-        <rect x="29" y="50" width="9" height="16" rx="4" fill="#3b3b44" />
-        <rect x="82" y="50" width="9" height="16" rx="4" fill="#3b3b44" />
-      </g>
-    );
-  return null;
-}
-function ExtraBody({ id }: { id: string }) {
-  // neck and chest extras were drawn for a bigger body: fit them onto the slimmer one
-  if (['ex-bowtie', 'ex-scarf', 'ex-medal', 'ex-scholar'].includes(id))
-    return (
-      <g transform="translate(60 40) scale(0.88) translate(-60 -72)">
-        <ExtraBodyInner id={id} />
-      </g>
-    );
-  return <ExtraBodyInner id={id} />;
+/** Wings of light: drawn behind the knight, from his shoulders. */
+function Wings() {
+  return (
+    <g fill="#fffaf0" stroke="#e3dcc8" stroke-width="1" transform="translate(0 -38)">
+      <path d="M44 72 C20 58 4 62 6 88 C14 80 20 84 22 92 C28 86 34 90 38 98 C40 90 42 82 46 78 Z" />
+      <path d="M76 72 C100 58 116 62 114 88 C106 80 100 84 98 92 C92 86 86 90 82 98 C80 90 78 82 74 78 Z" />
+    </g>
+  );
 }
 
-function ExtraBodyInner({ id }: { id: string }) {
-  switch (id) {
-    case 'ex-bowtie':
-      return (
-        <g fill="#c4647a">
-          <path d="M60 72 L50 67 L50 77 Z" />
-          <path d="M60 72 L70 67 L70 77 Z" />
-          <circle cx="60" cy="72" r="2.6" fill="#a24a5f" />
-        </g>
-      );
-    case 'ex-scarf':
-      return (
-        <g fill="#c4647a">
-          <path d="M46 66 C52 74 68 74 74 66 L76 74 C68 80 52 80 44 74 Z" />
-          <path d="M68 76 L74 94 L66 92 L62 78 Z" fill="#a24a5f" />
-        </g>
-      );
-    case 'ex-medal':
-      return (
-        <g>
-          <path d="M54 70 L60 82 L66 70" fill="none" stroke="#c4647a" stroke-width="2.6" />
-          <circle cx="60" cy="86" r="5" fill="#f2c94c" stroke="#c9962c" stroke-width="1.3" />
-        </g>
-      );
-    case 'ex-scholar':
-      return (
-        <g>
-          <path d="M44 72 L76 98" stroke="#f2c94c" stroke-width="4" stroke-linecap="round" opacity="0.9" />
-          <path d="M44 72 L76 98" stroke="#2f3e63" stroke-width="1.4" stroke-linecap="round" opacity="0.5" />
-        </g>
-      );
-    case 'ex-lantern':
-      return (
-        <g transform="translate(94 12)">
-          <circle cx="8" cy="12" r="12" fill="#ffe9a0" opacity="0.35" />
-          <path d="M3 4 Q8 -2 13 4" fill="none" stroke="#6b5a3a" stroke-width="1.6" />
-          <rect x="3" y="4" width="10" height="14" rx="2.5" fill="#f2c94c" stroke="#8a6a2a" stroke-width="1.3" />
-          <rect x="6" y="8" width="4" height="6" rx="2" fill="#fff6c9" />
-        </g>
-      );
-    case 'ex-butterfly':
-      return (
-        <g transform="translate(96 20)">
-          <ellipse cx="-4" cy="-2" rx="5" ry="4" fill="#9b8be0" transform="rotate(-20 -4 -2)" />
-          <ellipse cx="4" cy="-2" rx="5" ry="4" fill="#b7a8ee" transform="rotate(20 4 -2)" />
-          <ellipse cx="-3" cy="4" rx="3.4" ry="3" fill="#f2b8c6" />
-          <ellipse cx="3" cy="4" rx="3.4" ry="3" fill="#f2b8c6" />
-          <rect x="-0.8" y="-4" width="1.6" height="10" rx="0.8" fill="#4a4040" />
-        </g>
-      );
-    case 'ex-star':
-      return (
-        <path
-          transform="translate(96 22)"
-          d="M0 -10 L3 -3 L10 -3 L4.4 1.6 L6.4 9 L0 4.6 L-6.4 9 L-4.4 1.6 L-10 -3 L-3 -3 Z"
-          fill="#f2c94c"
-          stroke="#c9962c"
-          stroke-width="1.2"
-          stroke-linejoin="round"
-        />
-      );
-    case 'ex-scroll':
-      return (
-        <g transform="translate(94 8) rotate(12)">
-          <rect x="0" y="2" width="22" height="14" rx="2" fill="#f4efe6" stroke="#c9b88f" stroke-width="1" />
-          <rect x="-2" y="0" width="4" height="18" rx="2" fill="#c9a66b" />
-          <rect x="20" y="0" width="4" height="18" rx="2" fill="#c9a66b" />
-          <path d="M5 7 H18 M5 11 H15" stroke="#b9a678" stroke-width="1.3" stroke-linecap="round" />
-        </g>
-      );
-    case 'ex-banner':
-      return (
-        <g>
-          <rect x="106" y="50" width="2.2" height="68" fill="#6b5a3a" />
-          <path d="M108 52 L120 58 L108 66 Z" fill="#b5483f" />
-          <path d="M111 58 L115 58 M113 56 L113 61" stroke="#fff0b8" stroke-width="1.2" />
-        </g>
-      );
-    default:
-      return null;
-  }
-}
-
-/** The knight: drawn from simple shapes so it works offline, scales sharply and follows the theme. */
+/**
+ * The knight. The painted pieces are placed in "figure units" (centred on x = 0, boots at y = 250); this scales them to fit the
+ * 120 x 120 picture. Scenes, companions, wings and crowns are the simple drawn style.
+ */
 export function AvatarFigure({ look, size = 120, title, view = 'full' }: { look: Look; size?: number; title?: string; view?: 'full' | 'face' }) {
-  const skin = col(look.skin, '#efc09a');
-  const hair = col(look.hairColor, '#6a4630');
-  const eye = col(look.eyes, '#5a3a24');
-  const tunic = col(look.tunic, '#2a6569');
-  const helmeted = !!armorUrl(look.helmet);
-  const plated = !!armorUrl(look.breastplate);
-  const booted = !!armorUrl(look.shoes);
-  const dressed = plated || !!armorUrl(look.belt) || booted;
-  const hose = dressed ? '#2d3038' : shade(tunic, -0.4);
-  const full = armorWorn(look) === ARMOR_SLOTS.length;
-  const HEAD = 'translate(60 22) scale(0.5) translate(-60 -52)'; // the friendly face, scaled to sit on a human-proportioned body
+  const full = armorWorn(look) === 6;
   const face = view === 'face';
+  const K = 0.448;
   return (
     <svg
-      viewBox={face ? '40 2 40 40' : '0 0 120 120'}
+      viewBox={face ? '30 2 60 60' : '0 0 120 120'}
       width={size}
       height={size}
       role="img"
-      aria-label={title ?? 'Your avatar'}
+      aria-label={title ?? 'Your knight'}
       data-look={JSON.stringify(look)}
       data-armor={armorWorn(look)}
       style={{ display: 'block' }}
     >
       <defs>
-        <clipPath id={`avc-${view}${size}`}>{face ? <rect x="40" y="2" width="40" height="40" rx="9" /> : <rect width="120" height="120" rx="26" />}</clipPath>
+        <clipPath id={`avc-${view}${size}`}>{face ? <rect x="30" y="2" width="60" height="60" rx="13" /> : <rect width="120" height="120" rx="26" />}</clipPath>
       </defs>
       <g clip-path={`url(#avc-${view}${size})`}>
         <Background id={look.background} />
-        {full && <circle cx="60" cy="64" r="52" fill="#fff6c9" opacity="0.4" />}
-        <Cape id={look.cape} />
+        {full && <circle cx="60" cy="62" r="54" fill="#fff6c9" opacity="0.4" />}
+        {look.cape === 'cape-wings' && <Wings />}
         <Companion id={look.companion} />
-        {!helmeted && (
-          <g transform={HEAD}>
-            <HairBack id={look.hair} color={hair} />
-          </g>
-        )}
-        {/* legs and feet */}
-        {!booted && (
-          <g>
-            <rect x="49" y="68" width="9" height="42" rx="3.5" fill={hose} />
-            <rect x="62" y="68" width="9" height="42" rx="3.5" fill={hose} />
-            <ellipse cx="52.5" cy="112" rx="6.2" ry="3" fill="#d9b59a" />
-            <ellipse cx="67.5" cy="112" rx="6.2" ry="3" fill="#d9b59a" />
-          </g>
-        )}
-        {booted && (
-          <g>
-            <rect x="49" y="68" width="9" height="30" rx="3.5" fill={hose} />
-            <rect x="62" y="68" width="9" height="30" rx="3.5" fill={hose} />
-          </g>
-        )}
-        {/* arms, torso, neck */}
-        {!plated && (
-          <g>
-            <path d="M43.5 43 L36 66" stroke={tunic} stroke-width="6.5" stroke-linecap="round" />
-            <path d="M76.5 43 L84 69" stroke={tunic} stroke-width="6.5" stroke-linecap="round" />
-          </g>
-        )}
-        {!plated && <path d="M42 74 C42 46 47 38 60 38 C73 38 78 46 78 74 Z" fill={tunic} />}
-        <rect x="55.5" y="30" width="9" height="12" rx="4" fill={shade(skin, -0.1)} />
-        <ArmorPiece slot="breastplate" id={look.breastplate} />
-        <ArmorPiece slot="belt" id={look.belt} />
-        <ArmorPiece slot="shoes" id={look.shoes} />
-        <ExtraBody id={look.extra} />
-        {!plated && <circle cx="36" cy="67" r="3.2" fill={skin} />}
-        <circle cx="84" cy="70" r="3.2" fill={plated ? '#4a3a2c' : skin} />
-        <ArmorPiece slot="shield" id={look.shield} />
-        <ArmorPiece slot="sword" id={look.sword} />
-        {/* head: the same friendly face, drawn big and scaled down */}
-        {!helmeted && (
-          <g transform={HEAD}>
-            <circle cx="35" cy="55" r="4.4" fill={skin} />
-            <circle cx="85" cy="55" r="4.4" fill={skin} />
-            <circle cx="60" cy="52" r="25" fill={skin} />
-            <HairFront id={look.hair} color={hair} />
-            <circle cx="51" cy="54" r="3.2" fill={eye} />
-            <circle cx="69" cy="54" r="3.2" fill={eye} />
-            <circle cx="51" cy="54" r="1.5" fill={INK} />
-            <circle cx="69" cy="54" r="1.5" fill={INK} />
-            <circle cx="52" cy="52.8" r="0.9" fill="#fff" />
-            <circle cx="70" cy="52.8" r="0.9" fill="#fff" />
-            <circle cx="45" cy="62" r="4" fill="#e58f8f" opacity="0.35" />
-            <circle cx="75" cy="62" r="4" fill="#e58f8f" opacity="0.35" />
-            <Beard id={look.beard} color={hair} />
-            <path d="M52 64 Q60 72 68 64" fill="none" stroke={INK} stroke-width="2.4" stroke-linecap="round" />
-            <Glasses id={look.glasses} />
-            <ExtraHead id={look.extra} />
-          </g>
-        )}
-        <ArmorPiece slot="helmet" id={look.helmet} />
-        <g transform={HEAD}>
-          <Crown id={look.crown} lift={helmeted ? 6 : 0} />
+        <g transform={`translate(60 ${116 - 250 * K}) scale(${K})`}>
+          <ArmorLayers look={look} />
+          <ArmorExtras look={look} />
         </g>
+        {!none(look.crown) && (
+          <g transform="translate(60 10) scale(0.42) translate(-60 -26)">
+            <Crown id={look.crown} lift={0} />
+          </g>
+        )}
       </g>
     </svg>
   );

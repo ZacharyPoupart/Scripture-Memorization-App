@@ -3,13 +3,13 @@ import {
   ARMOR_NAMES,
   ARMOR_SLOTS,
   armorWorn,
-  completedSet,
   currentLook,
   describeUnlock,
   isGated,
   isUnlocked,
   itemById,
   itemsIn,
+  matchedColourway,
   owns,
   seedsBalance,
   SLOT_GROUPS,
@@ -24,11 +24,11 @@ import { armorUrl } from './ArmorArt.tsx';
 import { AvatarFigure } from './AvatarFigure.tsx';
 import { Icon } from './common.tsx';
 
-/** Your knight: look like yourself for free, then put on the armor of God and earn the rest with seeds and streaks. */
+/** Your knight: everyone starts in the same basic steel armor, and any piece can be swapped for another with seeds and streaks. */
 export function AvatarScreen() {
   const { data } = useApp();
-  const [group, setGroup] = useState<(typeof SLOT_GROUPS)[number]['key']>('me');
-  const [slot, setSlot] = useState<Slot>('skin');
+  const [group, setGroup] = useState<(typeof SLOT_GROUPS)[number]['key']>('armor');
+  const [slot, setSlot] = useState<Slot>('helmet');
   const [pick, setPick] = useState<string | null>(null);
   const look = currentLook(data);
   const balance = seedsBalance(data);
@@ -37,7 +37,7 @@ export function AvatarScreen() {
   const items = itemsIn(slot);
   const grp = SLOT_GROUPS.find((g) => g.key === group)!;
   const worn = armorWorn(look);
-  const set = completedSet(look);
+  const matched = matchedColourway(look);
   const armorInfo = (ARMOR_SLOTS as readonly string[]).includes(slot) ? ARMOR_NAMES[slot as (typeof ARMOR_SLOTS)[number]] : null;
 
   const choose = (item: Item) => {
@@ -86,7 +86,7 @@ export function AvatarScreen() {
             <AvatarFigure look={shown} size={200} title="Your knight" />
             <div class="armor-meter" data-testid="armor-meter">
               <strong>
-                {set ? `${set.name} — set complete` : worn === ARMOR_SLOTS.length ? 'Full armor of God' : `Armor of God: ${worn} of ${ARMOR_SLOTS.length}`}
+                {matched ? `${matched.name} armor — breastplate, arms and legs match` : worn === ARMOR_SLOTS.length ? 'Full armor of God' : `Armor of God: ${worn} of ${ARMOR_SLOTS.length} upgraded`}
               </strong>
               <span class="armor-pips" aria-hidden="true">
                 {ARMOR_SLOTS.map((s) => (
@@ -94,14 +94,9 @@ export function AvatarScreen() {
                 ))}
               </span>
             </div>
-            {set && (
-              <p class="muted small" style={{ margin: 0 }} data-testid="set-tagline">
-                {set.tagline}
-              </p>
-            )}
             <p class="muted small" style={{ margin: 0 }}>
-              Looking like yourself is always free. Armor, capes and companions come from seeds (1 per review, 5 for a finished day, 25 when a verse moves up)
-              or from long streaks. Seeds are never taken away.
+              Everyone starts in the same basic steel armor. Swap any piece: pieces cost seeds (1 per review, 5 for a finished day, 25 when a verse moves up), and the
+              finest also need a long streak. Seeds are never taken away.
             </p>
           </div>
 
@@ -155,17 +150,16 @@ export function AvatarScreen() {
                 >
                   {armorUrl(item.id) ? (
                     <img class="piece-img" src={armorUrl(item.id)!} alt="" width="72" height="72" loading="lazy" />
-                  ) : item.id.endsWith('-none') && group === 'armor' ? (
+                  ) : item.id.endsWith('-none') && group !== 'extras' ? (
                     <span class="piece-img piece-none" aria-hidden="true">
                       —
                     </span>
                   ) : (
-                    <AvatarFigure look={{ ...look, [item.slot]: item.id }} size={72} view={group === 'me' || slot === 'crown' ? 'face' : 'full'} />
+                    <AvatarFigure look={{ ...look, [item.slot]: item.id }} size={72} view={'full'} />
                   )}
                   <span class="item-name">{item.name}</span>
                   <small class="muted">
-                    {item.rarity ? `${item.rarity} · ` : ''}
-                    {isWorn
+                                        {isWorn
                       ? 'Wearing'
                       : have
                         ? 'Owned'

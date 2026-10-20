@@ -1,85 +1,51 @@
-# Cuts design/armor-sheet.webp (ten sets x six pieces, transparent background) into public/armor/<slot>-<set>.webp.
-# Run:  python3 design/cut-armor.py   (needs Pillow + numpy). The sheet is laid out row by row, two sets per row.
+# Cuts design/armor-sheet.webp (the owner's painted armor pieces on a transparent background) into one picture per piece:
+# public/armor/<id>.webp, plus src/ui/armorSizes.json (each picture's width and height, used to place it on the knight).
+# Run:  python3 design/cut-armor.py   (needs Pillow). The boxes below are where each piece sits on the sheet.
 from PIL import Image
-import numpy as np, math, os
+import json, os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, '..', 'public', 'armor')
-SETS = ['initiate', 'soldier', 'vanguard', 'paladin', 'warden', 'ranger', 'crusader', 'shadow', 'storm', 'legend']
-SLOTS = ['helmet', 'breastplate', 'belt', 'shoes', 'shield', 'sword']
-BANDS = [(12, 205), (217, 411), (424, 612), (623, 806), (810, 987)]
-COLS = [(0, 748), (748, 1500)]
+SIZES = os.path.join(HERE, '..', 'src', 'ui', 'armorSizes.json')
 
-im = Image.open(os.path.join(HERE, 'armor-sheet.webp')).convert('RGBA')
-alpha = np.asarray(im)[:, :, 3] > 30
+HELMETS = ['steel', 'gold', 'shadow', 'horned', 'winged', 'spiked', 'cross']
+COLOURWAYS = ['knight', 'gold', 'shadow', 'forest', 'azure', 'iron', 'crimson']  # chest, arms and legs come in these seven
+CAPES = ['blue', 'red', 'green', 'black', 'purple', 'white']
+SHIELDS = ['lion', 'dragon', 'sun', 'tree', 'spiked', 'round']
+WEAPONS = ['sword', 'darksword', 'goldsword', 'axe', 'mace', 'spear', 'bow', 'staff']
+PLUMES = ['blue', 'red', 'green', 'white', 'purple']
+BANNERS = ['lion', 'dragon', 'tree', 'sun']
+EXTRAS = ['pouch', 'lantern', 'medal', 'scroll']
+
+BOXES = {
+    'helmet': [[183, 52, 254, 158], [281, 52, 353, 157], [384, 53, 454, 157], [472, 55, 578, 158], [593, 28, 694, 162], [715, 53, 791, 160], [815, 57, 884, 159]],
+    'chest': [[172, 211, 281, 325], [282, 211, 384, 325], [392, 211, 496, 326], [498, 211, 600, 319], [600, 211, 703, 324], [710, 211, 810, 323], [813, 211, 912, 324]],
+    'arms': [[21, 368, 139, 486], [156, 369, 274, 491], [287, 368, 406, 491], [418, 369, 531, 490], [544, 369, 662, 491], [672, 369, 788, 490], [800, 369, 916, 491]],
+    'legs': [[37, 542, 125, 671], [172, 543, 258, 671], [302, 543, 388, 671], [431, 543, 518, 671], [559, 542, 645, 671], [685, 543, 771, 671], [810, 542, 896, 671]],
+    'cape': [[958, 51, 1055, 224], [1068, 51, 1163, 221], [959, 237, 1055, 403], [1069, 237, 1170, 405], [958, 418, 1055, 596], [1073, 418, 1162, 587]],
+    'shield': [[960, 641, 1035, 751], [1048, 641, 1122, 752], [1136, 641, 1211, 752], [1225, 641, 1298, 753], [1315, 640, 1392, 752], [1404, 640, 1498, 742]],
+    'weapon': [[1242, 50, 1289, 220], [1320, 50, 1377, 228], [1397, 50, 1447, 218], [1233, 237, 1310, 401], [1347, 248, 1406, 410], [1446, 209, 1474, 418], [1267, 386, 1334, 597], [1408, 394, 1434, 593]],
+    'plume': [[942, 824, 992, 883], [996, 824, 1044, 882], [1048, 824, 1095, 882], [1099, 824, 1146, 882], [1150, 824, 1199, 882]],
+    'banner': [[942, 904, 994, 997], [1008, 904, 1059, 997], [1071, 904, 1123, 997], [1135, 903, 1188, 997]],
+    'extra': [[1224, 917, 1268, 978], [1288, 907, 1325, 978], [1343, 911, 1384, 962], [1395, 927, 1450, 965]],
+}
+
+names = {}
+for slot, keys in [('helmet', HELMETS), ('chest', COLOURWAYS), ('arms', COLOURWAYS), ('legs', COLOURWAYS), ('cape', CAPES), ('shield', SHIELDS),
+                   ('weapon', WEAPONS), ('plume', PLUMES)]:
+    for key, box in zip(keys, BOXES[slot]):
+        names[f'{slot}-{key}'] = box
+for key, box in zip(BANNERS, BOXES['banner']):
+    names[f'ex-banner-{key}'] = box
+for key, box in zip(EXTRAS, BOXES['extra']):
+    names[f'ex-{key}'] = box
+
+sheet = Image.open(os.path.join(HERE, 'armor-sheet.webp')).convert('RGBA')
 os.makedirs(OUT, exist_ok=True)
-
-def runs_of(mask):
-    cols = mask.sum(0)
-    out, s = [], None
-    for x, v in enumerate(cols):
-        if v > 0 and s is None: s = x
-        if v == 0 and s is not None: out.append([s, x]); s = None
-    if s is not None: out.append([s, len(cols)])
-    merged = []
-    for a, b in out:
-        if merged and a - merged[-1][1] < 4: merged[-1][1] = b
-        else: merged.append([a, b])
-    return [(a, b) for a, b in merged if b - a > 8]
-
-def upright_sword(piece):
-    a = np.asarray(piece)[:, :, 3] > 30
-    ys, xs = np.nonzero(a)
-    cx, cy = xs.mean(), ys.mean()
-    cov = np.cov(np.vstack([xs - cx, ys - cy]))
-    w, v = np.linalg.eigh(cov)
-    ax = v[:, 1]  # principal axis (x, y)
-    ang = math.degrees(math.atan2(ax[0], ax[1]))  # angle from vertical
-    def tidy(angle):
-        t = piece.rotate(angle, resample=Image.BICUBIC, expand=True)
-        b = np.asarray(t)[:, :, 3] > 30
-        yy, xx = np.nonzero(b)
-        return t, (xx.max() - xx.min()) / (yy.max() - yy.min())
-    r = min((tidy(ang), tidy(-ang)), key=lambda t: t[1])[0]  # whichever direction stands the blade upright
-    ra = np.asarray(r)[:, :, 3] > 30
-    widths = ra.sum(1)
-    rows = np.nonzero(widths)[0]
-    top, bottom = rows.min(), rows.max()
-    widest = rows[np.argmax(widths[rows])]
-    if widest < (top + bottom) / 2:  # crossguard is at the top: flip so the tip points up
-        r = r.rotate(180, resample=Image.BICUBIC, expand=True)
-    return r
-
-for si, key in enumerate(SETS):
-    r, c = divmod(si, 2)
-    y0, y1 = BANDS[r]
-    x0, x1 = COLS[c]
-    m = alpha[y0:y1, x0:x1].copy()
-    # the coloured title banner is the first object at the top left; blank it up to the first empty row
-    left = m[:, :270].any(1)
-    y = 0
-    while y < len(left) and not left[y]: y += 1
-    while y < len(left) and left[y]: y += 1
-    m[:y, :270] = False
-    sheet_cell = (x0, y0, y)
-    runs = runs_of(m)
-    if len(runs) == 5:  # boots and shield touch on one sheet: split at the thinnest column between them
-        a, b = runs[3]
-        cols = m[:, a:b].sum(0)
-        lo, hi = int((b - a) * 0.4), int((b - a) * 0.6)
-        cut = a + lo + int(np.argmin(cols[lo:hi]))
-        runs = runs[:3] + [(a, cut), (cut, b)] + runs[4:]
-    assert len(runs) == 6, (key, runs)
-    for slot, (a, b) in zip(SLOTS, runs):
-        top = y if (a < 270) else 0
-        sub = im.crop((x0 + a, y0 + top, x0 + b, y1))
-        sa = np.asarray(sub)[:, :, 3]
-        mask = sa > 30
-        if slot == 'sword':
-            sub = upright_sword(sub)
-            sa = np.asarray(sub)[:, :, 3]
-            mask = sa > 30
-        ys, xs = np.nonzero(mask)
-        sub = sub.crop((max(xs.min() - 2, 0), max(ys.min() - 2, 0), min(xs.max() + 3, sub.width), min(ys.max() + 3, sub.height)))
-        sub.save(os.path.join(OUT, f'{slot}-{key}.webp'), 'WEBP', quality=92, method=6)
-print('done')
+sizes = {}
+for name, box in sorted(names.items()):
+    piece = sheet.crop(tuple(box))
+    piece.save(os.path.join(OUT, f'{name}.webp'), 'WEBP', quality=92, method=6)
+    sizes[name] = [piece.width, piece.height]
+json.dump(sizes, open(SIZES, 'w'), indent=1, sort_keys=True)
+print(len(names), 'pieces')

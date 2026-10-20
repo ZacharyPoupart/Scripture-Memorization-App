@@ -5,6 +5,13 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.17.0] - 2026-10-20
+
+### Changed
+- The avatar is a new painted knight. The character designs (skin, hair, eyes, beard and so on) are gone: everyone starts in the same free basic steel armor, and every piece can be swapped for another because they are all painted to the same size.
+- Swappable pieces: 7 helmets, 5 plumes, breastplate, arms & belt and legs & boots in 7 colourways, 6 capes, 6 shields and 8 weapons (swords, axe, mace, spear, longbow and a crystal staff), plus a pouch, lantern and four banners. Each piece costs more than the one before it; the finest (Shadow, Gold, the golden helm and sword, the winged helm and spiked shield) also need a long streak.
+- Scenes, companions, wings and the royal crown, halo and crown of life stay. The flower and laurel crowns, the old scarf, bow tie, headphones, butterfly, star and sash, and the old character looks were retired; seeds spent on them are refunded automatically.
+
 ## [1.16.0] - 2026-10-10
 
 ### Added

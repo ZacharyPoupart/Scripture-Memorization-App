@@ -19,7 +19,7 @@ test.describe('avatar and seeds', () => {
     await expect(page.getByTestId('seeds-gain')).toContainText(/\+\d+ seed/);
   });
 
-  test('try on, buy, wear, keep after reload and offline; free items cost nothing', async ({ page, context }) => {
+  test('try on, buy, wear, keep after reload and offline', async ({ page, context }) => {
     await autoDismissMilestones(page);
     await blockLookups(page);
     await openApp(page);
@@ -30,44 +30,44 @@ test.describe('avatar and seeds', () => {
     await expect(page.getByRole('heading', { name: 'Your avatar' })).toBeVisible();
     const before = Number((await page.getByTestId('seeds-balance').innerText()).replace(/\D/g, ''));
     expect(before).toBeGreaterThan(100);
-    // a free item is worn with one tap
-    await page.getByTestId('slot-hair').click();
-    await page.getByTestId('item-hair-long').click();
-    await expect(page.getByTestId('item-hair-long')).toContainText('Wearing');
-    // a paid item previews first, then is bought
+    // everyone starts in the same free basic steel armor
     await expect(page.getByTestId('armor-meter')).toContainText('0 of 6');
-    await page.getByTestId('group-armor').click();
-    await page.getByTestId('item-helmet-soldier').click();
-    await expect(page.getByTestId('item-helmet-soldier')).not.toContainText('Wearing');
+    await expect(page.getByTestId('item-helmet-steel')).toContainText('Wearing');
+    // a paid piece previews first, then is bought and worn
+    await page.getByTestId('item-helmet-cross').click();
+    await expect(page.getByTestId('item-helmet-cross')).not.toContainText('Wearing');
     await page.getByTestId('buy').click();
-    await expect(page.getByTestId('item-helmet-soldier')).toContainText('Wearing');
+    await expect(page.getByTestId('item-helmet-cross')).toContainText('Wearing');
     const after = Number((await page.getByTestId('seeds-balance').innerText()).replace(/\D/g, ''));
-    expect(after).toBe(before - 35);
+    expect(after).toBe(before - 25);
     await expect(page.getByTestId('armor-meter')).toContainText('1 of 6');
+    // going back to the free helmet is one tap and costs nothing
+    await page.getByTestId('item-helmet-steel').click();
+    await expect(page.getByTestId('item-helmet-steel')).toContainText('Wearing');
+    await page.getByTestId('item-helmet-cross').click();
+    await expect(page.getByTestId('item-helmet-cross')).toContainText('Wearing');
     await saved(page);
     await context.setOffline(true);
     await page.reload();
-    await page.getByTestId('group-armor').click();
-    await expect(page.getByTestId('item-helmet-soldier')).toContainText('Wearing');
+    await expect(page.getByTestId('item-helmet-cross')).toContainText('Wearing');
     const bal = Number((await page.getByTestId('seeds-balance').innerText()).replace(/\D/g, ''));
     expect(bal).toBe(after);
     await context.setOffline(false);
   });
 
-  test('everything that makes the knight look like you is free', async ({ page }) => {
+  test('a new knight starts in free basic armor, with every other piece waiting to be earned', async ({ page }) => {
     await autoDismissMilestones(page);
     await blockLookups(page);
     await openApp(page);
+    await page.evaluate(() => (window as any).__mfl.armorFree(false));
     await addVerse(page, JOHN316);
     await page.goto('/#/avatar');
-    for (const slot of ['skin', 'hair', 'hairColor', 'eyes', 'beard', 'glasses', 'tunic']) {
-      await page.getByTestId(`slot-${slot}`).click();
-      await expect(page.getByTestId('item-grid').getByText('🌱'), slot).toHaveCount(0);
-      await expect(page.getByTestId('item-grid').getByText('🔒'), slot).toHaveCount(0);
-    }
-    await page.getByTestId('slot-beard').click();
-    await page.getByTestId('item-beard-full').click();
-    await expect(page.getByTestId('item-beard-full')).toContainText('Wearing');
+    await expect(page.getByTestId('armor-meter')).toContainText('0 of 6');
+    await expect(page.getByTestId('item-helmet-steel')).toContainText('Wearing');
+    await expect(page.getByTestId('item-helmet-cross')).toContainText('🌱 25');
+    await page.getByTestId('slot-chest').click();
+    await expect(page.getByTestId('item-chest-knight')).toContainText('Wearing');
+    await expect(page.getByTestId('item-chest-gold')).toContainText('🔒');
   });
 
   test('while testing, all armor is free to wear with no seeds and no streak', async ({ page }) => {
@@ -77,9 +77,8 @@ test.describe('avatar and seeds', () => {
     await addVerse(page, JOHN316);
     await page.goto('/#/avatar');
     await expect(page.getByTestId('armor-free-banner')).toBeVisible();
-    await page.getByTestId('group-armor').click();
-    await page.getByTestId('item-helmet-legend').click(); // a Legend piece: costs seeds and a 365-day streak when not testing; now one tap wears it
-    await expect(page.getByTestId('item-helmet-legend')).toContainText('Wearing');
+    await page.getByTestId('item-helmet-gold').click(); // costs seeds and a 365-day streak when not testing; now one tap wears it
+    await expect(page.getByTestId('item-helmet-gold')).toContainText('Wearing');
     await expect(page.getByTestId('armor-meter')).toContainText('1 of 6');
     await expect(page.getByTestId('seeds-balance')).toContainText('0'); // nothing was spent
   });
@@ -91,15 +90,15 @@ test.describe('avatar and seeds', () => {
     await page.evaluate(() => (window as any).__mfl.armorFree(false));
     await addVerse(page, JOHN316);
     await page.goto('/#/avatar');
-    await page.getByTestId('group-armor').click();
-    await page.getByTestId('slot-sword').click();
-    await page.getByTestId('item-sword-legend').click();
-    await expect(page.getByTestId('unlock-hint')).toContainText('365-day streak'); // the finest armor also asks for the longest streak
+    await page.getByTestId('group-gear').click();
+    await page.getByTestId('slot-weapon').click();
+    await page.getByTestId('item-weapon-goldsword').click();
+    await expect(page.getByTestId('unlock-hint')).toContainText('365-day streak'); // the finest pieces also ask for the longest streak
     await expect(page.getByTestId('armor-verse')).toContainText('Ephesians 6:17');
     await page.getByTestId('group-extras').click();
     await page.getByTestId('slot-crown').click();
-    await page.getByTestId('item-crown-laurel').click();
-    await expect(page.getByTestId('unlock-hint')).toContainText('14-day streak');
+    await page.getByTestId('item-crown-life').click();
+    await expect(page.getByTestId('unlock-hint')).toContainText('730-day streak');
     await page.goto('/#/settings');
     await page.getByTestId('toggle-avatar').click();
     await page.goto('/#/');
