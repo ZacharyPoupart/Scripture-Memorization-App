@@ -5,6 +5,13 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.18.0] - 2026-10-20
+
+### Changed
+- New equipment sheet. The six armor categories are now helmet, chest plate, belt, boots, shield and sword (no separate arms; the chest plates already have sleeves). Helmets, chest plates, belts, boots and capes come in twelve matching sets that cost more and more, with the finest needing a long streak; there are 6 shields and 11 swords and weapons. Accessories (ring, amulet, gloves, pouch, lantern, charm, banner, medal, scroll) and capes stay as bonus extras.
+- Leg armor is worn automatically with the matching chest plate. Plumes are gone (the new sheet has none).
+- Anything bought from the old sheet is refunded automatically (seeds are derived), and the avatar falls back to the basic armor until you pick new pieces.
+
 ## [1.17.0] - 2026-10-20
 
 ### Changed

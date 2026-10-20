@@ -1,246 +1,394 @@
 {
- "arms-azure": [
-  118,
-  122
+ "belt-1": [
+  83,
+  35
  ],
- "arms-crimson": [
-  116,
-  122
- ],
- "arms-forest": [
-  113,
-  121
- ],
- "arms-gold": [
-  118,
-  122
- ],
- "arms-iron": [
-  116,
-  121
- ],
- "arms-knight": [
-  118,
-  118
- ],
- "arms-shadow": [
-  119,
-  123
- ],
- "cape-black": [
-  101,
-  168
- ],
- "cape-blue": [
-  97,
-  173
- ],
- "cape-green": [
-  96,
-  166
- ],
- "cape-purple": [
-  97,
-  178
- ],
- "cape-red": [
-  95,
-  170
- ],
- "cape-white": [
-  89,
-  169
- ],
- "chest-azure": [
-  103,
-  113
- ],
- "chest-crimson": [
-  99,
-  113
- ],
- "chest-forest": [
-  102,
-  108
- ],
- "chest-gold": [
-  102,
-  114
- ],
- "chest-iron": [
-  100,
-  112
- ],
- "chest-knight": [
-  109,
-  114
- ],
- "chest-shadow": [
-  104,
-  115
- ],
- "ex-banner-dragon": [
-  51,
-  93
- ],
- "ex-banner-lion": [
-  52,
-  93
- ],
- "ex-banner-sun": [
-  53,
-  94
- ],
- "ex-banner-tree": [
-  52,
-  93
- ],
- "ex-lantern": [
-  37,
-  71
- ],
- "ex-medal": [
-  41,
-  51
- ],
- "ex-pouch": [
-  44,
-  61
- ],
- "ex-scroll": [
-  55,
+ "belt-10": [
+  88,
   38
  ],
- "helmet-cross": [
-  69,
-  102
+ "belt-11": [
+  87,
+  35
  ],
- "helmet-gold": [
+ "belt-12": [
+  84,
+  37
+ ],
+ "belt-2": [
+  77,
+  36
+ ],
+ "belt-3": [
+  79,
+  35
+ ],
+ "belt-4": [
+  79,
+  36
+ ],
+ "belt-5": [
+  81,
+  34
+ ],
+ "belt-6": [
+  81,
+  37
+ ],
+ "belt-7": [
+  80,
+  36
+ ],
+ "belt-8": [
+  81,
+  38
+ ],
+ "belt-9": [
+  80,
+  36
+ ],
+ "boots-1": [
+  82,
+  67
+ ],
+ "boots-10": [
   72,
-  105
+  65
  ],
- "helmet-horned": [
-  106,
-  103
- ],
- "helmet-shadow": [
+ "boots-11": [
   70,
-  104
+  65
  ],
- "helmet-spiked": [
-  76,
-  107
+ "boots-12": [
+  67,
+  64
  ],
- "helmet-steel": [
+ "boots-2": [
+  79,
+  68
+ ],
+ "boots-3": [
+  72,
+  67
+ ],
+ "boots-4": [
+  72,
+  68
+ ],
+ "boots-5": [
+  77,
+  67
+ ],
+ "boots-6": [
   71,
+  69
+ ],
+ "boots-7": [
+  74,
+  69
+ ],
+ "boots-8": [
+  70,
+  68
+ ],
+ "boots-9": [
+  74,
+  67
+ ],
+ "cape-1": [
+  82,
+  115
+ ],
+ "cape-10": [
+  81,
+  115
+ ],
+ "cape-11": [
+  83,
+  114
+ ],
+ "cape-12": [
+  83,
+  115
+ ],
+ "cape-2": [
+  83,
+  116
+ ],
+ "cape-3": [
+  82,
+  115
+ ],
+ "cape-4": [
+  83,
+  116
+ ],
+ "cape-5": [
+  84,
+  115
+ ],
+ "cape-6": [
+  84,
+  115
+ ],
+ "cape-7": [
+  82,
+  116
+ ],
+ "cape-8": [
+  82,
+  116
+ ],
+ "cape-9": [
+  82,
+  114
+ ],
+ "chest-1": [
+  110,
   106
  ],
- "helmet-winged": [
-  101,
-  134
+ "chest-10": [
+  112,
+  106
  ],
- "legs-azure": [
-  86,
-  129
+ "chest-11": [
+  112,
+  105
  ],
- "legs-crimson": [
-  86,
-  129
+ "chest-12": [
+  112,
+  107
  ],
- "legs-forest": [
-  87,
-  128
+ "chest-2": [
+  112,
+  108
  ],
- "legs-gold": [
-  86,
-  128
+ "chest-3": [
+  106,
+  106
  ],
- "legs-iron": [
-  86,
-  128
+ "chest-4": [
+  111,
+  106
  ],
- "legs-knight": [
-  88,
-  129
+ "chest-5": [
+  113,
+  107
  ],
- "legs-shadow": [
-  86,
-  128
+ "chest-6": [
+  112,
+  106
  ],
- "plume-blue": [
-  50,
-  59
+ "chest-7": [
+  111,
+  106
  ],
- "plume-green": [
+ "chest-8": [
+  113,
+  106
+ ],
+ "chest-9": [
+  109,
+  104
+ ],
+ "ex-amulet": [
+  28,
+  41
+ ],
+ "ex-banner": [
+  27,
+  51
+ ],
+ "ex-charm": [
+  26,
+  37
+ ],
+ "ex-gloves": [
+  43,
+  34
+ ],
+ "ex-lantern": [
+  26,
+  45
+ ],
+ "ex-medal": [
+  28,
+  40
+ ],
+ "ex-pouch": [
+  35,
+  48
+ ],
+ "ex-ring": [
+  33,
+  33
+ ],
+ "ex-scroll": [
   47,
-  58
+  28
  ],
- "plume-purple": [
-  49,
-  58
+ "helmet-1": [
+  68,
+  98
  ],
- "plume-red": [
-  48,
-  58
+ "helmet-10": [
+  71,
+  101
  ],
- "plume-white": [
-  47,
-  58
+ "helmet-11": [
+  92,
+  101
  ],
- "shield-dragon": [
-  74,
-  111
+ "helmet-12": [
+  67,
+  99
  ],
- "shield-lion": [
+ "helmet-2": [
+  67,
+  99
+ ],
+ "helmet-3": [
+  69,
+  101
+ ],
+ "helmet-4": [
+  69,
+  99
+ ],
+ "helmet-5": [
+  98,
+  101
+ ],
+ "helmet-6": [
   75,
-  110
+  107
  ],
- "shield-round": [
-  94,
+ "helmet-7": [
+  77,
+  99
+ ],
+ "helmet-8": [
+  65,
+  100
+ ],
+ "helmet-9": [
+  70,
   102
  ],
- "shield-spiked": [
-  77,
-  112
+ "legs-1": [
+  81,
+  114
  ],
- "shield-sun": [
+ "legs-10": [
+  80,
+  115
+ ],
+ "legs-11": [
+  80,
+  114
+ ],
+ "legs-12": [
+  80,
+  114
+ ],
+ "legs-2": [
+  80,
+  114
+ ],
+ "legs-3": [
+  78,
+  115
+ ],
+ "legs-4": [
+  78,
+  115
+ ],
+ "legs-5": [
   75,
-  111
+  114
  ],
- "shield-tree": [
+ "legs-6": [
+  79,
+  115
+ ],
+ "legs-7": [
+  76,
+  113
+ ],
+ "legs-8": [
   73,
   112
  ],
- "weapon-axe": [
-  77,
-  164
+ "legs-9": [
+  73,
+  112
  ],
- "weapon-bow": [
-  67,
-  211
+ "shield-1": [
+  55,
+  77
  ],
- "weapon-darksword": [
-  57,
-  178
- ],
- "weapon-goldsword": [
-  50,
-  168
- ],
- "weapon-mace": [
-  59,
-  162
- ],
- "weapon-spear": [
-  28,
-  209
- ],
- "weapon-staff": [
-  26,
-  199
- ],
- "weapon-sword": [
+ "shield-2": [
   47,
-  170
+  69
+ ],
+ "shield-3": [
+  47,
+  69
+ ],
+ "shield-4": [
+  50,
+  72
+ ],
+ "shield-5": [
+  50,
+  75
+ ],
+ "shield-6": [
+  50,
+  51
+ ],
+ "weapon-1": [
+  31,
+  108
+ ],
+ "weapon-10": [
+  13,
+  100
+ ],
+ "weapon-11": [
+  46,
+  106
+ ],
+ "weapon-2": [
+  30,
+  106
+ ],
+ "weapon-3": [
+  33,
+  109
+ ],
+ "weapon-4": [
+  30,
+  108
+ ],
+ "weapon-5": [
+  50,
+  100
+ ],
+ "weapon-6": [
+  36,
+  89
+ ],
+ "weapon-7": [
+  17,
+  98
+ ],
+ "weapon-8": [
+  29,
+  96
+ ],
+ "weapon-9": [
+  43,
+  83
  ]
 }
