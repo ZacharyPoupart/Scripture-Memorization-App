@@ -8,7 +8,7 @@
 import { STREAK_MILESTONES } from './milestones.ts';
 import type { AppData } from './types.ts';
 
-export type Slot = 'helmet' | 'plume' | 'chest' | 'arms' | 'legs' | 'cape' | 'shield' | 'weapon' | 'crown' | 'extra' | 'companion' | 'background';
+export type Slot = 'helmet' | 'chest' | 'belt' | 'boots' | 'cape' | 'shield' | 'weapon' | 'crown' | 'extra' | 'companion' | 'background';
 
 export interface SlotGroup {
   key: 'armor' | 'gear' | 'extras';
@@ -16,33 +16,32 @@ export interface SlotGroup {
   slots: Slot[];
 }
 export const SLOT_GROUPS: SlotGroup[] = [
-  { key: 'armor', label: 'Armor', slots: ['helmet', 'plume', 'chest', 'arms', 'legs', 'cape'] },
+  { key: 'armor', label: 'Armor', slots: ['helmet', 'chest', 'belt', 'boots'] },
   { key: 'gear', label: 'Weapons', slots: ['shield', 'weapon'] },
-  { key: 'extras', label: 'Extras', slots: ['extra', 'crown', 'companion', 'background'] },
+  { key: 'extras', label: 'Extras', slots: ['cape', 'extra', 'crown', 'companion', 'background'] },
 ];
 export const SLOTS: Slot[] = SLOT_GROUPS.flatMap((g) => g.slots);
 export const SLOT_LABELS: Record<Slot, string> = {
   helmet: 'Helmet',
-  plume: 'Plume',
-  chest: 'Breastplate',
-  arms: 'Arms & belt',
-  legs: 'Legs & boots',
+  chest: 'Chest plate',
+  belt: 'Belt',
+  boots: 'Boots',
   cape: 'Cape',
   shield: 'Shield',
-  weapon: 'Weapon',
+  weapon: 'Sword',
   crown: 'Crown',
-  extra: 'Extras',
+  extra: 'Accessories',
   companion: 'Companion',
   background: 'Scene',
 };
 
 /** The six pieces of the armor of God, with where each is named (Ephesians 6:14-17). */
-export const ARMOR_SLOTS = ['helmet', 'chest', 'arms', 'legs', 'shield', 'weapon'] as const;
+export const ARMOR_SLOTS = ['helmet', 'chest', 'belt', 'boots', 'shield', 'weapon'] as const;
 export const ARMOR_NAMES: Record<(typeof ARMOR_SLOTS)[number], { title: string; verse: string }> = {
   helmet: { title: 'Helmet of Salvation', verse: 'Ephesians 6:17' },
   chest: { title: 'Breastplate of Righteousness', verse: 'Ephesians 6:14' },
-  arms: { title: 'Belt of Truth', verse: 'Ephesians 6:14' },
-  legs: { title: 'Shoes of the Gospel of Peace', verse: 'Ephesians 6:15' },
+  belt: { title: 'Belt of Truth', verse: 'Ephesians 6:14' },
+  boots: { title: 'Shoes of the Gospel of Peace', verse: 'Ephesians 6:15' },
   shield: { title: 'Shield of Faith', verse: 'Ephesians 6:16' },
   weapon: { title: 'Sword of the Spirit', verse: 'Ephesians 6:17' },
 };
@@ -65,8 +64,8 @@ export interface Item {
   color?: string;
   /** A painted piece (armor, weapons, capes, plumes, banners...), as opposed to a simple drawn extra. */
   art?: boolean;
-  /** Breastplate, arms and legs come in the same seven colourways, so a matching set can be worn. */
-  colourway?: string;
+  /** Which of the twelve matching sets (1-12) a helmet, chest plate, belt, boots or cape belongs to. */
+  set?: number;
   /** Must be reached before this item can be bought (it still costs seeds). */
   requires?: Unlock;
 }
@@ -76,82 +75,88 @@ const streak = (days: number): Unlock => ({ kind: 'streak', days });
 const art = (slot: Slot, id: string, name: string, cost: number, needs?: number, extra: Partial<Item> = {}): Item =>
   I(slot, id, name, cost, { art: true, ...(needs ? { requires: streak(needs) } : {}), ...extra });
 
-/** Breastplate, arms and legs: the same seven colourways, each costing more than the last. The steel knight set is the free start. */
-export interface Colourway {
-  key: string;
+/**
+ * Helmets, chest plates, belts and boots (and capes) come in twelve matching sets painted to the same scale, so any piece goes
+ * with any other. Each set costs more than the one before, and the finest need a long streak first. Set 1 is the free start.
+ * Leg armor is not a choice of its own: the legs of the chest plate's set are worn automatically (see ArmorArt).
+ */
+export interface ArmorSet {
+  n: number;
   name: string;
+  /** Seeds for the chest plate; the other pieces are a fraction of it. */
   price: number;
   streak?: number;
 }
-export const COLOURWAYS: Colourway[] = [
-  { key: 'knight', name: 'Knight', price: 0 },
-  { key: 'iron', name: 'Iron', price: 15 },
-  { key: 'azure', name: 'Azure', price: 35 },
-  { key: 'forest', name: 'Forest', price: 60 },
-  { key: 'crimson', name: 'Crimson', price: 100 },
-  { key: 'shadow', name: 'Shadow', price: 180, streak: 90 },
-  { key: 'gold', name: 'Gold', price: 320, streak: 365 },
+export const SETS: ArmorSet[] = [
+  { n: 1, name: 'Knight', price: 0 },
+  { n: 2, name: 'Azure', price: 15 },
+  { n: 3, name: 'Dawn', price: 30 },
+  { n: 4, name: 'Shadow', price: 50 },
+  { n: 5, name: 'Forest', price: 75 },
+  { n: 6, name: 'Sapphire', price: 105 },
+  { n: 7, name: 'Iron', price: 140 },
+  { n: 8, name: 'Crimson', price: 180, streak: 30 },
+  { n: 9, name: 'Pearl', price: 230, streak: 60 },
+  { n: 10, name: 'Amethyst', price: 290, streak: 90 },
+  { n: 11, name: 'Midnight', price: 350, streak: 180 },
+  { n: 12, name: 'Crusader', price: 420, streak: 365 },
 ];
-const NOUN = { chest: 'breastplate', arms: 'arms & belt', legs: 'greaves & boots' } as const;
-const bodyPieces: Item[] = (['chest', 'arms', 'legs'] as const).flatMap((slot) =>
-  COLOURWAYS.map((c) => art(slot, `${slot}-${c.key}`, `${c.name} ${NOUN[slot]}`, c.price, c.streak, { colourway: c.key })),
-);
+const FRACTION = { helmet: 1, chest: 1, belt: 0.4, boots: 0.5, cape: 0.6 } as const;
+const HELMET_NAMES = [
+  'Steel helm',
+  'Visor helm',
+  'Golden helm',
+  'Shadow helm',
+  'Horned helm',
+  'Plumed helm',
+  'Spiked helm',
+  'Cross helm',
+  'Crested helm',
+  'Royal helm',
+  'Winged helm',
+  'Golden crest helm',
+];
+const CAPE_NAMES = ['Blue lion', 'Red lion', 'Green tree', 'White sun', 'Purple rose', 'Black dragon', 'Blue star', 'Green stag', 'Red phoenix', 'Cross', 'Violet sun', 'Shadow'];
+const NOUN = { chest: 'chest plate', belt: 'belt', boots: 'boots' } as const;
+const setPieces: Item[] = SETS.flatMap((set) => {
+  const cost = (slot: keyof typeof FRACTION) => Math.round((set.price * FRACTION[slot]) / 5) * 5;
+  return [
+    art('helmet', `helmet-${set.n}`, HELMET_NAMES[set.n - 1], cost('helmet'), set.streak, { set: set.n }),
+    ...(['chest', 'belt', 'boots'] as const).map((slot) => art(slot, `${slot}-${set.n}`, `${set.name} ${NOUN[slot]}`, cost(slot), set.streak, { set: set.n })),
+  ];
+});
+const capes: Item[] = SETS.map((set) => art('cape', `cape-${set.n}`, `${CAPE_NAMES[set.n - 1]} cape`, Math.round((set.price * FRACTION.cape + 10) / 5) * 5, set.streak, { set: set.n }));
+
+const SHIELD_NAMES = ['Lion shield', 'Dragon shield', 'Sun shield', 'Tree shield', 'Spiked shield', 'Round shield'];
+const SHIELD_COSTS = [30, 160, 100, 60, 240, 20];
+const WEAPON_NAMES = ['Steel sword', 'Golden sword', 'Dark sword', 'Crystal sword', 'Battle axe', 'Mace', 'Spear', 'Longbow', 'Scimitar', 'Crystal staff', 'Great bow'];
+const WEAPON_COSTS = [20, 350, 200, 120, 70, 50, 30, 100, 160, 150, 260];
+const WEAPON_STREAKS: Record<number, number> = { 2: 365, 3: 90 };
 
 export const ITEMS: Item[] = [
-  // ---- helmets
-  art('helmet', 'helmet-steel', 'Steel helm', 0),
-  art('helmet', 'helmet-cross', 'Cross helm', 25),
-  art('helmet', 'helmet-shadow', 'Shadow helm', 70),
-  art('helmet', 'helmet-spiked', 'Spiked helm', 120),
-  art('helmet', 'helmet-horned', 'Horned helm', 180),
-  art('helmet', 'helmet-winged', 'Winged helm', 260, 180),
-  art('helmet', 'helmet-gold', 'Golden helm', 400, 365),
-  // ---- plumes (sit on top of the helmet)
-  I('plume', 'plume-none', 'None'),
-  art('plume', 'plume-blue', 'Blue plume', 20),
-  art('plume', 'plume-red', 'Red plume', 20),
-  art('plume', 'plume-green', 'Green plume', 20),
-  art('plume', 'plume-white', 'White plume', 30),
-  art('plume', 'plume-purple', 'Purple plume', 40),
-  // ---- breastplate, arms and legs
-  ...bodyPieces,
+  // ---- helmets, chest plates, belts and boots
+  ...setPieces,
   // ---- capes
   I('cape', 'cape-none', 'None'),
-  art('cape', 'cape-blue', 'Blue cape', 30),
-  art('cape', 'cape-green', 'Green cape', 50),
-  art('cape', 'cape-red', 'Red cape', 70),
-  art('cape', 'cape-white', 'White cape', 110),
-  art('cape', 'cape-purple', 'Purple cape', 150),
-  art('cape', 'cape-black', 'Black cape', 200, 90),
+  ...capes,
   I('cape', 'cape-wings', 'Wings of light', 0, { unlock: streak(500) }),
   // ---- shields
   I('shield', 'shield-none', 'None'),
-  art('shield', 'shield-round', 'Round shield', 15),
-  art('shield', 'shield-lion', 'Lion shield', 30),
-  art('shield', 'shield-tree', 'Tree shield', 60),
-  art('shield', 'shield-sun', 'Sun shield', 100),
-  art('shield', 'shield-dragon', 'Dragon shield', 160),
-  art('shield', 'shield-spiked', 'Spiked shield', 240, 180),
+  ...SHIELD_NAMES.map((name, i) => art('shield', `shield-${i + 1}`, name, SHIELD_COSTS[i], i === 4 ? 180 : undefined)),
   // ---- weapons
   I('weapon', 'weapon-none', 'None'),
-  art('weapon', 'weapon-sword', 'Steel sword', 20),
-  art('weapon', 'weapon-spear', 'Spear', 30),
-  art('weapon', 'weapon-mace', 'Mace', 50),
-  art('weapon', 'weapon-axe', 'Battle axe', 70),
-  art('weapon', 'weapon-bow', 'Longbow', 100),
-  art('weapon', 'weapon-staff', 'Crystal staff', 150),
-  art('weapon', 'weapon-darksword', 'Dark sword', 200, 90),
-  art('weapon', 'weapon-goldsword', 'Golden sword', 350, 365),
-  // ---- extras
+  ...WEAPON_NAMES.map((name, i) => art('weapon', `weapon-${i + 1}`, name, WEAPON_COSTS[i], WEAPON_STREAKS[i + 1])),
+  // ---- accessories
   I('extra', 'ex-none', 'None'),
+  art('extra', 'ex-ring', 'Ring', 25),
+  art('extra', 'ex-amulet', 'Amulet', 40),
+  art('extra', 'ex-gloves', 'Gloves', 30),
   art('extra', 'ex-pouch', 'Pouch', 20),
   art('extra', 'ex-lantern', 'Lantern', 45),
-  art('extra', 'ex-banner-lion', 'Lion banner', 55),
-  art('extra', 'ex-banner-dragon', 'Dragon banner', 55),
-  art('extra', 'ex-banner-tree', 'Tree banner', 55),
-  art('extra', 'ex-banner-sun', 'Sun banner', 55),
-  art('extra', 'ex-medal', 'Medal', 0, undefined, { unlock: { kind: 'levelups', n: 1 }, requires: undefined }),
-  art('extra', 'ex-scroll', 'Scholar’s scroll', 0, undefined, { unlock: { kind: 'reviews', n: 500 }, requires: undefined }),
+  art('extra', 'ex-charm', 'Charm', 35),
+  art('extra', 'ex-banner', 'Banner', 55),
+  art('extra', 'ex-medal', 'Medal', 0, undefined, { unlock: { kind: 'levelups', n: 1 } }),
+  art('extra', 'ex-scroll', 'Scholar’s scroll', 0, undefined, { unlock: { kind: 'reviews', n: 500 } }),
   // ---- crowns (they float above the helmet)
   I('crown', 'crown-none', 'None'),
   I('crown', 'crown-royal', 'Royal crown', 300),
@@ -190,11 +195,10 @@ export type Look = Record<Slot, string>;
 
 export function defaultLook(): Look {
   return {
-    helmet: 'helmet-steel',
-    plume: 'plume-none',
-    chest: 'chest-knight',
-    arms: 'arms-knight',
-    legs: 'legs-knight',
+    helmet: 'helmet-1',
+    chest: 'chest-1',
+    belt: 'belt-1',
+    boots: 'boots-1',
     cape: 'cape-none',
     shield: 'shield-none',
     weapon: 'weapon-none',
@@ -211,10 +215,10 @@ export function armorWorn(look: Look): number {
   return ARMOR_SLOTS.filter((s) => look[s] !== base[s]).length;
 }
 
-/** The colourway being worn on breastplate, arms and legs, if all three match (and it is not the free start). */
-export function matchedColourway(look: Look): Colourway | undefined {
-  const keys = (['chest', 'arms', 'legs'] as const).map((slot) => itemById(look[slot])?.colourway);
-  return keys.every((k) => k && k === keys[0]) ? COLOURWAYS.find((c) => c.key === keys[0] && c.key !== 'knight') : undefined;
+/** The set being worn on helmet, chest plate, belt and boots, if all four match (and it is not the free start). */
+export function matchedSet(look: Look): ArmorSet | undefined {
+  const sets = (['helmet', 'chest', 'belt', 'boots'] as const).map((slot) => itemById(look[slot])?.set);
+  return sets.every((n) => n && n === sets[0]) ? SETS.find((s) => s.n === sets[0] && s.n !== 1) : undefined;
 }
 
 export function describeUnlock(u: Unlock): string {

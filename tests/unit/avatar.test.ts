@@ -15,8 +15,9 @@ import {
   seedsEarned,
   SLOTS,
   testing,
-  COLOURWAYS,
-  matchedColourway,
+  ARMOR_SLOTS,
+  SETS,
+  matchedSet,
   armorWorn,
   STREAK_SEED_BONUS,
 } from '../../src/core/avatar.ts';
@@ -67,32 +68,42 @@ describe('catalog', () => {
 describe('the knight', () => {
   it('everyone starts in the same free basic steel armor, with nothing in the shield and weapon slots', () => {
     const look = defaultLook();
-    expect(look).toMatchObject({ helmet: 'helmet-steel', chest: 'chest-knight', arms: 'arms-knight', legs: 'legs-knight', shield: 'shield-none', weapon: 'weapon-none' });
+    expect(look).toMatchObject({ helmet: 'helmet-1', chest: 'chest-1', belt: 'belt-1', boots: 'boots-1', shield: 'shield-none', weapon: 'weapon-none' });
     for (const slot of SLOTS) expect(itemById(look[slot])!.cost, slot).toBe(0);
     expect(armorWorn(look)).toBe(0);
   });
 
-  it('breastplate, arms and legs come in seven colourways with the same prices, and each costs more than the one before', () => {
-    expect(COLOURWAYS.length).toBe(7);
-    const prices = COLOURWAYS.map((c) => c.price);
-    expect(prices[0]).toBe(0);
+  it('the six armor categories are helmet, chest plate, belt, boots, shield and sword (no separate arms)', () => {
+    expect([...ARMOR_SLOTS]).toEqual(['helmet', 'chest', 'belt', 'boots', 'shield', 'weapon']);
+    expect(SLOTS).not.toContain('arms');
+  });
+
+  it('helmets, chest plates, belts, boots and capes come in twelve matching sets, each costing more than the one before', () => {
+    expect(SETS.length).toBe(12);
+    expect(SETS[0].price).toBe(0);
+    const prices = SETS.map((s) => s.price);
     expect(prices).toEqual([...prices].sort((a, b) => a - b));
-    expect(new Set(prices).size).toBe(7);
-    for (const c of COLOURWAYS) for (const slot of ['chest', 'arms', 'legs'] as const) {
-      const item = itemById(`${slot}-${c.key}`)!;
-      expect(item, `${slot}-${c.key}`).toBeDefined();
-      expect(item.cost).toBe(c.price);
-      expect(item.colourway).toBe(c.key);
+    expect(new Set(prices).size).toBe(12);
+    for (const set of SETS) {
+      for (const slot of ['helmet', 'chest', 'belt', 'boots', 'cape'] as const) {
+        const item = itemById(`${slot}-${set.n}`)!;
+        expect(item, `${slot}-${set.n}`).toBeDefined();
+        expect(item.set).toBe(set.n);
+      }
+    }
+    for (const slot of ['helmet', 'chest', 'belt', 'boots', 'cape'] as const) {
+      const costs = SETS.map((s) => itemById(`${slot}-${s.n}`)!.cost);
+      expect(costs, slot).toEqual([...costs].sort((a, b) => a - b));
     }
   });
 
   it('the finest pieces are the hardest to get: they cost the most and also need a long streak', () => {
     const days = (id: string) => (itemById(id)?.requires as { days: number } | undefined)?.days ?? 0;
-    expect(days('chest-gold')).toBeGreaterThanOrEqual(365);
-    expect(days('helmet-gold')).toBeGreaterThanOrEqual(365);
-    expect(days('weapon-goldsword')).toBeGreaterThanOrEqual(365);
-    expect(days('chest-shadow')).toBeGreaterThan(0);
-    for (const slot of ['helmet', 'shield', 'weapon'] as const) {
+    expect(days('chest-12')).toBeGreaterThanOrEqual(365);
+    expect(days('helmet-12')).toBeGreaterThanOrEqual(365);
+    expect(days('weapon-2')).toBeGreaterThanOrEqual(365);
+    expect(days('chest-10')).toBeGreaterThan(0);
+    for (const slot of ['helmet', 'chest', 'belt', 'boots', 'shield', 'weapon'] as const) {
       const inSlot = ITEMS.filter((i) => i.slot === slot && i.art);
       const priciest = inSlot.reduce((a, b) => (b.cost > a.cost ? b : a));
       expect(days(priciest.id), `${slot}: ${priciest.id}`).toBeGreaterThanOrEqual(180);
@@ -104,7 +115,7 @@ describe('the knight', () => {
   it('a piece that needs a streak cannot be bought early, however many seeds you have, and costs seeds once reached', () => {
     const d = rich();
     d.reviewsByDevice = { x: 100000 };
-    const sword = itemById('weapon-goldsword')!;
+    const sword = itemById('weapon-2')!;
     d.longestStreak = 364;
     expect(buyItem(d, sword.id, 1)).toMatchObject({ ok: false, reason: 'locked' });
     d.longestStreak = 365;
@@ -113,25 +124,25 @@ describe('the knight', () => {
     expect(seedsBalance(d)).toBe(before - sword.cost);
   });
 
-  it('notices a matching colourway on breastplate, arms and legs (but not the free start)', () => {
+  it('notices a matching set on helmet, chest plate, belt and boots (but not the free start)', () => {
     const look = defaultLook();
-    expect(matchedColourway(look)).toBeUndefined();
-    for (const s of ['chest', 'arms', 'legs'] as const) look[s] = `${s}-forest`;
-    expect(matchedColourway(look)?.key).toBe('forest');
-    look.legs = 'legs-gold';
-    expect(matchedColourway(look)).toBeUndefined();
+    expect(matchedSet(look)).toBeUndefined();
+    for (const s of ['helmet', 'chest', 'belt', 'boots'] as const) look[s] = `${s}-5`;
+    expect(matchedSet(look)?.name).toBe('Forest');
+    look.boots = 'boots-9';
+    expect(matchedSet(look)).toBeUndefined();
   });
 
   it('counts how many of the six pieces have been changed from the basic start', () => {
     const look = defaultLook();
     expect(armorWorn(look)).toBe(0);
-    look.shield = 'shield-lion';
-    look.weapon = 'weapon-sword';
+    look.shield = 'shield-1';
+    look.weapon = 'weapon-1';
     expect(armorWorn(look)).toBe(2);
-    look.helmet = 'helmet-cross';
-    look.chest = 'chest-iron';
-    look.arms = 'arms-iron';
-    look.legs = 'legs-iron';
+    look.helmet = 'helmet-8';
+    look.chest = 'chest-7';
+    look.belt = 'belt-7';
+    look.boots = 'boots-7';
     expect(armorWorn(look)).toBe(6);
   });
 });
@@ -312,7 +323,7 @@ describe('sync and backup', () => {
 describe('temporary "armor is free" testing switch', () => {
   it('while on, any armor can be worn with no seeds and no streak, nothing is recorded, and it falls off again when switched off', () => {
     const d = newData();
-    const legend = itemById('weapon-goldsword')!;
+    const legend = itemById('weapon-2')!;
     testing.armorFree = true;
     try {
       expect(owns(d, legend)).toBe(true);
