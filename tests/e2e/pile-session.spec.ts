@@ -19,10 +19,13 @@ test('reviewing a whole pile flows verse to verse and updates the schedule', asy
     await expect(page.getByTestId('review').locator('.sub')).toHaveText(`Verse ${i + 1} of 3`);
     await finishFlashcard(page);
     await expect(page.getByTestId('verse-result')).toBeVisible();
+    // in a run of several verses the seeds are saved for the end, so nothing slows you down in between
+    await expect(page.getByTestId('seeds-gain')).toHaveCount(0);
     // flows on by itself
   }
   await expect(page.getByTestId('session-summary')).toBeVisible({ timeout: 5000 });
   await expect(page.getByTestId('session-summary')).toContainText('3 verses reviewed · 3 counted');
+  await expect(page.getByTestId('session-seeds')).toContainText(/\+\d+ seeds/); // all of the run's seeds, once, at the end
   await page.getByTestId('session-done').click();
 
   // each Daily verse now needs a 2 hour gap before its 2nd review

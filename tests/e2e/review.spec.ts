@@ -176,6 +176,22 @@ test.describe('review modes', () => {
     await finishWithReference(page, JOHN316);
   });
 
+  test('speak it: close is enough — 85% of the words or better passes with no slips', async ({ page }) => {
+    // two of the 26 words are mis-heard or missing (92%)
+    await installFakeSpeech(page, JOHN_TEXT.replace(/[,.]/g, '').toLowerCase().replace('loved ', '').replace('eternal ', ''));
+    await page.goto('/#/pile/daily');
+    await page.reload();
+    await startVerseReview(page, 'speak');
+    await page.getByTestId('speak-start').click();
+    await expect(page.getByTestId('speak-done')).toBeVisible();
+    await page.waitForTimeout(600);
+    await page.getByTestId('speak-done').click();
+    await expect(page.getByTestId('speak-result')).toContainText('Close enough');
+    await page.getByTestId('speak-continue').click();
+    await expect(page.getByTestId('mistakes').locator('.dot.used')).toHaveCount(0);
+    await finishWithReference(page, JOHN316);
+  });
+
   test('speak it: "Read along" shows the words from the start, "From memory" hides them until you finish (and remembers the choice)', async ({ page }) => {
     await installFakeSpeech(page, JOHN_TEXT.replace(/[,.]/g, '').toLowerCase());
     await page.goto('/#/pile/daily');

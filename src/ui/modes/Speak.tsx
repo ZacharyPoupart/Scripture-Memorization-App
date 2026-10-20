@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { formatRef } from '../../core/reference.ts';
-import { alignSpeech, tokenizeSpeech } from '../../core/speech.ts';
+import { alignSpeech, speechAccuracy, speechPassed, SPEECH_PASS, tokenizeSpeech } from '../../core/speech.ts';
 import { tokenize } from '../../core/text.ts';
 import { navigate } from '../../router.ts';
 import { updateSettings, useApp } from '../../store.ts';
@@ -119,8 +119,9 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
   };
 
   const proceed = () => {
-    // Mistakes are charged now, after the word-by-word feedback has been seen.
-    if (align.mistakes > 0 && onMistake(align.mistakes)) return; // too many: restarts
+    // Close is enough (the microphone mishears): 85% of the words or better passes with no slips charged.
+    // Below that, the missed words are charged as slips now, after the word-by-word feedback has been seen.
+    if (!speechPassed(align) && align.mistakes > 0 && onMistake(align.mistakes)) return; // too many: restarts
     onDone();
   };
 
@@ -161,8 +162,12 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
           </div>
         )}
         {finished && (
-          <div class={`banner ${align.mistakes === 0 ? 'good' : 'info'}`} data-testid="speak-result">
-            {align.mistakes === 0 ? 'Perfect — every word!' : `${align.mistakes} word${align.mistakes === 1 ? '' : 's'} missed or different.`}
+          <div class={`banner ${speechPassed(align) ? 'good' : 'info'}`} data-testid="speak-result">
+            {align.mistakes === 0
+              ? 'Perfect — every word!'
+              : speechPassed(align)
+                ? `Close enough — ${Math.round(speechAccuracy(align) * 100)}% of the words. That counts.`
+                : `${align.mistakes} word${align.mistakes === 1 ? '' : 's'} missed or different (${Math.round(speechAccuracy(align) * 100)}%; ${Math.round(SPEECH_PASS * 100)}% passes).`}
           </div>
         )}
         {error && <div class="banner bad" role="alert">{error}</div>}
