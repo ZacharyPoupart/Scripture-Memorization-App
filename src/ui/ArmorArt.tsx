@@ -35,6 +35,7 @@ const BELT_S = 0.78; // the front of the belt covers the belt painted on the che
 const BELT_TOP = 119;
 const HIP = 146; // where pouches and the like hang
 const HAND_Y = 138;
+const SHIELD_S = 1.55; // a shield is about as wide as the body
 /** Where each weapon is held, as a fraction of its length from the top. */
 const GRIP: Record<string, number> = {
   'weapon-1': 0.82,
@@ -66,7 +67,7 @@ function Underlayer() {
 /** All the painted layers, back to front. */
 export function ArmorLayers({ look }: { look: Look }) {
   const weaponH = (SIZE[look.weapon]?.[1] ?? 110) * 1.2;
-  const shieldH = (SIZE[look.shield]?.[1] ?? 90) * 1.0;
+  const shieldH = (SIZE[look.shield]?.[1] ?? 90) * SHIELD_S;
   return (
     <g>
       <Piece id={look.cape} spot={{ s: 1.2, top: CHEST_TOP - 4 }} />
@@ -82,7 +83,7 @@ export function ArmorLayers({ look }: { look: Look }) {
       {look.extra === 'ex-gloves' && <Piece id="ex-gloves" spot={{ s: 0.75, cx: 32, top: HIP + 22 }} />}
       {look.extra === 'ex-ring' && <Piece id="ex-ring" spot={{ s: 0.7, cx: -46, top: HAND_Y + 6 }} />}
       <Piece id={look.helmet} spot={{ s: HELM_S, bottom: HELM_BOTTOM }} />
-      <Piece id={look.shield} spot={{ s: 1.0, cx: -54, top: HAND_Y - shieldH / 2 }} />
+      <Piece id={look.shield} spot={{ s: SHIELD_S, cx: -58, top: HAND_Y - shieldH / 2 }} />
       <Piece id={look.weapon} spot={{ s: 1.2, cx: 50, top: HAND_Y + 4 - (GRIP[look.weapon] ?? 0.75) * weaponH }} />
     </g>
   );

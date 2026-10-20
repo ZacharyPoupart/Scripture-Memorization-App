@@ -13,6 +13,7 @@ OUT = os.path.join(HERE, '..', 'public', 'armor')
 SIZES = os.path.join(HERE, '..', 'src', 'ui', 'armorSizes.json')
 
 BELT_FRONT = (0.08, 0.36, 0.92)  # left, top and right of the front band, as fractions of the belt picture
+BOW_CLEAN = {'weapon-8': 120, 'weapon-11': 175}  # the two bows, and how bright a colourless pixel must be to be cleared
 ACCESSORIES = ['ring', 'amulet', 'gloves', 'scroll', 'pouch', 'lantern', 'charm', 'banner', 'medal']
 
 BOXES = {
@@ -44,6 +45,15 @@ for f in os.listdir(OUT):
 sizes = {}
 for name, box in sorted(names.items()):
     piece = sheet.crop(tuple(box))
+    if name in BOW_CLEAN:
+        # the sheet leaves a pale smudge (and a checkerboard) between the wood and the string: clear every pale, colourless pixel
+        floor = BOW_CLEAN[name]
+        px = piece.load()
+        for y in range(piece.height):
+            for x in range(piece.width):
+                r, g, b, a = px[x, y]
+                if a and min(r, g, b) > floor and max(r, g, b) - min(r, g, b) < 28:
+                    px[x, y] = (r, g, b, 0)
     if name.startswith('belt-'):
         # keep just the front band: drop the top rim (the inside of the back of the ring) and the ends where the ring turns away
         w, h = piece.size
