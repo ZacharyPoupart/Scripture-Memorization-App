@@ -11,13 +11,12 @@ import type { AppData } from './types.ts';
 export type Slot = 'helmet' | 'chest' | 'belt' | 'boots' | 'cape' | 'shield' | 'weapon' | 'crown' | 'extra' | 'companion' | 'background';
 
 export interface SlotGroup {
-  key: 'armor' | 'gear' | 'extras';
+  key: 'armor' | 'extras';
   label: string;
   slots: Slot[];
 }
 export const SLOT_GROUPS: SlotGroup[] = [
-  { key: 'armor', label: 'Armor', slots: ['helmet', 'chest', 'belt', 'boots'] },
-  { key: 'gear', label: 'Weapons', slots: ['shield', 'weapon'] },
+  { key: 'armor', label: 'Armor', slots: ['helmet', 'chest', 'belt', 'boots', 'shield', 'weapon'] },
   { key: 'extras', label: 'Extras', slots: ['cape', 'extra', 'crown', 'companion', 'background'] },
 ];
 export const SLOTS: Slot[] = SLOT_GROUPS.flatMap((g) => g.slots);
@@ -78,7 +77,7 @@ const art = (slot: Slot, id: string, name: string, cost: number, needs?: number,
 /**
  * Helmets, chest plates, belts and boots (and capes) come in twelve matching sets painted to the same scale, so any piece goes
  * with any other. Each set costs more than the one before, and the finest need a long streak first. Set 1 is the free start.
- * Leg armor is not a choice of its own: the legs of the chest plate's set are worn automatically (see ArmorArt).
+ * Leg armor is not a choice of its own: the legs of the boots' set are worn automatically (see ArmorArt).
  */
 export interface ArmorSet {
   n: number;

@@ -81,4 +81,4 @@ The automated tests run in Chromium, which behaves differently from iPhone Safar
 - [ ] A wrong character shows the right one and you carry on.
 
 - [ ] Avatar: open it from Today, try on and buy an item, see it in the Today bubble; the scene and item tiles look sharp and the bottom Buy bar clears the home indicator.
-- [ ] Knight avatar: try on a helmet, chest plate, belt, boots and a shield (the matching legs appear on their own), the three tabs (Armor / Weapons / Extras) scroll and tap easily, and the knight stays sharp in the Today bubble.
+- [ ] Knight avatar: try on a helmet, chest plate, belt, boots and a shield (the legs matching the boots appear on their own), the two tabs (Armor with all six pieces, and Extras) scroll and tap easily, and the knight stays sharp in the Today bubble.

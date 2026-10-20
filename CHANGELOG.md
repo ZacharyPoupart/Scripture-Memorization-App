@@ -5,6 +5,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Changed
+- The leg armor now goes with the boots you choose (it used to follow the chest plate).
+- The belt sits at the waist, over the belt painted on the chest plate.
+- The avatar screen has two tabs: Armor holds all six pieces (helmet, chest plate, belt, boots, shield, sword) and Extras holds the cape, accessories, crown, companion and scene.
+
 ## [1.18.0] - 2026-10-20
 
 ### Changed

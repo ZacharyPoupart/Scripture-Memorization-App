@@ -90,7 +90,6 @@ test.describe('avatar and seeds', () => {
     await page.evaluate(() => (window as any).__mfl.armorFree(false));
     await addVerse(page, JOHN316);
     await page.goto('/#/avatar');
-    await page.getByTestId('group-gear').click();
     await page.getByTestId('slot-weapon').click();
     await page.getByTestId('item-weapon-2').click();
     await expect(page.getByTestId('unlock-hint')).toContainText('365-day streak'); // the finest pieces also ask for the longest streak
