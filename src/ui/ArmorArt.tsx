@@ -30,6 +30,7 @@ function Piece({ id, spot }: { id: string; spot: Spot }) {
 const S = 0.85; // every piece was painted to one scale, so one factor sizes them all
 const HELM_S = 0.8;
 const HELM_BOTTOM = 84;
+const CHEST_S = 0.95; // a little bigger than the rest so its sides reach past the legs
 const CHEST_TOP = 70; // where the top of the chest plate sits
 const BELT_S = 0.78; // the front of the belt covers the belt painted on the chest plate
 const BELT_TOP = 119;
@@ -58,8 +59,8 @@ function Underlayer() {
       <rect x="-10" y="74" width="20" height="28" rx="6" />
       <path d="M-28 90 Q-30 130 -22 160 L22 160 Q30 130 28 90 Z" />
       <path d="M-22 150 L22 150 L22 205 L4 205 L0 180 L-4 205 L-24 205 Z" />
-      <rect x="-24" y="195" width="19" height="50" rx="6" />
-      <rect x="5" y="195" width="19" height="50" rx="6" />
+      <rect x="-19" y="195" width="15" height="44" rx="6" />
+      <rect x="4" y="195" width="15" height="44" rx="6" />
     </g>
   );
 }
@@ -73,7 +74,7 @@ export function ArmorLayers({ look }: { look: Look }) {
       <Piece id={look.cape} spot={{ s: 1.2, top: CHEST_TOP - 4 }} />
       <Underlayer />
       <Piece id={look.boots} spot={{ s: S, bottom: 250 }} />
-      <Piece id={look.chest} spot={{ s: S, top: CHEST_TOP }} />
+      <Piece id={look.chest} spot={{ s: CHEST_S, top: CHEST_TOP }} />
       <Piece id={look.belt} spot={{ s: BELT_S, top: BELT_TOP }} />
       {look.extra === 'ex-amulet' && <Piece id="ex-amulet" spot={{ s: 0.8, top: CHEST_TOP + 10 }} />}
       {look.extra === 'ex-medal' && <Piece id="ex-medal" spot={{ s: 0.7, cx: -20, top: CHEST_TOP + 24 }} />}
