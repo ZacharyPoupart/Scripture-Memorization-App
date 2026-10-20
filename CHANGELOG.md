@@ -5,6 +5,12 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.18.3] - 2026-10-20
+
+### Changed
+- The shield is a bit smaller.
+- The dark "shadow" pieces (shadow and spiked helmets, shadow chest plate, belt, boots and cape, the spiked shield and the dark sword) are blue instead of red, and the two helmets no longer have glowing eyes (the eye area is dark).
+
 ## [1.18.2] - 2026-10-20
 
 ### Changed

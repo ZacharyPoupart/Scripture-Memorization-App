@@ -36,7 +36,7 @@ const BELT_S = 0.78; // the front of the belt covers the belt painted on the che
 const BELT_TOP = 119;
 const HIP = 146; // where pouches and the like hang
 const HAND_Y = 138;
-const SHIELD_S = 1.55; // a shield is about as wide as the body
+const SHIELD_S = 1.3; // a shield is about as wide as the body
 /** Where each weapon is held, as a fraction of its length from the top. */
 const GRIP: Record<string, number> = {
   'weapon-1': 0.82,
