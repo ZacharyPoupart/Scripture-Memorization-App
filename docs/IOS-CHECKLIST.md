@@ -82,3 +82,4 @@ The automated tests run in Chromium, which behaves differently from iPhone Safar
 
 - [ ] Avatar: open it from Today, try on and buy an item, see it in the Today bubble; the scene and item tiles look sharp and the bottom Buy bar clears the home indicator.
 - [ ] Knight avatar: try on a helmet, chest plate, belt, boots and a shield (the legs matching the boots appear on their own), the two tabs (Armor with all six pieces, and Extras) scroll and tap easily, and the knight stays sharp in the Today bubble.
+- [ ] Type it out: the keyboard opens and letters go straight in with no input box; tapping the text brings the keyboard back; the reference slots sit below the verse; the topic can be typed (letters narrow the choices) or tapped.

@@ -307,6 +307,18 @@ test.describe('topic is quizzed too', () => {
     await expect(page.getByTestId('verse-result')).toBeVisible({ timeout: 6000 });
   });
 
+  test('type it out: the topic is typed too (the letters narrow the choices), and a wrong letter is a slip', async ({ page }) => {
+    await page.getByTestId('review-type').click();
+    await typeWholeVerse(page, JOHN_TEXT);
+    await typeReference(page, JOHN316);
+    await expect(page.getByTestId('topic-options')).toBeVisible();
+    await expect(page.getByTestId('type-input')).toBeFocused(); // the keyboard stays up from the verse straight through to the topic
+    await page.keyboard.type('q'); // no topic starts with q
+    await expect(page.getByTestId('mistakes').locator('.dot.used')).toHaveCount(1);
+    await page.keyboard.type('gospel');
+    await expect(page.getByTestId('verse-result')).toBeVisible({ timeout: 6000 });
+  });
+
   test('speak it: typed reference, then the topic', async ({ page }) => {
     await speakToReference(page, JOHN_TEXT);
     await answerReference(page, JOHN316);
