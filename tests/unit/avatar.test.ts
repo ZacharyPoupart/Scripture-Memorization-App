@@ -15,11 +15,9 @@ import {
   seedsEarned,
   SLOTS,
   testing,
-  ARMOR_SETS,
-  ARMOR_SLOTS,
-  completedSet,
+  COLOURWAYS,
+  matchedColourway,
   armorWorn,
-  SLOT_GROUPS,
   STREAK_SEED_BONUS,
 } from '../../src/core/avatar.ts';
 import { mergeData } from '../../src/core/merge.ts';
@@ -67,59 +65,73 @@ describe('catalog', () => {
 });
 
 describe('the knight', () => {
-  it('everything that makes the knight look like you is free', () => {
-    const me = SLOT_GROUPS.find((g) => g.key === 'me')!.slots;
-    for (const slot of me) for (const i of ITEMS.filter((x) => x.slot === slot)) expect(i.cost + (i.unlock ? 1 : 0), i.id).toBe(0);
-    expect(ITEMS.filter((i) => i.slot === 'skin').length).toBeGreaterThanOrEqual(6);
-    expect(ITEMS.filter((i) => i.slot === 'hair').length).toBeGreaterThanOrEqual(8);
+  it('everyone starts in the same free basic steel armor, with nothing in the shield and weapon slots', () => {
+    const look = defaultLook();
+    expect(look).toMatchObject({ helmet: 'helmet-steel', chest: 'chest-knight', arms: 'arms-knight', legs: 'legs-knight', shield: 'shield-none', weapon: 'weapon-none' });
+    for (const slot of SLOTS) expect(itemById(look[slot])!.cost, slot).toBe(0);
+    expect(armorWorn(look)).toBe(0);
   });
 
-  it('has ten armor sets with a piece for each of the six slots, each set costing more than the one before', () => {
-    expect(ARMOR_SETS.length).toBe(10);
-    const prices = ARMOR_SETS.map((x) => x.price);
+  it('breastplate, arms and legs come in seven colourways with the same prices, and each costs more than the one before', () => {
+    expect(COLOURWAYS.length).toBe(7);
+    const prices = COLOURWAYS.map((c) => c.price);
+    expect(prices[0]).toBe(0);
     expect(prices).toEqual([...prices].sort((a, b) => a - b));
-    expect(new Set(prices).size).toBe(10);
-    for (const set of ARMOR_SETS) for (const slot of ARMOR_SLOTS) {
-      const item = itemById(`${slot}-${set.key}`)!;
-      expect(item, `${slot}-${set.key}`).toBeDefined();
-      expect(item.cost).toBe(set.price);
-      expect(item.set).toBe(set.key);
+    expect(new Set(prices).size).toBe(7);
+    for (const c of COLOURWAYS) for (const slot of ['chest', 'arms', 'legs'] as const) {
+      const item = itemById(`${slot}-${c.key}`)!;
+      expect(item, `${slot}-${c.key}`).toBeDefined();
+      expect(item.cost).toBe(c.price);
+      expect(item.colourway).toBe(c.key);
     }
-    // the coolest sets are the hardest to get: they also need a long streak, and the streaks only go up
-    const streaks = ARMOR_SETS.map((x) => x.streak ?? 0);
-    expect(streaks).toEqual([...streaks].sort((a, b) => a - b));
-    expect(ARMOR_SETS[9].streak).toBeGreaterThanOrEqual(365);
-    expect(ARMOR_SETS.slice(0, 7).every((x) => !x.streak)).toBe(true);
   });
 
-  it('a set that needs a streak cannot be bought early, however many seeds you have, and costs seeds once reached', () => {
+  it('the finest pieces are the hardest to get: they cost the most and also need a long streak', () => {
+    const days = (id: string) => (itemById(id)?.requires as { days: number } | undefined)?.days ?? 0;
+    expect(days('chest-gold')).toBeGreaterThanOrEqual(365);
+    expect(days('helmet-gold')).toBeGreaterThanOrEqual(365);
+    expect(days('weapon-goldsword')).toBeGreaterThanOrEqual(365);
+    expect(days('chest-shadow')).toBeGreaterThan(0);
+    for (const slot of ['helmet', 'shield', 'weapon'] as const) {
+      const inSlot = ITEMS.filter((i) => i.slot === slot && i.art);
+      const priciest = inSlot.reduce((a, b) => (b.cost > a.cost ? b : a));
+      expect(days(priciest.id), `${slot}: ${priciest.id}`).toBeGreaterThanOrEqual(180);
+    }
+    // a gated piece is never cheaper than the free-for-everyone ones in its slot
+    for (const i of ITEMS.filter((x) => x.requires)) expect(i.cost, i.id).toBeGreaterThan(0);
+  });
+
+  it('a piece that needs a streak cannot be bought early, however many seeds you have, and costs seeds once reached', () => {
     const d = rich();
     d.reviewsByDevice = { x: 100000 };
-    const legend = itemById('sword-legend')!;
+    const sword = itemById('weapon-goldsword')!;
     d.longestStreak = 364;
-    expect(buyItem(d, legend.id, 1)).toMatchObject({ ok: false, reason: 'locked' });
+    expect(buyItem(d, sword.id, 1)).toMatchObject({ ok: false, reason: 'locked' });
     d.longestStreak = 365;
     const before = seedsBalance(d);
-    expect(buyItem(d, legend.id, 2)).toEqual({ ok: true });
-    expect(seedsBalance(d)).toBe(before - legend.cost);
+    expect(buyItem(d, sword.id, 2)).toEqual({ ok: true });
+    expect(seedsBalance(d)).toBe(before - sword.cost);
   });
 
-  it('notices when a whole set is worn', () => {
+  it('notices a matching colourway on breastplate, arms and legs (but not the free start)', () => {
     const look = defaultLook();
-    expect(completedSet(look)).toBeUndefined();
-    for (const s of ARMOR_SLOTS) look[s] = `${s}-paladin`;
-    expect(completedSet(look)?.key).toBe('paladin');
-    look.shield = 'shield-storm';
-    expect(completedSet(look)).toBeUndefined();
+    expect(matchedColourway(look)).toBeUndefined();
+    for (const s of ['chest', 'arms', 'legs'] as const) look[s] = `${s}-forest`;
+    expect(matchedColourway(look)?.key).toBe('forest');
+    look.legs = 'legs-gold';
+    expect(matchedColourway(look)).toBeUndefined();
   });
 
-  it('counts how many pieces are worn', () => {
+  it('counts how many of the six pieces have been changed from the basic start', () => {
     const look = defaultLook();
     expect(armorWorn(look)).toBe(0);
-    look.shield = 'shield-soldier';
-    look.sword = 'sword-paladin';
+    look.shield = 'shield-lion';
+    look.weapon = 'weapon-sword';
     expect(armorWorn(look)).toBe(2);
-    for (const s of ARMOR_SLOTS) look[s] = `${s}-soldier`;
+    look.helmet = 'helmet-cross';
+    look.chest = 'chest-iron';
+    look.arms = 'arms-iron';
+    look.legs = 'legs-iron';
     expect(armorWorn(look)).toBe(6);
   });
 });
@@ -239,10 +251,10 @@ describe('buying, unlocking and equipping', () => {
 
   it('an unknown or unowned item in the data (e.g. from a newer version) falls back to the default instead of breaking', () => {
     const d = newData();
-    d.avatar = { owned: [], look: { helmet: 'future-helmet', tunic: hat.id }, lookAt: 1 };
+    d.avatar = { owned: [], look: { helmet: 'future-helmet', chest: hat.id }, lookAt: 1 };
     const look = currentLook(d);
     expect(look.helmet).toBe(defaultLook().helmet);
-    expect(look.tunic).toBe(defaultLook().tunic);
+    expect(look.chest).toBe(defaultLook().chest);
   });
 
   it('a balance can never show below zero, and no item is ever removed (two devices spending the same seeds)', () => {
@@ -290,7 +302,7 @@ describe('sync and backup', () => {
     equipItem(d, hat.id, 2);
     expect(parseBackup(exportBackup(d, '9.9.9', 0))).toEqual(d);
     const bad = JSON.parse(JSON.stringify(d));
-    bad.avatar = { owned: [1, null, 'ok', 'x'.repeat(500)], look: { hat: 5, tunic: 'fine' }, lookAt: 'no' };
+    bad.avatar = { owned: [1, null, 'ok', 'x'.repeat(500)], look: { hat: 5, chest: 'fine' }, lookAt: 'no' };
     const n = normalizeData(bad);
     expect(n.avatar === undefined || Array.isArray(n.avatar.owned)).toBe(true);
     if (n.avatar) expect(n.avatar.owned.every((s) => typeof s === 'string' && s.length < 80)).toBe(true);
@@ -300,18 +312,18 @@ describe('sync and backup', () => {
 describe('temporary "armor is free" testing switch', () => {
   it('while on, any armor can be worn with no seeds and no streak, nothing is recorded, and it falls off again when switched off', () => {
     const d = newData();
-    const legend = itemById('sword-legend')!;
+    const legend = itemById('weapon-goldsword')!;
     testing.armorFree = true;
     try {
       expect(owns(d, legend)).toBe(true);
       expect(equipItem(d, legend.id, 1)).toBe(true);
-      expect(currentLook(d).sword).toBe(legend.id);
+      expect(currentLook(d).weapon).toBe(legend.id);
       expect(seedsBalance(d)).toBe(0);
       expect(d.avatar?.owned ?? []).toEqual([]); // nothing was bought
-      expect(owns(d, itemById('cape-gold')!)).toBe(false); // only armor is free
+      expect(owns(d, itemById('pet-lion')!)).toBe(false); // only the painted pieces are free
     } finally {
       testing.armorFree = false;
     }
-    expect(currentLook(d).sword).toBe(defaultLook().sword);
+    expect(currentLook(d).weapon).toBe(defaultLook().weapon);
   });
 });
