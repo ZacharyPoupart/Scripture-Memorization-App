@@ -10,6 +10,7 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 ### Changed
 - The belt shows only its front band, not the whole ring.
 - The boots are now the sheet's leg-and-boot pieces drawn as one picture, instead of boots laid over separate legs.
+- The belt and helmet are a touch smaller, and a plain grey shape (like chain mail) sits behind the armor so no gaps show at the neck, waist or between the legs.
 
 ## [1.18.1] - 2026-10-20
 
