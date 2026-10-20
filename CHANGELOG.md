@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.18.1] - 2026-10-20
+
 ### Changed
 - The leg armor now goes with the boots you choose (it used to follow the chest plate).
 - The belt sits at the waist, over the belt painted on the chest plate.
