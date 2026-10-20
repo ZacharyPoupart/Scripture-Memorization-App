@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.19.0] - 2026-10-20
+
 ### Changed
 - Type it out: the topic can be typed too (the letters you type narrow the choices, and it is chosen when one is left; tapping still works), so you no longer swap between typing and tapping.
 - Type it out: the reference now appears below the verse instead of above it.
