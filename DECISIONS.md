@@ -274,3 +274,7 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Decisions I made (please check):** the sheet has a Leg Armor row that is not one of the six categories, so `legs-N` is drawn automatically with `chest-N` instead of being a choice. The sheet has no plumes, so plumes were dropped (helmet 6 has its own painted plume). The Shoulders/Arms row is unused. The weapon and bow labels on the sheet were cut off; set names and piece names are my guesses.
 **Data:** no shape change. Old ids are ignored and, since seeds are derived, anything bought is refunded automatically; the avatar returns to the basic armor.
 **Still on:** `testing.armorFree` (all painted pieces free to wear) until the owner says testing is done.
+
+## v1.18.1 — Legs follow the boots, belt at the waist, two tabs (owner request)
+**What:** `legs-N` is drawn with `boots-N` instead of `chest-N`; the belt is smaller and moved up to cover the belt painted on the chest plate; the Weapons tab is gone and its shield and sword sit in the Armor tab with the other four pieces.
+**Note:** the belt is placed at one fixed height, so it lines up best with chest plates whose painted belt is at the usual spot; if one looks off on your phone, tell me which.

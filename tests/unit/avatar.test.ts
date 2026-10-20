@@ -13,6 +13,7 @@ import {
   owns,
   seedsBalance,
   seedsEarned,
+  SLOT_GROUPS,
   SLOTS,
   testing,
   ARMOR_SLOTS,
@@ -71,6 +72,12 @@ describe('the knight', () => {
     expect(look).toMatchObject({ helmet: 'helmet-1', chest: 'chest-1', belt: 'belt-1', boots: 'boots-1', shield: 'shield-none', weapon: 'weapon-none' });
     for (const slot of SLOTS) expect(itemById(look[slot])!.cost, slot).toBe(0);
     expect(armorWorn(look)).toBe(0);
+  });
+
+  it('the armor tab holds all six pieces and the extras tab everything else', () => {
+    expect(SLOT_GROUPS.map((g) => g.key)).toEqual(['armor', 'extras']);
+    expect(SLOT_GROUPS[0].slots).toEqual(['helmet', 'chest', 'belt', 'boots', 'shield', 'weapon']);
+    expect(SLOT_GROUPS[1].slots).toEqual(['cape', 'extra', 'crown', 'companion', 'background']);
   });
 
   it('the six armor categories are helmet, chest plate, belt, boots, shield and sword (no separate arms)', () => {
