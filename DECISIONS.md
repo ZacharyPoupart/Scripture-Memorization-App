@@ -286,3 +286,7 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **And:** shield scale 1.0 -> 1.55; the two bows (`weapon-8`, `weapon-11`) have their pale smudge/checkerboard cleared in the cut script (`BOW_CLEAN`). The scimitar (`weapon-9`) is complete as drawn on the sheet: its art is a blade with no hilt, so I left it; a version with a hilt would need new art.
 **Also:** chest plate scale 0.85 -> 0.95 (`CHEST_S`) so its sides extend past the legs.
 **Removed:** the grey `Underlayer` behind the armor was tried and taken out again at the owner's request; nothing is drawn behind the armor now.
+
+## v1.18.3 — Smaller shield, no glowing red eyes (owner request)
+**What:** shield scale 1.55 -> 1.3; `helmet-4` (shadow) and `helmet-7` (spiked) have the red glow in the eye area turned dark by the cut script (`EYES` in `design/cut-armor.py`). The red cracks on the shadow helmet and the red shadow chest plate were left alone, since only the eyes were mentioned.
+**Swapping art:** new art with the same size and layout as the sheet only needs `design/armor-sheet.webp` replaced (with its background removed) and `python3 design/cut-armor.py` run again; if any piece moves, edit its box in that script.

@@ -5,6 +5,10 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Changed
+- The shield is a bit smaller.
+- The shadow and spiked helmets no longer have glowing red eyes (the eye area is dark now).
+
 ## [1.18.2] - 2026-10-20
 
 ### Changed

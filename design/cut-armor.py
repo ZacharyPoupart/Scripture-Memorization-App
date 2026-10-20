@@ -14,6 +14,8 @@ SIZES = os.path.join(HERE, '..', 'src', 'ui', 'armorSizes.json')
 
 BELT_FRONT = (0.08, 0.36, 0.92)  # left, top and right of the front band, as fractions of the belt picture
 BOW_CLEAN = {'weapon-8': 120, 'weapon-11': 175}  # the two bows, and how bright a colourless pixel must be to be cleared
+# The shadow and spiked helmets have glowing red eyes; the eye area (left, top, right, bottom as fractions of the picture) is turned dark
+EYES = {'helmet-4': (0.12, 0.45, 0.88, 0.66), 'helmet-7': (0.12, 0.38, 0.88, 0.72)}
 ACCESSORIES = ['ring', 'amulet', 'gloves', 'scroll', 'pouch', 'lantern', 'charm', 'banner', 'medal']
 
 BOXES = {
@@ -45,6 +47,14 @@ for f in os.listdir(OUT):
 sizes = {}
 for name, box in sorted(names.items()):
     piece = sheet.crop(tuple(box))
+    if name in EYES:
+        px = piece.load()
+        x0, y0, x1, y1 = (round(f * d) for f, d in zip(EYES[name], (piece.width, piece.height, piece.width, piece.height)))
+        for y in range(y0, y1):
+            for x in range(x0, x1):
+                r, g, b, a = px[x, y]
+                if a and r > 60 and r > g * 1.4 and r > b * 1.4:
+                    px[x, y] = (18, 14, 16, a)
     if name in BOW_CLEAN:
         # the sheet leaves a pale smudge (and a checkerboard) between the wood and the string: clear every pale, colourless pixel
         floor = BOW_CLEAN[name]
