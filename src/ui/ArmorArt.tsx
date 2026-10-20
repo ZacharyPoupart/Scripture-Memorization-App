@@ -52,19 +52,6 @@ const GRIP: Record<string, number> = {
   'weapon-11': 0.5,
 };
 
-/** A plain grey shape behind the armor, like chain mail, so no gaps show between the pieces (neck, waist, between the legs). */
-function Underlayer() {
-  return (
-    <g fill="#8b9199" stroke="#6b717a" stroke-width="1" stroke-linejoin="round">
-      <rect x="-10" y="74" width="20" height="28" rx="6" />
-      <path d="M-28 90 Q-30 130 -22 160 L22 160 Q30 130 28 90 Z" />
-      <path d="M-22 150 L22 150 L22 205 L4 205 L0 180 L-4 205 L-24 205 Z" />
-      <rect x="-19" y="195" width="15" height="44" rx="6" />
-      <rect x="4" y="195" width="15" height="44" rx="6" />
-    </g>
-  );
-}
-
 /** All the painted layers, back to front. */
 export function ArmorLayers({ look }: { look: Look }) {
   const weaponH = (SIZE[look.weapon]?.[1] ?? 110) * 1.2;
@@ -72,7 +59,6 @@ export function ArmorLayers({ look }: { look: Look }) {
   return (
     <g>
       <Piece id={look.cape} spot={{ s: 1.2, top: CHEST_TOP - 4 }} />
-      <Underlayer />
       <Piece id={look.boots} spot={{ s: S, bottom: 250 }} />
       <Piece id={look.chest} spot={{ s: CHEST_S, top: CHEST_TOP }} />
       <Piece id={look.belt} spot={{ s: BELT_S, top: BELT_TOP }} />

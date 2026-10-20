@@ -285,3 +285,4 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Also (same PR):** belt scale 0.85 -> 0.78, helmet 0.85 -> 0.80, and a plain grey `Underlayer` behind the armor in `ui/ArmorArt.tsx` fills the gaps (no detail, just a filler shape).
 **And:** shield scale 1.0 -> 1.55; the two bows (`weapon-8`, `weapon-11`) have their pale smudge/checkerboard cleared in the cut script (`BOW_CLEAN`). The scimitar (`weapon-9`) is complete as drawn on the sheet: its art is a blade with no hilt, so I left it; a version with a hilt would need new art.
 **Also:** chest plate scale 0.85 -> 0.95 (`CHEST_S`) so its sides extend past the legs.
+**Removed:** the grey `Underlayer` behind the armor was tried and taken out again at the owner's request; nothing is drawn behind the armor now.
