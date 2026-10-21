@@ -9,7 +9,7 @@ test.beforeEach(async ({ page }) => {
 // screens are added. Runs on the phone-sized viewport (and desktop).
 
 const ROUTES: [string, RegExp][] = [
-  ['/#/', /Good (morning|afternoon|evening)|Still up/],
+  ['/#/', /to review|Done for now|All done|Nothing due|On a break/],
   ['/#/piles', /All verses/],
   ['/#/add', /Add a verse/],
   ['/#/settings', /Settings/],

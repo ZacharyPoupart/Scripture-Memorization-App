@@ -5,6 +5,12 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.22.0] - 2026-10-21
+
+### Changed
+- Back to the original teal-and-paper colours (the warm Hearth colours are gone). The new fonts, rounder cards and pill buttons stay.
+- Today is calmer and focused on the verses: no date or greeting, no progress ring, no filler lines, the verse list is bigger with more space between rows, and the four piles are one quiet row of names and counts instead of four cards.
+
 ## [1.21.0] - 2026-10-21
 
 ### Changed

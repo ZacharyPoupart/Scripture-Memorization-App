@@ -21,7 +21,6 @@ export function Home() {
   const frozen = isFrozen(data, now) && verses.length > 0 && !onBreak;
   const untilFreeze = daysUntilFreeze(data, now);
   const readyAll = verses.filter((v) => verseStatus(data, v, now).state === 'ready').length;
-  const pct = today.total ? Math.round((today.met / today.total) * 100) : 100;
   const todayList = verses
     .map((v) => ({ v, s: verseStatus(data, v, now) }))
     .filter(({ v, s }) => s.state === 'ready' || s.state === 'waiting' || (s.state === 'done' && v.pile === 'daily') || (s.countedToday > 0 && v.pile !== 'daily'));
@@ -49,10 +48,8 @@ export function Home() {
     : readyAll > 0
       ? today.remaining > readyAll
         ? `${today.remaining - readyAll} more unlock later today`
-        : 'Aim for three a day; one keeps your streak.'
-      : [streak.count > 0 ? `Streak ${streak.count} day${streak.count === 1 ? '' : 's'}.` : '', nextText].filter(Boolean).join(' ') || 'Newly added verses are optional on their first day.';
-  const hour = new Date(now).getHours();
-  const greet = hour < 5 ? 'Still up?' : hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+        : ''
+      : [streak.count > 0 ? `Streak ${streak.count} day${streak.count === 1 ? '' : 's'}.` : '', nextText].filter(Boolean).join(' ');
 
   if (!verses.length) {
     return (
@@ -75,11 +72,9 @@ export function Home() {
   return (
     <>
       <div class="scroll">
-        <div class="narrow stack">
-          <div class="row spread">
+        <div class="narrow stack calm">
+          <div class="row spread home-top">
             <div>
-              <div class="muted small">{new Date(now).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}</div>
-              <h1>{greet}</h1>
               {!online && (
                 <div class="offline-note small muted" data-testid="offline-note">
                   Offline. Reviewing and your progress all work as normal.
@@ -87,23 +82,23 @@ export function Home() {
               )}
             </div>
             <div class="row" style={{ gap: '8px' }}>
-            {settings.avatarOn && (
-              <button class="avatar-bubble" onClick={() => navigate('/avatar')} aria-label={`Your avatar. ${seedsBalance(data)} seeds.`} data-testid="avatar-bubble">
-                <AvatarFigure look={currentLook(data)} size={44} view="face" />
-                <span class="seeds-chip" data-testid="seeds-chip">🌱 {seedsBalance(data)}</span>
+              {settings.avatarOn && (
+                <button class="avatar-bubble" onClick={() => navigate('/avatar')} aria-label={`Your avatar. ${seedsBalance(data)} seeds.`} data-testid="avatar-bubble">
+                  <AvatarFigure look={currentLook(data)} size={44} view="face" />
+                  <span class="seeds-chip" data-testid="seeds-chip">🌱 {seedsBalance(data)}</span>
+                </button>
+              )}
+              <button
+                class="streak"
+                title={`Longest streak: ${streak.longest}`}
+                aria-label={`Streak: ${streak.count} day${streak.count === 1 ? '' : 's'}. Open progress.`}
+                onClick={() => navigate('/stats')}
+                data-testid="streak"
+              >
+                <Icon name="flame" fill />
+                <span>{streak.count}</span>
+                {streak.longest > streak.count && <small class="streak-best">best {streak.longest}</small>}
               </button>
-            )}
-            <button
-              class="streak"
-              title={`Longest streak: ${streak.longest}`}
-              aria-label={`Streak: ${streak.count} day${streak.count === 1 ? '' : 's'}. Open progress.`}
-              onClick={() => navigate('/stats')}
-              data-testid="streak"
-            >
-              <Icon name="flame" fill />
-              <span>{streak.count}</span>
-              {streak.longest > streak.count && <small class="streak-best">best {streak.longest}</small>}
-            </button>
             </div>
           </div>
 
@@ -118,13 +113,17 @@ export function Home() {
           )}
 
           <div class="card stack today-card">
-            <div class="row">
-              <div class={`ring ${today.outcome === 'c' && readyAll === 0 ? 'done' : ''}`} style={{ '--p': pct } as never}>
-                <div data-testid="today-ring">{today.total ? `${today.met}/${today.total}` : '✓'}</div>
-              </div>
+            <div class="row spread today-head">
               <div class="grow">
                 <h2 data-testid="today-title">{headline}</h2>
-                <div class="muted small" data-testid="today-sub">{subline}</div>
+                {subline && (
+                  <div class="muted small" data-testid="today-sub">
+                    {subline}
+                  </div>
+                )}
+              </div>
+              <div class={`today-count ${today.outcome === 'c' && readyAll === 0 ? 'done' : ''}`} data-testid="today-ring">
+                {today.total ? `${today.met}/${today.total}` : '✓'}
               </div>
             </div>
             {todayList.length > 0 && (
@@ -133,7 +132,7 @@ export function Home() {
                   <li key={v.id} class={`pile-${v.pile} ${s.state}`}>
                     <i aria-hidden="true" />
                     <span>{formatRef(v)}</span>
-                    <small class="muted">{s.state === 'ready' ? (s.countedToday ? `${s.countedToday}/3` : 'ready') : s.state === 'waiting' ? `in ${formatDuration(s.waitMs ?? 0)}` : 'done'}</small>
+                    <small class="muted">{s.state === 'ready' ? (s.countedToday ? `${s.countedToday}/3` : '') : s.state === 'waiting' ? `in ${formatDuration(s.waitMs ?? 0)}` : 'done'}</small>
                   </li>
                 ))}
               </ul>
@@ -143,27 +142,22 @@ export function Home() {
                 End the break
               </button>
             )}
-            <ModePicker />
+            <ModePicker blurb={false} />
           </div>
 
-          <div>
-            <h2 class="section-title">Your piles</h2>
-            <div class="pile-grid">
-              {PILES.map((p) => {
-                const vs = pileVerses(data, p);
-                const ready = vs.filter((v) => verseStatus(data, v, now).state === 'ready').length;
-                return (
-                  <button key={p} class={`card tap pile-tile pile-${p}`} onClick={() => navigate(`/pile/${p}`)} data-testid={`pile-${p}`} aria-label={`${PILE_INFO[p].label}: ${vs.length} verses, ${ready} ready`}>
-                    <h3>{PILE_INFO[p].label}</h3>
-                    <div class="count" data-testid={`count-${p}`}>
-                      {vs.length}
-                    </div>
-                    <div class={`small ${ready ? 'status-ready' : 'muted'}`}>{ready ? `${ready} ready` : 'none due'}</div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          <nav class="pile-row" aria-label="Your piles">
+            {PILES.map((p) => {
+              const vs = pileVerses(data, p);
+              const ready = vs.filter((v) => verseStatus(data, v, now).state === 'ready').length;
+              return (
+                <button key={p} class={`pile-link pile-${p} ${ready ? 'has-ready' : ''}`} onClick={() => navigate(`/pile/${p}`)} data-testid={`pile-${p}`} aria-label={`${PILE_INFO[p].label}: ${vs.length} verses, ${ready} ready`}>
+                  <i aria-hidden="true" />
+                  <span>{PILE_INFO[p].label}</span>
+                  <b data-testid={`count-${p}`}>{vs.length}</b>
+                </button>
+              );
+            })}
+          </nav>
           {shouldNudgeBackup({
             syncOn: !!settings.syncCode,
             verses: verses.length,
