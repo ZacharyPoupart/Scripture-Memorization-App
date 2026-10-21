@@ -1,40 +1,84 @@
+/* Fonts are bundled (public/fonts) so the app looks the same offline. Hearth: Fraunces for the verse and headings, Nunito for the rest. */
+@font-face {
+  font-family: 'Fraunces';
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/fraunces-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Fraunces';
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/fraunces-600.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Fraunces';
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/fraunces-700.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Nunito';
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/nunito-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Nunito';
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/nunito-600.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Nunito';
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/nunito-700.woff2') format('woff2');
+}
+
 /* ============================== Design tokens ==============================
    Calm, low-glare palette: warm off-white paper (never pure white) with soft charcoal text (never pure black);
    in dark mode a deep blue-grey (never pure black) with soft off-white text. Every text/background pair is
    checked against WCAG AA (4.5:1) by tests/unit/contrast.test.ts. The theme follows the system by default;
    Settings can force light or dark (data-theme). The two dark blocks below MUST stay identical (a test checks). */
 :root {
-  --bg: #f6f3ec;
-  --surface: #fffdf8;
-  --surface-2: #ece7da;
-  --text: #272d2c;
-  --muted: #5a6564;
-  --border: #d9d2c2;
-  --accent: #2a6569;
-  --accent-strong: #1f5659;
-  --on-accent: #fffdf8;
-  --on-pile: #fffdf8;
-  --toast-link: #96d2d5;
-  --good: #1f6b45;
-  --good-bg: #dfeee5;
-  --warn: #85500f;
-  --warn-bg: #f6e8cf;
-  --bad: #9f352c;
-  --bad-bg: #f5ddd9;
-  --daily: #9a5a0c;
-  --weekly: #1f6a70;
-  --monthly: #4f56a8;
-  --yearly: #2f7048;
-  --shadow: 0 1px 2px rgba(40, 44, 40, 0.06), 0 6px 18px rgba(40, 44, 40, 0.06);
-  --radius: 16px;
-  --radius-sm: 10px;
+  --bg: #f4e9dc;
+  --surface: #fffaf3;
+  --surface-2: #ead9c4;
+  --text: #3b2a22;
+  --muted: #6e5848;
+  --border: #dfc9ae;
+  --accent: #a84a22;
+  --accent-strong: #8f3f1e;
+  --on-accent: #fff7ee;
+  --on-pile: #fffaf3;
+  --toast-link: #f2ad7b;
+  --good: #2f6a45;
+  --good-bg: #e1eddc;
+  --warn: #8a5311;
+  --warn-bg: #f6e4c4;
+  --bad: #a23a2c;
+  --bad-bg: #f6dcd3;
+  --daily: #a8531f;
+  --weekly: #4d6d4a;
+  --monthly: #7d4d76;
+  --yearly: #32636b;
+  --shadow: 0 1px 2px rgba(70, 40, 20, 0.07), 0 6px 18px rgba(70, 40, 20, 0.07);
+  --radius: 22px;
+  --radius-sm: 14px;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
   --tab-h: 62px;
-  --serif: ui-serif, 'New York', 'Iowan Old Style', 'Palatino Linotype', Georgia, 'Times New Roman', serif;
-  --sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --serif: 'Fraunces', ui-serif, 'New York', 'Iowan Old Style', 'Palatino Linotype', Georgia, 'Times New Roman', serif;
+  --sans: 'Nunito', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   /* Scripture text is the hero: ~19-24px, ~65 characters per line, generous leading */
   --verse-size: clamp(1.22rem, 1.08rem + 0.6vw, 1.5rem);
   --verse-leading: 1.75;
@@ -43,53 +87,53 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --bg: #161b1c;
-    --surface: #1e2526;
-    --surface-2: #283031;
-    --text: #e3e8e6;
-    --muted: #a3b0ae;
-    --border: #364143;
-    --accent: #7cc3c7;
-    --accent-strong: #96d2d5;
-    --on-accent: #10191a;
-    --on-pile: #10191a;
-    --toast-link: #1f5659;
-    --good: #7fcf9f;
-    --good-bg: #1a3427;
-    --warn: #e6b26a;
-    --warn-bg: #3b2f19;
-    --bad: #eb9a92;
-    --bad-bg: #3d2220;
-    --daily: #e3a65f;
-    --weekly: #7cc3c7;
-    --monthly: #a4abe8;
-    --yearly: #86cf9f;
+    --bg: #1a1411;
+    --surface: #241c17;
+    --surface-2: #2f251e;
+    --text: #f1e6d8;
+    --muted: #bba998;
+    --border: #43352b;
+    --accent: #e8955a;
+    --accent-strong: #f2ad7b;
+    --on-accent: #1a1411;
+    --on-pile: #1a1411;
+    --toast-link: #8f3f1e;
+    --good: #9bd1a3;
+    --good-bg: #1f3324;
+    --warn: #ecbb72;
+    --warn-bg: #3d2e18;
+    --bad: #f0a094;
+    --bad-bg: #43231f;
+    --daily: #eba062;
+    --weekly: #a3c98f;
+    --monthly: #d0a3c8;
+    --yearly: #8fc7cf;
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 6px 18px rgba(0, 0, 0, 0.25);
     color-scheme: dark;
   }
 }
 :root[data-theme='dark'] {
-  --bg: #161b1c;
-  --surface: #1e2526;
-  --surface-2: #283031;
-  --text: #e3e8e6;
-  --muted: #a3b0ae;
-  --border: #364143;
-  --accent: #7cc3c7;
-  --accent-strong: #96d2d5;
-  --on-accent: #10191a;
-  --on-pile: #10191a;
-  --toast-link: #1f5659;
-  --good: #7fcf9f;
-  --good-bg: #1a3427;
-  --warn: #e6b26a;
-  --warn-bg: #3b2f19;
-  --bad: #eb9a92;
-  --bad-bg: #3d2220;
-  --daily: #e3a65f;
-  --weekly: #7cc3c7;
-  --monthly: #a4abe8;
-  --yearly: #86cf9f;
+  --bg: #1a1411;
+  --surface: #241c17;
+  --surface-2: #2f251e;
+  --text: #f1e6d8;
+  --muted: #bba998;
+  --border: #43352b;
+  --accent: #e8955a;
+  --accent-strong: #f2ad7b;
+  --on-accent: #1a1411;
+  --on-pile: #1a1411;
+  --toast-link: #8f3f1e;
+  --good: #9bd1a3;
+  --good-bg: #1f3324;
+  --warn: #ecbb72;
+  --warn-bg: #3d2e18;
+  --bad: #f0a094;
+  --bad-bg: #43231f;
+  --daily: #eba062;
+  --weekly: #a3c98f;
+  --monthly: #d0a3c8;
+  --yearly: #8fc7cf;
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 6px 18px rgba(0, 0, 0, 0.25);
   color-scheme: dark;
 }
@@ -137,6 +181,8 @@ h2,
 h3 {
   margin: 0;
   line-height: 1.2;
+  font-family: var(--serif);
+  font-weight: 600;
 }
 h1 {
   font-size: 1.6rem;
@@ -327,7 +373,7 @@ button,
   gap: 8px;
   min-height: 48px;
   padding: 0 18px;
-  border-radius: 14px;
+  border-radius: 999px;
   border: 1px solid var(--border);
   background: var(--surface);
   font-weight: 600;
@@ -983,7 +1029,7 @@ textarea.input {
   padding: 6px 12px;
   font-weight: 700;
   background: rgba(255, 255, 255, 0.92);
-  color: #1f4d50;
+  color: #8f3f1e;
 }
 
 @media (prefers-reduced-motion: reduce) {
