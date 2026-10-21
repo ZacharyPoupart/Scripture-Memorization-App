@@ -24,7 +24,7 @@ import { armorUrl } from './ArmorArt.tsx';
 import { AvatarFigure } from './AvatarFigure.tsx';
 import { Icon } from './common.tsx';
 
-/** Your knight: everyone starts in the same basic steel armor, and any piece can be swapped for another with seeds and streaks. */
+/** Your knight: everyone starts in the same basic armor, and any piece can be swapped for another with seeds and streaks. */
 export function AvatarScreen() {
   const { data } = useApp();
   const [group, setGroup] = useState<(typeof SLOT_GROUPS)[number]['key']>('armor');
@@ -95,7 +95,7 @@ export function AvatarScreen() {
               </span>
             </div>
             <p class="muted small" style={{ margin: 0 }}>
-              Everyone starts in the same basic steel armor. Swap any piece: pieces cost seeds (1 per review, 5 for a finished day, 25 when a verse moves up), and the
+              Everyone starts in the same basic armor. Swap any piece: pieces cost seeds (1 per review, 5 for a finished day, 25 when a verse moves up), and the
               finest also need a long streak. Seeds are never taken away.
             </p>
           </div>
@@ -149,7 +149,7 @@ export function AvatarScreen() {
                   aria-pressed={isWorn || pick === item.id}
                 >
                   {armorUrl(item.id) ? (
-                    <img class="piece-img" src={armorUrl(item.id)!} alt="" width="72" height="72" loading="lazy" />
+                    <img class="piece-img" src={armorUrl(item.id)!} alt="" width="72" height="72" loading="lazy" style={item.slot === 'weapon' ? { transform: 'rotate(180deg)' } : undefined} />
                   ) : item.id.endsWith('-none') && group !== 'extras' ? (
                     <span class="piece-img piece-none" aria-hidden="true">
                       —

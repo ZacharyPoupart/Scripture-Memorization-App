@@ -1,0 +1,3115 @@
+{
+ "source": "source/armor-sheet-v2.webp",
+ "source_sha256": "f6f20dd465f253797f86a3cefef26e6fb6350417cc3e4ef6ff3d52ceffd9ad65",
+ "sets": [
+  {
+   "id": "knights-oath",
+   "name": "Knight's Oath",
+   "cx": 112,
+   "figure_cx": 114
+  },
+  {
+   "id": "silver-vanguard",
+   "name": "Silver Vanguard",
+   "cx": 240,
+   "figure_cx": 244
+  },
+  {
+   "id": "golden-paladin",
+   "name": "Golden Paladin",
+   "cx": 373,
+   "figure_cx": 376
+  },
+  {
+   "id": "crimson-legion",
+   "name": "Crimson Legion",
+   "cx": 509,
+   "figure_cx": 512
+  },
+  {
+   "id": "stormcaller",
+   "name": "Stormcaller",
+   "cx": 645,
+   "figure_cx": 648
+  },
+  {
+   "id": "iron-bulwark",
+   "name": "Iron Bulwark",
+   "cx": 780,
+   "figure_cx": 782
+  },
+  {
+   "id": "forest-guardian",
+   "name": "Forest Guardian",
+   "cx": 915,
+   "figure_cx": 916
+  },
+  {
+   "id": "ember-knight",
+   "name": "Ember Knight",
+   "cx": 1052,
+   "figure_cx": 1052
+  },
+  {
+   "id": "frostborn",
+   "name": "Frostborn",
+   "cx": 1185,
+   "figure_cx": 1185
+  },
+  {
+   "id": "shadowblade",
+   "name": "Shadowblade",
+   "cx": 1320,
+   "figure_cx": 1323
+  },
+  {
+   "id": "sulestial",
+   "name": "Sulestial",
+   "cx": 1452,
+   "figure_cx": 1456
+  }
+ ],
+ "slots": {
+  "helmet": {
+   "canvas": [
+    72,
+    82
+   ],
+   "anchor": [
+    36,
+    0
+   ],
+   "sheet_row_top": 316
+  },
+  "chest": {
+   "canvas": [
+    124,
+    117
+   ],
+   "anchor": [
+    62,
+    0
+   ],
+   "sheet_row_top": 386
+  },
+  "legs": {
+   "canvas": [
+    88,
+    102
+   ],
+   "anchor": [
+    44,
+    0
+   ],
+   "sheet_row_top": 497
+  },
+  "belt": {
+   "canvas": [
+    90,
+    36
+   ],
+   "anchor": [
+    45,
+    0
+   ],
+   "sheet_row_top": 599
+  },
+  "cape": {
+   "canvas": [
+    112,
+    126
+   ],
+   "anchor": [
+    56,
+    0
+   ],
+   "sheet_row_top": 633
+  },
+  "sword": {
+   "canvas": [
+    50,
+    147
+   ],
+   "anchor": [
+    25,
+    0
+   ],
+   "sheet_row_top": 755
+  },
+  "shield": {
+   "canvas": [
+    86,
+    103
+   ],
+   "anchor": [
+    43,
+    0
+   ],
+   "sheet_row_top": 897
+  },
+  "figure": {
+   "canvas": [
+    122,
+    243
+   ],
+   "anchor": [
+    61,
+    0
+   ],
+   "sheet_row_top": 76
+  }
+ },
+ "items": [
+  {
+   "id": "helmet-knights-oath",
+   "set": "knights-oath",
+   "set_name": "Knight's Oath",
+   "slot": "helmet",
+   "file": "assets/helmet/knights-oath.png",
+   "canvas": [
+    72,
+    82
+   ],
+   "anchor": [
+    36,
+    0
+   ],
+   "source_crop": [
+    76,
+    316,
+    148,
+    398
+   ],
+   "piece_bbox_in_sheet": [
+    90,
+    324,
+    137,
+    394
+   ],
+   "piece_bbox_in_canvas": [
+    14,
+    8,
+    61,
+    78
+   ]
+  },
+  {
+   "id": "helmet-silver-vanguard",
+   "set": "silver-vanguard",
+   "set_name": "Silver Vanguard",
+   "slot": "helmet",
+   "file": "assets/helmet/silver-vanguard.png",
+   "canvas": [
+    72,
+    82
+   ],
+   "anchor": [
+    36,
+    0
+   ],
+   "source_crop": [
+    204,
+    316,
+    276,
+    398
+   ],
+   "piece_bbox_in_sheet": [
+    218,
+    323,
+    264,
+    393
+   ],
+   "piece_bbox_in_canvas": [
+    14,
+    7,
+    60,
+    77
+   ]
+  },
+  {
+   "id": "helmet-golden-paladin",
+   "set": "golden-paladin",
+   "set_name": "Golden Paladin",
+   "slot": "helmet",
+   "file": "assets/helmet/golden-paladin.png",
+   "canvas": [
+    72,
+    82
+   ],
+   "anchor": [
+    36,
+    0
+   ],
+   "source_crop": [
+    337,
+    316,
+    409,
+    398
+   ],
+   "piece_bbox_in_sheet": [
+    350,
+    320,
+    400,
+    393
+   ],
+   "piece_bbox_in_canvas": [
+    13,
+    4,
+    63,
+    77
+   ]
+  },
+  {
+   "id": "helmet-crimson-legion",
+   "set": "crimson-legion",
+   "set_name": "Crimson Legion",
+   "slot": "helmet",
+   "file": "assets/helmet/crimson-legion.png",
+   "canvas": [
+    72,
+    82
+   ],
+   "anchor": [
+    36,
+    0
+   ],
+   "source_crop": [
+    473,
+    316,
+    545,
+    398
+   ],
+   "piece_bbox_in_sheet": [
+    483,
+    320,
+    533,
+    395
+   ],
+   "piece_bbox_in_canvas": [
+    10,
+    4,
+    60,
+    79
+   ]
+  },
+  {
+   "id": "helmet-stormcaller",
+   "set": "stormcaller",
+   "set_name": "Stormcaller",
+   "slot": "helmet",
+   "file": "assets/helmet/stormcaller.png",
+   "canvas": [
+    72,
+    82
+   ],
+   "anchor": [
+    36,
+    0
+   ],
+   "source_crop": [
+    609,
+    316,
+    681,
+    398
+   ],
+   "piece_bbox_in_sheet": [
+    620,
+    321,
+    668,
+    394
+   ],
+   "piece_bbox_in_canvas": [
+    11,
+    5,
+    59,
+    78
+   ]
+  },
+  {
+   "id": "helmet-iron-bulwark",
+   "set": "iron-bulwark",
+   "set_name": "Iron Bulwark",
+   "slot": "helmet",
+   "file": "assets/helmet/iron-bulwark.png",
+   "canvas": [
+    72,
+    82
+   ],
+   "anchor": [
+    36,
+    0
+   ],
+   "source_crop": [
+    744,
+    316,
+    816,
+    398
+   ],
+   "piece_bbox_in_sheet": [
+    755,
+    320,
+    804,
+    394
+   ],
+   "piece_bbox_in_canvas": [
+    11,
+    4,
+    60,
+    78
+   ]
+  },
+  {
+   "id": "helmet-forest-guardian",
+   "set": "forest-guardian",
+   "set_name": "Forest Guardian",
+   "slot": "helmet",
+   "file": "assets/helmet/forest-guardian.png",
+   "canvas": [
+    72,
+    82
+   ],
+   "anchor": [
+    36,
+    0
+   ],
+   "source_crop": [
+    879,
+    316,
+    951,
+    398
+   ],
+   "piece_bbox_in_sheet": [
+    883,
+    320,
+    948,
+    394
+   ],
+   "piece_bbox_in_canvas": [
+    4,
+    4,
+    69,
+    78
+   ]
+  },
+  {
+   "id": "helmet-ember-knight",
+   "set": "ember-knight",
+   "set_name": "Ember Knight",
+   "slot": "helmet",
+   "file": "assets/helmet/ember-knight.png",
+   "canvas": [
+    72,
+    82
+   ],
+   "anchor": [
+    36,
+    0
+   ],
+   "source_crop": [
+    1016,
+    316,
+    1088,
+    398
+   ],
+   "piece_bbox_in_sheet": [
+    1024,
+    320,
+    1075,
+    394
+   ],
+   "piece_bbox_in_canvas": [
+    8,
+    4,
+    59,
+    78
+   ]
+  },
+  {
+   "id": "helmet-frostborn",
+   "set": "frostborn",
+   "set_name": "Frostborn",
+   "slot": "helmet",
+   "file": "assets/helmet/frostborn.png",
+   "canvas": [
+    72,
+    82
+   ],
+   "anchor": [
+    36,
+    0
+   ],
+   "source_crop": [
+    1149,
+    316,
+    1221,
+    398
+   ],
+   "piece_bbox_in_sheet": [
+    1159,
+    319,
+    1209,
+    393
+   ],
+   "piece_bbox_in_canvas": [
+    10,
+    3,
+    60,
+    77
+   ]
+  },
+  {
+   "id": "helmet-shadowblade",
+   "set": "shadowblade",
+   "set_name": "Shadowblade",
+   "slot": "helmet",
+   "file": "assets/helmet/shadowblade.png",
+   "canvas": [
+    72,
+    82
+   ],
+   "anchor": [
+    36,
+    0
+   ],
+   "source_crop": [
+    1284,
+    316,
+    1356,
+    398
+   ],
+   "piece_bbox_in_sheet": [
+    1293,
+    321,
+    1344,
+    394
+   ],
+   "piece_bbox_in_canvas": [
+    9,
+    5,
+    60,
+    78
+   ]
+  },
+  {
+   "id": "helmet-sulestial",
+   "set": "sulestial",
+   "set_name": "Sulestial",
+   "slot": "helmet",
+   "file": "assets/helmet/sulestial.png",
+   "canvas": [
+    72,
+    82
+   ],
+   "anchor": [
+    36,
+    0
+   ],
+   "source_crop": [
+    1416,
+    316,
+    1488,
+    398
+   ],
+   "piece_bbox_in_sheet": [
+    1427,
+    320,
+    1478,
+    392
+   ],
+   "piece_bbox_in_canvas": [
+    11,
+    4,
+    62,
+    76
+   ]
+  },
+  {
+   "id": "chest-knights-oath",
+   "set": "knights-oath",
+   "set_name": "Knight's Oath",
+   "slot": "chest",
+   "file": "assets/chest/knights-oath.png",
+   "canvas": [
+    124,
+    117
+   ],
+   "anchor": [
+    62,
+    0
+   ],
+   "source_crop": [
+    50,
+    386,
+    174,
+    503
+   ],
+   "piece_bbox_in_sheet": [
+    63,
+    390,
+    166,
+    499
+   ],
+   "piece_bbox_in_canvas": [
+    13,
+    4,
+    116,
+    113
+   ]
+  },
+  {
+   "id": "chest-silver-vanguard",
+   "set": "silver-vanguard",
+   "set_name": "Silver Vanguard",
+   "slot": "chest",
+   "file": "assets/chest/silver-vanguard.png",
+   "canvas": [
+    124,
+    117
+   ],
+   "anchor": [
+    62,
+    0
+   ],
+   "source_crop": [
+    178,
+    386,
+    302,
+    503
+   ],
+   "piece_bbox_in_sheet": [
+    187,
+    391,
+    299,
+    500
+   ],
+   "piece_bbox_in_canvas": [
+    9,
+    5,
+    121,
+    114
+   ]
+  },
+  {
+   "id": "chest-golden-paladin",
+   "set": "golden-paladin",
+   "set_name": "Golden Paladin",
+   "slot": "chest",
+   "file": "assets/chest/golden-paladin.png",
+   "canvas": [
+    124,
+    117
+   ],
+   "anchor": [
+    62,
+    0
+   ],
+   "source_crop": [
+    311,
+    386,
+    435,
+    503
+   ],
+   "piece_bbox_in_sheet": [
+    318,
+    392,
+    432,
+    500
+   ],
+   "piece_bbox_in_canvas": [
+    7,
+    6,
+    121,
+    114
+   ]
+  },
+  {
+   "id": "chest-crimson-legion",
+   "set": "crimson-legion",
+   "set_name": "Crimson Legion",
+   "slot": "chest",
+   "file": "assets/chest/crimson-legion.png",
+   "canvas": [
+    124,
+    117
+   ],
+   "anchor": [
+    62,
+    0
+   ],
+   "source_crop": [
+    447,
+    386,
+    571,
+    503
+   ],
+   "piece_bbox_in_sheet": [
+    452,
+    390,
+    568,
+    500
+   ],
+   "piece_bbox_in_canvas": [
+    5,
+    4,
+    121,
+    114
+   ]
+  },
+  {
+   "id": "chest-stormcaller",
+   "set": "stormcaller",
+   "set_name": "Stormcaller",
+   "slot": "chest",
+   "file": "assets/chest/stormcaller.png",
+   "canvas": [
+    124,
+    117
+   ],
+   "anchor": [
+    62,
+    0
+   ],
+   "source_crop": [
+    583,
+    386,
+    707,
+    503
+   ],
+   "piece_bbox_in_sheet": [
+    589,
+    390,
+    703,
+    500
+   ],
+   "piece_bbox_in_canvas": [
+    6,
+    4,
+    120,
+    114
+   ]
+  },
+  {
+   "id": "chest-iron-bulwark",
+   "set": "iron-bulwark",
+   "set_name": "Iron Bulwark",
+   "slot": "chest",
+   "file": "assets/chest/iron-bulwark.png",
+   "canvas": [
+    124,
+    117
+   ],
+   "anchor": [
+    62,
+    0
+   ],
+   "source_crop": [
+    718,
+    386,
+    842,
+    503
+   ],
+   "piece_bbox_in_sheet": [
+    724,
+    390,
+    836,
+    500
+   ],
+   "piece_bbox_in_canvas": [
+    6,
+    4,
+    118,
+    114
+   ]
+  },
+  {
+   "id": "chest-forest-guardian",
+   "set": "forest-guardian",
+   "set_name": "Forest Guardian",
+   "slot": "chest",
+   "file": "assets/chest/forest-guardian.png",
+   "canvas": [
+    124,
+    117
+   ],
+   "anchor": [
+    62,
+    0
+   ],
+   "source_crop": [
+    853,
+    386,
+    977,
+    503
+   ],
+   "piece_bbox_in_sheet": [
+    857,
+    390,
+    972,
+    500
+   ],
+   "piece_bbox_in_canvas": [
+    4,
+    4,
+    119,
+    114
+   ]
+  },
+  {
+   "id": "chest-ember-knight",
+   "set": "ember-knight",
+   "set_name": "Ember Knight",
+   "slot": "chest",
+   "file": "assets/chest/ember-knight.png",
+   "canvas": [
+    124,
+    117
+   ],
+   "anchor": [
+    62,
+    0
+   ],
+   "source_crop": [
+    990,
+    386,
+    1114,
+    503
+   ],
+   "piece_bbox_in_sheet": [
+    995,
+    389,
+    1108,
+    500
+   ],
+   "piece_bbox_in_canvas": [
+    5,
+    3,
+    118,
+    114
+   ]
+  },
+  {
+   "id": "chest-frostborn",
+   "set": "frostborn",
+   "set_name": "Frostborn",
+   "slot": "chest",
+   "file": "assets/chest/frostborn.png",
+   "canvas": [
+    124,
+    117
+   ],
+   "anchor": [
+    62,
+    0
+   ],
+   "source_crop": [
+    1123,
+    386,
+    1247,
+    503
+   ],
+   "piece_bbox_in_sheet": [
+    1130,
+    391,
+    1239,
+    500
+   ],
+   "piece_bbox_in_canvas": [
+    7,
+    5,
+    116,
+    114
+   ]
+  },
+  {
+   "id": "chest-shadowblade",
+   "set": "shadowblade",
+   "set_name": "Shadowblade",
+   "slot": "chest",
+   "file": "assets/chest/shadowblade.png",
+   "canvas": [
+    124,
+    117
+   ],
+   "anchor": [
+    62,
+    0
+   ],
+   "source_crop": [
+    1258,
+    386,
+    1382,
+    503
+   ],
+   "piece_bbox_in_sheet": [
+    1263,
+    389,
+    1375,
+    500
+   ],
+   "piece_bbox_in_canvas": [
+    5,
+    3,
+    117,
+    114
+   ]
+  },
+  {
+   "id": "chest-sulestial",
+   "set": "sulestial",
+   "set_name": "Sulestial",
+   "slot": "chest",
+   "file": "assets/chest/sulestial.png",
+   "canvas": [
+    124,
+    117
+   ],
+   "anchor": [
+    62,
+    0
+   ],
+   "source_crop": [
+    1390,
+    386,
+    1514,
+    503
+   ],
+   "piece_bbox_in_sheet": [
+    1400,
+    390,
+    1505,
+    500
+   ],
+   "piece_bbox_in_canvas": [
+    10,
+    4,
+    115,
+    114
+   ]
+  },
+  {
+   "id": "legs-knights-oath",
+   "set": "knights-oath",
+   "set_name": "Knight's Oath",
+   "slot": "legs",
+   "file": "assets/legs/knights-oath.png",
+   "canvas": [
+    88,
+    102
+   ],
+   "anchor": [
+    44,
+    0
+   ],
+   "source_crop": [
+    68,
+    497,
+    156,
+    599
+   ],
+   "piece_bbox_in_sheet": [
+    74,
+    502,
+    152,
+    596
+   ],
+   "piece_bbox_in_canvas": [
+    6,
+    5,
+    84,
+    99
+   ]
+  },
+  {
+   "id": "legs-silver-vanguard",
+   "set": "silver-vanguard",
+   "set_name": "Silver Vanguard",
+   "slot": "legs",
+   "file": "assets/legs/silver-vanguard.png",
+   "canvas": [
+    88,
+    102
+   ],
+   "anchor": [
+    44,
+    0
+   ],
+   "source_crop": [
+    196,
+    497,
+    284,
+    599
+   ],
+   "piece_bbox_in_sheet": [
+    202,
+    501,
+    279,
+    596
+   ],
+   "piece_bbox_in_canvas": [
+    6,
+    4,
+    83,
+    99
+   ]
+  },
+  {
+   "id": "legs-golden-paladin",
+   "set": "golden-paladin",
+   "set_name": "Golden Paladin",
+   "slot": "legs",
+   "file": "assets/legs/golden-paladin.png",
+   "canvas": [
+    88,
+    102
+   ],
+   "anchor": [
+    44,
+    0
+   ],
+   "source_crop": [
+    329,
+    497,
+    417,
+    599
+   ],
+   "piece_bbox_in_sheet": [
+    336,
+    502,
+    411,
+    596
+   ],
+   "piece_bbox_in_canvas": [
+    7,
+    5,
+    82,
+    99
+   ]
+  },
+  {
+   "id": "legs-crimson-legion",
+   "set": "crimson-legion",
+   "set_name": "Crimson Legion",
+   "slot": "legs",
+   "file": "assets/legs/crimson-legion.png",
+   "canvas": [
+    88,
+    102
+   ],
+   "anchor": [
+    44,
+    0
+   ],
+   "source_crop": [
+    465,
+    497,
+    553,
+    599
+   ],
+   "piece_bbox_in_sheet": [
+    470,
+    502,
+    547,
+    596
+   ],
+   "piece_bbox_in_canvas": [
+    5,
+    5,
+    82,
+    99
+   ]
+  },
+  {
+   "id": "legs-stormcaller",
+   "set": "stormcaller",
+   "set_name": "Stormcaller",
+   "slot": "legs",
+   "file": "assets/legs/stormcaller.png",
+   "canvas": [
+    88,
+    102
+   ],
+   "anchor": [
+    44,
+    0
+   ],
+   "source_crop": [
+    601,
+    497,
+    689,
+    599
+   ],
+   "piece_bbox_in_sheet": [
+    606,
+    502,
+    683,
+    596
+   ],
+   "piece_bbox_in_canvas": [
+    5,
+    5,
+    82,
+    99
+   ]
+  },
+  {
+   "id": "legs-iron-bulwark",
+   "set": "iron-bulwark",
+   "set_name": "Iron Bulwark",
+   "slot": "legs",
+   "file": "assets/legs/iron-bulwark.png",
+   "canvas": [
+    88,
+    102
+   ],
+   "anchor": [
+    44,
+    0
+   ],
+   "source_crop": [
+    736,
+    497,
+    824,
+    599
+   ],
+   "piece_bbox_in_sheet": [
+    740,
+    502,
+    819,
+    596
+   ],
+   "piece_bbox_in_canvas": [
+    4,
+    5,
+    83,
+    99
+   ]
+  },
+  {
+   "id": "legs-forest-guardian",
+   "set": "forest-guardian",
+   "set_name": "Forest Guardian",
+   "slot": "legs",
+   "file": "assets/legs/forest-guardian.png",
+   "canvas": [
+    88,
+    102
+   ],
+   "anchor": [
+    44,
+    0
+   ],
+   "source_crop": [
+    871,
+    497,
+    959,
+    599
+   ],
+   "piece_bbox_in_sheet": [
+    875,
+    500,
+    954,
+    596
+   ],
+   "piece_bbox_in_canvas": [
+    4,
+    3,
+    83,
+    99
+   ]
+  },
+  {
+   "id": "legs-ember-knight",
+   "set": "ember-knight",
+   "set_name": "Ember Knight",
+   "slot": "legs",
+   "file": "assets/legs/ember-knight.png",
+   "canvas": [
+    88,
+    102
+   ],
+   "anchor": [
+    44,
+    0
+   ],
+   "source_crop": [
+    1008,
+    497,
+    1096,
+    599
+   ],
+   "piece_bbox_in_sheet": [
+    1012,
+    500,
+    1090,
+    596
+   ],
+   "piece_bbox_in_canvas": [
+    4,
+    3,
+    82,
+    99
+   ]
+  },
+  {
+   "id": "legs-frostborn",
+   "set": "frostborn",
+   "set_name": "Frostborn",
+   "slot": "legs",
+   "file": "assets/legs/frostborn.png",
+   "canvas": [
+    88,
+    102
+   ],
+   "anchor": [
+    44,
+    0
+   ],
+   "source_crop": [
+    1141,
+    497,
+    1229,
+    599
+   ],
+   "piece_bbox_in_sheet": [
+    1146,
+    502,
+    1223,
+    596
+   ],
+   "piece_bbox_in_canvas": [
+    5,
+    5,
+    82,
+    99
+   ]
+  },
+  {
+   "id": "legs-shadowblade",
+   "set": "shadowblade",
+   "set_name": "Shadowblade",
+   "slot": "legs",
+   "file": "assets/legs/shadowblade.png",
+   "canvas": [
+    88,
+    102
+   ],
+   "anchor": [
+    44,
+    0
+   ],
+   "source_crop": [
+    1276,
+    497,
+    1364,
+    599
+   ],
+   "piece_bbox_in_sheet": [
+    1279,
+    502,
+    1358,
+    596
+   ],
+   "piece_bbox_in_canvas": [
+    3,
+    5,
+    82,
+    99
+   ]
+  },
+  {
+   "id": "legs-sulestial",
+   "set": "sulestial",
+   "set_name": "Sulestial",
+   "slot": "legs",
+   "file": "assets/legs/sulestial.png",
+   "canvas": [
+    88,
+    102
+   ],
+   "anchor": [
+    44,
+    0
+   ],
+   "source_crop": [
+    1408,
+    497,
+    1496,
+    599
+   ],
+   "piece_bbox_in_sheet": [
+    1415,
+    502,
+    1492,
+    596
+   ],
+   "piece_bbox_in_canvas": [
+    7,
+    5,
+    84,
+    99
+   ]
+  },
+  {
+   "id": "belt-knights-oath",
+   "set": "knights-oath",
+   "set_name": "Knight's Oath",
+   "slot": "belt",
+   "file": "assets/belt/knights-oath.png",
+   "canvas": [
+    90,
+    36
+   ],
+   "anchor": [
+    45,
+    0
+   ],
+   "source_crop": [
+    67,
+    599,
+    157,
+    635
+   ],
+   "piece_bbox_in_sheet": [
+    73,
+    602,
+    153,
+    632
+   ],
+   "piece_bbox_in_canvas": [
+    6,
+    3,
+    86,
+    33
+   ]
+  },
+  {
+   "id": "belt-silver-vanguard",
+   "set": "silver-vanguard",
+   "set_name": "Silver Vanguard",
+   "slot": "belt",
+   "file": "assets/belt/silver-vanguard.png",
+   "canvas": [
+    90,
+    36
+   ],
+   "anchor": [
+    45,
+    0
+   ],
+   "source_crop": [
+    195,
+    599,
+    285,
+    635
+   ],
+   "piece_bbox_in_sheet": [
+    201,
+    602,
+    281,
+    632
+   ],
+   "piece_bbox_in_canvas": [
+    6,
+    3,
+    86,
+    33
+   ]
+  },
+  {
+   "id": "belt-golden-paladin",
+   "set": "golden-paladin",
+   "set_name": "Golden Paladin",
+   "slot": "belt",
+   "file": "assets/belt/golden-paladin.png",
+   "canvas": [
+    90,
+    36
+   ],
+   "anchor": [
+    45,
+    0
+   ],
+   "source_crop": [
+    328,
+    599,
+    418,
+    635
+   ],
+   "piece_bbox_in_sheet": [
+    334,
+    603,
+    413,
+    632
+   ],
+   "piece_bbox_in_canvas": [
+    6,
+    4,
+    85,
+    33
+   ]
+  },
+  {
+   "id": "belt-crimson-legion",
+   "set": "crimson-legion",
+   "set_name": "Crimson Legion",
+   "slot": "belt",
+   "file": "assets/belt/crimson-legion.png",
+   "canvas": [
+    90,
+    36
+   ],
+   "anchor": [
+    45,
+    0
+   ],
+   "source_crop": [
+    464,
+    599,
+    554,
+    635
+   ],
+   "piece_bbox_in_sheet": [
+    469,
+    602,
+    548,
+    632
+   ],
+   "piece_bbox_in_canvas": [
+    5,
+    3,
+    84,
+    33
+   ]
+  },
+  {
+   "id": "belt-stormcaller",
+   "set": "stormcaller",
+   "set_name": "Stormcaller",
+   "slot": "belt",
+   "file": "assets/belt/stormcaller.png",
+   "canvas": [
+    90,
+    36
+   ],
+   "anchor": [
+    45,
+    0
+   ],
+   "source_crop": [
+    600,
+    599,
+    690,
+    635
+   ],
+   "piece_bbox_in_sheet": [
+    605,
+    603,
+    686,
+    632
+   ],
+   "piece_bbox_in_canvas": [
+    5,
+    4,
+    86,
+    33
+   ]
+  },
+  {
+   "id": "belt-iron-bulwark",
+   "set": "iron-bulwark",
+   "set_name": "Iron Bulwark",
+   "slot": "belt",
+   "file": "assets/belt/iron-bulwark.png",
+   "canvas": [
+    90,
+    36
+   ],
+   "anchor": [
+    45,
+    0
+   ],
+   "source_crop": [
+    735,
+    599,
+    825,
+    635
+   ],
+   "piece_bbox_in_sheet": [
+    740,
+    603,
+    820,
+    632
+   ],
+   "piece_bbox_in_canvas": [
+    5,
+    4,
+    85,
+    33
+   ]
+  },
+  {
+   "id": "belt-forest-guardian",
+   "set": "forest-guardian",
+   "set_name": "Forest Guardian",
+   "slot": "belt",
+   "file": "assets/belt/forest-guardian.png",
+   "canvas": [
+    90,
+    36
+   ],
+   "anchor": [
+    45,
+    0
+   ],
+   "source_crop": [
+    870,
+    599,
+    960,
+    635
+   ],
+   "piece_bbox_in_sheet": [
+    876,
+    603,
+    956,
+    632
+   ],
+   "piece_bbox_in_canvas": [
+    6,
+    4,
+    86,
+    33
+   ]
+  },
+  {
+   "id": "belt-ember-knight",
+   "set": "ember-knight",
+   "set_name": "Ember Knight",
+   "slot": "belt",
+   "file": "assets/belt/ember-knight.png",
+   "canvas": [
+    90,
+    36
+   ],
+   "anchor": [
+    45,
+    0
+   ],
+   "source_crop": [
+    1007,
+    599,
+    1097,
+    635
+   ],
+   "piece_bbox_in_sheet": [
+    1012,
+    603,
+    1091,
+    632
+   ],
+   "piece_bbox_in_canvas": [
+    5,
+    4,
+    84,
+    33
+   ]
+  },
+  {
+   "id": "belt-frostborn",
+   "set": "frostborn",
+   "set_name": "Frostborn",
+   "slot": "belt",
+   "file": "assets/belt/frostborn.png",
+   "canvas": [
+    90,
+    36
+   ],
+   "anchor": [
+    45,
+    0
+   ],
+   "source_crop": [
+    1140,
+    599,
+    1230,
+    635
+   ],
+   "piece_bbox_in_sheet": [
+    1146,
+    603,
+    1225,
+    632
+   ],
+   "piece_bbox_in_canvas": [
+    6,
+    4,
+    85,
+    33
+   ]
+  },
+  {
+   "id": "belt-shadowblade",
+   "set": "shadowblade",
+   "set_name": "Shadowblade",
+   "slot": "belt",
+   "file": "assets/belt/shadowblade.png",
+   "canvas": [
+    90,
+    36
+   ],
+   "anchor": [
+    45,
+    0
+   ],
+   "source_crop": [
+    1275,
+    599,
+    1365,
+    635
+   ],
+   "piece_bbox_in_sheet": [
+    1280,
+    603,
+    1360,
+    632
+   ],
+   "piece_bbox_in_canvas": [
+    5,
+    4,
+    85,
+    33
+   ]
+  },
+  {
+   "id": "belt-sulestial",
+   "set": "sulestial",
+   "set_name": "Sulestial",
+   "slot": "belt",
+   "file": "assets/belt/sulestial.png",
+   "canvas": [
+    90,
+    36
+   ],
+   "anchor": [
+    45,
+    0
+   ],
+   "source_crop": [
+    1407,
+    599,
+    1497,
+    635
+   ],
+   "piece_bbox_in_sheet": [
+    1414,
+    602,
+    1494,
+    632
+   ],
+   "piece_bbox_in_canvas": [
+    7,
+    3,
+    87,
+    33
+   ]
+  },
+  {
+   "id": "cape-knights-oath",
+   "set": "knights-oath",
+   "set_name": "Knight's Oath",
+   "slot": "cape",
+   "file": "assets/cape/knights-oath.png",
+   "canvas": [
+    112,
+    126
+   ],
+   "anchor": [
+    56,
+    0
+   ],
+   "source_crop": [
+    56,
+    633,
+    168,
+    759
+   ],
+   "piece_bbox_in_sheet": [
+    62,
+    638,
+    162,
+    756
+   ],
+   "piece_bbox_in_canvas": [
+    6,
+    5,
+    106,
+    123
+   ]
+  },
+  {
+   "id": "cape-silver-vanguard",
+   "set": "silver-vanguard",
+   "set_name": "Silver Vanguard",
+   "slot": "cape",
+   "file": "assets/cape/silver-vanguard.png",
+   "canvas": [
+    112,
+    126
+   ],
+   "anchor": [
+    56,
+    0
+   ],
+   "source_crop": [
+    184,
+    633,
+    296,
+    759
+   ],
+   "piece_bbox_in_sheet": [
+    191,
+    638,
+    288,
+    753
+   ],
+   "piece_bbox_in_canvas": [
+    7,
+    5,
+    104,
+    120
+   ]
+  },
+  {
+   "id": "cape-golden-paladin",
+   "set": "golden-paladin",
+   "set_name": "Golden Paladin",
+   "slot": "cape",
+   "file": "assets/cape/golden-paladin.png",
+   "canvas": [
+    112,
+    126
+   ],
+   "anchor": [
+    56,
+    0
+   ],
+   "source_crop": [
+    317,
+    633,
+    429,
+    759
+   ],
+   "piece_bbox_in_sheet": [
+    321,
+    636,
+    423,
+    756
+   ],
+   "piece_bbox_in_canvas": [
+    4,
+    3,
+    106,
+    123
+   ]
+  },
+  {
+   "id": "cape-crimson-legion",
+   "set": "crimson-legion",
+   "set_name": "Crimson Legion",
+   "slot": "cape",
+   "file": "assets/cape/crimson-legion.png",
+   "canvas": [
+    112,
+    126
+   ],
+   "anchor": [
+    56,
+    0
+   ],
+   "source_crop": [
+    453,
+    633,
+    565,
+    759
+   ],
+   "piece_bbox_in_sheet": [
+    457,
+    638,
+    559,
+    756
+   ],
+   "piece_bbox_in_canvas": [
+    4,
+    5,
+    106,
+    123
+   ]
+  },
+  {
+   "id": "cape-stormcaller",
+   "set": "stormcaller",
+   "set_name": "Stormcaller",
+   "slot": "cape",
+   "file": "assets/cape/stormcaller.png",
+   "canvas": [
+    112,
+    126
+   ],
+   "anchor": [
+    56,
+    0
+   ],
+   "source_crop": [
+    589,
+    633,
+    701,
+    759
+   ],
+   "piece_bbox_in_sheet": [
+    595,
+    638,
+    695,
+    756
+   ],
+   "piece_bbox_in_canvas": [
+    6,
+    5,
+    106,
+    123
+   ]
+  },
+  {
+   "id": "cape-iron-bulwark",
+   "set": "iron-bulwark",
+   "set_name": "Iron Bulwark",
+   "slot": "cape",
+   "file": "assets/cape/iron-bulwark.png",
+   "canvas": [
+    112,
+    126
+   ],
+   "anchor": [
+    56,
+    0
+   ],
+   "source_crop": [
+    724,
+    633,
+    836,
+    759
+   ],
+   "piece_bbox_in_sheet": [
+    730,
+    638,
+    830,
+    756
+   ],
+   "piece_bbox_in_canvas": [
+    6,
+    5,
+    106,
+    123
+   ]
+  },
+  {
+   "id": "cape-forest-guardian",
+   "set": "forest-guardian",
+   "set_name": "Forest Guardian",
+   "slot": "cape",
+   "file": "assets/cape/forest-guardian.png",
+   "canvas": [
+    112,
+    126
+   ],
+   "anchor": [
+    56,
+    0
+   ],
+   "source_crop": [
+    859,
+    633,
+    971,
+    759
+   ],
+   "piece_bbox_in_sheet": [
+    863,
+    637,
+    967,
+    756
+   ],
+   "piece_bbox_in_canvas": [
+    4,
+    4,
+    108,
+    123
+   ]
+  },
+  {
+   "id": "cape-ember-knight",
+   "set": "ember-knight",
+   "set_name": "Ember Knight",
+   "slot": "cape",
+   "file": "assets/cape/ember-knight.png",
+   "canvas": [
+    112,
+    126
+   ],
+   "anchor": [
+    56,
+    0
+   ],
+   "source_crop": [
+    996,
+    633,
+    1108,
+    759
+   ],
+   "piece_bbox_in_sheet": [
+    999,
+    638,
+    1103,
+    756
+   ],
+   "piece_bbox_in_canvas": [
+    3,
+    5,
+    107,
+    123
+   ]
+  },
+  {
+   "id": "cape-frostborn",
+   "set": "frostborn",
+   "set_name": "Frostborn",
+   "slot": "cape",
+   "file": "assets/cape/frostborn.png",
+   "canvas": [
+    112,
+    126
+   ],
+   "anchor": [
+    56,
+    0
+   ],
+   "source_crop": [
+    1129,
+    633,
+    1241,
+    759
+   ],
+   "piece_bbox_in_sheet": [
+    1136,
+    637,
+    1236,
+    756
+   ],
+   "piece_bbox_in_canvas": [
+    7,
+    4,
+    107,
+    123
+   ]
+  },
+  {
+   "id": "cape-shadowblade",
+   "set": "shadowblade",
+   "set_name": "Shadowblade",
+   "slot": "cape",
+   "file": "assets/cape/shadowblade.png",
+   "canvas": [
+    112,
+    126
+   ],
+   "anchor": [
+    56,
+    0
+   ],
+   "source_crop": [
+    1264,
+    633,
+    1376,
+    759
+   ],
+   "piece_bbox_in_sheet": [
+    1270,
+    638,
+    1371,
+    756
+   ],
+   "piece_bbox_in_canvas": [
+    6,
+    5,
+    107,
+    123
+   ]
+  },
+  {
+   "id": "cape-sulestial",
+   "set": "sulestial",
+   "set_name": "Sulestial",
+   "slot": "cape",
+   "file": "assets/cape/sulestial.png",
+   "canvas": [
+    112,
+    126
+   ],
+   "anchor": [
+    56,
+    0
+   ],
+   "source_crop": [
+    1396,
+    633,
+    1508,
+    759
+   ],
+   "piece_bbox_in_sheet": [
+    1403,
+    637,
+    1501,
+    755
+   ],
+   "piece_bbox_in_canvas": [
+    7,
+    4,
+    105,
+    122
+   ]
+  },
+  {
+   "id": "sword-knights-oath",
+   "set": "knights-oath",
+   "set_name": "Knight's Oath",
+   "slot": "sword",
+   "file": "assets/sword/knights-oath.png",
+   "canvas": [
+    50,
+    147
+   ],
+   "anchor": [
+    25,
+    0
+   ],
+   "source_crop": [
+    87,
+    755,
+    137,
+    902
+   ],
+   "piece_bbox_in_sheet": [
+    92,
+    759,
+    131,
+    899
+   ],
+   "piece_bbox_in_canvas": [
+    5,
+    4,
+    44,
+    144
+   ]
+  },
+  {
+   "id": "sword-silver-vanguard",
+   "set": "silver-vanguard",
+   "set_name": "Silver Vanguard",
+   "slot": "sword",
+   "file": "assets/sword/silver-vanguard.png",
+   "canvas": [
+    50,
+    147
+   ],
+   "anchor": [
+    25,
+    0
+   ],
+   "source_crop": [
+    215,
+    755,
+    265,
+    902
+   ],
+   "piece_bbox_in_sheet": [
+    221,
+    759,
+    258,
+    899
+   ],
+   "piece_bbox_in_canvas": [
+    6,
+    4,
+    43,
+    144
+   ]
+  },
+  {
+   "id": "sword-golden-paladin",
+   "set": "golden-paladin",
+   "set_name": "Golden Paladin",
+   "slot": "sword",
+   "file": "assets/sword/golden-paladin.png",
+   "canvas": [
+    50,
+    147
+   ],
+   "anchor": [
+    25,
+    0
+   ],
+   "source_crop": [
+    348,
+    755,
+    398,
+    902
+   ],
+   "piece_bbox_in_sheet": [
+    352,
+    758,
+    390,
+    899
+   ],
+   "piece_bbox_in_canvas": [
+    4,
+    3,
+    42,
+    144
+   ]
+  },
+  {
+   "id": "sword-crimson-legion",
+   "set": "crimson-legion",
+   "set_name": "Crimson Legion",
+   "slot": "sword",
+   "file": "assets/sword/crimson-legion.png",
+   "canvas": [
+    50,
+    147
+   ],
+   "anchor": [
+    25,
+    0
+   ],
+   "source_crop": [
+    484,
+    755,
+    534,
+    902
+   ],
+   "piece_bbox_in_sheet": [
+    488,
+    758,
+    529,
+    899
+   ],
+   "piece_bbox_in_canvas": [
+    4,
+    3,
+    45,
+    144
+   ]
+  },
+  {
+   "id": "sword-stormcaller",
+   "set": "stormcaller",
+   "set_name": "Stormcaller",
+   "slot": "sword",
+   "file": "assets/sword/stormcaller.png",
+   "canvas": [
+    50,
+    147
+   ],
+   "anchor": [
+    25,
+    0
+   ],
+   "source_crop": [
+    620,
+    755,
+    670,
+    902
+   ],
+   "piece_bbox_in_sheet": [
+    624,
+    759,
+    663,
+    899
+   ],
+   "piece_bbox_in_canvas": [
+    4,
+    4,
+    43,
+    144
+   ]
+  },
+  {
+   "id": "sword-iron-bulwark",
+   "set": "iron-bulwark",
+   "set_name": "Iron Bulwark",
+   "slot": "sword",
+   "file": "assets/sword/iron-bulwark.png",
+   "canvas": [
+    50,
+    147
+   ],
+   "anchor": [
+    25,
+    0
+   ],
+   "source_crop": [
+    755,
+    755,
+    805,
+    902
+   ],
+   "piece_bbox_in_sheet": [
+    758,
+    758,
+    797,
+    899
+   ],
+   "piece_bbox_in_canvas": [
+    3,
+    3,
+    42,
+    144
+   ]
+  },
+  {
+   "id": "sword-forest-guardian",
+   "set": "forest-guardian",
+   "set_name": "Forest Guardian",
+   "slot": "sword",
+   "file": "assets/sword/forest-guardian.png",
+   "canvas": [
+    50,
+    147
+   ],
+   "anchor": [
+    25,
+    0
+   ],
+   "source_crop": [
+    890,
+    755,
+    940,
+    902
+   ],
+   "piece_bbox_in_sheet": [
+    895,
+    758,
+    935,
+    899
+   ],
+   "piece_bbox_in_canvas": [
+    5,
+    3,
+    45,
+    144
+   ]
+  },
+  {
+   "id": "sword-ember-knight",
+   "set": "ember-knight",
+   "set_name": "Ember Knight",
+   "slot": "sword",
+   "file": "assets/sword/ember-knight.png",
+   "canvas": [
+    50,
+    147
+   ],
+   "anchor": [
+    25,
+    0
+   ],
+   "source_crop": [
+    1027,
+    755,
+    1077,
+    902
+   ],
+   "piece_bbox_in_sheet": [
+    1030,
+    759,
+    1071,
+    899
+   ],
+   "piece_bbox_in_canvas": [
+    3,
+    4,
+    44,
+    144
+   ]
+  },
+  {
+   "id": "sword-frostborn",
+   "set": "frostborn",
+   "set_name": "Frostborn",
+   "slot": "sword",
+   "file": "assets/sword/frostborn.png",
+   "canvas": [
+    50,
+    147
+   ],
+   "anchor": [
+    25,
+    0
+   ],
+   "source_crop": [
+    1160,
+    755,
+    1210,
+    902
+   ],
+   "piece_bbox_in_sheet": [
+    1164,
+    759,
+    1205,
+    899
+   ],
+   "piece_bbox_in_canvas": [
+    4,
+    4,
+    45,
+    144
+   ]
+  },
+  {
+   "id": "sword-shadowblade",
+   "set": "shadowblade",
+   "set_name": "Shadowblade",
+   "slot": "sword",
+   "file": "assets/sword/shadowblade.png",
+   "canvas": [
+    50,
+    147
+   ],
+   "anchor": [
+    25,
+    0
+   ],
+   "source_crop": [
+    1295,
+    755,
+    1345,
+    902
+   ],
+   "piece_bbox_in_sheet": [
+    1300,
+    759,
+    1340,
+    899
+   ],
+   "piece_bbox_in_canvas": [
+    5,
+    4,
+    45,
+    144
+   ]
+  },
+  {
+   "id": "sword-sulestial",
+   "set": "sulestial",
+   "set_name": "Sulestial",
+   "slot": "sword",
+   "file": "assets/sword/sulestial.png",
+   "canvas": [
+    50,
+    147
+   ],
+   "anchor": [
+    25,
+    0
+   ],
+   "source_crop": [
+    1427,
+    755,
+    1477,
+    902
+   ],
+   "piece_bbox_in_sheet": [
+    1432,
+    758,
+    1471,
+    899
+   ],
+   "piece_bbox_in_canvas": [
+    5,
+    3,
+    44,
+    144
+   ]
+  },
+  {
+   "id": "shield-knights-oath",
+   "set": "knights-oath",
+   "set_name": "Knight's Oath",
+   "slot": "shield",
+   "file": "assets/shield/knights-oath.png",
+   "canvas": [
+    86,
+    103
+   ],
+   "anchor": [
+    43,
+    0
+   ],
+   "source_crop": [
+    69,
+    897,
+    155,
+    1000
+   ],
+   "piece_bbox_in_sheet": [
+    77,
+    900,
+    148,
+    994
+   ],
+   "piece_bbox_in_canvas": [
+    8,
+    3,
+    79,
+    97
+   ]
+  },
+  {
+   "id": "shield-silver-vanguard",
+   "set": "silver-vanguard",
+   "set_name": "Silver Vanguard",
+   "slot": "shield",
+   "file": "assets/shield/silver-vanguard.png",
+   "canvas": [
+    86,
+    103
+   ],
+   "anchor": [
+    43,
+    0
+   ],
+   "source_crop": [
+    197,
+    897,
+    283,
+    1000
+   ],
+   "piece_bbox_in_sheet": [
+    204,
+    900,
+    276,
+    994
+   ],
+   "piece_bbox_in_canvas": [
+    7,
+    3,
+    79,
+    97
+   ]
+  },
+  {
+   "id": "shield-golden-paladin",
+   "set": "golden-paladin",
+   "set_name": "Golden Paladin",
+   "slot": "shield",
+   "file": "assets/shield/golden-paladin.png",
+   "canvas": [
+    86,
+    103
+   ],
+   "anchor": [
+    43,
+    0
+   ],
+   "source_crop": [
+    330,
+    897,
+    416,
+    1000
+   ],
+   "piece_bbox_in_sheet": [
+    336,
+    901,
+    408,
+    993
+   ],
+   "piece_bbox_in_canvas": [
+    6,
+    4,
+    78,
+    96
+   ]
+  },
+  {
+   "id": "shield-crimson-legion",
+   "set": "crimson-legion",
+   "set_name": "Crimson Legion",
+   "slot": "shield",
+   "file": "assets/shield/crimson-legion.png",
+   "canvas": [
+    86,
+    103
+   ],
+   "anchor": [
+    43,
+    0
+   ],
+   "source_crop": [
+    466,
+    897,
+    552,
+    1000
+   ],
+   "piece_bbox_in_sheet": [
+    472,
+    900,
+    546,
+    995
+   ],
+   "piece_bbox_in_canvas": [
+    6,
+    3,
+    80,
+    98
+   ]
+  },
+  {
+   "id": "shield-stormcaller",
+   "set": "stormcaller",
+   "set_name": "Stormcaller",
+   "slot": "shield",
+   "file": "assets/shield/stormcaller.png",
+   "canvas": [
+    86,
+    103
+   ],
+   "anchor": [
+    43,
+    0
+   ],
+   "source_crop": [
+    602,
+    897,
+    688,
+    1000
+   ],
+   "piece_bbox_in_sheet": [
+    607,
+    900,
+    680,
+    995
+   ],
+   "piece_bbox_in_canvas": [
+    5,
+    3,
+    78,
+    98
+   ]
+  },
+  {
+   "id": "shield-iron-bulwark",
+   "set": "iron-bulwark",
+   "set_name": "Iron Bulwark",
+   "slot": "shield",
+   "file": "assets/shield/iron-bulwark.png",
+   "canvas": [
+    86,
+    103
+   ],
+   "anchor": [
+    43,
+    0
+   ],
+   "source_crop": [
+    737,
+    897,
+    823,
+    1000
+   ],
+   "piece_bbox_in_sheet": [
+    741,
+    900,
+    816,
+    994
+   ],
+   "piece_bbox_in_canvas": [
+    4,
+    3,
+    79,
+    97
+   ]
+  },
+  {
+   "id": "shield-forest-guardian",
+   "set": "forest-guardian",
+   "set_name": "Forest Guardian",
+   "slot": "shield",
+   "file": "assets/shield/forest-guardian.png",
+   "canvas": [
+    86,
+    103
+   ],
+   "anchor": [
+    43,
+    0
+   ],
+   "source_crop": [
+    872,
+    897,
+    958,
+    1000
+   ],
+   "piece_bbox_in_sheet": [
+    876,
+    900,
+    952,
+    996
+   ],
+   "piece_bbox_in_canvas": [
+    4,
+    3,
+    80,
+    99
+   ]
+  },
+  {
+   "id": "shield-ember-knight",
+   "set": "ember-knight",
+   "set_name": "Ember Knight",
+   "slot": "shield",
+   "file": "assets/shield/ember-knight.png",
+   "canvas": [
+    86,
+    103
+   ],
+   "anchor": [
+    43,
+    0
+   ],
+   "source_crop": [
+    1009,
+    897,
+    1095,
+    1000
+   ],
+   "piece_bbox_in_sheet": [
+    1013,
+    900,
+    1090,
+    997
+   ],
+   "piece_bbox_in_canvas": [
+    4,
+    3,
+    81,
+    100
+   ]
+  },
+  {
+   "id": "shield-frostborn",
+   "set": "frostborn",
+   "set_name": "Frostborn",
+   "slot": "shield",
+   "file": "assets/shield/frostborn.png",
+   "canvas": [
+    86,
+    103
+   ],
+   "anchor": [
+    43,
+    0
+   ],
+   "source_crop": [
+    1142,
+    897,
+    1228,
+    1000
+   ],
+   "piece_bbox_in_sheet": [
+    1145,
+    900,
+    1223,
+    997
+   ],
+   "piece_bbox_in_canvas": [
+    3,
+    3,
+    81,
+    100
+   ]
+  },
+  {
+   "id": "shield-shadowblade",
+   "set": "shadowblade",
+   "set_name": "Shadowblade",
+   "slot": "shield",
+   "file": "assets/shield/shadowblade.png",
+   "canvas": [
+    86,
+    103
+   ],
+   "anchor": [
+    43,
+    0
+   ],
+   "source_crop": [
+    1277,
+    897,
+    1363,
+    1000
+   ],
+   "piece_bbox_in_sheet": [
+    1282,
+    900,
+    1359,
+    997
+   ],
+   "piece_bbox_in_canvas": [
+    5,
+    3,
+    82,
+    100
+   ]
+  },
+  {
+   "id": "shield-sulestial",
+   "set": "sulestial",
+   "set_name": "Sulestial",
+   "slot": "shield",
+   "file": "assets/shield/sulestial.png",
+   "canvas": [
+    86,
+    103
+   ],
+   "anchor": [
+    43,
+    0
+   ],
+   "source_crop": [
+    1409,
+    897,
+    1495,
+    1000
+   ],
+   "piece_bbox_in_sheet": [
+    1416,
+    900,
+    1489,
+    995
+   ],
+   "piece_bbox_in_canvas": [
+    7,
+    3,
+    80,
+    98
+   ]
+  },
+  {
+   "id": "figure-knights-oath",
+   "set": "knights-oath",
+   "set_name": "Knight's Oath",
+   "slot": "figure",
+   "file": "reference/knights-oath.png",
+   "canvas": [
+    122,
+    243
+   ],
+   "anchor": [
+    61,
+    0
+   ],
+   "source_crop": [
+    53,
+    76,
+    175,
+    319
+   ],
+   "piece_bbox_in_sheet": [
+    56,
+    80,
+    164,
+    314
+   ],
+   "piece_bbox_in_canvas": [
+    3,
+    4,
+    111,
+    238
+   ]
+  },
+  {
+   "id": "figure-silver-vanguard",
+   "set": "silver-vanguard",
+   "set_name": "Silver Vanguard",
+   "slot": "figure",
+   "file": "reference/silver-vanguard.png",
+   "canvas": [
+    122,
+    243
+   ],
+   "anchor": [
+    61,
+    0
+   ],
+   "source_crop": [
+    183,
+    76,
+    305,
+    319
+   ],
+   "piece_bbox_in_sheet": [
+    188,
+    79,
+    300,
+    315
+   ],
+   "piece_bbox_in_canvas": [
+    5,
+    3,
+    117,
+    239
+   ]
+  },
+  {
+   "id": "figure-golden-paladin",
+   "set": "golden-paladin",
+   "set_name": "Golden Paladin",
+   "slot": "figure",
+   "file": "reference/golden-paladin.png",
+   "canvas": [
+    122,
+    243
+   ],
+   "anchor": [
+    61,
+    0
+   ],
+   "source_crop": [
+    315,
+    76,
+    437,
+    319
+   ],
+   "piece_bbox_in_sheet": [
+    320,
+    83,
+    432,
+    314
+   ],
+   "piece_bbox_in_canvas": [
+    5,
+    7,
+    117,
+    238
+   ]
+  },
+  {
+   "id": "figure-crimson-legion",
+   "set": "crimson-legion",
+   "set_name": "Crimson Legion",
+   "slot": "figure",
+   "file": "reference/crimson-legion.png",
+   "canvas": [
+    122,
+    243
+   ],
+   "anchor": [
+    61,
+    0
+   ],
+   "source_crop": [
+    451,
+    76,
+    573,
+    319
+   ],
+   "piece_bbox_in_sheet": [
+    456,
+    79,
+    563,
+    315
+   ],
+   "piece_bbox_in_canvas": [
+    5,
+    3,
+    112,
+    239
+   ]
+  },
+  {
+   "id": "figure-stormcaller",
+   "set": "stormcaller",
+   "set_name": "Stormcaller",
+   "slot": "figure",
+   "file": "reference/stormcaller.png",
+   "canvas": [
+    122,
+    243
+   ],
+   "anchor": [
+    61,
+    0
+   ],
+   "source_crop": [
+    587,
+    76,
+    709,
+    319
+   ],
+   "piece_bbox_in_sheet": [
+    591,
+    80,
+    699,
+    315
+   ],
+   "piece_bbox_in_canvas": [
+    4,
+    4,
+    112,
+    239
+   ]
+  },
+  {
+   "id": "figure-iron-bulwark",
+   "set": "iron-bulwark",
+   "set_name": "Iron Bulwark",
+   "slot": "figure",
+   "file": "reference/iron-bulwark.png",
+   "canvas": [
+    122,
+    243
+   ],
+   "anchor": [
+    61,
+    0
+   ],
+   "source_crop": [
+    721,
+    76,
+    843,
+    319
+   ],
+   "piece_bbox_in_sheet": [
+    728,
+    79,
+    836,
+    315
+   ],
+   "piece_bbox_in_canvas": [
+    7,
+    3,
+    115,
+    239
+   ]
+  },
+  {
+   "id": "figure-forest-guardian",
+   "set": "forest-guardian",
+   "set_name": "Forest Guardian",
+   "slot": "figure",
+   "file": "reference/forest-guardian.png",
+   "canvas": [
+    122,
+    243
+   ],
+   "anchor": [
+    61,
+    0
+   ],
+   "source_crop": [
+    855,
+    76,
+    977,
+    319
+   ],
+   "piece_bbox_in_sheet": [
+    863,
+    79,
+    971,
+    315
+   ],
+   "piece_bbox_in_canvas": [
+    8,
+    3,
+    116,
+    239
+   ]
+  },
+  {
+   "id": "figure-ember-knight",
+   "set": "ember-knight",
+   "set_name": "Ember Knight",
+   "slot": "figure",
+   "file": "reference/ember-knight.png",
+   "canvas": [
+    122,
+    243
+   ],
+   "anchor": [
+    61,
+    0
+   ],
+   "source_crop": [
+    991,
+    76,
+    1113,
+    319
+   ],
+   "piece_bbox_in_sheet": [
+    997,
+    80,
+    1106,
+    315
+   ],
+   "piece_bbox_in_canvas": [
+    6,
+    4,
+    115,
+    239
+   ]
+  },
+  {
+   "id": "figure-frostborn",
+   "set": "frostborn",
+   "set_name": "Frostborn",
+   "slot": "figure",
+   "file": "reference/frostborn.png",
+   "canvas": [
+    122,
+    243
+   ],
+   "anchor": [
+    61,
+    0
+   ],
+   "source_crop": [
+    1124,
+    76,
+    1246,
+    319
+   ],
+   "piece_bbox_in_sheet": [
+    1132,
+    79,
+    1240,
+    315
+   ],
+   "piece_bbox_in_canvas": [
+    8,
+    3,
+    116,
+    239
+   ]
+  },
+  {
+   "id": "figure-shadowblade",
+   "set": "shadowblade",
+   "set_name": "Shadowblade",
+   "slot": "figure",
+   "file": "reference/shadowblade.png",
+   "canvas": [
+    122,
+    243
+   ],
+   "anchor": [
+    61,
+    0
+   ],
+   "source_crop": [
+    1262,
+    76,
+    1384,
+    319
+   ],
+   "piece_bbox_in_sheet": [
+    1269,
+    79,
+    1375,
+    315
+   ],
+   "piece_bbox_in_canvas": [
+    7,
+    3,
+    113,
+    239
+   ]
+  },
+  {
+   "id": "figure-sulestial",
+   "set": "sulestial",
+   "set_name": "Sulestial",
+   "slot": "figure",
+   "file": "reference/sulestial.png",
+   "canvas": [
+    122,
+    243
+   ],
+   "anchor": [
+    61,
+    0
+   ],
+   "source_crop": [
+    1395,
+    76,
+    1517,
+    319
+   ],
+   "piece_bbox_in_sheet": [
+    1403,
+    79,
+    1507,
+    316
+   ],
+   "piece_bbox_in_canvas": [
+    8,
+    3,
+    112,
+    240
+   ]
+  }
+ ],
+ "notes": [
+  "Canvas size is identical for every set of a slot. Each canvas is centred on its set's column centre (cx) and starts at the slot's fixed row top, so pieces keep the sheet's own relative positions.",
+  "anchor = the point of the canvas that sits on the set's column centre line (x) and the slot's row top (y)."
+ ],
+ "placement": {
+  "frame": "native sheet pixels. x: shift from the centre line (0 = canvas centred on it). y: top of the slot canvas, measured from the top of the reference figure canvas after enlarging it by 1/figure_scale.",
+  "figure_scale": 0.96,
+  "slots": {
+   "helmet": {
+    "dx": 0,
+    "y": -10
+   },
+   "chest": {
+    "dx": 0,
+    "y": 47
+   },
+   "legs": {
+    "dx": 0,
+    "y": 138
+   },
+   "belt": {
+    "dx": 0,
+    "y": 101,
+    "scale": 0.82
+   },
+   "cape": {
+    "dx": 0,
+    "y": 44,
+    "scale": 1.35
+   },
+   "sword": {
+    "dx": 48,
+    "y": -4,
+    "scale": 1.2,
+    "rotate": 180,
+    "note": "held by the grip: turned 180 degrees (the sheet draws the sword point-down) and scaled 1.2x; 'tilt' turns it further around the hand, clockwise from straight up (0 = up, 90 = out to the side, 180 = down)",
+    "tilt": 0,
+    "grip_from_pommel": 24
+   },
+   "shield": {
+    "dx": -56,
+    "y": 74,
+    "scale": 1.25
+   }
+  }
+ },
+ "review_flags": []
+}

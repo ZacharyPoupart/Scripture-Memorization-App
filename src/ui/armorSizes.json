@@ -1,195 +1,179 @@
 {
- "belt-1": [
-  69,
-  22
+ "belt-crimson-legion": [
+  90,
+  36
  ],
- "belt-10": [
-  74,
-  24
+ "belt-ember-knight": [
+  90,
+  36
  ],
- "belt-11": [
-  73,
-  22
+ "belt-forest-guardian": [
+  90,
+  36
  ],
- "belt-12": [
-  70,
-  24
+ "belt-frostborn": [
+  90,
+  36
  ],
- "belt-2": [
-  65,
-  23
+ "belt-golden-paladin": [
+  90,
+  36
  ],
- "belt-3": [
-  67,
-  22
+ "belt-iron-bulwark": [
+  90,
+  36
  ],
- "belt-4": [
-  67,
-  23
+ "belt-knights-oath": [
+  90,
+  36
  ],
- "belt-5": [
-  69,
-  22
+ "belt-shadowblade": [
+  90,
+  36
  ],
- "belt-6": [
-  69,
-  24
+ "belt-silver-vanguard": [
+  90,
+  36
  ],
- "belt-7": [
-  68,
-  23
+ "belt-stormcaller": [
+  90,
+  36
  ],
- "belt-8": [
-  69,
-  24
+ "belt-sulestial": [
+  90,
+  36
  ],
- "belt-9": [
-  68,
-  23
+ "boots-crimson-legion": [
+  88,
+  102
  ],
- "boots-1": [
-  81,
-  114
+ "boots-ember-knight": [
+  88,
+  102
  ],
- "boots-10": [
-  80,
-  115
+ "boots-forest-guardian": [
+  88,
+  102
  ],
- "boots-11": [
-  80,
-  114
+ "boots-frostborn": [
+  88,
+  102
  ],
- "boots-12": [
-  80,
-  114
+ "boots-golden-paladin": [
+  88,
+  102
  ],
- "boots-2": [
-  80,
-  114
+ "boots-iron-bulwark": [
+  88,
+  102
  ],
- "boots-3": [
-  78,
-  115
+ "boots-knights-oath": [
+  88,
+  102
  ],
- "boots-4": [
-  78,
-  115
+ "boots-shadowblade": [
+  88,
+  102
  ],
- "boots-5": [
-  75,
-  114
+ "boots-silver-vanguard": [
+  88,
+  102
  ],
- "boots-6": [
-  79,
-  115
+ "boots-stormcaller": [
+  88,
+  102
  ],
- "boots-7": [
-  76,
-  113
+ "boots-sulestial": [
+  88,
+  102
  ],
- "boots-8": [
-  73,
-  112
- ],
- "boots-9": [
-  73,
-  112
- ],
- "cape-1": [
-  82,
-  115
- ],
- "cape-10": [
-  81,
-  115
- ],
- "cape-11": [
-  83,
-  114
- ],
- "cape-12": [
-  83,
-  115
- ],
- "cape-2": [
-  83,
-  116
- ],
- "cape-3": [
-  82,
-  115
- ],
- "cape-4": [
-  83,
-  116
- ],
- "cape-5": [
-  84,
-  115
- ],
- "cape-6": [
-  84,
-  115
- ],
- "cape-7": [
-  82,
-  116
- ],
- "cape-8": [
-  82,
-  116
- ],
- "cape-9": [
-  82,
-  114
- ],
- "chest-1": [
-  110,
-  106
- ],
- "chest-10": [
+ "cape-crimson-legion": [
   112,
-  106
+  126
  ],
- "chest-11": [
+ "cape-ember-knight": [
   112,
-  105
+  126
  ],
- "chest-12": [
+ "cape-forest-guardian": [
   112,
-  107
+  126
  ],
- "chest-2": [
+ "cape-frostborn": [
   112,
-  108
+  126
  ],
- "chest-3": [
-  106,
-  106
- ],
- "chest-4": [
-  111,
-  106
- ],
- "chest-5": [
-  113,
-  107
- ],
- "chest-6": [
+ "cape-golden-paladin": [
   112,
-  106
+  126
  ],
- "chest-7": [
-  111,
-  106
+ "cape-iron-bulwark": [
+  112,
+  126
  ],
- "chest-8": [
-  113,
-  106
+ "cape-knights-oath": [
+  112,
+  126
  ],
- "chest-9": [
-  109,
-  104
+ "cape-shadowblade": [
+  112,
+  126
+ ],
+ "cape-silver-vanguard": [
+  112,
+  126
+ ],
+ "cape-stormcaller": [
+  112,
+  126
+ ],
+ "cape-sulestial": [
+  112,
+  126
+ ],
+ "chest-crimson-legion": [
+  124,
+  117
+ ],
+ "chest-ember-knight": [
+  124,
+  117
+ ],
+ "chest-forest-guardian": [
+  124,
+  117
+ ],
+ "chest-frostborn": [
+  124,
+  117
+ ],
+ "chest-golden-paladin": [
+  124,
+  117
+ ],
+ "chest-iron-bulwark": [
+  124,
+  117
+ ],
+ "chest-knights-oath": [
+  124,
+  117
+ ],
+ "chest-shadowblade": [
+  124,
+  117
+ ],
+ "chest-silver-vanguard": [
+  124,
+  117
+ ],
+ "chest-stormcaller": [
+  124,
+  117
+ ],
+ "chest-sulestial": [
+  124,
+  117
  ],
  "ex-amulet": [
   28,
@@ -227,120 +211,136 @@
   47,
   28
  ],
- "helmet-1": [
-  68,
-  98
+ "helmet-crimson-legion": [
+  72,
+  82
  ],
- "helmet-10": [
-  71,
-  101
+ "helmet-ember-knight": [
+  72,
+  82
  ],
- "helmet-11": [
-  92,
-  101
+ "helmet-forest-guardian": [
+  72,
+  82
  ],
- "helmet-12": [
-  67,
-  99
+ "helmet-frostborn": [
+  72,
+  82
  ],
- "helmet-2": [
-  67,
-  99
+ "helmet-golden-paladin": [
+  72,
+  82
  ],
- "helmet-3": [
-  69,
-  101
+ "helmet-iron-bulwark": [
+  72,
+  82
  ],
- "helmet-4": [
-  69,
-  99
+ "helmet-knights-oath": [
+  72,
+  82
  ],
- "helmet-5": [
-  98,
-  101
+ "helmet-shadowblade": [
+  72,
+  82
  ],
- "helmet-6": [
-  75,
-  107
+ "helmet-silver-vanguard": [
+  72,
+  82
  ],
- "helmet-7": [
-  77,
-  99
+ "helmet-stormcaller": [
+  72,
+  82
  ],
- "helmet-8": [
-  65,
-  100
+ "helmet-sulestial": [
+  72,
+  82
  ],
- "helmet-9": [
-  70,
-  102
+ "shield-crimson-legion": [
+  86,
+  103
  ],
- "shield-1": [
-  55,
-  77
+ "shield-ember-knight": [
+  86,
+  103
  ],
- "shield-2": [
-  47,
-  69
+ "shield-forest-guardian": [
+  86,
+  103
  ],
- "shield-3": [
-  47,
-  69
+ "shield-frostborn": [
+  86,
+  103
  ],
- "shield-4": [
+ "shield-golden-paladin": [
+  86,
+  103
+ ],
+ "shield-iron-bulwark": [
+  86,
+  103
+ ],
+ "shield-knights-oath": [
+  86,
+  103
+ ],
+ "shield-shadowblade": [
+  86,
+  103
+ ],
+ "shield-silver-vanguard": [
+  86,
+  103
+ ],
+ "shield-stormcaller": [
+  86,
+  103
+ ],
+ "shield-sulestial": [
+  86,
+  103
+ ],
+ "weapon-crimson-legion": [
   50,
-  72
+  147
  ],
- "shield-5": [
+ "weapon-ember-knight": [
   50,
-  75
+  147
  ],
- "shield-6": [
+ "weapon-forest-guardian": [
   50,
-  51
+  147
  ],
- "weapon-1": [
-  31,
-  108
- ],
- "weapon-10": [
-  13,
-  100
- ],
- "weapon-11": [
-  46,
-  106
- ],
- "weapon-2": [
-  30,
-  106
- ],
- "weapon-3": [
-  33,
-  109
- ],
- "weapon-4": [
-  30,
-  108
- ],
- "weapon-5": [
+ "weapon-frostborn": [
   50,
-  100
+  147
  ],
- "weapon-6": [
-  36,
-  89
+ "weapon-golden-paladin": [
+  50,
+  147
  ],
- "weapon-7": [
-  17,
-  98
+ "weapon-iron-bulwark": [
+  50,
+  147
  ],
- "weapon-8": [
-  29,
-  96
+ "weapon-knights-oath": [
+  50,
+  147
  ],
- "weapon-9": [
-  43,
-  83
+ "weapon-shadowblade": [
+  50,
+  147
+ ],
+ "weapon-silver-vanguard": [
+  50,
+  147
+ ],
+ "weapon-stormcaller": [
+  50,
+  147
+ ],
+ "weapon-sulestial": [
+  50,
+  147
  ]
 }

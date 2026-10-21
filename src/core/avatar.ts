@@ -63,7 +63,7 @@ export interface Item {
   color?: string;
   /** A painted piece (armor, weapons, capes, plumes, banners...), as opposed to a simple drawn extra. */
   art?: boolean;
-  /** Which of the twelve matching sets (1-12) a helmet, chest plate, belt, boots or cape belongs to. */
+  /** Which matching set (1-11, see SETS) a helmet, chest plate, belt, boots, cape, sword or shield belongs to. */
   set?: number;
   /** Must be reached before this item can be bought (it still costs seeds). */
   requires?: Unlock;
@@ -75,76 +75,56 @@ const art = (slot: Slot, id: string, name: string, cost: number, needs?: number,
   I(slot, id, name, cost, { art: true, ...(needs ? { requires: streak(needs) } : {}), ...extra });
 
 /**
- * Helmets, chest plates, belts and boots (and capes) come in twelve matching sets painted to the same scale, so any piece goes
- * with any other. Each set costs more than the one before, and the finest need a long streak first. Set 1 is the free start.
- * Leg armor is not a choice of its own: the legs of the boots' set are worn automatically (see ArmorArt).
+ * Every set is eleven matching pieces drawn to the same scale (helmet, chest plate, belt, boots, cape, sword and shield), so
+ * any piece goes with any other. Each set costs more than the one before, and the finest need a long streak first. The first
+ * set is the free start. The files are cut from the owner's sheet by design/armor-v2 (ids are the file names).
  */
 export interface ArmorSet {
   n: number;
+  id: string;
   name: string;
-  /** Seeds for the chest plate; the other pieces are a fraction of it. */
+  /** Seeds for the helmet and chest plate; the other pieces are a fraction of it. */
   price: number;
   streak?: number;
 }
 export const SETS: ArmorSet[] = [
-  { n: 1, name: 'Knight', price: 0 },
-  { n: 2, name: 'Azure', price: 15 },
-  { n: 3, name: 'Dawn', price: 30 },
-  { n: 4, name: 'Shadow', price: 50 },
-  { n: 5, name: 'Forest', price: 75 },
-  { n: 6, name: 'Sapphire', price: 105 },
-  { n: 7, name: 'Iron', price: 140 },
-  { n: 8, name: 'Crimson', price: 180, streak: 30 },
-  { n: 9, name: 'Pearl', price: 230, streak: 60 },
-  { n: 10, name: 'Amethyst', price: 290, streak: 90 },
-  { n: 11, name: 'Midnight', price: 350, streak: 180 },
-  { n: 12, name: 'Crusader', price: 420, streak: 365 },
+  { n: 1, id: 'knights-oath', name: 'Knight’s Oath', price: 0 },
+  { n: 2, id: 'silver-vanguard', name: 'Silver Vanguard', price: 15 },
+  { n: 3, id: 'iron-bulwark', name: 'Iron Bulwark', price: 30 },
+  { n: 4, id: 'forest-guardian', name: 'Forest Guardian', price: 50 },
+  { n: 5, id: 'stormcaller', name: 'Stormcaller', price: 75 },
+  { n: 6, id: 'frostborn', name: 'Frostborn', price: 105 },
+  { n: 7, id: 'ember-knight', name: 'Ember Knight', price: 140 },
+  { n: 8, id: 'crimson-legion', name: 'Crimson Legion', price: 180, streak: 30 },
+  { n: 9, id: 'shadowblade', name: 'Shadowblade', price: 230, streak: 60 },
+  { n: 10, id: 'golden-paladin', name: 'Golden Paladin', price: 310, streak: 180 },
+  { n: 11, id: 'sulestial', name: 'Sulestial', price: 420, streak: 365 },
 ];
-const FRACTION = { helmet: 1, chest: 1, belt: 0.4, boots: 0.5, cape: 0.6 } as const;
-const HELMET_NAMES = [
-  'Steel helm',
-  'Visor helm',
-  'Golden helm',
-  'Shadow helm',
-  'Horned helm',
-  'Plumed helm',
-  'Spiked helm',
-  'Cross helm',
-  'Crested helm',
-  'Royal helm',
-  'Winged helm',
-  'Golden crest helm',
-];
-const CAPE_NAMES = ['Blue lion', 'Red lion', 'Green tree', 'White sun', 'Purple rose', 'Black dragon', 'Blue star', 'Green stag', 'Red phoenix', 'Cross', 'Violet sun', 'Shadow'];
-const NOUN = { chest: 'chest plate', belt: 'belt', boots: 'boots' } as const;
-const setPieces: Item[] = SETS.flatMap((set) => {
-  const cost = (slot: keyof typeof FRACTION) => Math.round((set.price * FRACTION[slot]) / 5) * 5;
-  return [
-    art('helmet', `helmet-${set.n}`, HELMET_NAMES[set.n - 1], cost('helmet'), set.streak, { set: set.n }),
-    ...(['chest', 'belt', 'boots'] as const).map((slot) => art(slot, `${slot}-${set.n}`, `${set.name} ${NOUN[slot]}`, cost(slot), set.streak, { set: set.n })),
-  ];
-});
-const capes: Item[] = SETS.map((set) => art('cape', `cape-${set.n}`, `${CAPE_NAMES[set.n - 1]} cape`, Math.round((set.price * FRACTION.cape + 10) / 5) * 5, set.streak, { set: set.n }));
-
-const SHIELD_NAMES = ['Lion shield', 'Dragon shield', 'Sun shield', 'Tree shield', 'Spiked shield', 'Round shield'];
-const SHIELD_COSTS = [30, 160, 100, 60, 240, 20];
-const WEAPON_NAMES = ['Steel sword', 'Golden sword', 'Dark sword', 'Crystal sword', 'Battle axe', 'Mace', 'Spear', 'Longbow', 'Scimitar', 'Crystal staff', 'Great bow'];
-const WEAPON_COSTS = [20, 350, 200, 120, 70, 50, 30, 100, 160, 150, 260];
-const WEAPON_STREAKS: Record<number, number> = { 2: 365, 3: 90 };
+/** What each piece costs, as a share of the set's price (capes, swords and shields also have a small base so the first set's are not free). */
+const FRACTION = { helmet: 1, chest: 1, belt: 0.4, boots: 0.5, cape: 0.6, weapon: 0.5, shield: 0.5 } as const;
+const BASE = { helmet: 0, chest: 0, belt: 0, boots: 0, cape: 10, weapon: 10, shield: 10 } as const;
+const NOUN = { helmet: 'helm', chest: 'chest plate', belt: 'belt', boots: 'boots', cape: 'cape', weapon: 'sword', shield: 'shield' } as const;
+type SetSlot = keyof typeof FRACTION;
+const setPrice = (set: ArmorSet, slot: SetSlot) => Math.round((set.price * FRACTION[slot] + BASE[slot]) / 5) * 5;
+const setPiece = (slot: SetSlot, set: ArmorSet): Item => art(slot, `${slot}-${set.id}`, `${set.name} ${NOUN[slot]}`, setPrice(set, slot), set.streak, { set: set.n });
+const piecesOf = (slot: SetSlot): Item[] => SETS.map((set) => setPiece(slot, set));
 
 export const ITEMS: Item[] = [
   // ---- helmets, chest plates, belts and boots
-  ...setPieces,
+  ...piecesOf('helmet'),
+  ...piecesOf('chest'),
+  ...piecesOf('belt'),
+  ...piecesOf('boots'),
   // ---- capes
   I('cape', 'cape-none', 'None'),
-  ...capes,
+  ...piecesOf('cape'),
   I('cape', 'cape-wings', 'Wings of light', 0, { unlock: streak(500) }),
   // ---- shields
   I('shield', 'shield-none', 'None'),
-  ...SHIELD_NAMES.map((name, i) => art('shield', `shield-${i + 1}`, name, SHIELD_COSTS[i], i === 4 ? 180 : undefined)),
-  // ---- weapons
+  ...piecesOf('shield'),
+  // ---- swords
   I('weapon', 'weapon-none', 'None'),
-  ...WEAPON_NAMES.map((name, i) => art('weapon', `weapon-${i + 1}`, name, WEAPON_COSTS[i], WEAPON_STREAKS[i + 1])),
+  ...piecesOf('weapon'),
   // ---- accessories
   I('extra', 'ex-none', 'None'),
   art('extra', 'ex-ring', 'Ring', 25),
@@ -194,10 +174,10 @@ export type Look = Record<Slot, string>;
 
 export function defaultLook(): Look {
   return {
-    helmet: 'helmet-1',
-    chest: 'chest-1',
-    belt: 'belt-1',
-    boots: 'boots-1',
+    helmet: 'helmet-knights-oath',
+    chest: 'chest-knights-oath',
+    belt: 'belt-knights-oath',
+    boots: 'boots-knights-oath',
     cape: 'cape-none',
     shield: 'shield-none',
     weapon: 'weapon-none',
