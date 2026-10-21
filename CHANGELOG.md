@@ -5,6 +5,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.21.0] - 2026-10-21
+
+### Changed
+- A new look, "Hearth": warm cream and terracotta in light mode, warm brown and amber in dark mode, Fraunces (a soft serif) for the verse and headings and Nunito for the rest, rounder cards and pill-shaped buttons. The fonts are bundled, so it looks the same offline. Every colour pair is still checked for contrast in both modes.
+
 ## [1.20.0] - 2026-10-20
 
 ### Changed

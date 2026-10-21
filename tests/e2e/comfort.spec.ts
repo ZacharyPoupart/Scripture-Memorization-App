@@ -13,22 +13,22 @@ test.describe('theme follows the system by default', () => {
     await page.emulateMedia({ colorScheme: 'light' });
     await blockLookups(page);
     await openApp(page);
-    expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe(rgb('#f6f3ec'));
-    expect(await page.evaluate(() => getComputedStyle(document.body).color)).toBe(rgb('#272d2c'));
+    expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe(rgb('#f4e9dc'));
+    expect(await page.evaluate(() => getComputedStyle(document.body).color)).toBe(rgb('#3b2a22'));
   });
   test('dark', async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'dark' });
     await blockLookups(page);
     await openApp(page);
-    expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe(rgb('#161b1c'));
-    expect(await page.evaluate(() => getComputedStyle(document.body).color)).toBe(rgb('#e3e8e6'));
+    expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe(rgb('#1a1411'));
+    expect(await page.evaluate(() => getComputedStyle(document.body).color)).toBe(rgb('#f1e6d8'));
   });
   test('an explicit choice in Settings overrides the system', async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'dark' });
     await blockLookups(page);
     await openApp(page, '/#/settings');
     await page.getByRole('button', { name: 'Light' }).click();
-    expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe(rgb('#f6f3ec'));
+    expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe(rgb('#f4e9dc'));
   });
 });
 
