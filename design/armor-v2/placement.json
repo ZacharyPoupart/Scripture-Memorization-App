@@ -1,0 +1,42 @@
+{
+ "frame": "native sheet pixels. x: shift from the centre line (0 = canvas centred on it). y: top of the slot canvas, measured from the top of the reference figure canvas after enlarging it by 1/figure_scale.",
+ "figure_scale": 0.96,
+ "slots": {
+  "helmet": {
+   "dx": 0,
+   "y": -10
+  },
+  "chest": {
+   "dx": 0,
+   "y": 47
+  },
+  "legs": {
+   "dx": 0,
+   "y": 138
+  },
+  "belt": {
+   "dx": 0,
+   "y": 101,
+   "scale": 0.82
+  },
+  "cape": {
+   "dx": 0,
+   "y": 44,
+   "scale": 1.35
+  },
+  "sword": {
+   "dx": 48,
+   "y": -4,
+   "scale": 1.2,
+   "rotate": 180,
+   "note": "held by the grip: turned 180 degrees (the sheet draws the sword point-down) and scaled 1.2x; 'tilt' turns it further around the hand, clockwise from straight up (0 = up, 90 = out to the side, 180 = down)",
+   "tilt": 0,
+   "grip_from_pommel": 24
+  },
+  "shield": {
+   "dx": -56,
+   "y": 74,
+   "scale": 1.25
+  }
+ }
+}

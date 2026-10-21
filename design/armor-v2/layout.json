@@ -1,0 +1,142 @@
+{
+ "source": "source/armor-sheet-v2.webp",
+ "source_sha256": "f6f20dd465f253797f86a3cefef26e6fb6350417cc3e4ef6ff3d52ceffd9ad65",
+ "background": {
+  "min_channel": 222,
+  "max_spread": 10,
+  "min_contrast": 40,
+  "min_alpha": 0.04,
+  "grow_min_channel": 196,
+  "grow_max_spread": 16
+ },
+ "edge": {},
+ "sets": [
+  {
+   "id": "knights-oath",
+   "name": "Knight's Oath",
+   "cx": 112,
+   "banner_cut_y": 80,
+   "figure_cx": 114
+  },
+  {
+   "id": "silver-vanguard",
+   "name": "Silver Vanguard",
+   "cx": 240,
+   "banner_cut_y": 79,
+   "figure_cx": 244
+  },
+  {
+   "id": "golden-paladin",
+   "name": "Golden Paladin",
+   "cx": 373,
+   "banner_cut_y": 83,
+   "figure_cx": 376
+  },
+  {
+   "id": "crimson-legion",
+   "name": "Crimson Legion",
+   "cx": 509,
+   "banner_cut_y": 79,
+   "figure_cx": 512
+  },
+  {
+   "id": "stormcaller",
+   "name": "Stormcaller",
+   "cx": 645,
+   "banner_cut_y": 80,
+   "figure_cx": 648
+  },
+  {
+   "id": "iron-bulwark",
+   "name": "Iron Bulwark",
+   "cx": 780,
+   "banner_cut_y": 79,
+   "figure_cx": 782
+  },
+  {
+   "id": "forest-guardian",
+   "name": "Forest Guardian",
+   "cx": 915,
+   "banner_cut_y": 79,
+   "figure_cx": 916
+  },
+  {
+   "id": "ember-knight",
+   "name": "Ember Knight",
+   "cx": 1052,
+   "banner_cut_y": 80,
+   "figure_cx": 1052
+  },
+  {
+   "id": "frostborn",
+   "name": "Frostborn",
+   "cx": 1185,
+   "banner_cut_y": 79,
+   "figure_cx": 1185
+  },
+  {
+   "id": "shadowblade",
+   "name": "Shadowblade",
+   "cx": 1320,
+   "banner_cut_y": 79,
+   "figure_cx": 1323
+  },
+  {
+   "id": "sulestial",
+   "name": "Sulestial",
+   "cx": 1452,
+   "banner_cut_y": 79,
+   "figure_cx": 1456
+  }
+ ],
+ "centroid_bands": {
+  "helmet": [
+   300,
+   376
+  ],
+  "chest": [
+   376,
+   501
+  ],
+  "legs": [
+   501,
+   601
+  ],
+  "belt": [
+   601,
+   634
+  ]
+ },
+ "lower_rows": {
+  "from_y": 630,
+  "cuts": [
+   757,
+   900
+  ],
+  "slots": [
+   "cape",
+   "sword",
+   "shield"
+  ]
+ },
+ "figure_cut_min_y": 30,
+ "figure_cut_max_y": 320,
+ "label_strip_max_x": 70,
+ "min_piece_pixels": 25,
+ "exclude_rects": [
+  [
+   0,
+   410,
+   65,
+   462
+  ]
+ ],
+ "canvas_padding": 3,
+ "touching_pieces": {
+  "ember-knight": {
+   "cut_y": 394,
+   "half_width": 40,
+   "why": "the helmet chin touches the chest plate collar in the sheet"
+  }
+ }
+}

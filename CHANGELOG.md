@@ -5,6 +5,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.23.0] - 2026-10-21
+
+### Changed
+- The knight's armor is replaced with the new eleven sets: Knight's Oath (free, everyone starts in it), Silver Vanguard, Iron Bulwark, Forest Guardian, Stormcaller, Frostborn, Ember Knight, Crimson Legion, Shadowblade, Golden Paladin and Sulestial. Helmet, chest plate with arms, belt, boots, cape, shield and sword all mix and match. Armor you bought before is refunded as seeds; nothing is lost.
+
 ## [1.22.0] - 2026-10-21
 
 ### Changed

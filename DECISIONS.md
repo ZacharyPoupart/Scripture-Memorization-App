@@ -310,3 +310,11 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Today:** removed the date and greeting, the progress ring (the `0/3` count stays as plain text, same test id), the "Aim for three a day" and "Newly added verses…" filler lines, the mode description under the picker (only on Today; other places keep it) and the "Your piles" heading. The verse list rows are bigger (serif, 52px tall, divided by hairlines); the four pile cards became one row of `dot Name count` buttons (same test ids). `tests/e2e/offline-smoke.spec.ts` no longer looks for the greeting on Today; it looks for the headline instead. New e2e test: Today has no date, greeting, ring or pile cards.
 **Not changed:** the other screens (Verses, Stats, Settings, review modes). Say which to simplify next.
 **Test change:** `tests/e2e/motivation.spec.ts` looked for the ring's `done` state after the last review of the day; with the ring gone, the same moment is now the count turning green (`.today-count.done`). Same behaviour checked: Today shows that the day is finished.
+
+## v1.23.0 — New armor sheet, eleven sets (owner request)
+**What:** the old numbered armour (twelve sets) is replaced by the owner's new sheet, cut by `design/armor-v2/` (README and REPORT there). Eleven sets, not twelve, because the sheet has eleven. Ids are now `<slot>-<set-id>`; `SETS` in `core/avatar.ts`. The first set is free and is the default look.
+**Guesses to confirm:** prices (0, 15, 30, 50, 75, 105, 140, 180, 230, 310, 420 seeds) and streak gates (30 / 60 / 180 / 365 days on the last four) are mine; shield and sword prices are fractions of the set price as before.
+**Old purchases:** old ids are unknown to the catalog, so they cost nothing and the seeds come back automatically (seeds are derived). A saved look with an old id falls back to the default piece. No data shape change; schema stays 1.
+**Placement:** the sheet's loose pieces are not on the finished figure's scale, so belt, cape, sword and shield positions are hand-set in `design/armor-v2/placement.json` and verified on assembled previews. The sword is turned upright.
+**Test changes:** `tests/unit/avatar.test.ts` and `tests/e2e/avatar.spec.ts` use the new ids and prices (same behaviours checked). `testing.armorFree` is still on.
+**Undo:** roll back to `v1.22.0-bare-today`.

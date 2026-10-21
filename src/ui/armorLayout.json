@@ -1,0 +1,111 @@
+{
+ "frame": {
+  "top": -10,
+  "height": 250
+ },
+ "sets": [
+  {
+   "id": "knights-oath",
+   "name": "Knight's Oath"
+  },
+  {
+   "id": "silver-vanguard",
+   "name": "Silver Vanguard"
+  },
+  {
+   "id": "golden-paladin",
+   "name": "Golden Paladin"
+  },
+  {
+   "id": "crimson-legion",
+   "name": "Crimson Legion"
+  },
+  {
+   "id": "stormcaller",
+   "name": "Stormcaller"
+  },
+  {
+   "id": "iron-bulwark",
+   "name": "Iron Bulwark"
+  },
+  {
+   "id": "forest-guardian",
+   "name": "Forest Guardian"
+  },
+  {
+   "id": "ember-knight",
+   "name": "Ember Knight"
+  },
+  {
+   "id": "frostborn",
+   "name": "Frostborn"
+  },
+  {
+   "id": "shadowblade",
+   "name": "Shadowblade"
+  },
+  {
+   "id": "sulestial",
+   "name": "Sulestial"
+  }
+ ],
+ "slots": {
+  "helmet": {
+   "prefix": "helmet",
+   "dir": "helmet",
+   "w": 72,
+   "h": 82,
+   "x": -36,
+   "y": -10
+  },
+  "chest": {
+   "prefix": "chest",
+   "dir": "chest",
+   "w": 124,
+   "h": 117,
+   "x": -62,
+   "y": 47
+  },
+  "legs": {
+   "prefix": "boots",
+   "dir": "legs",
+   "w": 88,
+   "h": 102,
+   "x": -44,
+   "y": 138
+  },
+  "belt": {
+   "prefix": "belt",
+   "dir": "belt",
+   "w": 73.8,
+   "h": 29.52,
+   "x": -36.9,
+   "y": 101
+  },
+  "cape": {
+   "prefix": "cape",
+   "dir": "cape",
+   "w": 151.2,
+   "h": 170.1,
+   "x": -75.6,
+   "y": 44
+  },
+  "sword": {
+   "prefix": "weapon",
+   "dir": "sword",
+   "w": 60.0,
+   "h": 176.4,
+   "x": 18.0,
+   "y": -4,
+   "rotate": 180
+  },
+  "shield": {
+   "prefix": "shield",
+   "dir": "shield",
+   "w": 107.5,
+   "h": 128.75,
+   "x": -109.75,
+   "y": 74
+  }
+ }
+}
