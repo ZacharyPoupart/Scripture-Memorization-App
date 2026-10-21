@@ -122,7 +122,7 @@ export function Home() {
                   </div>
                 )}
               </div>
-              <div class="today-count" data-testid="today-ring">
+              <div class={`today-count ${today.outcome === 'c' && readyAll === 0 ? 'done' : ''}`} data-testid="today-ring">
                 {today.total ? `${today.met}/${today.total}` : '✓'}
               </div>
             </div>

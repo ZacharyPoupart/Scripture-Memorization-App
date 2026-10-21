@@ -96,7 +96,7 @@ test.describe('feedback and celebrations', () => {
     await expect(page.getByTestId('all-done')).toContainText('Streak: 7 days');
     await page.getByTestId('session-done').click();
     await expect(page.getByTestId('milestone')).toBeHidden(); // already celebrated once
-    await expect(page.locator('.ring.done')).toBeVisible();
+    await expect(page.locator('.today-count.done')).toBeVisible(); // Today marks the finished day (a green count; there is no ring any more)
     await page.reload();
     await expect(page.getByTestId('milestone')).toBeHidden(); // celebrated once
   });

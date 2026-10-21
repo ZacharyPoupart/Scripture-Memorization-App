@@ -1807,6 +1807,9 @@ button.streak {
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
+.today-count.done {
+  color: var(--good);
+}
 .today-list {
   gap: 4px;
 }
