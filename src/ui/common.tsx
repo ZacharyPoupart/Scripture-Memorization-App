@@ -144,7 +144,7 @@ export function Confirm({ title, body, confirmLabel, danger, onConfirm, onCancel
   );
 }
 
-const CONFETTI_COLORS = ['#e9b44c', '#b4532a', '#e07a5f', '#81b29a', '#8a5a83', '#f2cc8f'];
+const CONFETTI_COLORS = ['#e9b44c', '#2f8a8f', '#e07a5f', '#81b29a', '#6c63ff', '#f2cc8f'];
 export function Confetti({ count = 46 }: { count?: number }) {
   const pieces = Array.from({ length: count }, (_, i) => ({
     left: (i * 37) % 100,

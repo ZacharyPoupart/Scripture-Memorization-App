@@ -88,3 +88,17 @@ test('with no connection, Today says so calmly and everything keeps working', as
   await page.goto('/#/');
   await expect(page.getByTestId('offline-note')).toHaveCount(0);
 });
+
+test('Today is just the verses: no date, greeting, ring or pile cards; the four piles are one quiet row', async ({ page }) => {
+  await blockLookups(page);
+  await openApp(page);
+  await addVerse(page, JOHN316);
+  await page.goto('/#/');
+  await expect(page.getByTestId('today-list')).toContainText('John 3:16');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveCount(0); // no greeting
+  await expect(page.locator('main')).not.toContainText(/Good (morning|afternoon|evening)|Still up/);
+  await expect(page.locator('main')).not.toContainText(new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' }));
+  await expect(page.locator('.ring')).toHaveCount(0);
+  for (const p of ['daily', 'weekly', 'monthly', 'yearly']) await expect(page.getByTestId(`pile-${p}`)).toBeVisible();
+  await expect(page.getByTestId('count-daily')).toHaveText('1');
+});
