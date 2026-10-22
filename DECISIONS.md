@@ -386,3 +386,9 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 - One order for all piles and modes (Flashcards never quiz, as before). Per-pile or per-mode orders would be a follow-up.
 **Test changes:** none to existing tests; new `tests/unit/practice.test.ts` and `tests/e2e/practice-order.spec.ts` (every preset, all three modes, a verse with no topic, wrong answers, remembered after reload).
 **Undo:** roll back to the `v1.29.0-verse-gates` tag.
+
+## v1.31.0 — Review type bar at the top of Today; swap the type mid review (owner request)
+**What:** `ModePicker` now sits at the top of the Today card (above the headline) instead of at the bottom. In a review, the type name in the header is a button (`data-testid="switch-mode"`) that opens a sheet with the four types; choosing another remounts the current verse in that type and the rest of the session uses it. If the verse's result card is showing, the swap just applies to the next verse.
+**Choices (tell me if you want them different):** the swap is for this session only and never changes the saved default type. A swap is a fresh attempt at the same verse: slips from the abandoned try do not carry over (the same as the restart that happens after too many slips). It does not count as a review or a mistake. I first misread "the review page" as the single-verse page and moved its card; the owner sent a screenshot of the Today bar, so that change was undone.
+**Test changes:** none to existing tests; new `tests/e2e/mode-switch.spec.ts` (position on Today, swapping mid review, cancel, same type, swapping on the result card).
+**Undo:** roll back to the `v1.30.0-practice-order` tag.

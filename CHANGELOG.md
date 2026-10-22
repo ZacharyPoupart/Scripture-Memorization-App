@@ -5,6 +5,12 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Changed
+- On Today, the review type bar (Flashcard, Blanks, Type, Speak) is now at the top of the card instead of the bottom.
+
+### Added
+- Swap the review type in the middle of a review: tap the type's name at the top of the review screen and pick another. The verse you are on starts over in the new type, and the rest of the session uses it. Your saved default type does not change.
+
 ## [1.30.0] - 2026-10-22
 
 ### Added

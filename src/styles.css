@@ -759,6 +759,16 @@ textarea.input {
   font-weight: 700;
   font-size: 0.95rem;
 }
+.review-head .mode-switch {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  padding: 4px 10px;
+  min-height: 32px;
+  border-radius: 10px;
+}
 .review-head .sub {
   display: block;
   font-weight: 500;

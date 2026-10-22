@@ -113,6 +113,7 @@ export function Home() {
           )}
 
           <div class="card stack today-card">
+            <ModePicker blurb={false} />
             <div class="row spread today-head">
               <div class="grow">
                 <h2 data-testid="today-title">{headline}</h2>
@@ -142,7 +143,6 @@ export function Home() {
                 End the break
               </button>
             )}
-            <ModePicker blurb={false} />
           </div>
 
           <nav class="pile-row" aria-label="Your piles">
