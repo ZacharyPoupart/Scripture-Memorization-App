@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.31.0] - 2026-10-22
+
 ### Changed
 - On Today, the review type bar (Flashcard, Blanks, Type, Speak) is now at the top of the card instead of the bottom.
 
