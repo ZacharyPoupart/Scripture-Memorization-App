@@ -37,6 +37,7 @@ export type Unlock =
   | { kind: 'streak'; days: number }
   | { kind: 'reviews'; n: number }
   | { kind: 'levelups'; n: number }
+  | { kind: 'verses'; n: number }
   | { kind: 'yearly' };
 
 export interface Item {
@@ -51,48 +52,51 @@ export interface Item {
   art?: boolean;
   /** Which matching set (1-11, see SETS) a helmet, chest plate, belt, boots, cape, sword or shield belongs to. */
   set?: number;
-  /** Must be reached before this item can be bought (it still costs seeds). */
-  requires?: Unlock;
+  /** All of these must be reached before this item can be bought (it still costs seeds). */
+  requires?: Unlock[];
 }
 
 const I = (slot: Slot, id: string, name: string, cost = 0, extra: Partial<Item> = {}): Item => ({ id, slot, name, cost, ...extra });
 const streak = (days: number): Unlock => ({ kind: 'streak', days });
-const art = (slot: Slot, id: string, name: string, cost: number, needs?: number, extra: Partial<Item> = {}): Item =>
-  I(slot, id, name, cost, { art: true, ...(needs ? { requires: streak(needs) } : {}), ...extra });
+const art = (slot: Slot, id: string, name: string, cost: number, needs: Unlock[] = [], extra: Partial<Item> = {}): Item =>
+  I(slot, id, name, cost, { art: true, ...(needs.length ? { requires: needs } : {}), ...extra });
 
 /**
- * Every set is eleven matching pieces drawn to the same scale (helmet, chest plate, belt, boots, cape, sword and shield), so
- * any piece goes with any other. Each set costs more than the one before, and the finest need a long streak first. The first
- * set is the free start. The files are cut from the owner's sheet by design/armor-v2 (ids are the file names).
+ * Every set is seven matching pieces drawn to the same scale (helmet, chest plate, belt, boots, cape, sword and shield), so
+ * any piece goes with any other. The sets are listed from the plainest (the free start) to the finest, and each costs more than
+ * the one before; the later ones also need a long streak and a growing library of verses. Nothing has to be bought in order.
+ * The files are cut from the owner's sheet by design/armor-v2 (ids are the file names).
  */
 export interface ArmorSet {
   n: number;
   id: string;
   name: string;
-  /** Seeds for the helmet and chest plate; the other pieces are a fraction of it. */
+  /** Seeds for the whole set (every piece); each piece is a share of it, see SHARE. */
   price: number;
+  /** Longest streak (days) and verses added that are needed before any piece can be bought. */
   streak?: number;
+  verses?: number;
 }
 export const SETS: ArmorSet[] = [
-  { n: 1, id: 'knights-oath', name: 'Knight’s Oath', price: 0 },
-  { n: 2, id: 'silver-vanguard', name: 'Silver Vanguard', price: 15 },
-  { n: 3, id: 'iron-bulwark', name: 'Iron Bulwark', price: 30 },
-  { n: 4, id: 'forest-guardian', name: 'Forest Guardian', price: 50 },
-  { n: 5, id: 'stormcaller', name: 'Stormcaller', price: 75 },
-  { n: 6, id: 'frostborn', name: 'Frostborn', price: 105 },
-  { n: 7, id: 'ember-knight', name: 'Ember Knight', price: 140 },
-  { n: 8, id: 'crimson-legion', name: 'Crimson Legion', price: 180, streak: 30 },
-  { n: 9, id: 'shadowblade', name: 'Shadowblade', price: 230, streak: 60 },
-  { n: 10, id: 'golden-paladin', name: 'Golden Paladin', price: 310, streak: 180 },
-  { n: 11, id: 'sulestial', name: 'Sulestial', price: 420, streak: 365 },
+  { n: 1, id: 'iron-bulwark', name: 'Iron Bulwark', price: 0 },
+  { n: 2, id: 'silver-vanguard', name: 'Silver Vanguard', price: 200 },
+  { n: 3, id: 'forest-guardian', name: 'Forest Guardian', price: 400 },
+  { n: 4, id: 'knights-oath', name: 'Knight’s Oath', price: 600 },
+  { n: 5, id: 'stormcaller', name: 'Stormcaller', price: 900, verses: 5 },
+  { n: 6, id: 'frostborn', name: 'Frostborn', price: 1200, verses: 10 },
+  { n: 7, id: 'ember-knight', name: 'Ember Knight', price: 1600, verses: 15 },
+  { n: 8, id: 'crimson-legion', name: 'Crimson Legion', price: 2200, streak: 30, verses: 20 },
+  { n: 9, id: 'shadowblade', name: 'Shadowblade', price: 3000, streak: 60, verses: 30 },
+  { n: 10, id: 'golden-paladin', name: 'Golden Paladin', price: 4000, streak: 180, verses: 45 },
+  { n: 11, id: 'sulestial', name: 'Sulestial', price: 5500, streak: 365, verses: 60 },
 ];
-/** What each piece costs, as a share of the set's price (capes, swords and shields also have a small base so the first set's are not free). */
-const FRACTION = { helmet: 1, chest: 1, belt: 0.4, boots: 0.5, cape: 0.6, weapon: 0.5, shield: 0.5 } as const;
-const BASE = { helmet: 0, chest: 0, belt: 0, boots: 0, cape: 10, weapon: 10, shield: 10 } as const;
+/** What each piece costs, as a share of its set's price (they add up to 1). */
+const SHARE = { helmet: 0.2, chest: 0.25, shield: 0.18, weapon: 0.18, boots: 0.08, belt: 0.06, cape: 0.05 } as const;
 const NOUN = { helmet: 'helm', chest: 'chest plate', belt: 'belt', boots: 'boots', cape: 'cape', weapon: 'sword', shield: 'shield' } as const;
-type SetSlot = keyof typeof FRACTION;
-const setPrice = (set: ArmorSet, slot: SetSlot) => Math.round((set.price * FRACTION[slot] + BASE[slot]) / 5) * 5;
-const setPiece = (slot: SetSlot, set: ArmorSet): Item => art(slot, `${slot}-${set.id}`, `${set.name} ${NOUN[slot]}`, setPrice(set, slot), set.streak, { set: set.n });
+type SetSlot = keyof typeof SHARE;
+const setPrice = (set: ArmorSet, slot: SetSlot) => Math.round((set.price * SHARE[slot]) / 5) * 5;
+const setNeeds = (set: ArmorSet): Unlock[] => [...(set.streak ? [streak(set.streak)] : []), ...(set.verses ? [{ kind: 'verses', n: set.verses } as Unlock] : [])];
+const setPiece = (slot: SetSlot, set: ArmorSet): Item => art(slot, `${slot}-${set.id}`, `${set.name} ${NOUN[slot]}`, setPrice(set, slot), setNeeds(set), { set: set.n });
 const piecesOf = (slot: SetSlot): Item[] => SETS.map((set) => setPiece(slot, set));
 
 export const ITEMS: Item[] = [
@@ -121,10 +125,10 @@ export type Look = Record<Slot, string>;
 
 export function defaultLook(): Look {
   return {
-    helmet: 'helmet-knights-oath',
-    chest: 'chest-knights-oath',
-    belt: 'belt-knights-oath',
-    boots: 'boots-knights-oath',
+    helmet: 'helmet-iron-bulwark',
+    chest: 'chest-iron-bulwark',
+    belt: 'belt-iron-bulwark',
+    boots: 'boots-iron-bulwark',
     cape: 'cape-none',
     shield: 'shield-none',
     weapon: 'weapon-none',
@@ -151,9 +155,16 @@ export function describeUnlock(u: Unlock): string {
       return `Complete ${u.n} reviews`;
     case 'levelups':
       return u.n === 1 ? 'Move a verse up to the next pile' : `Move ${u.n} verses up`;
+    case 'verses':
+      return `Have ${u.n} verses`;
     case 'yearly':
       return 'Get a verse all the way to Yearly';
   }
+}
+
+/** The short form shown on a locked tile: "365-day", "60 verses". */
+export function shortUnlock(u: Unlock): string {
+  return u.kind === 'streak' ? `${u.days}-day` : u.kind === 'verses' ? `${u.n} verses` : describeUnlock(u);
 }
 
 // ---------------------------------------------------------------- seeds
@@ -213,6 +224,8 @@ export function meets(data: AppData, u: Unlock): boolean {
       return totalCounted(data) >= u.n;
     case 'levelups':
       return data.levelUps.length >= u.n;
+    case 'verses':
+      return Object.values(data.verses).filter((v) => !v.deletedAt).length >= u.n;
     case 'yearly':
       return data.levelUps.some((l) => l.to === 'yearly') || Object.values(data.verses).some((v) => !v.deletedAt && v.pile === 'yearly');
   }
@@ -232,7 +245,7 @@ export const testing = { armorFree: true };
 
 export function isGated(data: AppData, item: Item): boolean {
   if (testing.armorFree && item.art) return false;
-  return !!item.requires && !meets(data, item.requires);
+  return !!item.requires && !item.requires.every((u) => meets(data, u));
 }
 
 /** Free items, bought items, and earned items that have been unlocked. */

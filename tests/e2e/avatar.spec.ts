@@ -32,18 +32,18 @@ test.describe('avatar and seeds', () => {
     expect(before).toBeGreaterThan(100);
     // everyone starts in the same free basic steel armor
     await expect(page.getByTestId('armor-meter')).toContainText('0 of 6');
-    await expect(page.getByTestId('item-helmet-knights-oath')).toContainText('Wearing');
+    await expect(page.getByTestId('item-helmet-iron-bulwark')).toContainText('Wearing');
     // a paid piece previews first, then is bought and worn
     await page.getByTestId('item-helmet-silver-vanguard').click();
     await expect(page.getByTestId('item-helmet-silver-vanguard')).not.toContainText('Wearing');
     await page.getByTestId('buy').click();
     await expect(page.getByTestId('item-helmet-silver-vanguard')).toContainText('Wearing');
     const after = Number((await page.getByTestId('seeds-balance').innerText()).replace(/\D/g, ''));
-    expect(after).toBe(before - 15);
+    expect(after).toBe(before - 40);
     await expect(page.getByTestId('armor-meter')).toContainText('1 of 6');
     // going back to the free helmet is one tap and costs nothing
-    await page.getByTestId('item-helmet-knights-oath').click();
-    await expect(page.getByTestId('item-helmet-knights-oath')).toContainText('Wearing');
+    await page.getByTestId('item-helmet-iron-bulwark').click();
+    await expect(page.getByTestId('item-helmet-iron-bulwark')).toContainText('Wearing');
     await page.getByTestId('item-helmet-silver-vanguard').click();
     await expect(page.getByTestId('item-helmet-silver-vanguard')).toContainText('Wearing');
     await saved(page);
@@ -63,10 +63,10 @@ test.describe('avatar and seeds', () => {
     await addVerse(page, JOHN316);
     await page.goto('/#/avatar');
     await expect(page.getByTestId('armor-meter')).toContainText('0 of 6');
-    await expect(page.getByTestId('item-helmet-knights-oath')).toContainText('Wearing');
-    await expect(page.getByTestId('item-helmet-silver-vanguard')).toContainText('🌱 15');
+    await expect(page.getByTestId('item-helmet-iron-bulwark')).toContainText('Wearing');
+    await expect(page.getByTestId('item-helmet-silver-vanguard')).toContainText('🌱 40');
     await page.getByTestId('slot-chest').click();
-    await expect(page.getByTestId('item-chest-knights-oath')).toContainText('Wearing');
+    await expect(page.getByTestId('item-chest-iron-bulwark')).toContainText('Wearing');
     await expect(page.getByTestId('item-chest-sulestial')).toContainText('🔒');
   });
 

@@ -329,3 +329,11 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Test changes:** the unit test about the two tabs now checks the seven slots; the e2e test that opened the Extras tab and the Crown of life now opens the cape slot and the Wings of light (500-day streak hint). Merge/sync tests use a cape instead of a scene.
 **Left alone:** `design/armor-sheet.webp` (old art) is still in the repo; say if you want it deleted. The `Unlock` kinds `reviews`, `levelups` and `yearly` are now unused.
 **Undo:** roll back to `v1.23.1-sword-hand`.
+
+## v1.25.0 — Armor prices and gates (owner approved the table)
+**What:** `SETS` now run plainest to finest with whole-set prices 0/200/400/600/900/1200/1600/2200/3000/4000/5500; each piece is a fixed share (helmet 20%, chest 25%, shield 18%, sword 18%, boots 8%, belt 6%, cape 5%), rounded to 5. Iron Bulwark replaces Knight's Oath as the free start (`defaultLook()`), so Knight's Oath is now a 600-seed set. Gates: verses added 5/10/15/20/30/45/60 from Stormcaller up; streak 30/60/180/365 on the last four. New `Unlock` kind `verses` (live, undeleted verses); `Item.requires` is now a list.
+**Order:** sets are not locked behind each other; the gates make the order. I recommended this to the owner; say if you want a strict order.
+**Old data:** nobody loses anything. Someone wearing Knight's Oath now just owns nothing there; the item is unowned so their look falls back to Iron Bulwark, and any seeds they had spent on armor are recalculated at the new prices (balance never below zero, nothing is taken back).
+**Still on:** `testing.armorFree`, so none of these prices apply until it is turned off.
+**Test changes:** unit tests use the new default and new ids, the streak-gate test now also needs 60 verses, and two new tests check the price table and the verse gates; the e2e avatar test uses Iron Bulwark as the free helmet and Silver Vanguard's helmet at 40 seeds.
+**Undo:** roll back to the v1.24.0 tag.
