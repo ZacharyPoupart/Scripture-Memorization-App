@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.28.1] - 2026-10-22
+
 ### Fixed
 - The armor tiles on the avatar screen are tidy: every price sits on the bottom line with its coin beside it (never split across lines), what a piece needs (a streak, a number of verses) is one short line each, and prices over 999 have a comma. The coin beside your balance on Today also stays on the line with its number.
 
