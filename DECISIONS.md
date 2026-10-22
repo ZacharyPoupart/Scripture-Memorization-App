@@ -337,3 +337,8 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Still on:** `testing.armorFree`, so none of these prices apply until it is turned off.
 **Test changes:** unit tests use the new default and new ids, the streak-gate test now also needs 60 verses, and two new tests check the price table and the verse gates; the e2e avatar test uses Iron Bulwark as the free helmet and Silver Vanguard's helmet at 40 seeds.
 **Undo:** roll back to the v1.24.0 tag.
+
+## v1.25.0 (addition) — Armor free-for-testing is off; first sword and shield are rewards (owner request)
+**What:** `testing.armorFree` now defaults to false (the switch and banner stay for tests). The Iron Bulwark sword unlocks free when the first verse is added (`verses` 1) and the Iron Bulwark shield when the longest streak reaches 3 days. I read "first streak" as 3 days (a streak of 1 is just one day, and the first milestone beyond it is 3); it is one number in `REWARD` in `core/avatar.ts` if you want 1 or something else. Other sets' swords and shields are still bought.
+**"Take away all my sets":** nothing was ever recorded while the free switch was on, so turning it off removes all that armor from your knight by itself. I can't reach your phone's data: if you bought any armor while testing, those purchases are still owned (owned items only ever grow and sync), so tell me and I will add a one-time reset.
+**Test changes:** the "while testing" e2e test turns the switch on itself (it is off by default now); unit tests restore it to off; new unit test for the two rewards and an e2e check on the avatar screen.

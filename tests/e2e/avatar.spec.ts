@@ -68,12 +68,20 @@ test.describe('avatar and seeds', () => {
     await page.getByTestId('slot-chest').click();
     await expect(page.getByTestId('item-chest-iron-bulwark')).toContainText('Wearing');
     await expect(page.getByTestId('item-chest-sulestial')).toContainText('🔒');
+    // the free set's sword came with the first verse; its shield waits for a first streak
+    await page.getByTestId('slot-weapon').click();
+    await expect(page.getByTestId('item-weapon-iron-bulwark')).toContainText('Owned');
+    await page.getByTestId('slot-shield').click();
+    await expect(page.getByTestId('item-shield-iron-bulwark')).toContainText('🔒 3-day');
+    await page.getByTestId('item-shield-iron-bulwark').click();
+    await expect(page.getByTestId('unlock-hint')).toContainText('3-day streak');
   });
 
   test('while testing, all armor is free to wear with no seeds and no streak', async ({ page }) => {
     await autoDismissMilestones(page);
     await blockLookups(page);
     await openApp(page);
+    await page.evaluate(() => (window as any).__mfl.armorFree(true)); // the switch is off by default now
     await addVerse(page, JOHN316);
     await page.goto('/#/avatar');
     await expect(page.getByTestId('armor-free-banner')).toBeVisible();

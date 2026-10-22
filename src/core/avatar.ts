@@ -96,7 +96,13 @@ const NOUN = { helmet: 'helm', chest: 'chest plate', belt: 'belt', boots: 'boots
 type SetSlot = keyof typeof SHARE;
 const setPrice = (set: ArmorSet, slot: SetSlot) => Math.round((set.price * SHARE[slot]) / 5) * 5;
 const setNeeds = (set: ArmorSet): Unlock[] => [...(set.streak ? [streak(set.streak)] : []), ...(set.verses ? [{ kind: 'verses', n: set.verses } as Unlock] : [])];
-const setPiece = (slot: SetSlot, set: ArmorSet): Item => art(slot, `${slot}-${set.id}`, `${set.name} ${NOUN[slot]}`, setPrice(set, slot), setNeeds(set), { set: set.n });
+/** The free set's sword and shield are rewards, not purchases: the sword for adding your first verse, the shield for your first streak. */
+const REWARD: Partial<Record<SetSlot, Unlock>> = { weapon: { kind: 'verses', n: 1 }, shield: { kind: 'streak', days: 3 } };
+const setPiece = (slot: SetSlot, set: ArmorSet): Item =>
+  art(slot, `${slot}-${set.id}`, `${set.name} ${NOUN[slot]}`, setPrice(set, slot), setNeeds(set), {
+    set: set.n,
+    ...(set.n === 1 && REWARD[slot] ? { unlock: REWARD[slot] } : {}),
+  });
 const piecesOf = (slot: SetSlot): Item[] => SETS.map((set) => setPiece(slot, set));
 
 export const ITEMS: Item[] = [
@@ -156,7 +162,7 @@ export function describeUnlock(u: Unlock): string {
     case 'levelups':
       return u.n === 1 ? 'Move a verse up to the next pile' : `Move ${u.n} verses up`;
     case 'verses':
-      return `Have ${u.n} verses`;
+      return u.n === 1 ? 'Add your first verse' : `Have ${u.n} verses`;
     case 'yearly':
       return 'Get a verse all the way to Yearly';
   }
@@ -164,7 +170,7 @@ export function describeUnlock(u: Unlock): string {
 
 /** The short form shown on a locked tile: "365-day", "60 verses". */
 export function shortUnlock(u: Unlock): string {
-  return u.kind === 'streak' ? `${u.days}-day` : u.kind === 'verses' ? `${u.n} verses` : describeUnlock(u);
+  return u.kind === 'streak' ? `${u.days}-day` : u.kind === 'verses' ? (u.n === 1 ? 'first verse' : `${u.n} verses`) : describeUnlock(u);
 }
 
 // ---------------------------------------------------------------- seeds
@@ -241,7 +247,7 @@ export function isUnlocked(data: AppData, item: Item): boolean {
  * Nothing is bought or recorded, so seeds are untouched, and turning it off simply takes the unearned armor off again.
  * To end the test, set `armorFree` to false (one line) and remove the banner on the avatar screen.
  */
-export const testing = { armorFree: true };
+export const testing = { armorFree: false };
 
 export function isGated(data: AppData, item: Item): boolean {
   if (testing.armorFree && item.art) return false;

@@ -31,7 +31,7 @@ beforeAll(() => {
   testing.armorFree = false;
 });
 afterAll(() => {
-  testing.armorFree = true;
+  testing.armorFree = false;
 });
 
 const rich = () => {
@@ -150,6 +150,28 @@ describe('the knight', () => {
     expect(['helmet', 'chest', 'shield', 'weapon', 'boots', 'belt', 'cape'].map((s) => cost(s, 'silver-vanguard'))).toEqual([40, 50, 35, 35, 15, 10, 10]);
     expect(['helmet', 'chest', 'shield', 'weapon', 'boots', 'belt', 'cape'].map((s) => cost(s, 'sulestial'))).toEqual([1100, 1375, 990, 990, 440, 330, 275]);
     for (const slot of ['helmet', 'chest', 'belt', 'boots', 'cape', 'weapon', 'shield']) expect(cost(slot, 'iron-bulwark'), slot).toBe(0);
+  });
+
+  it('the free set\'s sword is a reward for adding a first verse, and its shield for a first streak (3 days)', () => {
+    const d = newData();
+    const sword = itemById('weapon-iron-bulwark')!;
+    const shield = itemById('shield-iron-bulwark')!;
+    expect(sword.cost).toBe(0);
+    expect(shield.cost).toBe(0);
+    expect(owns(d, sword)).toBe(false);
+    expect(owns(d, shield)).toBe(false);
+    expect(equipItem(d, sword.id, 1)).toBe(false);
+    john316(d, 1000);
+    expect(owns(d, sword)).toBe(true);
+    expect(equipItem(d, sword.id, 2)).toBe(true);
+    d.longestStreak = 2;
+    expect(owns(d, shield)).toBe(false);
+    d.longestStreak = 3;
+    expect(owns(d, shield)).toBe(true);
+    expect(buyItem(d, sword.id, 3)).toMatchObject({ ok: false, reason: 'owned' });
+    // every other set's sword and shield are still bought with seeds
+    expect(itemById('weapon-silver-vanguard')!.unlock).toBeUndefined();
+    expect(itemById('shield-silver-vanguard')!.unlock).toBeUndefined();
   });
 
   it('later sets need a growing number of verses (and the finest a streak too); the early ones need nothing but seeds, in any order', () => {
