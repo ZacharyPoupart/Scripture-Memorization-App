@@ -126,8 +126,8 @@ describe('the knight', () => {
     d.longestStreak = 364;
     expect(buyItem(d, sword.id, 1)).toMatchObject({ ok: false, reason: 'locked' });
     d.longestStreak = 365;
-    expect(buyItem(d, sword.id, 1)).toMatchObject({ ok: false, reason: 'locked' }); // the streak is not enough on its own: it also needs 60 verses
-    for (let i = 0; i < 60; i++) john316(d, 1000 + i);
+    expect(buyItem(d, sword.id, 1)).toMatchObject({ ok: false, reason: 'locked' }); // the streak is not enough on its own: it also needs 50 verses
+    for (let i = 0; i < 50; i++) john316(d, 1000 + i);
     const before = seedsBalance(d);
     expect(buyItem(d, sword.id, 2)).toEqual({ ok: true });
     expect(seedsBalance(d)).toBe(before - sword.cost);
@@ -174,20 +174,24 @@ describe('the knight', () => {
     expect(itemById('shield-silver-vanguard')!.unlock).toBeUndefined();
   });
 
-  it('later sets need a growing number of verses (and the finest a streak too); the early ones need nothing but seeds, in any order', () => {
+  it('only the last four sets need verses (10, 20, 30, 50) and a streak; every earlier set needs nothing but coins, in any order', () => {
     const need = (id: string) => itemById(id)!.requires ?? [];
-    expect(need('helmet-silver-vanguard')).toEqual([]);
-    expect(need('helmet-knights-oath')).toEqual([]);
-    expect(need('helmet-stormcaller')).toEqual([{ kind: 'verses', n: 5 }]);
-    expect(need('chest-crimson-legion')).toEqual([{ kind: 'streak', days: 30 }, { kind: 'verses', n: 20 }]);
+    for (const set of ['silver-vanguard', 'forest-guardian', 'knights-oath', 'stormcaller', 'frostborn', 'ember-knight']) expect(need(`helmet-${set}`), set).toEqual([]);
+    expect(need('chest-crimson-legion')).toEqual([{ kind: 'streak', days: 30 }, { kind: 'verses', n: 10 }]);
+    expect(need('chest-shadowblade')).toEqual([{ kind: 'streak', days: 60 }, { kind: 'verses', n: 20 }]);
+    expect(need('chest-golden-paladin')).toEqual([{ kind: 'streak', days: 180 }, { kind: 'verses', n: 30 }]);
+    expect(need('chest-sulestial')).toEqual([{ kind: 'streak', days: 365 }, { kind: 'verses', n: 50 }]);
     const d = rich();
     d.reviewsByDevice = { x: 100000 };
-    expect(buyItem(d, 'helmet-stormcaller', 1)).toMatchObject({ ok: false, reason: 'locked' });
-    const added = Array.from({ length: 5 }, (_, i) => john316(d, 1000 + i));
-    expect(buyItem(d, 'helmet-stormcaller', 2)).toEqual({ ok: true });
+    expect(buyItem(d, 'helmet-stormcaller', 1)).toEqual({ ok: true }); // no verses or streak needed
+    expect(buyItem(d, 'helmet-ember-knight', 2)).toEqual({ ok: true }); // and no need to own the earlier sets
+    d.longestStreak = 30;
+    expect(buyItem(d, 'chest-crimson-legion', 3)).toMatchObject({ ok: false, reason: 'locked' }); // the streak alone is not enough
+    const added = Array.from({ length: 10 }, (_, i) => john316(d, 1000 + i));
     added[0].deletedAt = 5; // a deleted verse no longer counts
-    expect(buyItem(d, 'chest-stormcaller', 3)).toMatchObject({ ok: false, reason: 'locked' });
-    expect(buyItem(d, 'helmet-forest-guardian', 4)).toEqual({ ok: true }); // no need to own the earlier sets
+    expect(buyItem(d, 'chest-crimson-legion', 4)).toMatchObject({ ok: false, reason: 'locked' });
+    john316(d, 2000);
+    expect(buyItem(d, 'chest-crimson-legion', 5)).toEqual({ ok: true });
   });
 
   it('notices a matching set on helmet, chest plate, belt and boots (but not the free start)', () => {
