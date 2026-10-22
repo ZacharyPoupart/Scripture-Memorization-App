@@ -12,5 +12,4 @@
 - The figure is a separate drawing about 0.96x the size of the loose pieces, so matching it by pixels was unreliable. Belt, cape, sword and shield positions were set by hand (`placement.json`) and checked on the assembled previews, including random mix-and-match.
 - The sword is drawn point-down on the sheet; the app turns it 180 degrees so the knight holds it point-up.
 - The chest-and-arms label pill touches Knight's Oath's arm and is excluded by rectangle; Ember Knight's helmet and chest touch and are split with a cut line.
-- Accessories (ring, amulet, etc.) still come from the old sheet via `design/cut-armor.py`.
 - The app (a PWA) serves lossless WebP copies of the PNGs, not the PNGs themselves.

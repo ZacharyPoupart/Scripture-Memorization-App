@@ -23,11 +23,6 @@ ITEM_PREFIX = {'helmet': 'helmet', 'chest': 'chest', 'legs': 'boots', 'belt': 'b
 
 def run(manifest: dict) -> None:
     sizes: dict[str, list[int]] = {}
-    # accessories (ring, pouch, lantern ...) come from the older sheet and are not touched here
-    if os.path.exists(SIZES):
-        for k, v in json.load(open(SIZES)).items():
-            if k.startswith('ex-'):
-                sizes[k] = v
     total = 0
     for it in manifest['items']:
         if it['slot'] == 'figure':

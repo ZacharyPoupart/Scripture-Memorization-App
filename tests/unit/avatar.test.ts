@@ -13,7 +13,6 @@ import {
   owns,
   seedsBalance,
   seedsEarned,
-  SLOT_GROUPS,
   SLOTS,
   testing,
   ARMOR_SLOTS,
@@ -74,10 +73,9 @@ describe('the knight', () => {
     expect(armorWorn(look)).toBe(0);
   });
 
-  it('the armor tab holds all six pieces and the extras tab everything else', () => {
-    expect(SLOT_GROUPS.map((g) => g.key)).toEqual(['armor', 'extras']);
-    expect(SLOT_GROUPS[0].slots).toEqual(['helmet', 'chest', 'belt', 'boots', 'shield', 'weapon']);
-    expect(SLOT_GROUPS[1].slots).toEqual(['cape', 'extra', 'crown', 'companion', 'background']);
+  it('the avatar screen lists the six armor pieces and then the cape, and nothing else (no extras)', () => {
+    expect(SLOTS).toEqual(['helmet', 'chest', 'belt', 'boots', 'shield', 'weapon', 'cape']);
+    expect([...new Set(ITEMS.map((i) => i.slot))].sort()).toEqual([...SLOTS].sort());
   });
 
   it('the six armor categories are helmet, chest plate, belt, boots, shield and sword (no separate arms)', () => {
@@ -278,11 +276,11 @@ describe('buying, unlocking and equipping', () => {
 
   it('a balance can never show below zero, and no item is ever removed (two devices spending the same seeds)', () => {
     const base = rich();
-    const other0 = ITEMS.find((i) => i.slot === 'background' && i.cost > 0)!;
+    const other0 = ITEMS.find((i) => i.slot === 'cape' && i.cost > 0)!;
     base.reviewsByDevice = { x: Math.max(hat.cost, other0.cost) + 5 }; // enough for either, not for both
     const a = structuredClone(base);
     const b = structuredClone(base);
-    const other = ITEMS.find((i) => i.slot === 'background' && i.cost > 0)!;
+    const other = ITEMS.find((i) => i.slot === 'cape' && i.cost > 0)!;
     buyItem(a, hat.id, 1);
     buyItem(b, other.id, 2);
     const m = mergeData(a, b);
@@ -294,7 +292,7 @@ describe('buying, unlocking and equipping', () => {
 
 describe('sync and backup', () => {
   const hat = ITEMS.find((i) => i.slot === 'helmet' && i.cost > 0)!;
-  const bg = ITEMS.find((i) => i.slot === 'background' && i.cost > 0)!;
+  const bg = ITEMS.find((i) => i.slot === 'cape' && i.cost > 0)!;
   it('owned items are unioned, the look is last-writer-wins, and merge stays commutative / associative / idempotent', () => {
     const base = rich();
     const a = structuredClone(base);
@@ -310,7 +308,7 @@ describe('sync and backup', () => {
     expect(mergeData(mergeData(a, b), c)).toEqual(mergeData(a, mergeData(b, c)));
     expect([...ab.avatar!.owned].sort()).toEqual([hat.id, bg.id].sort());
     expect(ab.avatar!.lookAt).toBe(21);
-    expect(ab.avatar!.look.background).toBe(bg.id); // the later decision wins
+    expect(ab.avatar!.look.cape).toBe(bg.id); // the later decision wins
   });
   it('no avatar on either side stays no avatar (older data and older apps are unaffected)', () => {
     expect(mergeData(newData(), newData()).avatar).toBeUndefined();
@@ -339,7 +337,7 @@ describe('temporary "armor is free" testing switch', () => {
       expect(currentLook(d).weapon).toBe(legend.id);
       expect(seedsBalance(d)).toBe(0);
       expect(d.avatar?.owned ?? []).toEqual([]); // nothing was bought
-      expect(owns(d, itemById('pet-lion')!)).toBe(false); // only the painted pieces are free
+      expect(owns(d, itemById('cape-wings')!)).toBe(false); // only the painted pieces are free
     } finally {
       testing.armorFree = false;
     }
