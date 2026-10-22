@@ -3,6 +3,7 @@ import { formatRef } from '../core/reference.ts';
 import { nextPile, pileVerses, streakInfo, todaySummary, verseStatus } from '../core/schedule.ts';
 import { doneLine } from '../core/milestones.ts';
 import { feedback } from '../services/feedback.ts';
+import { cueFor, planFor } from '../core/practice.ts';
 import { tooManyMistakes } from '../core/quiz.ts';
 import { PILES, type AppData, type LevelUp, type ReviewMode, type Verse } from '../core/types.ts';
 import { back, navigate, type Route } from '../router.ts';
@@ -30,11 +31,19 @@ function buildQueue(data: AppData, q: URLSearchParams, now: number): string[] {
   return [];
 }
 
-type Step = 'text' | 'ref';
+type Step = 'before' | 'text' | 'after';
 
-/** One verse, one attempt: the chosen mode, then reference recall. Remounted (new key) on restart. */
+/**
+ * One verse, one attempt: whatever the practice order asks before the verse (topic and/or citation), the chosen mode, then whatever it
+ * asks after. Fill in the blank and Type it out ask for what comes after inside their own flow (blanks / typed characters); Speak it
+ * and the questions before the verse use the shared quiz. Flashcards show the reference on the card and never quiz. Remounted
+ * (new key) on restart.
+ */
 function VerseAttempt({ verse, mode, onFinished, onRestart }: { verse: Verse; mode: ReviewMode; onFinished: () => void; onRestart: () => void }) {
-  const [step, setStep] = useState<Step>('text');
+  const { settings } = useApp();
+  // the order is fixed when the attempt starts, so changing a setting never changes a verse half way through
+  const plan = useRef(mode === 'flashcard' ? { before: [], after: [] } : planFor(settings.practice, verse)).current;
+  const [step, setStep] = useState<Step>(plan.before.length ? 'before' : 'text');
   const [mistakes, setMistakes] = useState(0);
   const count = useRef(0);
   const pile = useRef(verse.pile).current; // the pile the attempt started in decides how strict it is
@@ -48,9 +57,16 @@ function VerseAttempt({ verse, mode, onFinished, onRestart }: { verse: Verse; mo
     }
     return false;
   };
-  // A flashcard shows the reference on the card itself, and Fill-in-the-blank and Type it out ask for the reference as part of their own flow (blanks / typed characters); Speak finishes with typed reference recall; every mode but flashcards then quizzes the topic if there is one
-  const props = { verse, onMistake, onRestart, mistakes, onDone: () => (step === 'text' && mode === 'speak' ? setStep('ref') : onFinished()) };
-  if (step === 'ref') return <RefRecall {...props} />;
+  const props = {
+    verse,
+    onMistake,
+    onRestart,
+    mistakes,
+    after: plan.after,
+    onDone: () => (step === 'text' && mode === 'speak' && plan.after.length ? setStep('after') : onFinished()),
+  };
+  if (step === 'before') return <RefRecall {...props} parts={plan.before} cue={cueFor(plan.before, verse)} onDone={() => setStep('text')} />;
+  if (step === 'after') return <RefRecall {...props} parts={plan.after} onDone={onFinished} />;
   switch (mode) {
     case 'blanks':
       return <Blanks {...props} />;

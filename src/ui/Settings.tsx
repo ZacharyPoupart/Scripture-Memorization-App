@@ -26,6 +26,7 @@ import {
 import { Confirm, Field, Overlay, Seg, Toggle } from './common.tsx';
 import { feedback, hapticsSupported } from '../services/feedback.ts';
 import { buildReminderIcs, MAX_REMINDERS } from '../core/reminders.ts';
+import { describeOrder, normalizeOrder, PRESETS, presetOf, type PracticeOrder, type PracticePart } from '../core/practice.ts';
 import { ModePicker } from './ModePicker.tsx';
 
 function RemindersCard() {
@@ -414,6 +415,56 @@ const SPACING_PRESETS = [
 ];
 
 /** Time between a Daily verse's counted reviews: presets plus a custom number of minutes. */
+/** What is asked before and after the verse: the topic and the citation, in any of the orders the Topical Memory System uses. */
+function PracticeOrderField() {
+  const { settings } = useApp();
+  const order = normalizeOrder(settings.practice);
+  const preset = presetOf(order);
+  const save = (o: PracticeOrder) => updateSettings({ practice: normalizeOrder(o) });
+  const setBefore = (part: PracticePart, on: boolean) =>
+    save({ ...order, before: on ? [...order.before.filter((p) => p !== part), part] : order.before.filter((p) => p !== part) });
+  const setAfter = (part: PracticePart, on: boolean) => save({ ...order, after: on ? [...order.after.filter((p) => p !== part), part] : order.after.filter((p) => p !== part) });
+  const both = order.before.length === 2;
+  return (
+    <div class="stack" data-testid="practice-order">
+      <Field
+        group
+        label="Practice order"
+        hint="For Fill in the blank, Type it out and Speak it. A topic is only asked for verses that have one. Flashcards show the reference on the card and ask nothing."
+      >
+        <div class="slot-chips" role="group" aria-label="Practice order presets">
+          {PRESETS.map((p) => (
+            <button key={p.id} type="button" aria-pressed={preset?.id === p.id} class={`chip-btn ${preset?.id === p.id ? 'on' : ''}`} title={p.hint} onClick={() => save(p.order)} data-testid={`practice-preset-${p.id}`}>
+              {p.label}
+            </button>
+          ))}
+        </div>
+        <div class="practice-preview" data-testid="practice-preview" aria-live="polite">
+          {describeOrder(order)}
+        </div>
+        {preset && <div class="hint-text">{preset.hint}</div>}
+      </Field>
+      <Toggle label="Ask the topic before the verse" hint="You see the citation as a cue until you start typing." checked={order.before.includes('topic')} onChange={(on) => setBefore('topic', on)} testid="practice-before-topic" />
+      <Toggle label="Ask the citation before the verse" hint="You see the topic (or the first words) as a cue until you start answering." checked={order.before.includes('citation')} onChange={(on) => setBefore('citation', on)} testid="practice-before-citation" />
+      {both && (
+        <Field group label="Before the verse, ask first">
+          <Seg<'topic' | 'citation'>
+            label="Which comes first before the verse"
+            value={order.before[0]}
+            options={[
+              { value: 'topic', label: 'Topic' },
+              { value: 'citation', label: 'Citation' },
+            ]}
+            onChange={(first) => save({ ...order, before: first === 'topic' ? ['topic', 'citation'] : ['citation', 'topic'] })}
+          />
+        </Field>
+      )}
+      <Toggle label="Ask the citation after the verse" checked={order.after.includes('citation')} onChange={(on) => setAfter('citation', on)} testid="practice-after-citation" />
+      <Toggle label="Ask the topic after the verse" hint="After the verse, the citation always comes before the topic." checked={order.after.includes('topic')} onChange={(on) => setAfter('topic', on)} testid="practice-after-topic" />
+    </div>
+  );
+}
+
 function SpacingField({ hours, onChange }: { hours: number; onChange: (hours: number) => void }) {
   const isPreset = SPACING_PRESETS.some((p) => p.hours === hours);
   const [custom, setCustom] = useState(!isPreset);
@@ -529,6 +580,7 @@ export function Settings({ onShowIntro }: { onShowIntro: () => void }) {
           <Field group label="Default review mode">
             <ModePicker />
           </Field>
+          <PracticeOrderField />
         </div>
 
         <div class="card stack" data-testid="feedback-card">
