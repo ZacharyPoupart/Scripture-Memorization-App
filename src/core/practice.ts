@@ -67,7 +67,20 @@ export function presetOf(order: PracticeOrder): PracticePreset | undefined {
   return PRESETS.find((p) => JSON.stringify(p.order) === JSON.stringify(o));
 }
 
-/** The first few words, shown as the cue when something is asked before the verse ("For God so loved the world…"). */
+export type CueKind = 'citation' | 'topic' | 'words';
+
+/**
+ * What to show above the first question asked before the verse, so you know which verse is meant: the other one of the pair
+ * (ask for the topic and you see the citation; ask for the citation and you see the topic), or the first few words of the verse
+ * when it has no topic. Null when nothing is asked before the verse.
+ */
+export function cueFor(before: PracticePart[], verse: Pick<Verse, 'topic'>): CueKind | null {
+  if (!before.length) return null;
+  if (before[0] === 'topic') return 'citation';
+  return verse.topic ? 'topic' : 'words';
+}
+
+/** The first few words, the cue for a verse with no topic ("For God so loved the…"). */
 export function firstWords(text: string, n = 5): string {
   const words = text.trim().split(/\s+/).filter(Boolean);
   return words.length <= n ? words.join(' ') : `${words.slice(0, n).join(' ')}…`;

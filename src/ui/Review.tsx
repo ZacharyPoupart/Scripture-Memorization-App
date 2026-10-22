@@ -3,7 +3,7 @@ import { formatRef } from '../core/reference.ts';
 import { nextPile, pileVerses, streakInfo, todaySummary, verseStatus } from '../core/schedule.ts';
 import { doneLine } from '../core/milestones.ts';
 import { feedback } from '../services/feedback.ts';
-import { planFor } from '../core/practice.ts';
+import { cueFor, planFor } from '../core/practice.ts';
 import { tooManyMistakes } from '../core/quiz.ts';
 import { PILES, type AppData, type LevelUp, type ReviewMode, type Verse } from '../core/types.ts';
 import { back, navigate, type Route } from '../router.ts';
@@ -65,7 +65,7 @@ function VerseAttempt({ verse, mode, onFinished, onRestart }: { verse: Verse; mo
     after: plan.after,
     onDone: () => (step === 'text' && mode === 'speak' && plan.after.length ? setStep('after') : onFinished()),
   };
-  if (step === 'before') return <RefRecall {...props} parts={plan.before} cue onDone={() => setStep('text')} />;
+  if (step === 'before') return <RefRecall {...props} parts={plan.before} cue={cueFor(plan.before, verse)} onDone={() => setStep('text')} />;
   if (step === 'after') return <RefRecall {...props} parts={plan.after} onDone={onFinished} />;
   switch (mode) {
     case 'blanks':

@@ -444,8 +444,8 @@ function PracticeOrderField() {
         </div>
         {preset && <div class="hint-text">{preset.hint}</div>}
       </Field>
-      <Toggle label="Ask the topic before the verse" checked={order.before.includes('topic')} onChange={(on) => setBefore('topic', on)} testid="practice-before-topic" />
-      <Toggle label="Ask the citation before the verse" hint="You see the first words of the verse as a cue." checked={order.before.includes('citation')} onChange={(on) => setBefore('citation', on)} testid="practice-before-citation" />
+      <Toggle label="Ask the topic before the verse" hint="You see the citation as a cue until you start typing." checked={order.before.includes('topic')} onChange={(on) => setBefore('topic', on)} testid="practice-before-topic" />
+      <Toggle label="Ask the citation before the verse" hint="You see the topic (or the first words) as a cue until you start answering." checked={order.before.includes('citation')} onChange={(on) => setBefore('citation', on)} testid="practice-before-citation" />
       {both && (
         <Field group label="Before the verse, ask first">
           <Seg<'topic' | 'citation'>

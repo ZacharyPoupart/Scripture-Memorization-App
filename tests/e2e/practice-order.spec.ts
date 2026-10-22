@@ -74,12 +74,32 @@ test.describe('practice order: the sandwich (topic, citation, verse, citation)',
 
   test('fill in the blank: topic and citation first, then the words, then the citation again', async ({ page }) => {
     await startReview(page, 'blanks');
-    await expect(page.getByTestId('quiz-cue')).toContainText('For God so loved the');
-    await expect(page.getByTestId('ref-verse-text')).toHaveCount(0); // only the first words, not the whole verse
+    await expect(page.getByTestId('quiz-cue')).toHaveText('John 3:16'); // the citation is the cue for the topic question
     await page.getByTestId('topic-option').filter({ hasText: /^Gospel$/ }).click();
     await fillCitation(page);
     await completeBlanks(page, JOHN_TEXT);
     await finishBlankReference(page, JOHN316); // closing citation only: the topic was asked at the start
+  });
+
+  test('the citation is shown at the top; typing the topic hides it (the space stays), and the topic is typed in a box', async ({ page }) => {
+    await startReview(page, 'blanks');
+    const cue = page.getByTestId('quiz-cue');
+    await expect(cue).toHaveText('John 3:16');
+    const before = await cue.boundingBox();
+    await expect(page.getByTestId('topic-input')).toBeFocused();
+    await page.keyboard.type('gospel'); // the letters narrow the choices; the right one is taken as soon as it is the only one left
+    await expect(cue).toBeHidden(); // gone once they start answering
+    const after = await cue.boundingBox();
+    expect(after?.height).toBe(before?.height); // the space stays, so nothing moves
+    await expect(page.getByTestId('ref-book')).toBeVisible(); // now the citation, from memory
+    await expect(cue).toBeHidden();
+  });
+
+  test('a wrong letter in the topic box is a slip, and the cue is already gone', async ({ page }) => {
+    await startReview(page, 'blanks');
+    await page.keyboard.type('q'); // no topic starts with q
+    await expect(page.getByTestId('mistakes').locator('.dot.used')).toHaveCount(1);
+    await expect(page.getByTestId('quiz-cue')).toBeHidden();
   });
 
   test('type it out: topic, citation, the verse, then the typed citation', async ({ page }) => {
@@ -122,7 +142,7 @@ test.describe('practice order: the sandwich (topic, citation, verse, citation)',
 
   test('a verse with no topic skips the topic and starts with the citation', async ({ page }) => {
     await startReview(page, 'blanks', 'Psalms');
-    await expect(page.getByTestId('quiz-cue')).toBeVisible();
+    await expect(page.getByTestId('quiz-cue')).toHaveText('The LORD is my shepherd;…'); // no topic, so the first words
     await expect(page.getByTestId('topic-options')).toHaveCount(0);
     await expect(page.getByTestId('ref-book')).toBeVisible();
   });
@@ -152,6 +172,7 @@ test.describe('practice order: other orders', () => {
   test('citation first: asked before the verse and not after', async ({ page }) => {
     await choosePreset(page, 'citation-first');
     await startReview(page, 'type');
+    await expect(page.getByTestId('quiz-cue')).toHaveText('Gospel'); // the topic is the cue for the citation question
     await expect(page.getByTestId('topic-options')).toHaveCount(0);
     await fillCitation(page);
     await page.getByTestId('type-input').focus();
