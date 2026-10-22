@@ -28,6 +28,17 @@ const ICONS: Record<string, string> = {
   chart: 'M5 20V11M12 20V4M19 20v-6',
 };
 
+/** A gold coin with a square hole in the middle (the currency). Sized to the text around it. */
+export function Coin() {
+  return (
+    <svg class="coin" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path fill-rule="evenodd" fill="#e3b23c" stroke="#a8741a" stroke-width="1.2" d="M12 1.6a10.4 10.4 0 1 0 0 20.8 10.4 10.4 0 0 0 0-20.8ZM8.4 8.4h7.2v7.2H8.4Z" />
+      <circle cx="12" cy="12" r="8.6" fill="none" stroke="#f5d983" stroke-width="1" />
+      <path fill="none" stroke="#a8741a" stroke-width="1" d="M8.4 8.4h7.2v7.2H8.4Z" />
+    </svg>
+  );
+}
+
 export function Icon({ name, fill }: { name: keyof typeof ICONS | string; fill?: boolean }) {
   return (
     <svg viewBox="0 0 24 24" fill={fill ? 'currentColor' : 'none'} stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">

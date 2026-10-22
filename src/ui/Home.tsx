@@ -8,7 +8,7 @@ import { shouldNudgeBackup } from '../core/nudges.ts';
 import { currentLook, seedsBalance } from '../core/avatar.ts';
 import { downloadBackup, stopBreak, updateSettings, useApp } from '../store.ts';
 import { AvatarFigure } from './AvatarFigure.tsx';
-import { Icon, PILE_INFO } from './common.tsx';
+import { Coin, Icon, PILE_INFO } from './common.tsx';
 import { ModePicker } from './ModePicker.tsx';
 
 export function Home() {
@@ -83,9 +83,9 @@ export function Home() {
             </div>
             <div class="row" style={{ gap: '8px' }}>
               {settings.avatarOn && (
-                <button class="avatar-bubble" onClick={() => navigate('/avatar')} aria-label={`Your avatar. ${seedsBalance(data)} seeds.`} data-testid="avatar-bubble">
+                <button class="avatar-bubble" onClick={() => navigate('/avatar')} aria-label={`Your avatar. ${seedsBalance(data)} coins.`} data-testid="avatar-bubble">
                   <AvatarFigure look={currentLook(data)} size={44} view="face" />
-                  <span class="seeds-chip" data-testid="seeds-chip">🌱 {seedsBalance(data)}</span>
+                  <span class="seeds-chip" data-testid="seeds-chip"><Coin /> {seedsBalance(data)}</span>
                 </button>
               )}
               <button

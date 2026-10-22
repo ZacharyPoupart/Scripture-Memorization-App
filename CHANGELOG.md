@@ -5,6 +5,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.26.0] - 2026-10-22
+
+### Changed
+- Seeds are now gold coins, drawn as a coin with a square hole in the middle. Everything is the same (1 per review, 5 for a finished day, 25 for a verse moving up) and anything you had stays: only the name and the picture changed.
+
 ## [1.25.0] - 2026-10-22
 
 ### Changed

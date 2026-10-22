@@ -7,7 +7,7 @@ import { tooManyMistakes } from '../core/quiz.ts';
 import { PILES, type AppData, type LevelUp, type ReviewMode, type Verse } from '../core/types.ts';
 import { back, navigate, type Route } from '../router.ts';
 import { completeReview, showToast, useApp } from '../store.ts';
-import { CheckMark, Confetti, Icon, PileBadge, PILE_INFO, pileProgress } from './common.tsx';
+import { CheckMark, Coin, Confetti, Icon, PileBadge, PILE_INFO, pileProgress } from './common.tsx';
 import { MODES } from './ModePicker.tsx';
 import { Blanks } from './modes/Blanks.tsx';
 import { Flashcard } from './modes/Flashcard.tsx';
@@ -187,7 +187,7 @@ export function Review({ route }: { route: Route }) {
           </p>
           {tally.seeds > 0 && settings.avatarOn && (
             <p class="seeds-gain" data-testid="session-seeds">
-              +{tally.seeds} seed{tally.seeds === 1 ? '' : 's'} 🌱
+              +{tally.seeds} coin{tally.seeds === 1 ? '' : 's'} <Coin />
             </p>
           )}
           {!fullyDone && sum.remaining > 0 && (
@@ -235,7 +235,7 @@ export function Review({ route }: { route: Route }) {
             {result.levelUps.length > 0 && <p>Level up! Now in {PILE_INFO[result.levelUps[result.levelUps.length - 1].to].label}.</p>}
             {result.seeds > 0 && settings.avatarOn && queue.length === 1 && (
               <p class="seeds-gain" data-testid="seeds-gain">
-                +{result.seeds} seed{result.seeds === 1 ? '' : 's'} 🌱
+                +{result.seeds} coin{result.seeds === 1 ? '' : 's'} <Coin />
               </p>
             )}
             {result.todayComplete && <p class="status-ready">That’s everything for today.</p>}

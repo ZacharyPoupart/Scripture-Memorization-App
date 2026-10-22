@@ -220,7 +220,7 @@ function SyncCard() {
   );
 }
 
-/** Clears everything bought and worn on the avatar; the seeds spent come back. */
+/** Clears everything bought and worn on the avatar; the coins spent come back. */
 function ResetArmor() {
   const [ask, setAsk] = useState(false);
   return (
@@ -231,12 +231,12 @@ function ResetArmor() {
       {ask && (
         <Confirm
           title="Reset your armor?"
-          body="Your knight goes back to the free start, and everything you bought is forgotten. The seeds you spent come back. Your verses and progress are not touched. With sync on, other devices that own armor would bring it back."
+          body="Your knight goes back to the free start, and everything you bought is forgotten. The coins you spent come back. Your verses and progress are not touched. With sync on, other devices that own armor would bring it back."
           confirmLabel="Reset"
           onConfirm={() => {
             setAsk(false);
             resetArmor();
-            showToast('Your armor is reset. The seeds are back.');
+            showToast('Your armor is reset. The coins are back.');
           }}
           onCancel={() => setAsk(false)}
         />
@@ -560,8 +560,8 @@ export function Settings({ onShowIntro }: { onShowIntro: () => void }) {
             testid="toggle-haptics"
           />
           <Toggle
-            label="Avatar and seeds"
-            hint="Earn seeds for reviewing and dress your avatar. Hides it from Today when off; nothing is lost."
+            label="Avatar and coins"
+            hint="Earn coins for reviewing and dress your avatar. Hides it from Today when off; nothing is lost."
             checked={settings.avatarOn}
             onChange={(avatarOn) => updateSettings({ avatarOn })}
             testid="toggle-avatar"

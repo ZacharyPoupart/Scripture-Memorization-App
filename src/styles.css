@@ -1689,6 +1689,13 @@ button.streak {
   font-weight: 700;
   white-space: nowrap;
 }
+.coin {
+  display: inline-block;
+  width: 1.05em;
+  height: 1.05em;
+  vertical-align: -0.17em;
+  margin-right: 0.2em;
+}
 .seeds-gain {
   color: var(--accent-strong);
   font-weight: 700;
