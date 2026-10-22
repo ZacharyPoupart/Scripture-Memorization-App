@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.24.0] - 2026-10-22
+
 ### Changed
 - The avatar screen no longer has an Extras tab. Capes stay (now next to the armor pieces); accessories, crowns, companions and scenes are gone, and the knight stands against one morning sky. Anything you owned there simply stops showing; seeds you spent on it come back.
 
