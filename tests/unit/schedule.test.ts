@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { dayKeyOf } from '../../src/core/dates.ts';
 import {
   daysInPile,
-  daysUntilFreeze,
   dueDay,
-  isFrozen,
+  periodEnd,
+  periodStart,
   movePile,
   pileVerses,
   progressDays,
@@ -114,25 +114,31 @@ describe('Daily pile: 3 reviews a day with spacing', () => {
 });
 
 describe('Weekly / Monthly / Yearly due dates', () => {
-  it('weekly is due 7 days after entering the pile or its last review', () => {
+  it('weekly follows the calendar week (Sunday to Saturday); the week it arrives in is free', () => {
     const data = newData();
+    // D0 is a Saturday: that week is a free pass, the first full week starts on Sunday (day 1)
     const v = john316(data, at(D0, '07:00'), { pile: 'weekly', pileSince: D0 });
-    expect(dueDay(v)).toBe(day(7));
-    expect(verseStatus(data, v, at(day(6))).state).toBe('notdue');
-    expect(verseStatus(data, v, at(day(6))).daysUntilDue).toBe(1);
-    expect(verseStatus(data, v, at(day(7))).state).toBe('ready');
-    // reviewing late restarts the clock from the review day
-    recordReview(data, v.id, at(day(10)), DEVICE);
-    expect(dueDay(v)).toBe(day(17));
-    expect(verseStatus(data, v, at(day(10), '20:00')).state).toBe('notdue');
+    expect(dueDay(v, D0)).toBe(day(1));
+    expect(verseStatus(data, v, at(D0)).state).toBe('notdue');
+    expect(verseStatus(data, v, at(D0)).daysUntilDue).toBe(1);
+    expect(verseStatus(data, v, at(day(1))).state).toBe('ready');
+    expect(verseStatus(data, v, at(day(7))).periodEnd).toBe(day(7)); // due by Saturday
+    // reviewing any day that week covers it until the next Sunday
+    recordReview(data, v.id, at(day(3)), DEVICE);
+    expect(dueDay(v, day(3))).toBe(day(8));
+    expect(verseStatus(data, v, at(day(7))).state).toBe('notdue');
+    expect(verseStatus(data, v, at(day(8))).state).toBe('ready');
   });
 
-  it('monthly uses calendar months and yearly uses calendar years', () => {
+  it('monthly and yearly use the calendar month and year', () => {
     const data = newData('2026-01-31');
     const m = john316(data, at('2026-01-31'), { pile: 'monthly', pileSince: '2026-01-31' });
-    expect(dueDay(m)).toBe('2026-02-28');
+    expect(dueDay(m, '2026-01-31')).toBe('2026-02-01');
+    expect(periodEnd('monthly', '2026-02-10')).toBe('2026-02-28');
     const y = john316(data, at('2028-02-29'), { pile: 'yearly', pileSince: '2028-02-29' });
-    expect(dueDay(y)).toBe('2029-02-28');
+    expect(dueDay(y, '2028-02-29')).toBe('2029-01-01');
+    expect(periodStart('weekly', '2026-02-07')).toBe('2026-02-01');
+    expect(periodEnd('yearly', '2026-06-01')).toBe('2026-12-31');
   });
 
   it('only one counted review per due period; later practice is uncounted', () => {
@@ -145,7 +151,7 @@ describe('Weekly / Monthly / Yearly due dates', () => {
 });
 
 describe('Graduation', () => {
-  it('Daily -> Weekly after exactly 90 days, with a level-up event', () => {
+  it('Daily -> Weekly on the review that earns the 90th day, with a level-up event', () => {
     const data = newData();
     const v = john316(data, at(D0, '07:00'));
     for (let i = 1; i <= 89; i++) reviewEverythingDue(data, day(i));
@@ -153,7 +159,10 @@ describe('Graduation', () => {
     expect(v.pile).toBe('daily');
     expect(progressDays(data, v, at(day(89), '23:00'))).toBe(89);
 
-    const result = settle(data, at(day(90), '00:05'));
+    // day 90 only counts once the verse has been reviewed that day
+    expect(settle(data, at(day(90), '00:05')).levelUps).toEqual([]);
+    expect(v.pile).toBe('daily');
+    const result = recordReview(data, v.id, at(day(90), '08:00'), DEVICE);
     expect(v.pile).toBe('weekly');
     expect(v.pileSince).toBe(day(90));
     expect(result.levelUps).toEqual([{ id: `${v.id}:weekly:${day(90)}`, verseId: v.id, from: 'daily', to: 'weekly', day: day(90) }]);
@@ -164,17 +173,19 @@ describe('Graduation', () => {
     const data = newData();
     const w = john316(data, at(D0, '07:00'), { pile: 'weekly', pileSince: D0 });
     const m = john316(data, at(D0, '07:00'), { pile: 'monthly', pileSince: D0 });
-    // keep the user active so nothing freezes: review something every day
+    // review something every day
     const keep = john316(data, at(D0, '07:00'));
     for (let i = 1; i <= 366; i++) {
       reviewEverythingDue(data, day(i));
-      if (i === 89) {
+      // weeks start on Sundays (day 1, 8, ...): the 13th full week is reviewed on day 85 and brings day 91, past 90
+      if (i === 84) {
         settle(data, at(day(i), '23:30'));
         expect(w.pile).toBe('weekly');
       }
-      if (i === 90) expect(w.pile).toBe('monthly');
-      if (i === 364) expect(m.pile).toBe('monthly');
-      if (i === 365) expect(m.pile).toBe('yearly');
+      if (i === 85) expect(w.pile).toBe('monthly');
+      // February 2026 to January 2027 is exactly 365 days; the last of those months is reviewed on Jan 1 2027 (day 356)
+      if (i === 355) expect(m.pile).toBe('monthly');
+      if (i === 356) expect(m.pile).toBe('yearly');
     }
     settle(data, at(day(366), '12:00'));
     expect(m.pile).toBe('yearly');
@@ -187,10 +198,10 @@ describe('Graduation', () => {
     for (let i = 7; i < 456; i += 7) w.reviews.push(at(day(i), '09:00'));
     const result = settle(data, at(day(460), '12:00'));
     expect(w.pile).toBe('yearly');
-    expect(w.pileSince).toBe(day(455)); // 90 days weekly + 365 days monthly
+    expect(w.pileSince).toBe(day(448)); // 13 weeks, then May 2026 to April 2027, each reviewed on a Saturday
     expect(result.levelUps.map((l) => `${l.from}>${l.to}@${l.day}`)).toEqual([
-      `weekly>monthly@${day(90)}`,
-      `monthly>yearly@${day(455)}`,
+      `weekly>monthly@${day(91)}`,
+      `monthly>yearly@${day(448)}`,
     ]);
   });
 
@@ -201,7 +212,7 @@ describe('Graduation', () => {
     const snap = movePile(data, v.id, 'monthly', at(day(20), '15:00'));
     expect(v.pile).toBe('monthly');
     expect(v.pileSince).toBe(day(20));
-    expect(dueDay(v)).toBe('2026-02-28'); // moved Jan 30 -> one calendar month later, clamped to Feb 28
+    expect(dueDay(v, day(20))).toBe('2026-02-01'); // moved Jan 30: January is the free month, February is the first one due
     restorePile(data, v.id, snap, at(day(20), '15:01'));
     expect(v.pile).toBe('daily');
     expect(v.pileSince).toBe(D0);
@@ -214,55 +225,6 @@ describe('Graduation', () => {
     const b = john316(data, at(day(5), '07:00'));
     const c = john316(data, at(day(2), '07:00'));
     expect(pileVerses(data, 'daily').map((v) => v.id)).toEqual([a.id, c.id, b.id]);
-  });
-});
-
-describe('Freeze', () => {
-  it('stops progress after 3 days with no review, and resumes on the day you review', () => {
-    const data = newData();
-    const v = john316(data, at(D0, '07:00'));
-    for (let i = 1; i <= 50; i++) reviewEverythingDue(data, day(i));
-    // silence for days 51..99
-    settle(data, at(day(100), '09:00'));
-    // days 51,52,53 still count (3 days of grace); 54..99 frozen; day 100 frozen until you review
-    expect(progressDays(data, v, at(day(100), '09:00'))).toBe(53);
-    expect(isFrozen(data, at(day(100), '09:00'))).toBe(true);
-    expect(v.pile).toBe('daily');
-
-    reviewEverythingDue(data, day(100));
-    expect(isFrozen(data, at(day(100), '15:00'))).toBe(false);
-    expect(progressDays(data, v, at(day(100), '15:00'))).toBe(54);
-    reviewEverythingDue(data, day(101));
-    expect(progressDays(data, v, at(day(101), '15:00'))).toBe(55);
-  });
-
-  it('a verse that already earned its promotion still moves up while frozen', () => {
-    const data = newData();
-    const v = john316(data, at(D0, '07:00'));
-    for (let i = 1; i <= 87; i++) reviewEverythingDue(data, day(i));
-    // app closed from day 88 on; days 88, 89 and 90 are inside the 3-day grace period
-    settle(data, at(day(120), '09:00'));
-    expect(v.pile).toBe('weekly');
-    expect(v.pileSince).toBe(day(90));
-  });
-
-  it('does not freeze users who simply have nothing due', () => {
-    const data = newData();
-    const v = john316(data, at(D0, '07:00'), { pile: 'monthly', pileSince: D0 });
-    settle(data, at(day(20), '09:00'));
-    expect(isFrozen(data, at(day(20), '09:00'))).toBe(false);
-    expect(progressDays(data, v, at(day(20), '09:00'))).toBe(20);
-  });
-
-  it('warns how many days remain before the freeze', () => {
-    const data = newData();
-    john316(data, at(D0, '07:00'));
-    reviewEverythingDue(data, day(1));
-    settle(data, at(day(3), '09:00')); // day 2 lapsed
-    expect(daysUntilFreeze(data, at(day(3), '09:00'))).toBe(2);
-    settle(data, at(day(5), '09:00')); // days 2,3,4 lapsed
-    expect(daysUntilFreeze(data, at(day(5), '09:00'))).toBe(0);
-    expect(isFrozen(data, at(day(5), '09:00'))).toBe(true);
   });
 });
 

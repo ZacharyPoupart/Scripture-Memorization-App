@@ -177,9 +177,8 @@ export function Confetti({ count = 46 }: { count?: number }) {
 export function statusLabel(s: VerseStatus): { text: string; cls: string } {
   switch (s.state) {
     case 'ready':
-      if (s.daysUntilDue !== undefined && s.daysUntilDue < 0)
-        return { text: `Ready · overdue ${formatDays(-s.daysUntilDue)}`, cls: 'status-overdue' };
-      return { text: s.daysUntilDue === 0 ? 'Ready · due today' : s.countedToday > 0 ? `Ready · ${s.countedToday} of ${DAILY_REVIEWS} done` : 'Ready for review', cls: 'status-ready' };
+      if (s.period) return { text: `Ready · any time this ${s.period}`, cls: 'status-ready' };
+      return { text: s.countedToday > 0 ? `Ready · ${s.countedToday} of ${DAILY_REVIEWS} done` : 'Ready for review', cls: 'status-ready' };
     case 'waiting':
       return { text: `Next review in ${formatDuration(s.waitMs ?? 0)} · ${s.countedToday} of ${DAILY_REVIEWS} done`, cls: 'status-wait' };
     case 'done':
@@ -232,9 +231,8 @@ export function ProgressRing({ ring }: { ring: Ring }) {
         ) : (
           <circle class="pring-arc" cx="18" cy="18" r={R} stroke-dasharray={`${(C * ring.fraction).toFixed(2)} ${C.toFixed(2)}`} transform="rotate(-90 18 18)" />
         )}
-        {ring.state === 'frozen' && <path class="pring-pause" d="M15 14v8M21 14v8" />}
       </svg>
-      {ring.state !== 'yearly' && ring.state !== 'frozen' && <b aria-hidden="true">{ring.earned}</b>}
+      {ring.state !== 'yearly' && <b aria-hidden="true">{ring.earned}</b>}
     </span>
   );
 }

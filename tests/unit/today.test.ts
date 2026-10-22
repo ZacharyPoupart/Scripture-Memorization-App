@@ -70,7 +70,9 @@ describe('nextReviewInfo', () => {
     expect(nextReviewInfo(newData(), at(D0))).toEqual({ kind: 'none' });
     const data = newData();
     john316(data, at(D0, '07:00'), { pile: 'weekly', pileSince: D0 });
-    expect(nextReviewInfo(data, at(day(2), '09:00'))).toEqual({ kind: 'day', day: day(7), daysAway: 5 });
+    const v = Object.values(data.verses)[0];
+    recordReview(data, v.id, at(day(2), '08:00'), DEVICE); // this week (Sunday to Saturday) is covered
+    expect(nextReviewInfo(data, at(day(2), '09:00'))).toEqual({ kind: 'day', day: day(8), daysAway: 6 });
   });
 });
 
@@ -98,17 +100,16 @@ describe('progressRing', () => {
     expect(r).toMatchObject({ state: 'yearly', target: null, fraction: 1 });
   });
 
-  it('a frozen day shows a calm paused ring that keeps the earned days', () => {
+  it('a day without a review keeps the earned days and the ring simply waits (there is no frozen state)', () => {
     const data = newData();
     const v = john316(data, at(D0, '07:00'));
     recordReview(data, v.id, at(day(1), '09:00'), DEVICE); // one real progress day
-    for (let i = 2; i <= 5; i++) settle(data, at(day(i), '09:00')); // days 2-4 lapse, day 5 frozen
-    const r = progressRing(data, v, at(day(5), '09:00'));
-    expect(r.state).toBe('frozen');
-    expect(r.label).toMatch(/\(paused\)$/);
-    expect(r.earned).toBeGreaterThan(0);
-    // reviewing unfreezes
-    recordReview(data, v.id, at(day(5), '09:30'), DEVICE);
-    expect(progressRing(data, v, at(day(5), '10:00')).state).toBe('progress');
+    for (let i = 2; i <= 6; i++) settle(data, at(day(i), '09:00')); // five days with no review
+    const r = progressRing(data, v, at(day(6), '09:00'));
+    expect(r.state).toBe('progress');
+    expect(r.earned).toBe(1);
+    expect(r.label).toBe('Day 1 of 90 toward Weekly');
+    recordReview(data, v.id, at(day(6), '09:30'), DEVICE); // reviewing adds the day at once
+    expect(progressRing(data, v, at(day(6), '10:00')).earned).toBe(2);
   });
 });

@@ -189,7 +189,7 @@ test.describe('feedback and celebrations', () => {
     await expect(page.getByTestId('feedback-card')).toContainText('iPhone web apps can’t vibrate');
   });
 
-  test('wording stays kind: a long break and a freeze never scold', async ({ page }) => {
+  test('wording stays kind: a long time away never scolds', async ({ page }) => {
     await page.clock.install({ time: new Date(2026, 2, 10, 8, 0) });
     await page.clock.resume();
     await blockLookups(page);
@@ -198,7 +198,7 @@ test.describe('feedback and celebrations', () => {
     await page.clock.setSystemTime(new Date(2026, 2, 16, 9, 0));
     await page.reload();
     await page.goto('/#/');
-    await expect(page.getByTestId('freeze-banner')).toBeVisible();
+    await expect(page.getByTestId('freeze-banner')).toHaveCount(0); // there is no freeze any more
     const guilt = /you (missed|failed|lost|let)|streak (lost|broken|ruined)|behind|shame|disappoint|don['’]t give up|last chance|hurry/i;
     for (const route of ['/#/', '/#/stats', '/#/piles', '/#/settings']) {
       await page.goto(route);

@@ -1,9 +1,9 @@
 // Read-only helpers for the Today screen and verse cards. Nothing here changes scheduling:
 // the queue is exactly "every verse that is ready right now" (verseStatus decides), and the ring is
-// a view of progressDays / graduationTarget / isFrozen.
+// a view of progressDays / graduationTarget.
 import { addDays, dayKeyOf, daysBetween } from './dates.ts';
 import type { DayKey } from './dates.ts';
-import { graduationTarget, isFrozen, pileVerses, progressDays, verseStatus } from './schedule.ts';
+import { graduationTarget, pileVerses, progressDays, verseStatus } from './schedule.ts';
 import { PILES } from './types.ts';
 import type { AppData, Verse } from './types.ts';
 
@@ -38,7 +38,7 @@ export function nextReviewInfo(data: AppData, now: number): NextReview {
   return { kind: 'none' };
 }
 
-export type RingState = 'progress' | 'frozen' | 'yearly';
+export type RingState = 'progress' | 'yearly';
 
 export interface Ring {
   state: RingState;
@@ -57,7 +57,5 @@ export function progressRing(data: AppData, v: Verse, now: number): Ring {
   if (target === null) return { state: 'yearly', earned: 0, target: null, fraction: 1, label: 'Yearly: in your permanent collection' };
   const earned = progressDays(data, v, now);
   const fraction = Math.min(1, earned / target);
-  const frozen = isFrozen(data, now);
-  const base = `Day ${earned} of ${target} toward ${NEXT_NAME[v.pile as keyof typeof NEXT_NAME]}`;
-  return { state: frozen ? 'frozen' : 'progress', earned, target, fraction, label: frozen ? `${base} (paused)` : base };
+  return { state: 'progress', earned, target, fraction, label: `Day ${earned} of ${target} toward ${NEXT_NAME[v.pile as keyof typeof NEXT_NAME]}` };
 }

@@ -1,7 +1,7 @@
 import { useState } from 'preact/hooks';
 import { BOOKS } from '../core/books.ts';
 import { bibleGatewayUrl, formatRef } from '../core/reference.ts';
-import { GRADUATION_DAYS, deleteVerse, isFrozen, maxDaysIn, movePile, nextPile, restorePile, restoreVerse, verseStatus } from '../core/schedule.ts';
+import { GRADUATION_DAYS, deleteVerse, maxDaysIn, movePile, nextPile, restorePile, restoreVerse, verseStatus } from '../core/schedule.ts';
 import { PILES, type Pile } from '../core/types.ts';
 import { back, navigate } from '../router.ts';
 import { act, showToast, useApp } from '../store.ts';
@@ -35,7 +35,6 @@ export function VerseDetail({ id }: { id: string }) {
   const label = statusLabel(status);
   const p = pileProgress(data, v, now);
   const next = nextPile(v.pile);
-  const frozen = isFrozen(data, now);
 
   const doMove = (to: Pile) => {
     setMoving(false);
@@ -86,7 +85,7 @@ export function VerseDetail({ id }: { id: string }) {
               <>
                 {' '}
                 {p.earned} of {GRADUATION_DAYS[v.pile as keyof typeof GRADUATION_DAYS]} days toward {PILE_INFO[next].label}
-                {frozen ? ' (paused — review to resume)' : ''}.
+.{status.state === 'ready' && status.countedToday === 0 ? (v.pile === 'daily' ? ' A review today adds a day.' : ' A review this ' + (status.period ?? 'week') + ' counts the whole ' + (status.period ?? 'week') + '.') : ''}
               </>
             )}
             {!next && ' Kept for life — reviewed once a year.'}

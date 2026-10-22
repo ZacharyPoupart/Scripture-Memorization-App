@@ -5,6 +5,9 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Changed
+- A verse now moves toward its next pile only on days it is up to date. Daily verses earn a day when you do one counted review that day. Weekly, Monthly and Yearly verses earn every day they are not overdue, and wait (no days added) once they are due until you review them. The three-days-away freeze is gone: a quiet stretch just waits, nothing is lost. Progress you already earned is kept.
+
 ## [1.31.0] - 2026-10-22
 
 ### Changed

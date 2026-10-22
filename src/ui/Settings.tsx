@@ -363,7 +363,7 @@ const BREAK_CHOICES = [
   { days: 30, label: 'A month' },
 ];
 
-/** "Take a break": nothing is due, the streak waits, nothing freezes, nothing is lost. */
+/** "Take a break": nothing is due, the streak waits, nothing is lost. */
 function BreakCard() {
   const { data } = useApp();
   const today = dayKeyOf(Date.now());
@@ -385,7 +385,7 @@ function BreakCard() {
       ) : (
         <>
           <p class="muted" style={{ margin: 0 }}>
-            Away or busy? Pause for a while: nothing is due, your streak waits, and nothing freezes. Verses just don't move up while you're away.
+            Away or busy? Pause for a while: nothing is due, and your streak waits. Verses just don't earn days while you're away.
           </p>
           <div class="row">
             <select class="input grow" aria-label="Length of the break" value={days} onChange={(e) => setDays(Number(e.currentTarget.value))} data-testid="break-length">

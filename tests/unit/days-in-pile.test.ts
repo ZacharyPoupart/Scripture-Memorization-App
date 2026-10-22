@@ -69,7 +69,7 @@ describe('days already in the pile', () => {
     expect(verseStatus(data, v, now).state).toBe('ready');
     movePile(data, v.id, 'yearly', now, 366);
     expect(verseStatus(data, v, now).state).toBe('ready');
-    movePile(data, v.id, 'yearly', now, 10);
+    movePile(data, v.id, 'yearly', now, 5); // Jan 5 2026: still the year it arrived in
     expect(verseStatus(data, v, now).state).toBe('notdue');
   });
 

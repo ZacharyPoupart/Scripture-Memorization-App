@@ -27,6 +27,8 @@ export function john316(data: AppData, now: number, extra: Partial<Verse> = {}):
     now,
   );
   Object.assign(v, extra);
+  // a verse placed straight into a pile or back-dated looks like one saved by an older version: its earlier days are read from the ledger once
+  if ('pile' in extra || 'pileSince' in extra) delete v.prog;
   return v;
 }
 

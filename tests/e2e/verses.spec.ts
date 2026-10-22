@@ -103,7 +103,7 @@ test.describe('adding, editing and organizing verses', () => {
     await page.getByTestId('move').click();
     await page.getByTestId('move-weekly').click();
     await expect(page.getByTestId('toast')).toContainText('Moved to Weekly');
-    await expect(page.getByTestId('detail-status')).toContainText('Next review in 7 days');
+    await expect(page.getByTestId('detail-status')).toHaveText(/Next review in \d+ days?/);
     await page.getByTestId('toast').getByRole('button', { name: 'Undo' }).click();
     await expect(page.getByTestId('detail-status')).toContainText('Ready');
     // delete + undo

@@ -1,29 +1,29 @@
-// The heart of the app: piles, due dates, daily spacing, graduation, freeze and streak.
+// The heart of the app: piles, due dates, daily spacing, graduation (progress days) and streak.
 // Everything here is a pure function of (data, now). Functions that change data mutate the
 // object they are given; the app store clones before calling them (tests just call them).
 //
 // RULES (keep in sync with CLAUDE.md and the About screen):
 //  * Days are local calendar days; they roll over at local midnight.
-//  * Daily: 3 counted reviews per day, at least `spacingHours` apart. Weekly/Monthly/Yearly: one
-//    counted review once the verse is due (7 days / 1 calendar month / 1 calendar year after the
-//    later of its last counted review and the day it entered the pile).
+//  * Daily: 3 counted reviews per day, at least `spacingHours` apart. Weekly/Monthly/Yearly follow the
+//    calendar: one counted review in each week (Sunday to Saturday) / calendar month / calendar year.
+//    Reviewed any time in the period = good until the next one starts; everything is due on the period's
+//    last day (that is when a miss breaks the streak). The period a verse arrives in is a free pass.
 //  * Extra practice is always allowed but never counted (and never stored).
 //  * Graduation: Daily->Weekly after 90 progress days, Weekly->Monthly after 90, Monthly->Yearly
-//    after 365. A "progress day" is a day after entering the pile that is not frozen.
-//  * Freeze: a day is frozen when the 3 days before it were all "lapse days" (obligations existed
-//    but nothing at all was reviewed) and nothing has been reviewed yet that day. Frozen days don't
-//    add progress. Verses that already earned their promotion still move up.
+//    after 365. A "progress day" is a day after entering the pile on which the verse was up to date:
+//    Daily, it got a counted review that day; Weekly/Monthly, it was reviewed in that week/month (the
+//    whole period counts at once; a missed period never counts). Each verse keeps its own list of those days. There is no freeze: a day that does not count
+//    just does not count, and nothing already earned is ever lost.
 //  * Streak: +1 for each day on which every due verse got at least ONE counted review (three a day is
 //    the goal for Daily, one keeps the flame). Practising on a day when nothing was due (e.g. the very
 //    first day) also earns it. Days with nothing due and no practice are neutral. A due verse with no
 //    review breaks the streak. Verses added/moved today are exempt for today.
-//  * Break (pause): on paused days nothing is due and nothing can be missed (the streak waits, no lapse,
-//    no freeze), but no progress day is earned either - unless the user reviews anyway, which counts as
-//    a normal day. Due dates of Weekly/Monthly/Yearly verses are not moved.
+//  * Break (pause): on paused days nothing is due and nothing can be missed (the streak waits, no lapse),
+//    but no progress day is earned either - unless the user reviews anyway, which counts as a normal day.
+//    Due dates of Weekly/Monthly/Yearly verses are not moved.
 import {
   addDays,
   addMonths,
-  addYears,
   dayKeyOf,
   daysBetween,
   startOfLocalDay,
@@ -42,7 +42,6 @@ import {
 
 export const GRADUATION_DAYS = { daily: 90, weekly: 90, monthly: 365 } as const;
 export const DAILY_REVIEWS = 3;
-export const FREEZE_AFTER_DAYS = 3;
 const HOUR = 3_600_000;
 const KEEP_REVIEWS_MS = 60 * 24 * HOUR;
 
@@ -106,32 +105,96 @@ const isLapse = (data: AppData, day: DayKey) => {
   return e?.o === 'm' && !e.r;
 };
 
-/** Does `day` add progress toward graduation? (see Freeze rule at top of file) */
-export function dayGains(data: AppData, day: DayKey): boolean {
+/** After a run of this many lapse days the OLD rule stopped counting days. Only used to carry over what verses had already earned. */
+const LEGACY_FREEZE_AFTER_DAYS = 3;
+
+/** The rule before v1.33.0: every day counted unless the 3 days before were all lapse days and nothing was reviewed that day. */
+function legacyDayGains(data: AppData, day: DayKey): boolean {
   if (data.ledger[day]?.r) return true;
-  if (data.ledger[day]?.p || isPaused(data, day)) return false; // on a break nothing is earned (nothing is lost either)
+  if (data.ledger[day]?.p || isPaused(data, day)) return false;
   return !(
     isLapse(data, addDays(day, -1)) &&
     isLapse(data, addDays(day, -2)) &&
-    isLapse(data, addDays(day, -FREEZE_AFTER_DAYS))
+    isLapse(data, addDays(day, -LEGACY_FREEZE_AFTER_DAYS))
   );
 }
 
-export function isFrozen(data: AppData, now: number): boolean {
-  return !dayGains(data, dayKeyOf(now));
+/** What an older version had earned: the offsets of its progress days up to and including `through`. */
+function legacyOffsets(data: AppData, v: Verse, through: DayKey): number[] {
+  const out: number[] = [];
+  const span = daysBetween(v.pileSince, through);
+  for (let i = 1; i <= span; i++) if (legacyDayGains(data, addDays(v.pileSince, i))) out.push(i);
+  return out;
 }
 
-/** How many more consecutive no-review days until progress freezes (0 = already frozen). */
-export function daysUntilFreeze(data: AppData, now: number): number | null {
-  const today = dayKeyOf(now);
-  if (data.ledger[today]?.r) return null;
-  let run = 0;
-  for (let i = 1; i <= FREEZE_AFTER_DAYS; i++) {
-    if (isLapse(data, addDays(today, -i))) run++;
-    else break;
-  }
-  return FREEZE_AFTER_DAYS - run;
+// ---------------------------------------------------------------- calendar periods
+
+/** Weeks run Sunday to Saturday, months and years are the calendar ones. */
+export function periodStart(pile: Pile, day: DayKey): DayKey {
+  if (pile === 'weekly') return addDays(day, -new Date(`${day}T00:00:00Z`).getUTCDay());
+  if (pile === 'monthly') return `${day.slice(0, 7)}-01`;
+  if (pile === 'yearly') return `${day.slice(0, 4)}-01-01`;
+  return day;
 }
+
+/** Last day of the period holding `day`. */
+export function periodEnd(pile: Pile, day: DayKey): DayKey {
+  const start = periodStart(pile, day);
+  if (pile === 'weekly') return addDays(start, 6);
+  if (pile === 'monthly') return addDays(addMonths(start, 1), -1);
+  if (pile === 'yearly') return `${day.slice(0, 4)}-12-31`;
+  return day;
+}
+
+/** Was the verse counted-reviewed anywhere in the period holding `day` (up to and including `through`, default the period's end)? */
+function reviewedInPeriod(v: Verse, day: DayKey, through?: DayKey): boolean {
+  const start = periodStart(v.pile, day);
+  const end = through && through < periodEnd(v.pile, day) ? through : periodEnd(v.pile, day);
+  return v.reviews.some((t) => {
+    const d = dayKeyOf(t);
+    return d >= start && d <= end;
+  });
+}
+
+/** The week/month/year the verse arrived in is a free pass; its first requirement is the next one. */
+const inArrivalPeriod = (v: Verse, day: DayKey): boolean => periodStart(v.pile, v.pileSince) === periodStart(v.pile, day);
+
+/**
+ * Does `day` count as a progress day for this verse in its current pile? Daily: a counted review that day. Weekly/Monthly: the
+ * whole period counts once the verse was reviewed anywhere in it (never the period it arrived in). Yearly earns nothing.
+ */
+function dayCounts(_data: AppData, v: Verse, day: DayKey): boolean {
+  if (v.pile === 'yearly' || day <= v.pileSince) return false;
+  if (v.pile === 'daily') return reviewsOn(v, day) > 0;
+  return !inArrivalPeriod(v, day) && reviewedInPeriod(v, day);
+}
+
+const range = (from: number, to: number): number[] => Array.from({ length: Math.max(0, to - from + 1) }, (_, i) => from + i);
+
+/** Offsets of the days a review today earns: just today for Daily, the whole week/month for Weekly/Monthly (days still ahead included). */
+function periodOffsets(v: Verse, today: DayKey): number[] {
+  const first = v.pile === 'daily' ? today : periodStart(v.pile, today);
+  const last = v.pile === 'daily' ? today : periodEnd(v.pile, today);
+  return range(daysBetween(v.pileSince, first), daysBetween(v.pileSince, last)).filter((n) => n > 0);
+}
+
+/** Saved days plus today, if today already counts (so the ring moves the moment you review). Sorted. */
+function offsetsWithToday(data: AppData, v: Verse, today: DayKey): number[] {
+  if (v.pile === 'yearly') return [];
+  const saved = v.prog ?? legacyOffsets(data, v, addDays(today, -1));
+  if (!dayCounts(data, v, today)) return saved;
+  const extra = periodOffsets(v, today);
+  return unionSorted(saved, extra);
+}
+
+/** Days (offsets) from `from` to `to` that count for the verse as it is now. */
+function recordDays(data: AppData, v: Verse, from: DayKey, to: DayKey): number[] {
+  const out: number[] = [];
+  for (let d = from; d <= to; d = addDays(d, 1)) if (dayCounts(data, v, d)) out.push(daysBetween(v.pileSince, d));
+  return out;
+}
+
+const unionSorted = (a: number[], b: number[]): number[] => [...new Set([...a, ...b])].sort((x, y) => x - y);
 
 // ---------------------------------------------------------------- verse timing
 
@@ -152,20 +215,11 @@ export function lastReviewDay(v: Verse, before?: DayKey): DayKey | undefined {
   return best;
 }
 
-/** Day a Weekly/Monthly/Yearly verse is (or became) due. */
-export function dueDay(v: Verse, beforeDay?: DayKey): DayKey {
-  const last = lastReviewDay(v, beforeDay);
-  const base = last && last > v.pileSince ? last : v.pileSince;
-  switch (v.pile) {
-    case 'weekly':
-      return addDays(base, 7);
-    case 'monthly':
-      return addMonths(base, 1);
-    case 'yearly':
-      return addYears(base, 1);
-    default:
-      return base;
-  }
+/** Day a Weekly/Monthly/Yearly verse is (or became) due as of `day`: the start of this period, or of the next one when it is already covered. */
+export function dueDay(v: Verse, day: DayKey): DayKey {
+  if (v.pile === 'daily') return v.pileSince;
+  if (inArrivalPeriod(v, day) || reviewedInPeriod(v, day, day)) return addDays(periodEnd(v.pile, day), 1);
+  return periodStart(v.pile, day);
 }
 
 export interface VerseStatus {
@@ -179,12 +233,15 @@ export interface VerseStatus {
   /** Periodic piles: due day, and days until due (negative = overdue). */
   due?: DayKey;
   daysUntilDue?: number;
+  /** Periodic piles: the last day of the week/month/year it belongs to (the day it must be done by). */
+  periodEnd?: DayKey;
+  period?: 'week' | 'month' | 'year';
 }
 
 export function verseStatus(data: AppData, v: Verse, now: number): VerseStatus {
   const today = dayKeyOf(now);
   const countedToday = reviewsOn(v, today);
-  const required = v.pileSince < today;
+  const required = v.pileSince < today && (v.pile === 'daily' || !inArrivalPeriod(v, today));
   if (v.pile === 'daily') {
     if (countedToday >= DAILY_REVIEWS) return { state: 'done', required, countedToday };
     if (countedToday > 0) {
@@ -194,23 +251,18 @@ export function verseStatus(data: AppData, v: Verse, now: number): VerseStatus {
     }
     return { state: 'ready', required, countedToday };
   }
-  const due = dueDay(v);
+  const due = dueDay(v, today);
   const daysUntilDue = daysBetween(today, due);
-  return { state: daysUntilDue <= 0 ? 'ready' : 'notdue', required, countedToday, due, daysUntilDue };
+  return { state: daysUntilDue <= 0 ? 'ready' : 'notdue', required, countedToday, due, daysUntilDue, periodEnd: periodEnd(v.pile, today), period: v.pile === 'weekly' ? 'week' : v.pile === 'monthly' ? 'month' : 'year' };
 }
 
 export function daysInPile(v: Verse, now: number): number {
   return Math.max(0, daysBetween(v.pileSince, dayKeyOf(now)));
 }
 
-/** Progress days earned toward graduation (0 for Yearly). */
+/** Progress days earned toward graduation (0 for Yearly), including today once it counts. */
 export function progressDays(data: AppData, v: Verse, now: number): number {
-  if (v.pile === 'yearly') return 0;
-  const today = dayKeyOf(now);
-  const span = daysBetween(v.pileSince, today);
-  let n = 0;
-  for (let i = 1; i <= span; i++) if (dayGains(data, addDays(v.pileSince, i))) n++;
-  return n;
+  return offsetsWithToday(data, v, dayKeyOf(now)).length;
 }
 
 export function graduationTarget(p: Pile): number | null {
@@ -261,7 +313,7 @@ export function todaySummary(data: AppData, now: number): TodaySummary {
     } else if (s.state === 'ready') {
       total++;
       readyNow++;
-      streakUnmet++;
+      if (s.periodEnd === dayKeyOf(now)) streakUnmet++; // everything is due on the period's last day
     } else if (s.countedToday > 0) {
       // periodic verse reviewed today: obligation met
       total++;
@@ -274,7 +326,7 @@ export function todaySummary(data: AppData, now: number): TodaySummary {
   const practiced = !!data.ledger[today]?.r;
   let outcome: TodaySummary['outcome'];
   if (data.ledger[today]?.o === 'c' || (streakUnmet === 0 && (streakMet > 0 || practiced))) outcome = 'c';
-  else if (total === 0) outcome = 'n';
+  else if (streakUnmet === 0) outcome = 'n';
   else outcome = 'pending';
   return { total, met, remaining, readyNow, outcome };
 }
@@ -320,9 +372,9 @@ function computeDay(data: AppData, day: DayKey): { outcome: DayOutcome; reviewed
     if (v.pile === 'daily') {
       if (n >= 1) met++; // one counted review keeps the streak; three is the goal
       else unmet++;
-    } else if (dueDay(v, day) <= day) {
+    } else if (!inArrivalPeriod(v, day)) {
       if (n > 0) met++;
-      else unmet++;
+      else if (day === periodEnd(v.pile, day) && !reviewedInPeriod(v, day)) unmet++; // due on the period's last day
     }
   }
   const paused = isPaused(data, day);
@@ -344,6 +396,9 @@ export function settle(data: AppData, now: number): SettleResult {
   const yesterday = addDays(today, -1);
   const out: SettleResult = { levelUps: [] };
 
+  // Verses saved by an older version carry what they had earned over, read once from the ledger with the old rule.
+  for (const v of liveVerses(data)) if (v.prog === undefined) v.prog = v.pile === 'yearly' ? [] : legacyOffsets(data, v, data.settledThrough);
+
   let start = addDays(data.settledThrough, 1);
   if (start < data.createdDay) start = data.createdDay;
   for (let d = start; d <= yesterday; d = addDays(d, 1)) {
@@ -352,6 +407,8 @@ export function settle(data: AppData, now: number): SettleResult {
     if (reviewed) computed.r = 1;
     if (paused) computed.p = 1;
     data.ledger[d] = mergeLedgerDay(data.ledger[d], computed);
+    // each verse keeps the days it was up to date
+    for (const v of liveVerses(data)) if (dayCounts(data, v, d)) v.prog = unionSorted(v.prog ?? [], [daysBetween(v.pileSince, d)]);
   }
   if (data.settledThrough < yesterday) data.settledThrough = yesterday;
 
@@ -373,26 +430,32 @@ function graduate(data: AppData, v: Verse, today: DayKey, out: SettleResult) {
     const to = nextPile(v.pile);
     if (!to) return;
     const need = GRADUATION_DAYS[v.pile as keyof typeof GRADUATION_DAYS];
-    const span = daysBetween(v.pileSince, today);
-    let got = 0;
-    let hit: DayKey | null = null;
-    for (let i = 1; i <= span; i++) {
-      const d = addDays(v.pileSince, i);
-      if (dayGains(data, d) && ++got === need) {
-        hit = d;
-        break;
-      }
-    }
-    if (!hit) return;
+    const days = offsetsWithToday(data, v, today);
+    if (days.length < need) return;
+    const hit = promotionDay(v, addDays(v.pileSince, days[need - 1]), today);
     const lu: LevelUp = { id: `${v.id}:${to}:${hit}`, verseId: v.id, from: v.pile, to, day: hit };
     v.pile = to;
     v.pileSince = hit;
     v.pileAt = startOfLocalDay(hit);
+    // the days since then are worked out again under the new pile's rule
+    v.prog = to === 'yearly' ? [] : recordDays(data, v, addDays(hit, 1), data.settledThrough);
     if (!data.levelUps.some((x) => x.id === lu.id)) {
       data.levelUps.push(lu);
       out.levelUps.push(lu);
     }
   }
+}
+
+/** The day the promotion was earned: for Daily the day itself; for Weekly/Monthly the first review of the period that reached the target. */
+function promotionDay(v: Verse, reached: DayKey, today: DayKey): DayKey {
+  let hit = reached;
+  if (v.pile !== 'daily') {
+    const start = periodStart(v.pile, reached);
+    const end = periodEnd(v.pile, reached);
+    const firstReview = v.reviews.map(dayKeyOf).filter((d) => d >= start && d <= end).sort()[0];
+    if (firstReview) hit = firstReview;
+  }
+  return hit > today ? today : hit;
 }
 
 function pruneReviews(v: Verse, now: number) {
@@ -435,6 +498,7 @@ export function addVerse(data: AppData, input: NewVerse, now: number): Verse {
     createdAt: now,
     reviews: [],
   };
+  v.prog = range(1, safeDaysIn('daily', input.daysInPile)); // days claimed at the start are credited at once
   data.verses[v.id] = v;
   return v;
 }
@@ -464,6 +528,7 @@ export function restoreVerse(data: AppData, id: string, now: number): void {
 export interface PileSnapshot {
   pile: Pile;
   pileSince: DayKey;
+  prog?: number[];
 }
 
 /** Manually move a verse. Returns what's needed to undo it. Progress restarts in the new pile. */
@@ -485,10 +550,12 @@ function safeDaysIn(pile: Pile, n: number | undefined): number {
 export function movePile(data: AppData, id: string, to: Pile, now: number, daysIn = 0): PileSnapshot {
   const v = data.verses[id];
   if (!v || v.deletedAt) throw new Error('Verse not found');
-  const prev = { pile: v.pile, pileSince: v.pileSince };
+  const prev: PileSnapshot = { pile: v.pile, pileSince: v.pileSince, prog: v.prog ? [...v.prog] : undefined };
+  const claimed = safeDaysIn(to, daysIn);
   v.pile = to;
-  v.pileSince = addDays(dayKeyOf(now), -safeDaysIn(to, daysIn));
+  v.pileSince = addDays(dayKeyOf(now), -claimed);
   v.pileAt = now;
+  v.prog = to === 'yearly' ? [] : range(1, claimed); // a plain move restarts at zero; days claimed are credited at once
   return prev;
 }
 
@@ -497,12 +564,14 @@ export function restorePile(data: AppData, id: string, snap: PileSnapshot, now: 
   if (!v) return;
   v.pile = snap.pile;
   v.pileSince = snap.pileSince;
+  if (snap.prog) v.prog = [...snap.prog];
+  else delete v.prog;
   v.pileAt = Math.max(now, v.pileAt + 1);
 }
 
 /**
  * Record a finished review. It *counts* only when the verse is ready (see verseStatus);
- * otherwise it is extra practice: it keeps the freeze at bay but doesn't touch the schedule.
+ * otherwise it is extra practice: it doesn't touch the schedule.
  */
 export function recordReview(
   data: AppData,
@@ -524,12 +593,16 @@ export function recordReview(
     }
     data.reviewsByDevice[deviceId] = (data.reviewsByDevice[deviceId] ?? 0) + 1;
   }
+  if (counted && v.pile !== 'daily' && v.pile !== 'yearly' && !inArrivalPeriod(v, today)) v.prog = unionSorted(v.prog ?? [], periodOffsets(v, today));
+  // a counted review can be the day that earns the promotion: it happens right now, not at midnight
+  const levelUps = [...settled.levelUps];
+  if (counted) graduate(data, v, today, { levelUps });
   const summary = todaySummary(data, now);
   if (summary.outcome === 'c') {
     data.ledger[today] = mergeLedgerDay(data.ledger[today], { o: 'c' });
   }
   data.longestStreak = Math.max(data.longestStreak, streakInfo(data, now).count);
-  return { counted, levelUps: settled.levelUps, todayComplete: summary.total > 0 && summary.remaining === 0 };
+  return { counted, levelUps, todayComplete: summary.total > 0 && summary.remaining === 0 };
 }
 
 export function totalReviews(data: AppData): number {
