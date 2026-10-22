@@ -25,8 +25,8 @@
    "scale": 1.35
   },
   "sword": {
-   "dx": 48,
-   "y": -4,
+   "dx": 36,
+   "y": -14,
    "scale": 1.2,
    "rotate": 180,
    "note": "held by the grip: turned 180 degrees (the sheet draws the sword point-down) and scaled 1.2x; 'tilt' turns it further around the hand, clockwise from straight up (0 = up, 90 = out to the side, 180 = down)",
