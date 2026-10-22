@@ -10,6 +10,7 @@ import { back, navigate, type Route } from '../router.ts';
 import { completeReview, showToast, useApp } from '../store.ts';
 import { CheckMark, Coin, Confetti, Icon, PileBadge, PILE_INFO, pileProgress } from './common.tsx';
 import { MODES } from './ModePicker.tsx';
+import { Overlay } from './common.tsx';
 import { Blanks } from './modes/Blanks.tsx';
 import { Flashcard } from './modes/Flashcard.tsx';
 import { RefRecall } from './modes/RefRecall.tsx';
@@ -114,7 +115,10 @@ function SkipVerse({ onSkip }: { onSkip: () => void }) {
 
 export function Review({ route }: { route: Route }) {
   const { data, settings } = useApp();
-  const mode = (MODES.find((m) => m.value === route.query.get('mode'))?.value ?? settings.defaultMode) as ReviewMode;
+  const startMode = (MODES.find((m) => m.value === route.query.get('mode'))?.value ?? settings.defaultMode) as ReviewMode;
+  const [chosen, setChosen] = useState<ReviewMode | null>(null); // a type picked during this session (the default is not changed)
+  const [switching, setSwitching] = useState(false);
+  const mode = chosen ?? startMode;
   const queue = useMemo(() => buildQueue(data, route.query, Date.now()), []);
   const [idx, setIdx] = useState(0);
   const [attempt, setAttempt] = useState(0);
@@ -159,6 +163,14 @@ export function Review({ route }: { route: Route }) {
     feedback.complete();
     setTally((t) => ({ counted: t.counted + (r.counted ? 1 : 0), practice: t.practice + (r.counted ? 0 : 1), ups: t.ups + r.levelUps.length, seeds: t.seeds + r.seeds }));
     advanceTimer.current = setTimeout(next, 1100);
+  };
+
+  /** Swap the review type: the verse in front of you starts over in the new type, and the rest of the session uses it too. */
+  const switchTo = (m: ReviewMode) => {
+    setSwitching(false);
+    if (m === mode) return;
+    setChosen(m);
+    if (!result) setAttempt((a) => a + 1);
   };
 
   const onRestart = () => {
@@ -231,7 +243,9 @@ export function Review({ route }: { route: Route }) {
           <Icon name="close" />
         </button>
         <div class="title">
-          {modeInfo.long}
+          <button class="mode-switch" onClick={() => setSwitching(true)} aria-label={`Review type: ${modeInfo.long}. Change it`} data-testid="switch-mode">
+            {modeInfo.long} <span aria-hidden="true">▾</span>
+          </button>
           <span class="sub">
             Verse {idx + 1} of {queue.length}
           </span>
@@ -259,6 +273,25 @@ export function Review({ route }: { route: Route }) {
         </div>
       ) : (
         <VerseAttempt key={`${verse.id}-${attempt}`} verse={verse} mode={mode} onFinished={onFinished} onRestart={onRestart} />
+      )}
+      {switching && (
+        <Overlay onClose={() => setSwitching(false)} label="Change review type">
+          <div class="sheet stack" data-testid="mode-sheet">
+            <h2>Change review type</h2>
+            <div class="hint-text">{result ? 'The next verse will use it.' : 'This verse starts over in the new type, and the rest of the session uses it.'}</div>
+            <div class="stack" style={{ '--gap': '8px' } as never}>
+              {MODES.map((m) => (
+                <button key={m.value} class={`btn block ${m.value === mode ? 'primary' : ''}`} aria-pressed={m.value === mode} onClick={() => switchTo(m.value)} data-testid={`switch-to-${m.value}`}>
+                  {m.long}
+                  {m.value === mode ? ' (current)' : ''}
+                </button>
+              ))}
+            </div>
+            <button class="btn ghost block" onClick={() => setSwitching(false)}>
+              Cancel
+            </button>
+          </div>
+        </Overlay>
       )}
     </div>
   );
