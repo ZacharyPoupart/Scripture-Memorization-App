@@ -9,7 +9,7 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ### Changed
 - Real prices for the armor. Iron Bulwark is now the free starting set; the other ten cost from 200 seeds (Silver Vanguard) up to 5,500 (Sulestial) for a whole set, and each piece costs its share of that. Stormcaller and above also need a number of verses in your library (5 up to 60), and the last four need a 30, 60, 180 or 365-day streak as well. You can buy sets in any order once you reach them.
-- Armor is no longer free for testing: you wear what you have earned or bought. The Iron Bulwark sword comes free when you add your first verse, and its shield when you reach a 3-day streak.
+- Armor is no longer free for testing: you wear what you have earned or bought. The Iron Bulwark sword comes free when you add your first verse, and its shield when your streak first lights (day 1).
 
 ## [1.24.0] - 2026-10-22
 

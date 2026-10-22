@@ -12,6 +12,7 @@ import {
   importBackup,
   listSnapshots,
   previewBackup,
+  resetArmor,
   resetEverything,
   restoreSnapshot,
   setPrefs,
@@ -216,6 +217,31 @@ function SyncCard() {
         />
       )}
     </div>
+  );
+}
+
+/** Clears everything bought and worn on the avatar; the seeds spent come back. */
+function ResetArmor() {
+  const [ask, setAsk] = useState(false);
+  return (
+    <>
+      <button class="btn ghost small" onClick={() => setAsk(true)} data-testid="reset-armor">
+        Reset my armor
+      </button>
+      {ask && (
+        <Confirm
+          title="Reset your armor?"
+          body="Your knight goes back to the free start, and everything you bought is forgotten. The seeds you spent come back. Your verses and progress are not touched. With sync on, other devices that own armor would bring it back."
+          confirmLabel="Reset"
+          onConfirm={() => {
+            setAsk(false);
+            resetArmor();
+            showToast('Your armor is reset. The seeds are back.');
+          }}
+          onCancel={() => setAsk(false)}
+        />
+      )}
+    </>
   );
 }
 
@@ -540,6 +566,7 @@ export function Settings({ onShowIntro }: { onShowIntro: () => void }) {
             onChange={(avatarOn) => updateSettings({ avatarOn })}
             testid="toggle-avatar"
           />
+          <ResetArmor />
           <Field
             group
             label="Celebrations"

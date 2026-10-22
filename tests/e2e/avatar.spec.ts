@@ -55,6 +55,26 @@ test.describe('avatar and seeds', () => {
     await context.setOffline(false);
   });
 
+  test('"Reset my armor" in Settings forgets what was bought and gives the seeds back', async ({ page }) => {
+    await autoDismissMilestones(page);
+    await blockLookups(page);
+    await openApp(page);
+    await page.evaluate(() => (window as any).__mfl.armorFree(false));
+    await replaceDataWith(page, fixture);
+    await page.goto('/#/avatar');
+    const before = Number((await page.getByTestId('seeds-balance').innerText()).replace(/\D/g, ''));
+    await page.getByTestId('item-helmet-silver-vanguard').click();
+    await page.getByTestId('buy').click();
+    await expect(page.getByTestId('item-helmet-silver-vanguard')).toContainText('Wearing');
+    await page.goto('/#/settings');
+    await page.getByTestId('reset-armor').click();
+    await page.getByRole('button', { name: 'Reset', exact: true }).click();
+    await page.goto('/#/avatar');
+    await expect(page.getByTestId('item-helmet-iron-bulwark')).toContainText('Wearing');
+    await expect(page.getByTestId('item-helmet-silver-vanguard')).toContainText('🌱 40');
+    expect(Number((await page.getByTestId('seeds-balance').innerText()).replace(/\D/g, ''))).toBe(before);
+  });
+
   test('a new knight starts in free basic armor, with every other piece waiting to be earned', async ({ page }) => {
     await autoDismissMilestones(page);
     await blockLookups(page);
@@ -72,9 +92,9 @@ test.describe('avatar and seeds', () => {
     await page.getByTestId('slot-weapon').click();
     await expect(page.getByTestId('item-weapon-iron-bulwark')).toContainText('Owned');
     await page.getByTestId('slot-shield').click();
-    await expect(page.getByTestId('item-shield-iron-bulwark')).toContainText('🔒 3-day');
+    await expect(page.getByTestId('item-shield-iron-bulwark')).toContainText('🔒 1-day');
     await page.getByTestId('item-shield-iron-bulwark').click();
-    await expect(page.getByTestId('unlock-hint')).toContainText('3-day streak');
+    await expect(page.getByTestId('unlock-hint')).toContainText('1-day streak');
   });
 
   test('while testing, all armor is free to wear with no seeds and no streak', async ({ page }) => {

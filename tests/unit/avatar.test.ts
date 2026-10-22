@@ -19,6 +19,7 @@ import {
   SETS,
   matchedSet,
   armorWorn,
+  resetAvatar,
   STREAK_SEED_BONUS,
 } from '../../src/core/avatar.ts';
 import { mergeData } from '../../src/core/merge.ts';
@@ -152,7 +153,7 @@ describe('the knight', () => {
     for (const slot of ['helmet', 'chest', 'belt', 'boots', 'cape', 'weapon', 'shield']) expect(cost(slot, 'iron-bulwark'), slot).toBe(0);
   });
 
-  it('the free set\'s sword is a reward for adding a first verse, and its shield for a first streak (3 days)', () => {
+  it('the free set\'s sword is a reward for adding a first verse, and its shield for a first streak (the first day, when the flame lights)', () => {
     const d = newData();
     const sword = itemById('weapon-iron-bulwark')!;
     const shield = itemById('shield-iron-bulwark')!;
@@ -164,9 +165,8 @@ describe('the knight', () => {
     john316(d, 1000);
     expect(owns(d, sword)).toBe(true);
     expect(equipItem(d, sword.id, 2)).toBe(true);
-    d.longestStreak = 2;
     expect(owns(d, shield)).toBe(false);
-    d.longestStreak = 3;
+    d.longestStreak = 1;
     expect(owns(d, shield)).toBe(true);
     expect(buyItem(d, sword.id, 3)).toMatchObject({ ok: false, reason: 'owned' });
     // every other set's sword and shield are still bought with seeds
@@ -347,6 +347,25 @@ describe('buying, unlocking and equipping', () => {
     expect(seedsBalance(m)).toBeGreaterThanOrEqual(0);
     expect(owns(m, hat)).toBe(true);
     expect(owns(m, other)).toBe(true);
+  });
+});
+
+describe('resetting the armor (owner request)', () => {
+  it('forgets everything bought and worn, gives every seed back, and keeps verses and progress', () => {
+    const d = rich();
+    john316(d, 1000);
+    buyItem(d, 'helmet-silver-vanguard', 1);
+    equipItem(d, 'helmet-silver-vanguard', 2);
+    const spent = itemById('helmet-silver-vanguard')!.cost;
+    const before = seedsBalance(d);
+    const earned = seedsEarned(d);
+    resetAvatar(d, 5);
+    expect(d.avatar!.owned).toEqual([]);
+    expect(currentLook(d)).toEqual(defaultLook());
+    expect(seedsBalance(d)).toBe(before + spent);
+    expect(seedsEarned(d)).toBe(earned);
+    expect(Object.keys(d.verses)).toHaveLength(1);
+    expect(d.avatar!.lookAt).toBeGreaterThanOrEqual(5);
   });
 });
 

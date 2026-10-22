@@ -96,8 +96,8 @@ const NOUN = { helmet: 'helm', chest: 'chest plate', belt: 'belt', boots: 'boots
 type SetSlot = keyof typeof SHARE;
 const setPrice = (set: ArmorSet, slot: SetSlot) => Math.round((set.price * SHARE[slot]) / 5) * 5;
 const setNeeds = (set: ArmorSet): Unlock[] => [...(set.streak ? [streak(set.streak)] : []), ...(set.verses ? [{ kind: 'verses', n: set.verses } as Unlock] : [])];
-/** The free set's sword and shield are rewards, not purchases: the sword for adding your first verse, the shield for your first streak. */
-const REWARD: Partial<Record<SetSlot, Unlock>> = { weapon: { kind: 'verses', n: 1 }, shield: { kind: 'streak', days: 3 } };
+/** The free set's sword and shield are rewards, not purchases: the sword for adding your first verse, the shield for your first streak (the day the flame lights). */
+const REWARD: Partial<Record<SetSlot, Unlock>> = { weapon: { kind: 'verses', n: 1 }, shield: { kind: 'streak', days: 1 } };
 const setPiece = (slot: SetSlot, set: ArmorSet): Item =>
   art(slot, `${slot}-${set.id}`, `${set.name} ${NOUN[slot]}`, setPrice(set, slot), setNeeds(set), {
     set: set.n,
@@ -274,6 +274,16 @@ export function buyItem(data: AppData, id: string, now: number): BuyResult {
   data.avatar = { ...avatar, owned: [...avatar.owned, id] };
   void now;
   return { ok: true };
+}
+
+/**
+ * Owner-requested: forget everything bought and worn on this device, so the knight is back in the free start and every seed spent
+ * comes back (seeds are derived from what is owned). Owned items otherwise only ever grow, and merging with another device that still
+ * owns them would bring them back, so with sync on, reset (or have nothing bought on) the other devices too.
+ */
+export function resetAvatar(data: AppData, now: number): void {
+  const lookAt = data.avatar?.lookAt ?? 0;
+  data.avatar = { owned: [], look: {}, lookAt: Math.max(now, lookAt + 1) };
 }
 
 export function equipItem(data: AppData, id: string, now: number): boolean {
