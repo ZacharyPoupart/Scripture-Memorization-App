@@ -1685,9 +1685,23 @@ button.streak {
 .avatar-bubble svg {
   border-radius: 50%;
 }
+/* the coin is text-sized and inline, not a picture block like the knight */
+.avatar-bubble svg.coin,
+.item-tile svg.coin,
+.avatar-stage svg.coin {
+  display: inline-block;
+  border-radius: 0;
+}
 .seeds-chip {
   font-weight: 700;
   white-space: nowrap;
+}
+.coin {
+  display: inline-block;
+  width: 1.05em;
+  height: 1.05em;
+  vertical-align: -0.17em;
+  margin-right: 0.2em;
 }
 .seeds-gain {
   color: var(--accent-strong);
@@ -1717,7 +1731,7 @@ button.streak {
 }
 .item-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
   gap: 10px;
 }
 .item-tile {
@@ -1731,6 +1745,7 @@ button.streak {
   background: var(--surface);
   color: var(--text);
   font: inherit;
+  justify-content: flex-start;
 }
 .item-tile.worn {
   border-color: var(--accent);
@@ -1743,6 +1758,25 @@ button.streak {
   font-size: 0.8rem;
   font-weight: 600;
   text-align: center;
+  line-height: 1.25;
+  min-height: 2.5em; /* two lines, so every tile's status starts at the same height */
+}
+.item-status {
+  margin-top: auto; /* pinned to the bottom of the tile */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.25;
+}
+.item-need {
+  font-size: 0.74rem;
+}
+.item-price {
+  white-space: nowrap; /* the coin and its number never split across lines */
 }
 .avatar-stage svg {
   margin: 0 auto;
@@ -1767,9 +1801,6 @@ button.streak {
 .armor-pips i.on {
   background: var(--accent);
   border-color: var(--accent);
-}
-.item-tile.unowned small {
-  font-weight: 600;
 }
 .piece-img {
   width: 72px;

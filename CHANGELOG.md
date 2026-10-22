@@ -5,6 +5,26 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.28.1] - 2026-10-22
+
+### Fixed
+- The armor tiles on the avatar screen are tidy: every price sits on the bottom line with its coin beside it (never split across lines), what a piece needs (a streak, a number of verses) is one short line each, and prices over 999 have a comma. The coin beside your balance on Today also stays on the line with its number.
+
+## [1.28.0] - 2026-10-22
+
+### Changed
+- The Wings of light cape is gone for now. Capes are the eleven set capes (or none).
+
+## [1.27.0] - 2026-10-22
+
+### Changed
+- Armor costs four times as much, so there is something to work toward all year: a whole set now runs from 800 coins (Silver Vanguard) up to 22,000 (Sulestial). The streak and verse requirements are the same.
+
+## [1.26.0] - 2026-10-22
+
+### Changed
+- Seeds are now gold coins, drawn as a coin with a square hole in the middle. Everything is the same (1 per review, 5 for a finished day, 25 for a verse moving up) and anything you had stays: only the name and the picture changed.
+
 ## [1.25.0] - 2026-10-22
 
 ### Changed

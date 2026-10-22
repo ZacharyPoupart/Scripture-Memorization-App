@@ -5,7 +5,7 @@ import { addVerse, autoDismissMilestones, blockLookups, finishFlashcard, JOHN316
 const fixture = JSON.parse(readFileSync(new URL('../fixtures/backup-v1.1.0.json', import.meta.url), 'utf8')).data;
 
 test.describe('avatar and seeds', () => {
-  test('a review plants a seed, and the avatar bubble shows the balance', async ({ page }) => {
+  test('a review earns a coin, and the avatar bubble shows the balance', async ({ page }) => {
     await autoDismissMilestones(page);
     await blockLookups(page);
     await openApp(page);
@@ -16,7 +16,7 @@ test.describe('avatar and seeds', () => {
     await page.getByTestId('verse-card').click();
     await page.getByTestId('review-flashcard').click();
     await finishFlashcard(page);
-    await expect(page.getByTestId('seeds-gain')).toContainText(/\+\d+ seed/);
+    await expect(page.getByTestId('seeds-gain')).toContainText(/\+\d+ coin/);
   });
 
   test('try on, buy, wear, keep after reload and offline', async ({ page, context }) => {
@@ -39,7 +39,7 @@ test.describe('avatar and seeds', () => {
     await page.getByTestId('buy').click();
     await expect(page.getByTestId('item-helmet-silver-vanguard')).toContainText('Wearing');
     const after = Number((await page.getByTestId('seeds-balance').innerText()).replace(/\D/g, ''));
-    expect(after).toBe(before - 40);
+    expect(after).toBe(before - 160);
     await expect(page.getByTestId('armor-meter')).toContainText('1 of 6');
     // going back to the free helmet is one tap and costs nothing
     await page.getByTestId('item-helmet-iron-bulwark').click();
@@ -71,7 +71,7 @@ test.describe('avatar and seeds', () => {
     await page.getByRole('button', { name: 'Reset', exact: true }).click();
     await page.goto('/#/avatar');
     await expect(page.getByTestId('item-helmet-iron-bulwark')).toContainText('Wearing');
-    await expect(page.getByTestId('item-helmet-silver-vanguard')).toContainText('🌱 40');
+    await expect(page.getByTestId('item-helmet-silver-vanguard')).toContainText('160');
     expect(Number((await page.getByTestId('seeds-balance').innerText()).replace(/\D/g, ''))).toBe(before);
   });
 
@@ -84,7 +84,7 @@ test.describe('avatar and seeds', () => {
     await page.goto('/#/avatar');
     await expect(page.getByTestId('armor-meter')).toContainText('0 of 6');
     await expect(page.getByTestId('item-helmet-iron-bulwark')).toContainText('Wearing');
-    await expect(page.getByTestId('item-helmet-silver-vanguard')).toContainText('🌱 40');
+    await expect(page.getByTestId('item-helmet-silver-vanguard')).toContainText('160');
     await page.getByTestId('slot-chest').click();
     await expect(page.getByTestId('item-chest-iron-bulwark')).toContainText('Wearing');
     await expect(page.getByTestId('item-chest-sulestial')).toContainText('🔒');
@@ -122,9 +122,6 @@ test.describe('avatar and seeds', () => {
     await page.getByTestId('item-weapon-sulestial').click();
     await expect(page.getByTestId('unlock-hint')).toContainText('365-day streak'); // the finest pieces also ask for the longest streak
     await expect(page.getByTestId('armor-verse')).toContainText('Ephesians 6:17');
-    await page.getByTestId('slot-cape').click();
-    await page.getByTestId('item-cape-wings').click();
-    await expect(page.getByTestId('unlock-hint')).toContainText('500-day streak');
     await page.goto('/#/settings');
     await page.getByTestId('toggle-avatar').click();
     await page.goto('/#/');

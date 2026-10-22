@@ -79,16 +79,16 @@ export interface ArmorSet {
 }
 export const SETS: ArmorSet[] = [
   { n: 1, id: 'iron-bulwark', name: 'Iron Bulwark', price: 0 },
-  { n: 2, id: 'silver-vanguard', name: 'Silver Vanguard', price: 200 },
-  { n: 3, id: 'forest-guardian', name: 'Forest Guardian', price: 400 },
-  { n: 4, id: 'knights-oath', name: 'Knight’s Oath', price: 600 },
-  { n: 5, id: 'stormcaller', name: 'Stormcaller', price: 900, verses: 5 },
-  { n: 6, id: 'frostborn', name: 'Frostborn', price: 1200, verses: 10 },
-  { n: 7, id: 'ember-knight', name: 'Ember Knight', price: 1600, verses: 15 },
-  { n: 8, id: 'crimson-legion', name: 'Crimson Legion', price: 2200, streak: 30, verses: 20 },
-  { n: 9, id: 'shadowblade', name: 'Shadowblade', price: 3000, streak: 60, verses: 30 },
-  { n: 10, id: 'golden-paladin', name: 'Golden Paladin', price: 4000, streak: 180, verses: 45 },
-  { n: 11, id: 'sulestial', name: 'Sulestial', price: 5500, streak: 365, verses: 60 },
+  { n: 2, id: 'silver-vanguard', name: 'Silver Vanguard', price: 800 },
+  { n: 3, id: 'forest-guardian', name: 'Forest Guardian', price: 1600 },
+  { n: 4, id: 'knights-oath', name: 'Knight’s Oath', price: 2400 },
+  { n: 5, id: 'stormcaller', name: 'Stormcaller', price: 3600, verses: 5 },
+  { n: 6, id: 'frostborn', name: 'Frostborn', price: 4800, verses: 10 },
+  { n: 7, id: 'ember-knight', name: 'Ember Knight', price: 6400, verses: 15 },
+  { n: 8, id: 'crimson-legion', name: 'Crimson Legion', price: 8800, streak: 30, verses: 20 },
+  { n: 9, id: 'shadowblade', name: 'Shadowblade', price: 12000, streak: 60, verses: 30 },
+  { n: 10, id: 'golden-paladin', name: 'Golden Paladin', price: 16000, streak: 180, verses: 45 },
+  { n: 11, id: 'sulestial', name: 'Sulestial', price: 22000, streak: 365, verses: 60 },
 ];
 /** What each piece costs, as a share of its set's price (they add up to 1). */
 const SHARE = { helmet: 0.2, chest: 0.25, shield: 0.18, weapon: 0.18, boots: 0.08, belt: 0.06, cape: 0.05 } as const;
@@ -114,7 +114,6 @@ export const ITEMS: Item[] = [
   // ---- capes
   I('cape', 'cape-none', 'None'),
   ...piecesOf('cape'),
-  I('cape', 'cape-wings', 'Wings of light', 0, { unlock: streak(500) }),
   // ---- shields
   I('shield', 'shield-none', 'None'),
   ...piecesOf('shield'),
@@ -168,9 +167,9 @@ export function describeUnlock(u: Unlock): string {
   }
 }
 
-/** The short form shown on a locked tile: "365-day", "60 verses". */
+/** The short form shown on a locked tile, one line each: "365-day streak", "60 verses". */
 export function shortUnlock(u: Unlock): string {
-  return u.kind === 'streak' ? `${u.days}-day` : u.kind === 'verses' ? (u.n === 1 ? 'first verse' : `${u.n} verses`) : describeUnlock(u);
+  return u.kind === 'streak' ? `${u.days}-day streak` : u.kind === 'verses' ? (u.n === 1 ? 'first verse' : `${u.n} verses`) : describeUnlock(u);
 }
 
 // ---------------------------------------------------------------- seeds
