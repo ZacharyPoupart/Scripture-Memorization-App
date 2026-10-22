@@ -63,6 +63,7 @@ let state: AppState = {
     avatarOn: true,
     speakWords: true,
     practice: { before: [], after: ['citation', 'topic'] },
+    shuffle: false,
   },
   tick: 0,
   toast: null,

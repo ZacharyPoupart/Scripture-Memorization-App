@@ -100,6 +100,8 @@ export interface Settings {
   nudgeDismissedAt: number;
   /** Speak it: show the verse's words while you speak (read along), or keep them hidden until you finish (from memory). */
   speakWords: boolean;
+  /** Visit the verses of a review session in a random order instead of longest-in-pile first. Off by default. */
+  shuffle: boolean;
   /** What is asked before and after the verse in Fill in the blank, Type it out and Speak it (the topic and the citation). */
   practice: PracticeOrder;
   /** Show the avatar and seeds on Today. On by default; switching off only hides them. */
