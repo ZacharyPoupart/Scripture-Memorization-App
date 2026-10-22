@@ -353,3 +353,9 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Not changed:** the 🌱 on the Progress screen's empty state is decoration, not the currency, so it stays. The "+N seeds" lines on result cards are now "+N coins" with the coin.
 **Test changes:** e2e checks that looked for the 🌱 text or the word seed now look for the price number or the word coin (same behaviour checked).
 **Undo:** roll back to `v1.25.0-armor-prices`.
+
+## v1.27.0 — Armor costs four times as much (owner request)
+**What:** every set's whole-set price is multiplied by 4 (0/800/1,600/2,400/3,600/4,800/6,400/8,800/12,000/16,000/22,000). The owner said people memorizing a lot will have tens of thousands of coins in a year, so the old table (19,600 for everything) would be bought out. Piece shares, gates and rewards are unchanged. Rough pace: 1 coin per review, 5 per finished day, so someone with 20 verses in Daily earns about 65 a day (about 24,000 a year plus milestone bonuses), someone with 5 verses about 20 a day (about 7,000 a year). The top set is therefore about a year for a heavy user and out of reach for a light one by design; say if that is too steep and I will pick a different multiple.
+**Old data:** anything already bought is re-priced (balance never goes below zero, nothing is taken).
+**Test changes:** price-table unit test and the e2e avatar tests use the new numbers (Silver Vanguard helmet 160).
+**Undo:** roll back to `v1.26.0` tag (the coins release).

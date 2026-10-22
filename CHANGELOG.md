@@ -5,6 +5,9 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Changed
+- Armor costs four times as much, so there is something to work toward all year: a whole set now runs from 800 coins (Silver Vanguard) up to 22,000 (Sulestial). The streak and verse requirements are the same.
+
 ## [1.26.0] - 2026-10-22
 
 ### Changed
