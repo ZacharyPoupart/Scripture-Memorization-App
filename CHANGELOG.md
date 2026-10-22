@@ -5,6 +5,9 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Changed
+- Only the last four armor sets ask for verses now: Crimson Legion needs 10 verses (and a 30-day streak), Shadowblade 20 (60-day), Golden Paladin 30 (180-day) and Sulestial 50 (365-day). Every set before them just costs coins.
+
 ## [1.28.1] - 2026-10-22
 
 ### Fixed

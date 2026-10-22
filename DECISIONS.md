@@ -369,3 +369,9 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **What:** tiles are a little wider (112px), the name takes two lines of height so the bottom line always starts at the same place, and the status (Wearing / Owned / what it needs / the price) is pinned to the bottom. The price is its own no-wrap unit (coin + number, with a thousands comma); each requirement is one short line ("30-day streak", "20 verses") under a lock. The coin was also being drawn as a block inside the Today avatar bubble and on tiles (an old rule for pictures), so it stacked over its number; it is now inline there too.
 **Test changes:** none; the checks that look for the price number or the lock text still match.
 **Undo:** roll back to the `v1.28.0-no-wings` tag.
+
+## v1.29.0 — Verse requirements only on the last four sets (owner request)
+**What:** the verse-count gate (a new `Unlock` kind from v1.25.0) was on Stormcaller and up (5/10/15/20/30/45/60). It is now only on the four sets that also have a streak gate: Crimson Legion 10, Shadowblade 20, Golden Paladin 30, Sulestial 50. Stormcaller, Frostborn and Ember Knight are coins only. I asked which sets; the owner said "only the last 4 unlocks require streaks and verse counts, start with 10 at Crimson".
+**Old data:** nothing is removed; anything already owned stays owned.
+**Test changes:** the gate test now checks the six early sets have no requirements and the last four have the new streak and verse pairs (a deleted verse still does not count); the Sulestial sword test needs 50 verses.
+**Undo:** roll back to the `v1.28.1-tidy-tiles` tag.

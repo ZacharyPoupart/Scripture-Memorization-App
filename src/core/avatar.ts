@@ -64,7 +64,7 @@ const art = (slot: Slot, id: string, name: string, cost: number, needs: Unlock[]
 /**
  * Every set is seven matching pieces drawn to the same scale (helmet, chest plate, belt, boots, cape, sword and shield), so
  * any piece goes with any other. The sets are listed from the plainest (the free start) to the finest, and each costs more than
- * the one before; the later ones also need a long streak and a growing library of verses. Nothing has to be bought in order.
+ * the one before; the last four also need a long streak and a number of verses added. Nothing has to be bought in order.
  * The files are cut from the owner's sheet by design/armor-v2 (ids are the file names).
  */
 export interface ArmorSet {
@@ -82,13 +82,13 @@ export const SETS: ArmorSet[] = [
   { n: 2, id: 'silver-vanguard', name: 'Silver Vanguard', price: 800 },
   { n: 3, id: 'forest-guardian', name: 'Forest Guardian', price: 1600 },
   { n: 4, id: 'knights-oath', name: 'Knight’s Oath', price: 2400 },
-  { n: 5, id: 'stormcaller', name: 'Stormcaller', price: 3600, verses: 5 },
-  { n: 6, id: 'frostborn', name: 'Frostborn', price: 4800, verses: 10 },
-  { n: 7, id: 'ember-knight', name: 'Ember Knight', price: 6400, verses: 15 },
-  { n: 8, id: 'crimson-legion', name: 'Crimson Legion', price: 8800, streak: 30, verses: 20 },
-  { n: 9, id: 'shadowblade', name: 'Shadowblade', price: 12000, streak: 60, verses: 30 },
-  { n: 10, id: 'golden-paladin', name: 'Golden Paladin', price: 16000, streak: 180, verses: 45 },
-  { n: 11, id: 'sulestial', name: 'Sulestial', price: 22000, streak: 365, verses: 60 },
+  { n: 5, id: 'stormcaller', name: 'Stormcaller', price: 3600 },
+  { n: 6, id: 'frostborn', name: 'Frostborn', price: 4800 },
+  { n: 7, id: 'ember-knight', name: 'Ember Knight', price: 6400 },
+  { n: 8, id: 'crimson-legion', name: 'Crimson Legion', price: 8800, streak: 30, verses: 10 },
+  { n: 9, id: 'shadowblade', name: 'Shadowblade', price: 12000, streak: 60, verses: 20 },
+  { n: 10, id: 'golden-paladin', name: 'Golden Paladin', price: 16000, streak: 180, verses: 30 },
+  { n: 11, id: 'sulestial', name: 'Sulestial', price: 22000, streak: 365, verses: 50 },
 ];
 /** What each piece costs, as a share of its set's price (they add up to 1). */
 const SHARE = { helmet: 0.2, chest: 0.25, shield: 0.18, weapon: 0.18, boots: 0.08, belt: 0.06, cape: 0.05 } as const;
