@@ -97,6 +97,7 @@ test.describe('practice order: the sandwich (topic, citation, verse, citation)',
 
   test('a wrong letter in the topic box is a slip, and the cue is already gone', async ({ page }) => {
     await startReview(page, 'blanks');
+    await expect(page.getByTestId('topic-input')).toBeFocused(); // wait for the box before typing (a slower machine needs a moment)
     await page.keyboard.type('q'); // no topic starts with q
     await expect(page.getByTestId('mistakes').locator('.dot.used')).toHaveCount(1);
     await expect(page.getByTestId('quiz-cue')).toBeHidden();
