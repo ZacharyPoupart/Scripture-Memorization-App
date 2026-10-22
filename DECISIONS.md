@@ -375,3 +375,14 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Old data:** nothing is removed; anything already owned stays owned.
 **Test changes:** the gate test now checks the six early sets have no requirements and the last four have the new streak and verse pairs (a deleted verse still does not count); the Sulestial sword test needs 50 verses.
 **Undo:** roll back to the `v1.28.1-tidy-tiles` tag.
+
+## v1.30.0 — Practice order: when the topic and the citation are asked (owner request)
+**What:** a device setting `practice = {before, after}` (see CLAUDE.md "Practice order"). I first asked the owner which options they wanted; they replied with the Navigators' Topical Memory System as the example ("Christ the Center. Galatians 2:20. 'I have been crucified…' Galatians 2:20.") and asked for the methods to be highly configurable about when or whether the topic is asked and where the citation goes.
+**Design choices (tell me if you want them different):**
+- Before the verse, any of topic and citation in either order (each once). After the verse, citation then topic only, because Type it out and Fill in the blank run that tail in a fixed order inside their own flows (typed characters, choice blanks). Citation both before and after is allowed (the sandwich). Topic both before and after is also allowed.
+- A question before the verse needs something to tell you which verse is meant, so the first five words of the verse are shown as a cue. If you want "no cue at all" or the topic as the cue, it is a small follow-up.
+- Before-the-verse questions use the same shared form in every mode (book picker, chapter, verse; topic as choices). After the verse, each mode keeps its own style. A wrong answer anywhere is a mistake and restarts like every other mistake; "I don't remember" restarts the verse.
+- Settings are for this device only (like the speak-it option); the default is exactly the old order, so nothing changes until you pick something.
+- One order for all piles and modes (Flashcards never quiz, as before). Per-pile or per-mode orders would be a follow-up.
+**Test changes:** none to existing tests; new `tests/unit/practice.test.ts` and `tests/e2e/practice-order.spec.ts` (every preset, all three modes, a verse with no topic, wrong answers, remembered after reload).
+**Undo:** roll back to the `v1.29.0-verse-gates` tag.

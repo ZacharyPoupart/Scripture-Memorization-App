@@ -2,6 +2,7 @@ import { useMemo, useState } from 'preact/hooks';
 import { BOOKS, searchBooks } from '../../core/books.ts';
 import { formatRef } from '../../core/reference.ts';
 import { topicsOf } from '../../core/organize.ts';
+import { firstWords, type PracticePart } from '../../core/practice.ts';
 import { checkReference, difficultyFor, makeRng, makeTopicStep } from '../../core/quiz.ts';
 import { useApp } from '../../store.ts';
 import { Overlay } from '../common.tsx';
@@ -9,8 +10,12 @@ import { useShake } from '../dom.ts';
 import { feedback } from '../../services/feedback.ts';
 import { Dock, MistakeDots, type ModeProps } from './shared.tsx';
 
-/** After the verse itself: where is it found? Nothing on screen hints at the answer. */
-export function RefRecall({ verse, onMistake, onDone, onRestart, mistakes }: ModeProps) {
+/**
+ * The shared questions around the verse: where is it found (the citation) and what is its topic, in the order given by `parts`.
+ * After the verse (Speak it) the verse is shown above; before the verse (`cue`) only its first words are, so you know which verse
+ * is meant. Nothing on screen hints at the answer. Wrong answers count as mistakes like everywhere else.
+ */
+export function RefRecall({ verse, onMistake, onDone, onRestart, mistakes, parts, cue }: ModeProps & { parts: PracticePart[]; cue?: boolean }) {
   const [book, setBook] = useState<number | null>(null);
   const [chapter, setChapter] = useState('');
   const [start, setStart] = useState('');
@@ -22,7 +27,9 @@ export function RefRecall({ verse, onMistake, onDone, onRestart, mistakes }: Mod
   const [revealed, setRevealed] = useState(false);
   // If the verse has a topic, it is quizzed too (multiple choice) once the reference is right.
   const { data, settings } = useApp();
-  const [stage, setStage] = useState<'ref' | 'topic'>('ref');
+  const [idx, setIdx] = useState(0);
+  const stage = parts[idx] === 'topic' ? 'topic' : 'ref';
+  const next = () => (idx + 1 >= parts.length ? onDone() : setIdx(idx + 1));
   const [wrongTopics, setWrongTopics] = useState<string[]>([]);
   const topicStep = useMemo(
     () => (verse.topic ? makeTopicStep(verse.topic, topicsOf(data).filter((t) => t !== verse.topic), difficultyFor(verse.pile, settings.fillDifficulty), makeRng(Date.now() ^ (Math.random() * 1e9))) : null),
@@ -31,7 +38,7 @@ export function RefRecall({ verse, onMistake, onDone, onRestart, mistakes }: Mod
   const chooseTopic = (t: string) => {
     if (t.toLowerCase() === verse.topic.toLowerCase()) {
       feedback.correct();
-      onDone();
+      next();
       return;
     }
     setWrongTopics([...wrongTopics, t]);
@@ -47,8 +54,7 @@ export function RefRecall({ verse, onMistake, onDone, onRestart, mistakes }: Mod
     if (res.ok) {
       setMessage('');
       feedback.correct();
-      if (topicStep) setStage('topic');
-      else onDone();
+      next();
       return;
     }
     shake();
@@ -59,10 +65,19 @@ export function RefRecall({ verse, onMistake, onDone, onRestart, mistakes }: Mod
   return (
     <>
       <div class="verse-area">
-        <div class="muted small center">{stage === 'topic' ? "What is this verse's topic?" : 'Where is this verse found?'}</div>
-        <p class="verse-text" style={{ marginTop: '12px' }} data-testid="ref-verse-text">
-          {verse.text}
-        </p>
+        <div class="muted small center">
+          {cue ? 'This verse begins…' : stage === 'topic' ? "What is this verse's topic?" : 'Where is this verse found?'}
+        </div>
+        {cue && <div class="muted small center">{stage === 'topic' ? "What is its topic?" : 'Where is it found?'}</div>}
+        {cue ? (
+          <p class="verse-text" style={{ marginTop: '12px' }} data-testid="quiz-cue">
+            {firstWords(verse.text)}
+          </p>
+        ) : (
+          <p class="verse-text" style={{ marginTop: '12px' }} data-testid="ref-verse-text">
+            {verse.text}
+          </p>
+        )}
         {revealed && (
           <div class="banner info center" data-testid="ref-answer" style={{ marginTop: '12px' }}>
             It's <strong>{formatRef(verse)}</strong>. Let's go through it once more.

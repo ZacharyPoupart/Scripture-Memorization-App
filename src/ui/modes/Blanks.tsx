@@ -20,15 +20,15 @@ function Blank({ answer, state, testid }: { answer: string; state: 'hidden' | 'c
   );
 }
 
-export function Blanks({ verse, onMistake, onDone, mistakes }: ModeProps) {
+export function Blanks({ verse, onMistake, onDone, mistakes, after }: ModeProps) {
   const { data, settings } = useApp();
   const level = difficultyFor(verse.pile, settings.fillDifficulty);
   const { words, blanks } = useMemo(() => makeBlanks(verse.text, level, makeRng(Date.now() ^ (Math.random() * 1e9))), [verse.id, verse.text, level]);
-  // After the words: where is it found (book, chapter, verse) and, if it has one, what is its topic?
+  // After the words (as far as the practice order asks): where is it found (book, chapter, verse) and, if it has one, what is its topic?
   const steps: ChoiceStep[] = useMemo(() => {
     const rng = makeRng(Date.now() ^ (Math.random() * 1e9));
-    const s = makeReferenceSteps(verse, level, rng);
-    if (verse.topic) s.push(makeTopicStep(verse.topic, topicsOf(data).filter((t) => t !== verse.topic), level, rng));
+    const s = after.includes('citation') ? makeReferenceSteps(verse, level, rng) : [];
+    if (after.includes('topic') && verse.topic) s.push(makeTopicStep(verse.topic, topicsOf(data).filter((t) => t !== verse.topic), level, rng));
     return s;
   }, [verse.id, level]);
 
@@ -71,27 +71,28 @@ export function Blanks({ verse, onMistake, onDone, mistakes }: ModeProps) {
     return i === stepIdx && !inWords ? 'cur' : 'hidden';
   };
   const stepAnswer = (kind: ChoiceStep['kind']) => steps.find((s) => s.kind === kind)?.answer;
-  const bookName = stepAnswer('book')!;
+  const hasCitation = steps.some((s) => s.kind === 'book');
+  const bookName = stepAnswer('book') ?? '';
   const chapterText = stepAnswer('chapter') ?? String(verse.chapter); // one-chapter books have no chapter question
-  const verseText = stepAnswer('verse')!;
+  const verseText = stepAnswer('verse') ?? '';
   const topicStep = steps.find((s) => s.kind === 'topic');
 
   const options = current ? current.options : step ? step.options : [];
   return (
     <>
       <div class="verse-area" ref={area}>
-        <div class="muted small center">{inWords ? 'Choose the missing words' : 'Now, where is it found?'}</div>
+        <div class="muted small center">{inWords ? 'Choose the missing words' : hasCitation ? 'Now, where is it found?' : 'Now, what is its topic?'}</div>
         {inWords ? (
           <div class="prompt-ref" style={{ fontSize: '1.3rem' }}>
             {formatRef(verse)}
           </div>
-        ) : (
+        ) : hasCitation ? (
           <div class="ref-line" data-testid="ref-blanks">
             <Blank answer={bookName} state={stateOf('book')} testid={stateOf('book') === 'cur' ? 'current-ref-blank' : undefined} />{' '}
             {stepAnswer('chapter') ? <Blank answer={chapterText} state={stateOf('chapter')} testid={stateOf('chapter') === 'cur' ? 'current-ref-blank' : undefined} /> : chapterText}:
             <Blank answer={verseText} state={stateOf('verse')} testid={stateOf('verse') === 'cur' ? 'current-ref-blank' : undefined} />
           </div>
-        )}
+        ) : null}
         {!inWords && topicStep && (
           <div class="topic-line" data-testid="topic-blank-line">
             <span class="muted small">Topic </span>

@@ -5,6 +5,9 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Added
+- Choose your practice order (Settings → Reviewing). The topic and the citation can each be asked before the verse, after it, or both, in the order you like. Presets: Classic (what you had), Sandwich (topic, citation, verse, citation, like the Navigators' Topical Memory System), Citation first, and Verse only; or switch each piece on and off yourself. Before the verse you see its first few words as a cue. Flashcards are unchanged.
+
 ## [1.29.0] - 2026-10-22
 
 ### Changed

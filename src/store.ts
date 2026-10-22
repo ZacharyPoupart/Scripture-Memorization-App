@@ -62,6 +62,7 @@ let state: AppState = {
     nudgeDismissedAt: 0,
     avatarOn: true,
     speakWords: true,
+    practice: { before: [], after: ['citation', 'topic'] },
   },
   tick: 0,
   toast: null,

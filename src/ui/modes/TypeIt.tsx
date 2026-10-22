@@ -8,11 +8,11 @@ import { useApp } from '../../store.ts';
 import { keepInView, useShake } from '../dom.ts';
 import { Dock, MistakeDots, type ModeProps } from './shared.tsx';
 
-export function TypeIt({ verse, onMistake, onDone, mistakes }: ModeProps) {
+export function TypeIt({ verse, onMistake, onDone, mistakes, after }: ModeProps) {
   const words = useMemo(() => tokenize(verse.text), [verse.id, verse.text]);
   const [pos, setPos] = useState(0);
   // After the words: the reference, typed as the first letter of the book and then chapter:verse(-verse).
-  const refTokens = useMemo(() => referenceTokens(verse), [verse.id]);
+  const refTokens = useMemo(() => (after.includes('citation') ? referenceTokens(verse) : []), [verse.id]); // none when the practice order does not ask for the citation here
   const [rpos, setRpos] = useState(0);
   const [missedRef, setMissedRef] = useState<number[]>([]);
   const rposRef = useRef(0);
@@ -24,7 +24,7 @@ export function TypeIt({ verse, onMistake, onDone, mistakes }: ModeProps) {
   // If the verse has a topic, it is asked last: type its first letters (or tap it) once the reference is done.
   const { data, settings } = useApp();
   const topicStep = useMemo(
-    () => (verse.topic ? makeTopicStep(verse.topic, topicsOf(data).filter((t) => t !== verse.topic), difficultyFor(verse.pile, settings.fillDifficulty), makeRng(Date.now() ^ (Math.random() * 1e9))) : null),
+    () => (verse.topic && after.includes('topic') ? makeTopicStep(verse.topic, topicsOf(data).filter((t) => t !== verse.topic), difficultyFor(verse.pile, settings.fillDifficulty), makeRng(Date.now() ^ (Math.random() * 1e9))) : null),
     [verse.id],
   );
   const [wrongTopics, setWrongTopics] = useState<string[]>([]);
@@ -140,8 +140,9 @@ export function TypeIt({ verse, onMistake, onDone, mistakes }: ModeProps) {
     advance();
     onMistake();
   };
-  const inRef = pos >= words.length;
-  const inTopic = inRef && rpos >= refTokens.length && !!topicStep;
+  const wordsDone = pos >= words.length;
+  const inRef = wordsDone && refTokens.length > 0;
+  const inTopic = wordsDone && rpos >= refTokens.length && !!topicStep;
   // The keyboard types straight into a hidden field; tapping the text brings the keyboard back if it was dismissed.
   const focus = () => input.current?.focus({ preventScroll: true });
 
@@ -151,7 +152,7 @@ export function TypeIt({ verse, onMistake, onDone, mistakes }: ModeProps) {
         <div class="muted small center">
           {inTopic ? "What is this verse's topic? Type its first letters, or tap it" : inRef ? 'Now the reference: the first letter of the book, then chapter:verse' : 'Type the first letter of each word'}
         </div>
-        {!inRef && <div class="prompt-ref" style={{ fontSize: '1.3rem' }}>{formatRef(verse)}</div>}
+        {!wordsDone && <div class="prompt-ref" style={{ fontSize: '1.3rem' }}>{formatRef(verse)}</div>}
         <p class="verse-text" data-testid="type-text">
           {words.map((w, i) => (
             <span key={i}>

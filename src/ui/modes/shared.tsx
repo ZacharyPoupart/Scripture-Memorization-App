@@ -1,5 +1,6 @@
 import type { ComponentChildren } from 'preact';
 import type { Verse } from '../../core/types.ts';
+import type { PracticePart } from '../../core/practice.ts';
 import { mistakesAllowed } from '../../core/quiz.ts';
 
 export interface ModeProps {
@@ -9,6 +10,8 @@ export interface ModeProps {
   onDone: () => void;
   onRestart: () => void;
   mistakes: number;
+  /** What the mode asks after the verse itself (the practice order setting): the citation and/or the topic. */
+  after: PracticePart[];
 }
 
 export function MistakeDots({ verse, mistakes }: { verse: Verse; mistakes: number }) {

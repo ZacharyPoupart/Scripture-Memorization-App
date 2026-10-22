@@ -1707,6 +1707,14 @@ button.streak {
   color: var(--accent-strong);
   font-weight: 700;
 }
+.practice-preview {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--surface-2);
+  font-weight: 700;
+  text-align: center;
+}
 .slot-chips {
   display: flex;
   gap: 6px;

@@ -89,6 +89,7 @@ export function defaultSettings(): Settings {
     nudgeDismissedAt: 0,
     avatarOn: true,
     speakWords: true,
+    practice: { before: [], after: ['citation', 'topic'] },
   };
 }
 
