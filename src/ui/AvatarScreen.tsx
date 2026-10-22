@@ -23,9 +23,9 @@ import { back } from '../router.ts';
 import { buyAndWear, showToast, useApp, wearItem } from '../store.ts';
 import { armorUrl } from './ArmorArt.tsx';
 import { AvatarFigure } from './AvatarFigure.tsx';
-import { Icon } from './common.tsx';
+import { Coin, Icon } from './common.tsx';
 
-/** Your knight: everyone starts in the same basic armor, and any piece can be swapped for another with seeds and streaks. */
+/** Your knight: everyone starts in the same basic armor, and any piece can be swapped for another with coins and streaks. */
 export function AvatarScreen() {
   const { data } = useApp();
   const [slot, setSlot] = useState<Slot>('helmet');
@@ -52,7 +52,7 @@ export function AvatarScreen() {
     if (r.ok) {
       showToast(`${picked.name} is yours.`);
       setPick(null);
-    } else if (r.reason === 'funds') showToast('Not enough seeds yet — every review plants more.');
+    } else if (r.reason === 'funds') showToast('Not enough coins yet — every review earns more.');
   };
 
   const gated = !!picked && !owns(data, picked) && isGated(data, picked);
@@ -70,14 +70,14 @@ export function AvatarScreen() {
             <h1 class="grow" style={{ margin: 0 }}>
               Your avatar
             </h1>
-            <span class="chip seeds-chip" data-testid="seeds-balance" aria-label={`${balance} seeds`}>
-              🌱 {balance}
+            <span class="chip seeds-chip" data-testid="seeds-balance" aria-label={`${balance} coins`}>
+              <Coin /> {balance}
             </span>
           </div>
 
           {testing.armorFree && (
             <div class="banner info" data-testid="armor-free-banner">
-              <strong>Testing:</strong> every piece of armor is free to wear right now. Nothing is bought, and seeds are not touched.
+              <strong>Testing:</strong> every piece of armor is free to wear right now. Nothing is bought, and coins are not touched.
             </div>
           )}
 
@@ -94,8 +94,8 @@ export function AvatarScreen() {
               </span>
             </div>
             <p class="muted small" style={{ margin: 0 }}>
-              Everyone starts in the same basic armor. Swap any piece: pieces cost seeds (1 per review, 5 for a finished day, 25 when a verse moves up), and the
-              finest also need a long streak. Seeds are never taken away.
+              Everyone starts in the same basic armor. Swap any piece: pieces cost coins (1 per review, 5 for a finished day, 25 when a verse moves up), and the
+              finest also need a long streak. Coins are never taken away.
             </p>
           </div>
 
@@ -147,8 +147,8 @@ export function AvatarScreen() {
                       : have
                         ? 'Owned'
                         : lockedItem
-                          ? `🔒 ${(item.unlock ? [item.unlock] : item.requires!).map(shortUnlock).join(' + ')}${item.cost ? ` + 🌱 ${item.cost}` : ''}`
-                          : `🌱 ${item.cost}`}
+                          ? <>🔒 {(item.unlock ? [item.unlock] : item.requires!).map(shortUnlock).join(' + ')}{item.cost ? <> + <Coin />{item.cost}</> : null}</>
+                          : <><Coin />{item.cost}</>}
                   </small>
                 </button>
               );
@@ -160,13 +160,28 @@ export function AvatarScreen() {
         <div class="action-bar">
           {locked ? (
             <p class="muted center" style={{ margin: 0 }} data-testid="unlock-hint">
-              {gated
-                ? `${picked.name}: ${picked.requires!.map(describeUnlock).join(' and ').toLowerCase()} first, then it costs 🌱 ${picked.cost}.`
-                : `${picked.name}: ${describeUnlock(picked.unlock!)}.`}
+              {gated ? (
+                <>
+                  {picked.name}: {picked.requires!.map(describeUnlock).join(' and ').toLowerCase()} first, then it costs <Coin />
+                  {picked.cost}.
+                </>
+              ) : (
+                `${picked.name}: ${describeUnlock(picked.unlock!)}.`
+              )}
             </p>
           ) : canBuy ? (
             <button class="btn primary block" onClick={buy} disabled={balance < picked.cost} data-testid="buy">
-              {balance < picked.cost ? `${picked.name} · 🌱 ${picked.cost} (need ${picked.cost - balance} more)` : `Get ${picked.name} · 🌱 ${picked.cost}`}
+              {balance < picked.cost ? (
+                <>
+                  {picked.name} · <Coin />
+                  {picked.cost} (need {picked.cost - balance} more)
+                </>
+              ) : (
+                <>
+                  Get {picked.name} · <Coin />
+                  {picked.cost}
+                </>
+              )}
             </button>
           ) : (
             <button class="btn primary block" onClick={() => (wearItem(picked.id), setPick(null))} data-testid="wear">

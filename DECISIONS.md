@@ -347,3 +347,9 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Shield:** the Iron Bulwark shield now unlocks at a longest streak of 1 (the day the flame lights), not 3.
 **Reset:** Settings has a "Reset my armor" button (with a confirmation) that clears `data.avatar.owned` and `look` on this device; seeds are derived, so every seed spent comes back, and verses and progress are untouched. It is a button, not a one-time automatic action, so it is safe and can be used again. Limit: owned items normally only grow and merge as a union, so if sync is on and another device still owns armor, merging will bring it back; reset there too (or turn sync off). The reset keeps `lookAt` moving forward so the cleared look wins the sync merge. This is a deliberate exception to "never remove anything", asked for by the owner. A snapshot of the earlier data is kept by the usual daily snapshots.
 **Tests:** unit test for `resetAvatar`; e2e buys a helmet, resets, and checks the start look and the seed balance.
+
+## v1.26.0 — Seeds become gold coins (owner request)
+**What:** the currency is now drawn as a gold coin with a square hole (a new `Coin` SVG, sized to the text, no emoji) and called coins in every screen, toast and setting ("Avatar and coins"). Nothing else changed: same earning rules, same prices, same saved data. Internal names (`seedsBalance`, `seeds-chip` test ids, `data-testid`s, the Seeds comments) are deliberately unchanged so the code and the saved data stay stable; only what people see changed.
+**Not changed:** the 🌱 on the Progress screen's empty state is decoration, not the currency, so it stays. The "+N seeds" lines on result cards are now "+N coins" with the coin.
+**Test changes:** e2e checks that looked for the 🌱 text or the word seed now look for the price number or the word coin (same behaviour checked).
+**Undo:** roll back to `v1.25.0-armor-prices`.
