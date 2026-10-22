@@ -12,19 +12,9 @@ function Background() {
   );
 }
 
-/** Wings of light: drawn behind the knight, from his shoulders. */
-function Wings() {
-  return (
-    <g fill="#fffaf0" stroke="#e3dcc8" stroke-width="1" transform="translate(0 -38)">
-      <path d="M44 72 C20 58 4 62 6 88 C14 80 20 84 22 92 C28 86 34 90 38 98 C40 90 42 82 46 78 Z" />
-      <path d="M76 72 C100 58 116 62 114 88 C106 80 100 84 98 92 C92 86 86 90 82 98 C80 90 78 82 74 78 Z" />
-    </g>
-  );
-}
-
 /**
  * The knight. The painted pieces are placed in "figure units" (centred on x = 0, boots at y = 250); this scales them to fit the
- * 120 x 120 picture. The sky and the wings are the simple drawn style.
+ * 120 x 120 picture. The sky is the simple drawn style.
  */
 export function AvatarFigure({ look, size = 120, title, view = 'full' }: { look: Look; size?: number; title?: string; view?: 'full' | 'face' }) {
   const full = armorWorn(look) === 6;
@@ -47,7 +37,6 @@ export function AvatarFigure({ look, size = 120, title, view = 'full' }: { look:
       <g clip-path={`url(#avc-${view}${size})`}>
         <Background />
         {full && <circle cx="60" cy="62" r="54" fill="#fff6c9" opacity="0.4" />}
-        {look.cape === 'cape-wings' && <Wings />}
         <g transform={`translate(60 ${116 - 250 * K}) scale(${K})`}>
           <ArmorLayers look={look} />
         </g>

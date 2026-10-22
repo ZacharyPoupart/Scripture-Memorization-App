@@ -416,7 +416,6 @@ describe('temporary "armor is free" testing switch', () => {
       expect(currentLook(d).weapon).toBe(legend.id);
       expect(seedsBalance(d)).toBe(0);
       expect(d.avatar?.owned ?? []).toEqual([]); // nothing was bought
-      expect(owns(d, itemById('cape-wings')!)).toBe(false); // only the painted pieces are free
     } finally {
       testing.armorFree = false;
     }

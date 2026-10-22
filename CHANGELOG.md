@@ -5,6 +5,9 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Changed
+- The Wings of light cape is gone for now. Capes are the eleven set capes (or none).
+
 ## [1.27.0] - 2026-10-22
 
 ### Changed

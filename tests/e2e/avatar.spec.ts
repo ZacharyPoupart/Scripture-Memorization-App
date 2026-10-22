@@ -122,9 +122,6 @@ test.describe('avatar and seeds', () => {
     await page.getByTestId('item-weapon-sulestial').click();
     await expect(page.getByTestId('unlock-hint')).toContainText('365-day streak'); // the finest pieces also ask for the longest streak
     await expect(page.getByTestId('armor-verse')).toContainText('Ephesians 6:17');
-    await page.getByTestId('slot-cape').click();
-    await page.getByTestId('item-cape-wings').click();
-    await expect(page.getByTestId('unlock-hint')).toContainText('500-day streak');
     await page.goto('/#/settings');
     await page.getByTestId('toggle-avatar').click();
     await page.goto('/#/');
