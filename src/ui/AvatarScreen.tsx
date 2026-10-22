@@ -12,6 +12,7 @@ import {
   matchedSet,
   owns,
   seedsBalance,
+  shortUnlock,
   SLOTS,
   SLOT_LABELS,
   testing,
@@ -146,9 +147,7 @@ export function AvatarScreen() {
                       : have
                         ? 'Owned'
                         : lockedItem
-                          ? `🔒 ${describeUnlock((item.unlock ?? item.requires)!)
-                              .replace('Reach a ', '')
-                              .replace(' streak', '')}${item.cost ? ` + 🌱 ${item.cost}` : ''}`
+                          ? `🔒 ${(item.unlock ? [item.unlock] : item.requires!).map(shortUnlock).join(' + ')}${item.cost ? ` + 🌱 ${item.cost}` : ''}`
                           : `🌱 ${item.cost}`}
                   </small>
                 </button>
@@ -162,7 +161,7 @@ export function AvatarScreen() {
           {locked ? (
             <p class="muted center" style={{ margin: 0 }} data-testid="unlock-hint">
               {gated
-                ? `${picked.name}: ${describeUnlock(picked.requires!).toLowerCase()} first, then it costs 🌱 ${picked.cost}.`
+                ? `${picked.name}: ${picked.requires!.map(describeUnlock).join(' and ').toLowerCase()} first, then it costs 🌱 ${picked.cost}.`
                 : `${picked.name}: ${describeUnlock(picked.unlock!)}.`}
             </p>
           ) : canBuy ? (

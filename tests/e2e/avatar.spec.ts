@@ -32,18 +32,18 @@ test.describe('avatar and seeds', () => {
     expect(before).toBeGreaterThan(100);
     // everyone starts in the same free basic steel armor
     await expect(page.getByTestId('armor-meter')).toContainText('0 of 6');
-    await expect(page.getByTestId('item-helmet-knights-oath')).toContainText('Wearing');
+    await expect(page.getByTestId('item-helmet-iron-bulwark')).toContainText('Wearing');
     // a paid piece previews first, then is bought and worn
     await page.getByTestId('item-helmet-silver-vanguard').click();
     await expect(page.getByTestId('item-helmet-silver-vanguard')).not.toContainText('Wearing');
     await page.getByTestId('buy').click();
     await expect(page.getByTestId('item-helmet-silver-vanguard')).toContainText('Wearing');
     const after = Number((await page.getByTestId('seeds-balance').innerText()).replace(/\D/g, ''));
-    expect(after).toBe(before - 15);
+    expect(after).toBe(before - 40);
     await expect(page.getByTestId('armor-meter')).toContainText('1 of 6');
     // going back to the free helmet is one tap and costs nothing
-    await page.getByTestId('item-helmet-knights-oath').click();
-    await expect(page.getByTestId('item-helmet-knights-oath')).toContainText('Wearing');
+    await page.getByTestId('item-helmet-iron-bulwark').click();
+    await expect(page.getByTestId('item-helmet-iron-bulwark')).toContainText('Wearing');
     await page.getByTestId('item-helmet-silver-vanguard').click();
     await expect(page.getByTestId('item-helmet-silver-vanguard')).toContainText('Wearing');
     await saved(page);
@@ -55,6 +55,26 @@ test.describe('avatar and seeds', () => {
     await context.setOffline(false);
   });
 
+  test('"Reset my armor" in Settings forgets what was bought and gives the seeds back', async ({ page }) => {
+    await autoDismissMilestones(page);
+    await blockLookups(page);
+    await openApp(page);
+    await page.evaluate(() => (window as any).__mfl.armorFree(false));
+    await replaceDataWith(page, fixture);
+    await page.goto('/#/avatar');
+    const before = Number((await page.getByTestId('seeds-balance').innerText()).replace(/\D/g, ''));
+    await page.getByTestId('item-helmet-silver-vanguard').click();
+    await page.getByTestId('buy').click();
+    await expect(page.getByTestId('item-helmet-silver-vanguard')).toContainText('Wearing');
+    await page.goto('/#/settings');
+    await page.getByTestId('reset-armor').click();
+    await page.getByRole('button', { name: 'Reset', exact: true }).click();
+    await page.goto('/#/avatar');
+    await expect(page.getByTestId('item-helmet-iron-bulwark')).toContainText('Wearing');
+    await expect(page.getByTestId('item-helmet-silver-vanguard')).toContainText('🌱 40');
+    expect(Number((await page.getByTestId('seeds-balance').innerText()).replace(/\D/g, ''))).toBe(before);
+  });
+
   test('a new knight starts in free basic armor, with every other piece waiting to be earned', async ({ page }) => {
     await autoDismissMilestones(page);
     await blockLookups(page);
@@ -63,17 +83,25 @@ test.describe('avatar and seeds', () => {
     await addVerse(page, JOHN316);
     await page.goto('/#/avatar');
     await expect(page.getByTestId('armor-meter')).toContainText('0 of 6');
-    await expect(page.getByTestId('item-helmet-knights-oath')).toContainText('Wearing');
-    await expect(page.getByTestId('item-helmet-silver-vanguard')).toContainText('🌱 15');
+    await expect(page.getByTestId('item-helmet-iron-bulwark')).toContainText('Wearing');
+    await expect(page.getByTestId('item-helmet-silver-vanguard')).toContainText('🌱 40');
     await page.getByTestId('slot-chest').click();
-    await expect(page.getByTestId('item-chest-knights-oath')).toContainText('Wearing');
+    await expect(page.getByTestId('item-chest-iron-bulwark')).toContainText('Wearing');
     await expect(page.getByTestId('item-chest-sulestial')).toContainText('🔒');
+    // the free set's sword came with the first verse; its shield waits for a first streak
+    await page.getByTestId('slot-weapon').click();
+    await expect(page.getByTestId('item-weapon-iron-bulwark')).toContainText('Owned');
+    await page.getByTestId('slot-shield').click();
+    await expect(page.getByTestId('item-shield-iron-bulwark')).toContainText('🔒 1-day');
+    await page.getByTestId('item-shield-iron-bulwark').click();
+    await expect(page.getByTestId('unlock-hint')).toContainText('1-day streak');
   });
 
   test('while testing, all armor is free to wear with no seeds and no streak', async ({ page }) => {
     await autoDismissMilestones(page);
     await blockLookups(page);
     await openApp(page);
+    await page.evaluate(() => (window as any).__mfl.armorFree(true)); // the switch is off by default now
     await addVerse(page, JOHN316);
     await page.goto('/#/avatar');
     await expect(page.getByTestId('armor-free-banner')).toBeVisible();

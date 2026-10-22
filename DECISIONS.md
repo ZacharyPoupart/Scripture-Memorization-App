@@ -329,3 +329,21 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Test changes:** the unit test about the two tabs now checks the seven slots; the e2e test that opened the Extras tab and the Crown of life now opens the cape slot and the Wings of light (500-day streak hint). Merge/sync tests use a cape instead of a scene.
 **Left alone:** `design/armor-sheet.webp` (old art) is still in the repo; say if you want it deleted. The `Unlock` kinds `reviews`, `levelups` and `yearly` are now unused.
 **Undo:** roll back to `v1.23.1-sword-hand`.
+
+## v1.25.0 — Armor prices and gates (owner approved the table)
+**What:** `SETS` now run plainest to finest with whole-set prices 0/200/400/600/900/1200/1600/2200/3000/4000/5500; each piece is a fixed share (helmet 20%, chest 25%, shield 18%, sword 18%, boots 8%, belt 6%, cape 5%), rounded to 5. Iron Bulwark replaces Knight's Oath as the free start (`defaultLook()`), so Knight's Oath is now a 600-seed set. Gates: verses added 5/10/15/20/30/45/60 from Stormcaller up; streak 30/60/180/365 on the last four. New `Unlock` kind `verses` (live, undeleted verses); `Item.requires` is now a list.
+**Order:** sets are not locked behind each other; the gates make the order. I recommended this to the owner; say if you want a strict order.
+**Old data:** nobody loses anything. Someone wearing Knight's Oath now just owns nothing there; the item is unowned so their look falls back to Iron Bulwark, and any seeds they had spent on armor are recalculated at the new prices (balance never below zero, nothing is taken back).
+**Still on:** `testing.armorFree`, so none of these prices apply until it is turned off.
+**Test changes:** unit tests use the new default and new ids, the streak-gate test now also needs 60 verses, and two new tests check the price table and the verse gates; the e2e avatar test uses Iron Bulwark as the free helmet and Silver Vanguard's helmet at 40 seeds.
+**Undo:** roll back to the v1.24.0 tag.
+
+## v1.25.0 (addition) — Armor free-for-testing is off; first sword and shield are rewards (owner request)
+**What:** `testing.armorFree` now defaults to false (the switch and banner stay for tests). The Iron Bulwark sword unlocks free when the first verse is added (`verses` 1) and the Iron Bulwark shield when the longest streak reaches 3 days. I read "first streak" as 3 days (a streak of 1 is just one day, and the first milestone beyond it is 3); it is one number in `REWARD` in `core/avatar.ts` if you want 1 or something else. Other sets' swords and shields are still bought.
+**"Take away all my sets":** nothing was ever recorded while the free switch was on, so turning it off removes all that armor from your knight by itself. I can't reach your phone's data: if you bought any armor while testing, those purchases are still owned (owned items only ever grow and sync), so tell me and I will add a one-time reset.
+**Test changes:** the "while testing" e2e test turns the switch on itself (it is off by default now); unit tests restore it to off; new unit test for the two rewards and an e2e check on the avatar screen.
+
+## v1.25.0 (addition) — Reset my armor, shield at a 1-day streak (owner request)
+**Shield:** the Iron Bulwark shield now unlocks at a longest streak of 1 (the day the flame lights), not 3.
+**Reset:** Settings has a "Reset my armor" button (with a confirmation) that clears `data.avatar.owned` and `look` on this device; seeds are derived, so every seed spent comes back, and verses and progress are untouched. It is a button, not a one-time automatic action, so it is safe and can be used again. Limit: owned items normally only grow and merge as a union, so if sync is on and another device still owns armor, merging will bring it back; reset there too (or turn sync off). The reset keeps `lookAt` moving forward so the cleared look wins the sync merge. This is a deliberate exception to "never remove anything", asked for by the owner. A snapshot of the earlier data is kept by the usual daily snapshots.
+**Tests:** unit test for `resetAvatar`; e2e buys a helmet, resets, and checks the start look and the seed balance.

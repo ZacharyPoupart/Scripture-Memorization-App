@@ -1,7 +1,7 @@
 // App-wide state: the data document, device settings, and the glue to storage and sync.
 import { useEffect, useState } from 'preact/hooks';
 import { BackupError, exportBackup, parseBackup } from './core/backup.ts';
-import { buyItem, equipItem, seedsEarned, testing, type BuyResult } from './core/avatar.ts';
+import { buyItem, equipItem, resetAvatar, seedsEarned, testing, type BuyResult } from './core/avatar.ts';
 import { addDays, dayKeyOf } from './core/dates.ts';
 import { mergeData } from './core/merge.ts';
 import { createData, endPause, recordReview, setPause, settle } from './core/schedule.ts';
@@ -140,6 +140,11 @@ export function buyAndWear(id: string): BuyResult {
     if (r.ok) equipItem(d, id, now);
     return r;
   });
+}
+
+/** Take off and forget everything bought or worn (seeds come back). */
+export function resetArmor() {
+  act((d, now) => resetAvatar(d, now));
 }
 
 /** Wear an item you already have (or one an achievement has unlocked). */
