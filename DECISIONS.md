@@ -364,3 +364,8 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **What:** removed the `cape-wings` item (the 500-day-streak reward) and its drawing. The cape slot is now only the set capes and "None". Saved data that owned or wore it just falls back to no cape (unknown ids cost nothing and fall back). Nothing else changed; milestone seeds for long streaks still pay out.
 **Test changes:** the e2e "earned items explain how to get them" test no longer opens the cape slot to check the 500-day hint (the sword's 365-day hint and the shield's first-streak hint still cover locked items); the "only painted pieces are free" assertion in the armor-free unit test had only the wings as an example, so it is gone.
 **Undo:** roll back to the `v1.27.0` tag.
+
+## v1.28.1 — Avatar tiles tidied (owner request, laptop screenshot)
+**What:** tiles are a little wider (112px), the name takes two lines of height so the bottom line always starts at the same place, and the status (Wearing / Owned / what it needs / the price) is pinned to the bottom. The price is its own no-wrap unit (coin + number, with a thousands comma); each requirement is one short line ("30-day streak", "20 verses") under a lock. The coin was also being drawn as a block inside the Today avatar bubble and on tiles (an old rule for pictures), so it stacked over its number; it is now inline there too.
+**Test changes:** none; the checks that look for the price number or the lock text still match.
+**Undo:** roll back to the `v1.28.0-no-wings` tag.
