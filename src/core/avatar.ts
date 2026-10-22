@@ -167,9 +167,9 @@ export function describeUnlock(u: Unlock): string {
   }
 }
 
-/** The short form shown on a locked tile: "365-day", "60 verses". */
+/** The short form shown on a locked tile, one line each: "365-day streak", "60 verses". */
 export function shortUnlock(u: Unlock): string {
-  return u.kind === 'streak' ? `${u.days}-day` : u.kind === 'verses' ? (u.n === 1 ? 'first verse' : `${u.n} verses`) : describeUnlock(u);
+  return u.kind === 'streak' ? `${u.days}-day streak` : u.kind === 'verses' ? (u.n === 1 ? 'first verse' : `${u.n} verses`) : describeUnlock(u);
 }
 
 // ---------------------------------------------------------------- seeds

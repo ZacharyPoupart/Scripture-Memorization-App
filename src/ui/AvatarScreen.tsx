@@ -141,15 +141,29 @@ export function AvatarScreen() {
                     <AvatarFigure look={{ ...look, [item.slot]: item.id }} size={72} view={'full'} />
                   )}
                   <span class="item-name">{item.name}</span>
-                  <small class="muted">
-                                        {isWorn
-                      ? 'Wearing'
-                      : have
-                        ? 'Owned'
-                        : lockedItem
-                          ? <>🔒 {(item.unlock ? [item.unlock] : item.requires!).map(shortUnlock).join(' + ')}{item.cost ? <> + <Coin />{item.cost}</> : null}</>
-                          : <><Coin />{item.cost}</>}
-                  </small>
+                  <span class="item-status muted">
+                    {isWorn ? (
+                      'Wearing'
+                    ) : have ? (
+                      'Owned'
+                    ) : (
+                      <>
+                        {lockedItem &&
+                          (item.unlock ? [item.unlock] : item.requires!).map((u, n) => (
+                            <span class="item-need" key={n}>
+                              {n === 0 ? '🔒 ' : ''}
+                              {shortUnlock(u)}
+                            </span>
+                          ))}
+                        {(!item.unlock || !lockedItem) && (
+                          <span class="item-price">
+                            <Coin />
+                            {item.cost.toLocaleString('en-US')}
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </span>
                 </button>
               );
             })}
