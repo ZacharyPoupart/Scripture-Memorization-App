@@ -359,3 +359,8 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Old data:** anything already bought is re-priced (balance never goes below zero, nothing is taken).
 **Test changes:** price-table unit test and the e2e avatar tests use the new numbers (Silver Vanguard helmet 160).
 **Undo:** roll back to `v1.26.0` tag (the coins release).
+
+## v1.28.0 — Wings of light removed (owner request)
+**What:** removed the `cape-wings` item (the 500-day-streak reward) and its drawing. The cape slot is now only the set capes and "None". Saved data that owned or wore it just falls back to no cape (unknown ids cost nothing and fall back). Nothing else changed; milestone seeds for long streaks still pay out.
+**Test changes:** the e2e "earned items explain how to get them" test no longer opens the cape slot to check the 500-day hint (the sword's 365-day hint and the shield's first-streak hint still cover locked items); the "only painted pieces are free" assertion in the armor-free unit test had only the wings as an example, so it is gone.
+**Undo:** roll back to the `v1.27.0` tag.

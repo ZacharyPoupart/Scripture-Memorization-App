@@ -114,7 +114,6 @@ export const ITEMS: Item[] = [
   // ---- capes
   I('cape', 'cape-none', 'None'),
   ...piecesOf('cape'),
-  I('cape', 'cape-wings', 'Wings of light', 0, { unlock: streak(500) }),
   // ---- shields
   I('shield', 'shield-none', 'None'),
   ...piecesOf('shield'),
