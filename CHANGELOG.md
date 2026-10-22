@@ -5,6 +5,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.23.1] - 2026-10-22
+
+### Fixed
+- The knight's sword now sits in the hand: moved in toward the body and up a little so the grip is held.
+
 ## [1.23.0] - 2026-10-21
 
 ### Changed

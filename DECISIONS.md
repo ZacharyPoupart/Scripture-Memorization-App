@@ -318,3 +318,7 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Placement:** the sheet's loose pieces are not on the finished figure's scale, so belt, cape, sword and shield positions are hand-set in `design/armor-v2/placement.json` and verified on assembled previews. The sword is turned upright.
 **Test changes:** `tests/unit/avatar.test.ts` and `tests/e2e/avatar.spec.ts` use the new ids and prices (same behaviours checked). `testing.armorFree` is still on.
 **Undo:** roll back to `v1.22.0-bare-today`.
+
+## v1.23.1 — Sword hilt in the hand (owner request)
+**What:** sword placement in `design/armor-v2/placement.json` dx 48 -> 36, y -4 -> -14 (upright, same scale), so the grip overlaps the hand. Compared four positions on assembled previews first. No code or test changes.
+**Undo:** roll back to `v1.23.0-armor-v2`.
