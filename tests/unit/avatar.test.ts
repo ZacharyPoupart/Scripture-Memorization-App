@@ -136,20 +136,20 @@ describe('the knight', () => {
   it('the prices are the owner-approved table: whole-set totals, with each piece a fixed share of its set', () => {
     expect(SETS.map((s) => [s.id, s.price])).toEqual([
       ['iron-bulwark', 0],
-      ['silver-vanguard', 200],
-      ['forest-guardian', 400],
-      ['knights-oath', 600],
-      ['stormcaller', 900],
-      ['frostborn', 1200],
-      ['ember-knight', 1600],
-      ['crimson-legion', 2200],
-      ['shadowblade', 3000],
-      ['golden-paladin', 4000],
-      ['sulestial', 5500],
+      ['silver-vanguard', 800],
+      ['forest-guardian', 1600],
+      ['knights-oath', 2400],
+      ['stormcaller', 3600],
+      ['frostborn', 4800],
+      ['ember-knight', 6400],
+      ['crimson-legion', 8800],
+      ['shadowblade', 12000],
+      ['golden-paladin', 16000],
+      ['sulestial', 22000],
     ]);
     const cost = (slot: string, id: string) => itemById(`${slot}-${id}`)!.cost;
-    expect(['helmet', 'chest', 'shield', 'weapon', 'boots', 'belt', 'cape'].map((s) => cost(s, 'silver-vanguard'))).toEqual([40, 50, 35, 35, 15, 10, 10]);
-    expect(['helmet', 'chest', 'shield', 'weapon', 'boots', 'belt', 'cape'].map((s) => cost(s, 'sulestial'))).toEqual([1100, 1375, 990, 990, 440, 330, 275]);
+    expect(['helmet', 'chest', 'shield', 'weapon', 'boots', 'belt', 'cape'].map((s) => cost(s, 'silver-vanguard'))).toEqual([160, 200, 145, 145, 65, 50, 40]);
+    expect(['helmet', 'chest', 'shield', 'weapon', 'boots', 'belt', 'cape'].map((s) => cost(s, 'sulestial'))).toEqual([4400, 5500, 3960, 3960, 1760, 1320, 1100]);
     for (const slot of ['helmet', 'chest', 'belt', 'boots', 'cape', 'weapon', 'shield']) expect(cost(slot, 'iron-bulwark'), slot).toBe(0);
   });
 
