@@ -8,18 +8,10 @@
 import { STREAK_MILESTONES } from './milestones.ts';
 import type { AppData } from './types.ts';
 
-export type Slot = 'helmet' | 'chest' | 'belt' | 'boots' | 'cape' | 'shield' | 'weapon' | 'crown' | 'extra' | 'companion' | 'background';
+export type Slot = 'helmet' | 'chest' | 'belt' | 'boots' | 'cape' | 'shield' | 'weapon';
 
-export interface SlotGroup {
-  key: 'armor' | 'extras';
-  label: string;
-  slots: Slot[];
-}
-export const SLOT_GROUPS: SlotGroup[] = [
-  { key: 'armor', label: 'Armor', slots: ['helmet', 'chest', 'belt', 'boots', 'shield', 'weapon'] },
-  { key: 'extras', label: 'Extras', slots: ['cape', 'extra', 'crown', 'companion', 'background'] },
-];
-export const SLOTS: Slot[] = SLOT_GROUPS.flatMap((g) => g.slots);
+/** Everything you can change, in the order the avatar screen lists it: the six armor pieces, then the cape. */
+export const SLOTS: Slot[] = ['helmet', 'chest', 'belt', 'boots', 'shield', 'weapon', 'cape'];
 export const SLOT_LABELS: Record<Slot, string> = {
   helmet: 'Helmet',
   chest: 'Chest plate',
@@ -28,10 +20,6 @@ export const SLOT_LABELS: Record<Slot, string> = {
   cape: 'Cape',
   shield: 'Shield',
   weapon: 'Sword',
-  crown: 'Crown',
-  extra: 'Accessories',
-  companion: 'Companion',
-  background: 'Scene',
 };
 
 /** The six pieces of the armor of God, with where each is named (Ephesians 6:14-17). */
@@ -59,9 +47,7 @@ export interface Item {
   cost: number;
   /** Earned for free when the achievement is reached. */
   unlock?: Unlock;
-  /** Main colour of a scene, for the drawing. */
-  color?: string;
-  /** A painted piece (armor, weapons, capes, plumes, banners...), as opposed to a simple drawn extra. */
+  /** A painted piece (armor, weapons, capes). */
   art?: boolean;
   /** Which matching set (1-11, see SETS) a helmet, chest plate, belt, boots, cape, sword or shield belongs to. */
   set?: number;
@@ -125,45 +111,6 @@ export const ITEMS: Item[] = [
   // ---- swords
   I('weapon', 'weapon-none', 'None'),
   ...piecesOf('weapon'),
-  // ---- accessories
-  I('extra', 'ex-none', 'None'),
-  art('extra', 'ex-ring', 'Ring', 25),
-  art('extra', 'ex-amulet', 'Amulet', 40),
-  art('extra', 'ex-gloves', 'Gloves', 30),
-  art('extra', 'ex-pouch', 'Pouch', 20),
-  art('extra', 'ex-lantern', 'Lantern', 45),
-  art('extra', 'ex-charm', 'Charm', 35),
-  art('extra', 'ex-banner', 'Banner', 55),
-  art('extra', 'ex-medal', 'Medal', 0, undefined, { unlock: { kind: 'levelups', n: 1 } }),
-  art('extra', 'ex-scroll', 'Scholar’s scroll', 0, undefined, { unlock: { kind: 'reviews', n: 500 } }),
-  // ---- crowns (they float above the helmet)
-  I('crown', 'crown-none', 'None'),
-  I('crown', 'crown-royal', 'Royal crown', 300),
-  I('crown', 'crown-halo', 'Halo', 0, { unlock: { kind: 'yearly' } }),
-  I('crown', 'crown-life', 'Crown of life', 0, { unlock: streak(730) }),
-  // ---- companions
-  I('companion', 'pet-none', 'None'),
-  I('companion', 'pet-sprout', 'Sprout', 0, { unlock: streak(3) }),
-  I('companion', 'pet-lamb', 'Lamb', 60),
-  I('companion', 'pet-dove', 'Dove', 60),
-  I('companion', 'pet-kitten', 'Kitten', 80),
-  I('companion', 'pet-puppy', 'Puppy', 80),
-  I('companion', 'pet-owl', 'Owl', 100),
-  I('companion', 'pet-eagle', 'Eagle', 120),
-  I('companion', 'pet-dragon', 'Baby dragon', 200),
-  I('companion', 'pet-lion', 'Lion cub', 0, { unlock: streak(365) }),
-  I('companion', 'pet-angel', 'Guardian angel', 0, { unlock: streak(500) }),
-  // ---- scenes
-  I('background', 'bg-sky', 'Morning sky', 0, { color: '#cfe6ea' }),
-  I('background', 'bg-meadow', 'Meadow', 0, { color: '#d6e8c4' }),
-  I('background', 'bg-sunrise', 'Sunrise', 40, { color: '#f4d3b0' }),
-  I('background', 'bg-dusk', 'Dusk', 40, { color: '#c9bfe0' }),
-  I('background', 'bg-night', 'Starry night', 60, { color: '#2d3a63' }),
-  I('background', 'bg-garden', 'Garden', 70, { color: '#bfe0c8' }),
-  I('background', 'bg-castle', 'Castle wall', 70, { color: '#c9ccd4' }),
-  I('background', 'bg-library', 'Library', 80, { color: '#d9c2a0' }),
-  I('background', 'bg-mountain', 'Mountain top', 90, { color: '#cfdcea' }),
-  I('background', 'bg-gold', 'Golden hour', 0, { color: '#f1d27a', unlock: streak(100) }),
 ];
 
 const BY_ID = new Map(ITEMS.map((i) => [i.id, i]));
@@ -181,10 +128,6 @@ export function defaultLook(): Look {
     cape: 'cape-none',
     shield: 'shield-none',
     weapon: 'weapon-none',
-    crown: 'crown-none',
-    extra: 'ex-none',
-    companion: 'pet-none',
-    background: 'bg-sky',
   };
 }
 

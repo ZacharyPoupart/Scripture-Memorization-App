@@ -12,7 +12,7 @@ import {
   matchedSet,
   owns,
   seedsBalance,
-  SLOT_GROUPS,
+  SLOTS,
   SLOT_LABELS,
   testing,
   type Item,
@@ -27,7 +27,6 @@ import { Icon } from './common.tsx';
 /** Your knight: everyone starts in the same basic armor, and any piece can be swapped for another with seeds and streaks. */
 export function AvatarScreen() {
   const { data } = useApp();
-  const [group, setGroup] = useState<(typeof SLOT_GROUPS)[number]['key']>('armor');
   const [slot, setSlot] = useState<Slot>('helmet');
   const [pick, setPick] = useState<string | null>(null);
   const look = currentLook(data);
@@ -35,7 +34,6 @@ export function AvatarScreen() {
   const picked = pick ? itemById(pick) : undefined;
   const shown = picked ? { ...look, [picked.slot]: picked.id } : look;
   const items = itemsIn(slot);
-  const grp = SLOT_GROUPS.find((g) => g.key === group)!;
   const worn = armorWorn(look);
   const matched = matchedSet(look);
   const armorInfo = (ARMOR_SLOTS as readonly string[]).includes(slot) ? ARMOR_NAMES[slot as (typeof ARMOR_SLOTS)[number]] : null;
@@ -100,24 +98,8 @@ export function AvatarScreen() {
             </p>
           </div>
 
-          <div class="seg" role="group" aria-label="Part of the avatar">
-            {SLOT_GROUPS.map((g) => (
-              <button
-                key={g.key}
-                aria-pressed={g.key === group}
-                onClick={() => {
-                  setGroup(g.key);
-                  setSlot(g.slots[0]);
-                  setPick(null);
-                }}
-                data-testid={`group-${g.key}`}
-              >
-                {g.label}
-              </button>
-            ))}
-          </div>
           <div class="slot-chips" role="group" aria-label="What to change">
-            {grp.slots.map((s) => (
+            {SLOTS.map((s) => (
               <button
                 key={s}
                 aria-pressed={s === slot}
@@ -150,7 +132,7 @@ export function AvatarScreen() {
                 >
                   {armorUrl(item.id) ? (
                     <img class="piece-img" src={armorUrl(item.id)!} alt="" width="72" height="72" loading="lazy" style={item.slot === 'weapon' ? { transform: 'rotate(180deg)' } : undefined} />
-                  ) : item.id.endsWith('-none') && group !== 'extras' ? (
+                  ) : item.id.endsWith('-none') ? (
                     <span class="piece-img piece-none" aria-hidden="true">
                       —
                     </span>

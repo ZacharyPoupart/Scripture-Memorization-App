@@ -322,3 +322,10 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 ## v1.23.1 — Sword hilt in the hand (owner request)
 **What:** sword placement in `design/armor-v2/placement.json` dx 48 -> 36, y -4 -> -14 (upright, same scale), so the grip overlaps the hand. Compared four positions on assembled previews first. No code or test changes.
 **Undo:** roll back to `v1.23.0-armor-v2`.
+
+## v1.24.0 — Extras tab removed (owner request)
+**What:** removed accessories, crowns, companions and scenes (items, drawings, the nine `ex-*` pictures, `design/cut-armor.py` and the old `armor-sheet.webp` use). Capes stay and now sit with the armor pieces; the screen has no tabs. `Slot` is now seven values; the background is one fixed morning sky. I kept the Wings of light cape (it is a cape) at its 500-day streak.
+**Old data:** unknown ids cost nothing, so seeds spent on removed items come back automatically, and a saved look with a removed id falls back to the default. No shape change; schema stays 1.
+**Test changes:** the unit test about the two tabs now checks the seven slots; the e2e test that opened the Extras tab and the Crown of life now opens the cape slot and the Wings of light (500-day streak hint). Merge/sync tests use a cape instead of a scene.
+**Left alone:** `design/armor-sheet.webp` (old art) is still in the repo; say if you want it deleted. The `Unlock` kinds `reviews`, `levelups` and `yearly` are now unused.
+**Undo:** roll back to `v1.23.1-sword-hand`.
