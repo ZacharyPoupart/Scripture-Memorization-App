@@ -17,7 +17,7 @@ import { RefRecall } from './modes/RefRecall.tsx';
 import { Speak } from './modes/Speak.tsx';
 import { TypeIt } from './modes/TypeIt.tsx';
 
-import { buildTodayQueue } from '../core/today.ts';
+import { buildTodayQueue, shuffled } from '../core/today.ts';
 
 function buildQueue(data: AppData, q: URLSearchParams, now: number): string[] {
   const one = q.get('verse');
@@ -119,7 +119,10 @@ export function Review({ route }: { route: Route }) {
   const [chosen, setChosen] = useState<ReviewMode | null>(null); // a type picked during this session (the default is not changed)
   const [switching, setSwitching] = useState(false);
   const mode = chosen ?? startMode;
-  const queue = useMemo(() => buildQueue(data, route.query, Date.now()), []);
+  const queue = useMemo(() => {
+    const q = buildQueue(data, route.query, Date.now());
+    return settings.shuffle && !route.query.get('verse') ? shuffled(q) : q; // one chosen verse stays one verse
+  }, []);
   const [idx, setIdx] = useState(0);
   const [attempt, setAttempt] = useState(0);
   const [result, setResult] = useState<{ counted: boolean; levelUps: LevelUp[]; todayComplete: boolean; seeds: number } | null>(null);

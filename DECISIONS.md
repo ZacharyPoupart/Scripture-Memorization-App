@@ -392,3 +392,10 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Choices (tell me if you want them different):** the swap is for this session only and never changes the saved default type. A swap is a fresh attempt at the same verse: slips from the abandoned try do not carry over (the same as the restart that happens after too many slips). It does not count as a review or a mistake. I first misread "the review page" as the single-verse page and moved its card; the owner sent a screenshot of the Today bar, so that change was undone.
 **Test changes:** none to existing tests; new `tests/e2e/mode-switch.spec.ts` (position on Today, swapping mid review, cancel, same type, swapping on the result card).
 **Undo:** roll back to the `v1.30.0-practice-order` tag.
+
+## v1.32.0 — Shuffle button (owner request)
+**What:** `settings.shuffle` (device-only, default off) and a 46px icon button inside `ModePicker`, so it sits beside the Flashcard / Blanks / Type / Speak bar everywhere that bar appears (Today, a pile page, Settings). With it on, `Review` shuffles the queue for sessions started from Today or a pile (`shuffled`, Fisher–Yates over `Math.random`). A session for one chosen verse (`?verse=`) is never shuffled. The Today list itself keeps its normal order; only the order a session visits the verses in changes.
+**Rules:** the "longest in the pile first" ordering is still the default and still how lists are ordered. Shuffle is presentation only: what is due, what counts and the streak never read it.
+**Choices (tell me if you want them different):** one switch for Daily, Weekly, Monthly and Yearly together (a Today session mixes piles, so shuffle mixes them too); no separate setting per pile.
+**Test changes:** none to existing tests; new `shuffled` unit tests and `tests/e2e/shuffle.spec.ts` (button beside the bar and remembered; a shuffled session visits every verse once in a known different order with a fixed random source; off restores the usual order; one chosen verse stays one).
+**Undo:** roll back to the `v1.31.0-mode-switch` tag.

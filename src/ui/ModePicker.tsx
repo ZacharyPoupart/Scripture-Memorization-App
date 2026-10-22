@@ -1,6 +1,6 @@
 import type { ReviewMode } from '../core/types.ts';
 import { updateSettings, useApp } from '../store.ts';
-import { Seg } from './common.tsx';
+import { Icon, Seg } from './common.tsx';
 
 export const MODES: { value: ReviewMode; label: string; long: string; blurb: string }[] = [
   { value: 'flashcard', label: 'Flashcard', long: 'Flashcard', blurb: 'See the reference, recall the verse, flip to check.' },
@@ -13,16 +13,29 @@ export function ModePicker({ onChange, blurb = true }: { onChange?: (m: ReviewMo
   const { settings } = useApp();
   return (
     <div class="stack" style={{ '--gap': '8px' } as never}>
-      <Seg
-        label="Review mode"
-        value={settings.defaultMode}
-        options={MODES.map((m) => ({ value: m.value, label: m.label }))}
-        onChange={(m) => {
-          updateSettings({ defaultMode: m });
-          onChange?.(m);
-        }}
-      />
-      {blurb && <div class="hint-text">{MODES.find((m) => m.value === settings.defaultMode)?.blurb}</div>}
+      <div class="mode-row">
+        <Seg
+          label="Review mode"
+          value={settings.defaultMode}
+          options={MODES.map((m) => ({ value: m.value, label: m.label }))}
+          onChange={(m) => {
+            updateSettings({ defaultMode: m });
+            onChange?.(m);
+          }}
+        />
+        <button
+          type="button"
+          class="shuffle-btn"
+          aria-pressed={settings.shuffle}
+          aria-label="Shuffle the order of verses in a review"
+          title={settings.shuffle ? 'Shuffle is on: verses come in a random order' : 'Shuffle off: longest-held verses first'}
+          onClick={() => updateSettings({ shuffle: !settings.shuffle })}
+          data-testid="shuffle-toggle"
+        >
+          <Icon name="shuffle" />
+        </button>
+      </div>
+      {blurb && <div class="hint-text">{MODES.find((m) => m.value === settings.defaultMode)?.blurb}{settings.shuffle ? ' Shuffle is on: verses come in a random order.' : ''}</div>}
     </div>
   );
 }

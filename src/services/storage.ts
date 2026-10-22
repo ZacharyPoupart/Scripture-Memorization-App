@@ -90,6 +90,7 @@ export function defaultSettings(): Settings {
     avatarOn: true,
     speakWords: true,
     practice: { before: [], after: ['citation', 'topic'] },
+    shuffle: false,
   };
 }
 

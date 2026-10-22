@@ -26,6 +26,7 @@ const ICONS: Record<string, string> = {
   external: 'M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5',
   more: 'M5 12h.01M12 12h.01M19 12h.01',
   chart: 'M5 20V11M12 20V4M19 20v-6',
+  shuffle: 'M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5',
 };
 
 /** A gold coin with a square hole in the middle (the currency). Sized to the text around it. */
