@@ -18,8 +18,8 @@ import { at, D0, day, DEVICE, newData, john316, reviewEverythingDue } from './he
 const input = { book: 43, chapter: 3, start: 16, end: 16, translation: 'ESV', text: 'For God so loved the world, that he gave his only Son.' };
 
 describe('days already in the pile', () => {
-  it('limits: just under the graduation target (so nothing jumps a pile on save); 364 for Monthly, a year and a day for Yearly (so it can be due now)', () => {
-    expect([maxDaysIn('daily'), maxDaysIn('weekly'), maxDaysIn('monthly'), maxDaysIn('yearly')]).toEqual([89, 89, 364, 366]);
+  it('limits: just under the graduation target (89 days, 13 weeks, 4 months) so nothing jumps a pile on save; a year and a day for Yearly (so it can be due now)', () => {
+    expect([maxDaysIn('daily'), maxDaysIn('weekly'), maxDaysIn('monthly'), maxDaysIn('yearly')]).toEqual([89, 91, 120, 366]);
   });
 
   it('a new verse can start partway through Daily', () => {
@@ -48,7 +48,7 @@ describe('days already in the pile', () => {
     const snap = movePile(data, v.id, 'weekly', now, 45);
     expect(v.pile).toBe('weekly');
     expect(v.pileSince).toBe(addDays(day(10), -45));
-    expect(progressDays(data, v, now)).toBe(45);
+    expect(progressDays(data, v, now)).toBe(7); // 45 days is seven weeks, counted in weeks
     restorePile(data, v.id, snap, now + 1000);
     expect(v.pile).toBe('daily');
     expect(v.pileSince).toBe(D0);
@@ -69,7 +69,9 @@ describe('days already in the pile', () => {
     expect(verseStatus(data, v, now).state).toBe('ready');
     movePile(data, v.id, 'yearly', now, 366);
     expect(verseStatus(data, v, now).state).toBe('ready');
-    movePile(data, v.id, 'yearly', now, 5); // Jan 5 2026: still the year it arrived in
+    movePile(data, v.id, 'yearly', now, 5); // started in 2026: it needs a review this year
+    expect(verseStatus(data, v, now).state).toBe('ready');
+    movePile(data, v.id, 'yearly', now); // moved today: the next review is tomorrow at the earliest
     expect(verseStatus(data, v, now).state).toBe('notdue');
   });
 

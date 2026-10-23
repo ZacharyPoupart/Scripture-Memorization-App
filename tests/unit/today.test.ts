@@ -77,7 +77,7 @@ describe('nextReviewInfo', () => {
 });
 
 describe('progressRing', () => {
-  it('Daily, Weekly and Monthly show days earned toward the next pile', () => {
+  it('Daily, Weekly and Monthly show progress toward the next pile', () => {
     const data = newData();
     const d = john316(data, at(D0, '07:00'));
     const w = john316(data, at(D0, '07:00'), { pile: 'weekly', pileSince: D0 });
@@ -88,8 +88,9 @@ describe('progressRing', () => {
     expect(rd).toMatchObject({ state: 'progress', earned: 10, target: 90 });
     expect(rd.fraction).toBeCloseTo(10 / 90);
     expect(rd.label).toBe('Day 10 of 90 toward Weekly');
-    expect(progressRing(data, w, now).target).toBe(90);
-    expect(progressRing(data, m, now).target).toBe(365);
+    expect(progressRing(data, w, now).target).toBe(15);
+    expect(progressRing(data, w, now).label).toBe('Week 2 of 15 toward Monthly'); // weeks 1 and 2 were reviewed
+    expect(progressRing(data, m, now).target).toBe(6);
     expect(progressRing(data, m, now).label).toContain('toward Yearly');
   });
 

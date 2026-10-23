@@ -3,6 +3,8 @@ import { dayKeyOf } from '../../src/core/dates.ts';
 import {
   daysInPile,
   dueDay,
+  easierPile,
+  previousPile,
   periodEnd,
   periodStart,
   movePile,
@@ -133,10 +135,12 @@ describe('Weekly / Monthly / Yearly due dates', () => {
   it('monthly and yearly use the calendar month and year', () => {
     const data = newData('2026-01-31');
     const m = john316(data, at('2026-01-31'), { pile: 'monthly', pileSince: '2026-01-31' });
-    expect(dueDay(m, '2026-01-31')).toBe('2026-02-01');
+    expect(dueDay(m, '2026-01-31')).toBe('2026-02-01'); // moved up that day: tomorrow at the earliest
+    expect(dueDay(m, '2026-02-10')).toBe('2026-02-01'); // then due any time in the month
     expect(periodEnd('monthly', '2026-02-10')).toBe('2026-02-28');
     const y = john316(data, at('2028-02-29'), { pile: 'yearly', pileSince: '2028-02-29' });
-    expect(dueDay(y, '2028-02-29')).toBe('2029-01-01');
+    expect(dueDay(y, '2028-02-29')).toBe('2028-03-01');
+    expect(dueDay(y, '2028-08-01')).toBe('2028-01-01'); // there is no free year: it is due this year
     expect(periodStart('weekly', '2026-02-07')).toBe('2026-02-01');
     expect(periodEnd('yearly', '2026-06-01')).toBe('2026-12-31');
   });
@@ -169,7 +173,7 @@ describe('Graduation', () => {
     expect(daysInPile(v, at(day(90), '09:00'))).toBe(0);
   });
 
-  it('Weekly -> Monthly after 90 days, Monthly -> Yearly after 365, Yearly stays', () => {
+  it('Weekly -> Monthly after 15 reviewed weeks, Monthly -> Yearly after 6 reviewed months, Yearly stays', () => {
     const data = newData();
     const w = john316(data, at(D0, '07:00'), { pile: 'weekly', pileSince: D0 });
     const m = john316(data, at(D0, '07:00'), { pile: 'monthly', pileSince: D0 });
@@ -177,15 +181,15 @@ describe('Graduation', () => {
     const keep = john316(data, at(D0, '07:00'));
     for (let i = 1; i <= 366; i++) {
       reviewEverythingDue(data, day(i));
-      // weeks start on Sundays (day 1, 8, ...): the 13th full week is reviewed on day 85 and brings day 91, past 90
-      if (i === 84) {
+      // weeks start on Sundays (day 1, 8, ...): the 15th reviewed week starts on day 99
+      if (i === 98) {
         settle(data, at(day(i), '23:30'));
         expect(w.pile).toBe('weekly');
       }
-      if (i === 85) expect(w.pile).toBe('monthly');
-      // February 2026 to January 2027 is exactly 365 days; the last of those months is reviewed on Jan 1 2027 (day 356)
-      if (i === 355) expect(m.pile).toBe('monthly');
-      if (i === 356) expect(m.pile).toBe('yearly');
+      if (i === 99) expect(w.pile).toBe('monthly');
+      // January (reviewed from Jan 11) to June 2026 is six months; June is reviewed on June 1 (day 142)
+      if (i === 141) expect(m.pile).toBe('monthly');
+      if (i === 142) expect(m.pile).toBe('yearly');
     }
     settle(data, at(day(366), '12:00'));
     expect(m.pile).toBe('yearly');
@@ -198,10 +202,10 @@ describe('Graduation', () => {
     for (let i = 7; i < 456; i += 7) w.reviews.push(at(day(i), '09:00'));
     const result = settle(data, at(day(460), '12:00'));
     expect(w.pile).toBe('yearly');
-    expect(w.pileSince).toBe(day(448)); // 13 weeks, then May 2026 to April 2027, each reviewed on a Saturday
+    expect(w.pileSince).toBe(day(266)); // 15 weeks (Saturday day 105), then May to October 2026 (April was over before its first review)
     expect(result.levelUps.map((l) => `${l.from}>${l.to}@${l.day}`)).toEqual([
-      `weekly>monthly@${day(91)}`,
-      `monthly>yearly@${day(448)}`,
+      `weekly>monthly@${day(105)}`,
+      `monthly>yearly@${day(266)}`,
     ]);
   });
 
@@ -212,7 +216,7 @@ describe('Graduation', () => {
     const snap = movePile(data, v.id, 'monthly', at(day(20), '15:00'));
     expect(v.pile).toBe('monthly');
     expect(v.pileSince).toBe(day(20));
-    expect(dueDay(v, day(20))).toBe('2026-02-01'); // moved Jan 30: January is the free month, February is the first one due
+    expect(dueDay(v, day(20))).toBe(day(21)); // moved today: tomorrow at the earliest, and it must be reviewed in January
     restorePile(data, v.id, snap, at(day(20), '15:01'));
     expect(v.pile).toBe('daily');
     expect(v.pileSince).toBe(D0);
@@ -345,5 +349,16 @@ describe('Streak', () => {
     settle(data, at(day(3), '09:00'));
     expect(todaySummary(data, at(day(3), '09:00')).total).toBe(0);
     expect(dayKeyOf(at(day(3)))).toBe(day(3));
+  });
+});
+
+describe('offering more frequent practice', () => {
+  it('a verse in Weekly or Monthly or Yearly that needed two restarts is offered the pile below; Daily is not offered anything', () => {
+    expect(easierPile('weekly', 2)).toBe('daily');
+    expect(easierPile('monthly', 3)).toBe('weekly');
+    expect(easierPile('yearly', 2)).toBe('monthly');
+    expect(easierPile('weekly', 1)).toBeNull();
+    expect(easierPile('daily', 5)).toBeNull();
+    expect(previousPile('daily')).toBeNull();
   });
 });

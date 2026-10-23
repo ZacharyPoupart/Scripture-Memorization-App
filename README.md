@@ -17,11 +17,11 @@ A calm, offline-first app for memorizing Bible verses and **keeping them memoriz
 | Pile | Review | Moves up after |
 |---|---|---|
 | Daily | 3 times a day, ≥ 2 h apart (adjustable) | 90 days |
-| Weekly | once a week | 90 days |
-| Monthly | once a month | 365 days |
+| Weekly | once a week (Sun–Sat) | 15 reviewed weeks |
+| Monthly | once a calendar month | 6 reviewed months |
 | Yearly | once a year | stays for life |
 
-- **Progress days:** a verse earns a day toward the next pile on days it is up to date: a Daily verse with one counted review that day; a Weekly or Monthly verse on every day it is not overdue (and the day you review it). A day without a review just doesn't count. Nothing is lost, and a verse that already earned its promotion still moves up.
+- **Progress:** a verse moves up only when it is up to date. Daily earns a day with one counted review that day; Weekly (Sunday–Saturday) and Monthly (calendar month) earn the whole week or month with one review any time in it, and a skipped one just doesn't count. Yearly is due once a calendar year. Only the week a verse arrives in from Daily is free. After a review that took several tries in Weekly or beyond, the app offers to move the verse down a pile.
 - **Streak:** +1 for each day you finish all your due reviews; resets if you miss a day. Verses added today don't count against you; days with nothing due neither add nor break it.
 - Extra practice is always allowed and never counts toward the schedule. In each pile, the verses you've held longest are at the top.
 

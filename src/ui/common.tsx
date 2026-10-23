@@ -188,6 +188,9 @@ export function statusLabel(s: VerseStatus): { text: string; cls: string } {
   }
 }
 
+/** "days", "weeks" or "months": what a pile counts its progress in. */
+export const progressUnitPlural = (pile: Pile): string => (pile === 'daily' ? 'days' : pile === 'weekly' ? 'weeks' : 'months');
+
 export function pileProgress(data: AppData, v: Verse, now: number) {
   const target = graduationTarget(v.pile);
   const days = daysInPile(v, now);

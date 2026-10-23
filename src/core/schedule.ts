@@ -7,10 +7,11 @@
 //  * Daily: 3 counted reviews per day, at least `spacingHours` apart. Weekly/Monthly/Yearly follow the
 //    calendar: one counted review in each week (Sunday to Saturday) / calendar month / calendar year.
 //    Reviewed any time in the period = good until the next one starts; everything is due on the period's
-//    last day (that is when a miss breaks the streak). The period a verse arrives in is a free pass.
+//    last day (that is when a miss breaks the streak). Only the week a verse arrives in (from Daily) is a
+//    free pass: a verse that moves up to Monthly or Yearly must be reviewed in that month / year.
 //  * Extra practice is always allowed but never counted (and never stored).
-//  * Graduation: Daily->Weekly after 90 progress days, Weekly->Monthly after 90, Monthly->Yearly
-//    after 365. A "progress day" is a day after entering the pile on which the verse was up to date:
+//  * Graduation: Daily->Weekly after 90 progress days, Weekly->Monthly after 15 reviewed weeks,
+//    Monthly->Yearly after 6 reviewed months. A "progress day" is a day after entering the pile on which the verse was up to date:
 //    Daily, it got a counted review that day; Weekly/Monthly, it was reviewed in that week/month (the
 //    whole period counts at once; a missed period never counts). Each verse keeps its own list of those days. There is no freeze: a day that does not count
 //    just does not count, and nothing already earned is ever lost.
@@ -40,13 +41,28 @@ import {
   type Verse,
 } from './types.ts';
 
-export const GRADUATION_DAYS = { daily: 90, weekly: 90, monthly: 365 } as const;
+/** What a verse has to earn to move up: Daily needs 90 days, Weekly 15 reviewed weeks, Monthly 6 reviewed months. */
+export const GRADUATION_DAYS = { daily: 90, weekly: 15, monthly: 6 } as const;
+/** The unit each pile counts its progress in. */
+export const PROGRESS_UNIT = { daily: 'Day', weekly: 'Week', monthly: 'Month' } as const;
 export const DAILY_REVIEWS = 3;
 const HOUR = 3_600_000;
 const KEEP_REVIEWS_MS = 60 * 24 * HOUR;
 
 export function nextPile(p: Pile): Pile | null {
   return p === 'daily' ? 'weekly' : p === 'weekly' ? 'monthly' : p === 'monthly' ? 'yearly' : null;
+}
+
+export function previousPile(p: Pile): Pile | null {
+  return p === 'yearly' ? 'monthly' : p === 'monthly' ? 'weekly' : p === 'weekly' ? 'daily' : null;
+}
+
+/** Restarts (wrong answers in a review that allows none) after which a Weekly/Monthly/Yearly verse is gently offered more frequent practice. */
+export const STRUGGLE_RESTARTS = 2;
+
+/** The pile to offer for a verse that took many tries, or null (Daily has nowhere lower, and a verse that just moved up is not offered anything). */
+export function easierPile(pile: Pile, restarts: number): Pile | null {
+  return restarts >= STRUGGLE_RESTARTS ? previousPile(pile) : null;
 }
 
 export function createData(now: number): AppData {
@@ -152,12 +168,30 @@ function reviewedInPeriod(v: Verse, day: DayKey, through?: DayKey): boolean {
   const end = through && through < periodEnd(v.pile, day) ? through : periodEnd(v.pile, day);
   return v.reviews.some((t) => {
     const d = dayKeyOf(t);
-    return d >= start && d <= end;
+    return d >= start && d <= end && d > v.pileSince; // the review that earned the move belongs to the old pile
   });
 }
 
-/** The week/month/year the verse arrived in is a free pass; its first requirement is the next one. */
-const inArrivalPeriod = (v: Verse, day: DayKey): boolean => periodStart(v.pile, v.pileSince) === periodStart(v.pile, day);
+/** The week a verse arrives in from Daily is a free pass; its first requirement is the next week. Monthly and Yearly have no free pass. */
+const inArrivalPeriod = (v: Verse, day: DayKey): boolean =>
+  v.pile === 'weekly' && periodStart(v.pile, v.pileSince) === periodStart(v.pile, day);
+
+/** Distinct reviewed periods among progress offsets (the free week never counts). */
+function periodCount(v: Verse, offsets: number[]): number {
+  return countedPeriods(v, offsets).length;
+}
+function countedPeriods(v: Verse, offsets: number[]): { start: DayKey; last: number }[] {
+  const out: { start: DayKey; last: number }[] = [];
+  for (const off of offsets) {
+    const d = addDays(v.pileSince, off);
+    const start = periodStart(v.pile, d);
+    if (inArrivalPeriod(v, d)) continue;
+    const prev = out[out.length - 1];
+    if (prev && prev.start === start) prev.last = off;
+    else out.push({ start, last: off });
+  }
+  return out;
+}
 
 /**
  * Does `day` count as a progress day for this verse in its current pile? Daily: a counted review that day. Weekly/Monthly: the
@@ -219,6 +253,7 @@ export function lastReviewDay(v: Verse, before?: DayKey): DayKey | undefined {
 export function dueDay(v: Verse, day: DayKey): DayKey {
   if (v.pile === 'daily') return v.pileSince;
   if (inArrivalPeriod(v, day) || reviewedInPeriod(v, day, day)) return addDays(periodEnd(v.pile, day), 1);
+  if (day <= v.pileSince) return addDays(v.pileSince, 1); // moved up today: the next review is tomorrow at the earliest
   return periodStart(v.pile, day);
 }
 
@@ -260,9 +295,10 @@ export function daysInPile(v: Verse, now: number): number {
   return Math.max(0, daysBetween(v.pileSince, dayKeyOf(now)));
 }
 
-/** Progress days earned toward graduation (0 for Yearly), including today once it counts. */
+/** Progress earned toward graduation (0 for Yearly), including today once it counts: days for Daily, reviewed weeks / months for Weekly / Monthly. */
 export function progressDays(data: AppData, v: Verse, now: number): number {
-  return offsetsWithToday(data, v, dayKeyOf(now)).length;
+  const offsets = offsetsWithToday(data, v, dayKeyOf(now));
+  return v.pile === 'daily' ? offsets.length : periodCount(v, offsets);
 }
 
 export function graduationTarget(p: Pile): number | null {
@@ -431,8 +467,16 @@ function graduate(data: AppData, v: Verse, today: DayKey, out: SettleResult) {
     if (!to) return;
     const need = GRADUATION_DAYS[v.pile as keyof typeof GRADUATION_DAYS];
     const days = offsetsWithToday(data, v, today);
-    if (days.length < need) return;
-    const hit = promotionDay(v, addDays(v.pileSince, days[need - 1]), today);
+    let reachedOffset: number;
+    if (v.pile === 'daily') {
+      if (days.length < need) return;
+      reachedOffset = days[need - 1];
+    } else {
+      const periods = countedPeriods(v, days);
+      if (periods.length < need) return;
+      reachedOffset = periods[need - 1].last;
+    }
+    const hit = promotionDay(v, addDays(v.pileSince, reachedOffset), today);
     const lu: LevelUp = { id: `${v.id}:${to}:${hit}`, verseId: v.id, from: v.pile, to, day: hit };
     v.pile = to;
     v.pileSince = hit;
@@ -534,7 +578,8 @@ export interface PileSnapshot {
 /** Manually move a verse. Returns what's needed to undo it. Progress restarts in the new pile. */
 /** Most days a verse may be told it has already spent in a pile: just under the graduation target. */
 export function maxDaysIn(pile: Pile): number {
-  return pile === 'daily' || pile === 'weekly' ? GRADUATION_DAYS[pile] - 1 : pile === 'monthly' ? 364 : 366;
+  // a little under what it takes to move up: 89 days, 13 weeks, 4 months
+  return pile === 'daily' ? 89 : pile === 'weekly' ? 91 : pile === 'monthly' ? 120 : 366;
 }
 
 /** Whole days in [0, max for that pile]; anything else (negative, NaN, huge) is made safe. */

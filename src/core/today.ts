@@ -3,7 +3,7 @@
 // a view of progressDays / graduationTarget.
 import { addDays, dayKeyOf, daysBetween } from './dates.ts';
 import type { DayKey } from './dates.ts';
-import { graduationTarget, pileVerses, progressDays, verseStatus } from './schedule.ts';
+import { PROGRESS_UNIT, graduationTarget, pileVerses, progressDays, verseStatus } from './schedule.ts';
 import { PILES } from './types.ts';
 import type { AppData, Verse } from './types.ts';
 
@@ -57,5 +57,5 @@ export function progressRing(data: AppData, v: Verse, now: number): Ring {
   if (target === null) return { state: 'yearly', earned: 0, target: null, fraction: 1, label: 'Yearly: in your permanent collection' };
   const earned = progressDays(data, v, now);
   const fraction = Math.min(1, earned / target);
-  return { state: 'progress', earned, target, fraction, label: `Day ${earned} of ${target} toward ${NEXT_NAME[v.pile as keyof typeof NEXT_NAME]}` };
+  return { state: 'progress', earned, target, fraction, label: `${PROGRESS_UNIT[v.pile as keyof typeof PROGRESS_UNIT]} ${earned} of ${target} toward ${NEXT_NAME[v.pile as keyof typeof NEXT_NAME]}` };
 }

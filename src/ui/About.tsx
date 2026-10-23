@@ -26,8 +26,8 @@ export function About({ onShowIntro }: { onShowIntro: () => void }) {
           <p style={{ margin: 0 }}>Every verse lives in one pile and moves up on its own as time passes.</p>
           <ul style={{ margin: 0, paddingLeft: '1.2em' }}>
             <li><strong>Daily</strong> — reviewed 3 times a day, with some time between reviews. After {GRADUATION_DAYS.daily} days it moves to Weekly.</li>
-            <li><strong>Weekly</strong> — reviewed once a week (any day, Sunday to Saturday). After {GRADUATION_DAYS.weekly} days it moves to Monthly.</li>
-            <li><strong>Monthly</strong> — reviewed once in each calendar month. After {GRADUATION_DAYS.monthly} days it moves to Yearly.</li>
+            <li><strong>Weekly</strong> — reviewed once a week (any day, Sunday to Saturday). After {GRADUATION_DAYS.weekly} weeks it moves to Monthly.</li>
+            <li><strong>Monthly</strong> — reviewed once in each calendar month. After {GRADUATION_DAYS.monthly} months it moves to Yearly.</li>
             <li><strong>Yearly</strong> — reviewed once a year. It stays here for life.</li>
           </ul>
           <p class="muted small" style={{ margin: 0 }}>
@@ -41,7 +41,7 @@ export function About({ onShowIntro }: { onShowIntro: () => void }) {
             <strong>Streak:</strong> it grows by one each day every due verse gets at least one review (three a day is the goal, but one keeps your flame), and resets if a due verse is missed for a day. Weekly verses are due by Saturday, Monthly by the last day of the month, so anything left undone on those days ends it. Practising on any day, even your first, earns it. Verses you add today don't count against you, and days when nothing is due don't break it.
           </p>
           <p style={{ margin: 0 }}>
-            <strong>Progress:</strong> a verse earns a day toward its next pile on days it is up to date. A Daily verse earns it with one review that day. Review a Weekly verse any time in the week and the whole week counts; do the same in a month for a Monthly verse. A week or month it was skipped just doesn't count — nothing is lost, and the next one starts fresh. A verse that arrives mid-week or mid-month gets that first stretch free.
+            <strong>Progress:</strong> a verse earns a day toward its next pile on days it is up to date. A Daily verse earns it with one review that day. Review a Weekly verse any time in the week and the whole week counts; do the same in a month for a Monthly verse. A week or month it was skipped just doesn't count — nothing is lost, and the next one starts fresh. A verse that moves up from Daily gets the rest of that week free; one that moves up to Monthly or Yearly just needs a review in the month or year it arrives. Weekly takes 15 weeks that were reviewed and Monthly takes 6 months.
           </p>
           <p style={{ margin: 0 }}>
             <strong>Breaks:</strong> need time away? Settings has a "Take a break". While it lasts nothing is due, your streak waits. Verses don't earn days while you're away, and nothing is lost. Reviewing anyway is always welcome.

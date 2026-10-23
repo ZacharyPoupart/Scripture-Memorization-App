@@ -61,30 +61,31 @@ describe('progress days: a day counts when the verse is up to date', () => {
     const v = john316(data, at(D0, '07:00'), { pile: 'weekly', pileSince: D0 });
     reviewEverythingDue(data, day(3)); // week 1 (days 1-7), reviewed midweek
     settle(data, at(day(20), '09:00')); // week 2 (days 8-14) was never reviewed; today (day 20) is in week 3
-    expect(progressDays(data, v, at(day(20), '09:00'))).toBe(7);
-    reviewEverythingDue(data, day(20)); // week 3 is days 15-21: all seven count at once
-    expect(progressDays(data, v, at(day(20), '20:00'))).toBe(14);
+    expect(progressDays(data, v, at(day(20), '09:00'))).toBe(1); // progress is counted in weeks
+    reviewEverythingDue(data, day(20)); // week 3 is days 15-21
+    expect(progressDays(data, v, at(day(20), '20:00'))).toBe(2);
     expect(dueDay(v, day(20))).toBe(day(22)); // good until next Sunday
   });
 
-  it('Weekly on schedule earns 7 days a week, so the 13th week reaches 90', () => {
+  it('Weekly on schedule takes 15 reviewed weeks', () => {
     const data = newData();
     const v = john316(data, at(D0, '07:00'), { pile: 'weekly', pileSince: D0 });
-    for (let i = 1; i <= 84; i++) reviewEverythingDue(data, day(i));
+    for (let i = 1; i <= 98; i++) reviewEverythingDue(data, day(i));
     expect(v.pile).toBe('weekly');
-    expect(progressDays(data, v, at(day(84), '23:00'))).toBe(84);
-    reviewEverythingDue(data, day(85)); // Sunday of week 13
+    expect(progressDays(data, v, at(day(98), '23:00'))).toBe(14);
+    reviewEverythingDue(data, day(99)); // Sunday of week 15
     expect(v.pile).toBe('monthly');
-    expect(v.pileSince).toBe(day(85));
+    expect(v.pileSince).toBe(day(99));
   });
 
-  it('Monthly: a review any day of the calendar month earns the whole month; the month it arrived in is free', () => {
+  it('Monthly: a review any day of the calendar month earns that month, the month it arrived in included', () => {
     const data = newData();
     const v = john316(data, at(D0, '07:00'), { pile: 'monthly', pileSince: D0 });
-    settle(data, at(day(40), '09:00')); // January was the arrival month and nothing was reviewed in February yet
-    expect(progressDays(data, v, at(day(40), '09:00'))).toBe(0);
-    reviewEverythingDue(data, day(40)); // Feb 19: all 28 days of February
-    expect(progressDays(data, v, at(day(40), '20:00'))).toBe(28);
+    reviewEverythingDue(data, day(1)); // Jan 11: the month it arrived in has to be reviewed too
+    settle(data, at(day(40), '09:00')); // nothing reviewed in February yet
+    expect(progressDays(data, v, at(day(40), '09:00'))).toBe(1);
+    reviewEverythingDue(data, day(40)); // Feb 19
+    expect(progressDays(data, v, at(day(40), '20:00'))).toBe(2);
   });
 });
 
@@ -133,9 +134,9 @@ describe('a break earns nothing unless you review anyway', () => {
     setPause(data, day(11), day(20), at(day(11), '08:00'));
     settle(data, at(day(21), '09:00'));
     expect(progressDays(data, d, at(day(21), '09:00'))).toBe(10);
-    expect(progressDays(data, w, at(day(21), '09:00'))).toBe(14); // weeks 1 and 2 were reviewed before the break; week 3 was all break
+    expect(progressDays(data, w, at(day(21), '09:00'))).toBe(2); // weeks 1 and 2 were reviewed before the break; week 3 was all break
     reviewEverythingDue(data, day(21));
-    expect(progressDays(data, w, at(day(21), '20:00'))).toBe(21); // reviewing anyway earns its week
+    expect(progressDays(data, w, at(day(21), '20:00'))).toBe(3); // reviewing anyway earns its week
     expect(progressDays(data, d, at(day(21), '20:00'))).toBe(11);
   });
 
@@ -161,7 +162,7 @@ describe('start partway and moves', () => {
     expect(progressDays(data, v, at(day(1), '20:00'))).toBe(61);
     settle(data, at(day(2), '09:00')); // the app always settles the days before a move
     const m = movePile(data, v.id, 'weekly', at(day(2), '09:00'), 45);
-    expect(progressDays(data, v, at(day(2), '09:00'))).toBe(50); // 45 claimed, plus this week (Sunday day 1 was reviewed, so the week counts)
+    expect(progressDays(data, v, at(day(2), '09:00'))).toBe(7); // 45 days claimed is seven weeks
     restorePile(data, v.id, m, at(day(2), '09:01'));
     expect(v.pile).toBe('daily');
     expect(progressDays(data, v, at(day(2), '09:02'))).toBe(61); // undo gives back exactly what it had
@@ -294,7 +295,7 @@ describe('Weekly and Monthly are due on the last day of the week or month', () =
     expect(streakInfo(data, at(day(9), '09:00')).count).toBe(0);
     expect(progressDays(data, v, at(day(9), '09:00'))).toBe(0); // the missed week never counts, even when reviewed later
     reviewEverythingDue(data, day(9));
-    expect(progressDays(data, v, at(day(9), '20:00'))).toBe(7); // only the new week (days 8-14)
+    expect(progressDays(data, v, at(day(9), '20:00'))).toBe(1); // only the new week (days 8-14)
   });
 
   it('reviewing any day of the week keeps Saturday clear', () => {
@@ -309,8 +310,10 @@ describe('Weekly and Monthly are due on the last day of the week or month', () =
 
   it('Monthly is due on the last day of the month', () => {
     const data = newData();
-    john316(data, at(D0, '07:00'), { pile: 'monthly', pileSince: D0 }); // January is the free month
+    john316(data, at(D0, '07:00'), { pile: 'monthly', pileSince: D0 }); // January is not free: it needs a review too
     settle(data, at(day(60), '09:00')); // Feb 28 is day 49
+    expect(data.ledger[day(10)]?.o).toBe('n'); // midway through January
+    expect(data.ledger[day(21)]?.o).toBe('m'); // Jan 31: the month it arrived in has to be reviewed too
     expect(data.ledger[day(30)]?.o).toBe('n'); // midway through February
     expect(data.ledger[day(49)]?.o).toBe('m');
   });

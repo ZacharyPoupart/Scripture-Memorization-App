@@ -74,8 +74,6 @@ test('progress: only days the verse was reviewed count, and a quiet stretch just
   await addVerse(page, JOHN316);
   await travel(page, '2026-03-11T09:00:00');
   await oneReview(page); // day 1 of the pile, reviewed: it counts
-  await page.getByTestId('verse-card').click();
-  await expect(page.getByTestId('review-flashcard')).toBeVisible();
   await page.goto('/#/pile/daily');
   await expect(page.getByTestId('progress-ring')).toHaveAttribute('aria-label', 'Day 1 of 90 toward Weekly');
   await travel(page, '2026-03-16T09:00:00'); // five quiet days
@@ -101,13 +99,14 @@ test('a verse that earned its promotion moves up with a celebration', async ({ p
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   };
   const v = Object.values<any>(data.verses)[0];
-  v.pileSince = day(-90);
-  v.addedDay = day(-90);
-  data.createdDay = day(-90);
-  data.settledThrough = day(-91);
+  v.pileSince = day(-91);
+  delete v.prog; // saved by an older version: its earned days are worked out from the ledger
+  v.addedDay = day(-91);
+  data.createdDay = day(-91);
+  data.settledThrough = day(-92);
   data.ledger = {};
   v.reviews = [];
-  for (let n = -89; n < 0; n++) for (const h of [8, 11, 14]) v.reviews.push(new Date(2026, 2, 10 + n, h).getTime());
+  for (let n = -90; n < 0; n++) for (const h of [8, 11, 14]) v.reviews.push(new Date(2026, 2, 10 + n, h).getTime());
   const file = JSON.stringify({ app: 'memorize-for-life', format: 1, appVersion: '1.0.0', exportedAt: new Date().toISOString(), data });
 
   await page.goto('/#/settings');

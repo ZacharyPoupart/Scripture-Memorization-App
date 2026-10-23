@@ -5,7 +5,7 @@ import { GRADUATION_DAYS, deleteVerse, maxDaysIn, movePile, nextPile, restorePil
 import { PILES, type Pile } from '../core/types.ts';
 import { back, navigate } from '../router.ts';
 import { act, showToast, useApp } from '../store.ts';
-import { Confirm, DaysSlider, Icon, Overlay, PILE_INFO, PileBadge, pileProgress, statusLabel } from './common.tsx';
+import { Confirm, DaysSlider, Icon, Overlay, PILE_INFO, PileBadge, pileProgress, progressUnitPlural, statusLabel } from './common.tsx';
 import { MODES } from './ModePicker.tsx';
 import { formatDays } from '../core/dates.ts';
 
@@ -84,7 +84,7 @@ export function VerseDetail({ id }: { id: string }) {
             {p.target && next && (
               <>
                 {' '}
-                {p.earned} of {GRADUATION_DAYS[v.pile as keyof typeof GRADUATION_DAYS]} days toward {PILE_INFO[next].label}
+                {p.earned} of {GRADUATION_DAYS[v.pile as keyof typeof GRADUATION_DAYS]} {progressUnitPlural(v.pile)} toward {PILE_INFO[next].label}
 .{status.state === 'ready' && status.countedToday === 0 ? (v.pile === 'daily' ? ' A review today adds a day.' : ' A review this ' + (status.period ?? 'week') + ' counts the whole ' + (status.period ?? 'week') + '.') : ''}
               </>
             )}
@@ -136,7 +136,7 @@ export function VerseDetail({ id }: { id: string }) {
             <details class="quiet-details" open={daysIn > 0}>
               <summary>Already know this one? Start partway</summary>
               <DaysSlider value={daysIn} max={366} onChange={setDaysIn} testid="days-in" />
-              <div class="hint-text">Up to {maxDaysIn('daily')} days for Daily and Weekly, {maxDaysIn('monthly')} for Monthly, {maxDaysIn('yearly')} for Yearly.</div>
+              <div class="hint-text">Up to {maxDaysIn('daily')} days for Daily, {maxDaysIn('weekly')} for Weekly, {maxDaysIn('monthly')} for Monthly, {maxDaysIn('yearly')} for Yearly.</div>
             </details>
             {PILES.map((p2) => (
               <button key={p2} class={`btn block pile-${p2}`} disabled={p2 === v.pile} onClick={() => doMove(p2)} data-testid={`move-${p2}`}>
