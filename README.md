@@ -5,7 +5,7 @@ A calm, offline-first app for memorizing Bible verses and **keeping them memoriz
 - Installs to your iPhone home screen and runs full screen; works completely offline once installed.
 - Add a verse or range (book, chapter, verses), pick a translation, text is looked up automatically when online — or type/paste it any time.
 - Four review modes (flashcard, fill in the blank, type first letters, speak it) + recalling *where* the verse is.
-- Streaks, a gentle 3-day freeze, a Progress tab (streak history, calendar heatmap, what's nearly ready to move up), level-up and streak celebrations that scale with the achievement, light/dark mode (follows your phone).
+- Streaks, a Progress tab (streak history, calendar heatmap, what's nearly ready to move up), level-up and streak celebrations that scale with the achievement, light/dark mode (follows your phone).
 - Search, sort and filter your verses; rename topics; daily reminders through your Calendar app.
 - Export/import backups; optional private sync between your phone and computer with a link code (no email/password).
 
@@ -17,11 +17,11 @@ A calm, offline-first app for memorizing Bible verses and **keeping them memoriz
 | Pile | Review | Moves up after |
 |---|---|---|
 | Daily | 3 times a day, ≥ 2 h apart (adjustable) | 90 days |
-| Weekly | once a week | 90 days |
-| Monthly | once a month | 365 days |
+| Weekly | once a week (Sun–Sat) | 15 reviewed weeks |
+| Monthly | once a calendar month | 6 reviewed months |
 | Yearly | once a year | stays for life |
 
-- **Freeze:** if you go 3 days without reviewing, verses stop gaining days toward the next pile until you review again. Progress is paused, never lost; a verse that already earned its promotion still moves up.
+- **Progress:** a verse moves up only when it is up to date. Daily earns a day with one counted review that day; Weekly (Sunday–Saturday) and Monthly (calendar month) earn the whole week or month with one review any time in it, and a skipped one just doesn't count. Yearly is due once a calendar year. Only the week a verse arrives in from Daily is free. After a review that took several tries in Weekly or beyond, the app offers to move the verse down a pile.
 - **Streak:** +1 for each day you finish all your due reviews; resets if you miss a day. Verses added today don't count against you; days with nothing due neither add nor break it.
 - Extra practice is always allowed and never counts toward the schedule. In each pile, the verses you've held longest are at the top.
 
@@ -40,7 +40,7 @@ npm run dev          # http://localhost:5173 — and a "Network" URL for your ph
 
 ## Tests
 ```bash
-npm test             # unit tests: pile timing, daily spacing, graduation, freeze, streak, midnight rollover, merge, import/export, sync, lookup
+npm test             # unit tests: pile timing, daily spacing, graduation and progress days, streak, midnight rollover, merge, import/export, sync, lookup
 npm run typecheck
 npm run test:e2e     # real-browser tests: desktop + phone-sized screen, all review modes, pile session, offline, backup/restore, sync
 npm run test:all     # everything CI runs

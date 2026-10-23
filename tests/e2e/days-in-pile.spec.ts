@@ -15,7 +15,7 @@ test('moving a verse can carry days with it, and Undo puts everything back', asy
   await expect(page.getByTestId('toast')).toContainText('Moved to Weekly (45 days in)');
 
   await page.goto('/#/pile/weekly');
-  await expect(page.getByTestId('verse-card').getByTestId('progress-ring')).toHaveAttribute('aria-label', 'Day 45 of 90 toward Monthly');
+  await expect(page.getByTestId('verse-card').getByTestId('progress-ring')).toHaveAttribute('aria-label', /^Week [67] of 15 toward Monthly$/);
 
   // Undo from the message puts the verse back exactly as it was
   await page.goto('/#/pile/weekly');
@@ -24,7 +24,7 @@ test('moving a verse can carry days with it, and Undo puts everything back', asy
   await page.getByTestId('move-daily').click(); // a plain move starts fresh
   await page.getByTestId('toast').getByRole('button', { name: 'Undo' }).click();
   await page.goto('/#/pile/weekly');
-  await expect(page.getByTestId('verse-card').getByTestId('progress-ring')).toHaveAttribute('aria-label', 'Day 45 of 90 toward Monthly');
+  await expect(page.getByTestId('verse-card').getByTestId('progress-ring')).toHaveAttribute('aria-label', /^Week [67] of 15 toward Monthly$/);
 });
 
 test('a new verse can start partway through Daily', async ({ page }) => {

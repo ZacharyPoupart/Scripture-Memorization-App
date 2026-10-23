@@ -1,11 +1,10 @@
-// "Take a break": while paused, nothing is due, nothing is missed, nothing freezes, the streak waits,
+// "Take a break": while paused, nothing is due, nothing is missed, the streak waits,
 // and no progress days are earned. Reviewing anyway is welcome and counts as a normal day.
 import { describe, expect, it } from 'vitest';
 import { parseBackup, exportBackup, normalizeData } from '../../src/core/backup.ts';
 import { mergeData } from '../../src/core/merge.ts';
 import {
   endPause,
-  isFrozen,
   isPaused,
   progressDays,
   recordReview,
@@ -46,15 +45,14 @@ describe('pause: rules', () => {
     expect(streakInfo(b.data, at(day(16), '08:00')).count).toBe(0);
   });
 
-  it('a pause is not a run of lapse days: no freeze afterwards', () => {
-    const { data } = withStreak();
+  it('a pause is not a run of missed days: nothing is lost, and the verse earns again the day you review', () => {
+    const { data, v } = withStreak();
     setPause(data, day(6), day(15), at(day(6), '08:00'));
     settle(data, at(day(16), '08:00'));
-    expect(isFrozen(data, at(day(16), '08:00'))).toBe(false);
-    // ...whereas the same gap without a pause freezes
-    const b = withStreak();
-    settle(b.data, at(day(16), '08:00'));
-    expect(isFrozen(b.data, at(day(16), '08:00'))).toBe(true);
+    expect(progressDays(data, v, at(day(16), '08:00'))).toBe(5); // the 5 reviewed days; the break added none and took none
+    expect(v.pile).toBe('daily');
+    reviewEverythingDue(data, day(16));
+    expect(progressDays(data, v, at(day(16), '20:00'))).toBe(6);
   });
 
   it('no progress days are earned while paused, so nothing graduates on holiday', () => {
@@ -65,9 +63,11 @@ describe('pause: rules', () => {
     setPause(data, day(81), day(120), at(day(81), '08:00'));
     settle(data, at(day(121), '09:00'));
     expect(v.pile).toBe('daily');
-    // 40 paused days added nothing; only day 121 (today, a normal day again) counts on top of the earlier 80
+    // 40 paused days added nothing
     expect(progressDays(data, v, at(day(100), '09:00'))).toBe(80);
-    expect(progressDays(data, v, at(day(121), '09:00'))).toBe(81);
+    expect(progressDays(data, v, at(day(121), '09:00'))).toBe(80); // day 121 is a normal day again, and counts once it is reviewed
+    reviewEverythingDue(data, day(121));
+    expect(progressDays(data, v, at(day(121), '20:00'))).toBe(81);
     reviewEverythingDue(data, day(122));
     expect(progressDays(data, v, at(day(122), '20:00'))).toBe(82);
   });

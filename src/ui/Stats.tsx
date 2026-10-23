@@ -3,7 +3,7 @@ import { streakInfo } from '../core/schedule.ts';
 import { bestRuns, heatmap, nextGraduations, pileCounts, totals } from '../core/stats.ts';
 import { navigate } from '../router.ts';
 import { useApp } from '../store.ts';
-import { PILE_INFO } from './common.tsx';
+import { PILE_INFO, progressUnitPlural } from './common.tsx';
 
 const WEEKS = 26;
 const fmt = (day: string) => new Date(`${day}T12:00:00`).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
@@ -96,7 +96,7 @@ export function Stats() {
                 <span class="grow" style={{ textAlign: 'left' }}>
                   <strong>{formatRef(n.verse)}</strong>
                   <span class="muted small" style={{ display: 'block' }}>
-                    {n.remaining === 0 ? `Ready to move to ${PILE_INFO[n.to].label}` : `${n.remaining} day${n.remaining === 1 ? '' : 's'} to ${PILE_INFO[n.to].label}`}
+                    {n.remaining === 0 ? `Ready to move to ${PILE_INFO[n.to].label}` : `${n.remaining} ${n.remaining === 1 ? progressUnitPlural(n.verse.pile).slice(0, -1) : progressUnitPlural(n.verse.pile)} to ${PILE_INFO[n.to].label}`}
                   </span>
                   <span class="bar" style={{ display: 'block', marginTop: '6px' }}>
                     <i style={{ width: `${Math.round((n.earned / n.target) * 100)}%` }} />

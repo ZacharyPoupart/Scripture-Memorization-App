@@ -57,7 +57,7 @@ test.describe('stats screen', () => {
     await expect(page.getByTestId('heat-summary')).toContainText(/days with everything done/); // screen-reader summary
     await expect(page.getByTestId('pile-stat-daily')).toContainText('2');
     await expect(page.getByTestId('pile-stat-yearly')).toContainText('1');
-    await expect(page.getByTestId('nearly').first()).toContainText('days to');
+    await expect(page.getByTestId('nearly').first()).toContainText(/(days?|weeks?|months?) to/);
     expect(await page.getByTestId('run').count()).toBeGreaterThan(0);
     // reachable from Home via the streak chip and via the tab bar
     await page.goto('/#/');
@@ -113,13 +113,14 @@ test.describe('feedback and celebrations', () => {
       const data = await page.evaluate(() => structuredClone((window as any).__mfl.getState().data));
       const day = (n: number) => localDay(2026, 2, 10 + n);
       const v = Object.values<any>(data.verses)[0];
-      v.pileSince = day(-90);
-      v.addedDay = day(-90);
-      data.createdDay = day(-90);
-      data.settledThrough = day(-91);
+      v.pileSince = day(-91);
+      delete v.prog; // saved by an older version: its earned days are worked out from the ledger
+      v.addedDay = day(-91);
+      data.createdDay = day(-91);
+      data.settledThrough = day(-92);
       data.ledger = {};
       v.reviews = [];
-      for (let n = -89; n < 0; n++) for (const h of [8, 11, 14]) v.reviews.push(new Date(2026, 2, 10 + n, h).getTime());
+      for (let n = -90; n < 0; n++) for (const h of [8, 11, 14]) v.reviews.push(new Date(2026, 2, 10 + n, h).getTime());
       await replaceDataWith(page, data);
       await page.goto('/#/');
       await expect(page.getByTestId('celebration')).toBeVisible();
@@ -189,7 +190,7 @@ test.describe('feedback and celebrations', () => {
     await expect(page.getByTestId('feedback-card')).toContainText('iPhone web apps can’t vibrate');
   });
 
-  test('wording stays kind: a long break and a freeze never scold', async ({ page }) => {
+  test('wording stays kind: a long time away never scolds', async ({ page }) => {
     await page.clock.install({ time: new Date(2026, 2, 10, 8, 0) });
     await page.clock.resume();
     await blockLookups(page);
@@ -198,7 +199,7 @@ test.describe('feedback and celebrations', () => {
     await page.clock.setSystemTime(new Date(2026, 2, 16, 9, 0));
     await page.reload();
     await page.goto('/#/');
-    await expect(page.getByTestId('freeze-banner')).toBeVisible();
+    await expect(page.getByTestId('freeze-banner')).toHaveCount(0); // there is no freeze any more
     const guilt = /you (missed|failed|lost|let)|streak (lost|broken|ruined)|behind|shame|disappoint|don['’]t give up|last chance|hurry/i;
     for (const route of ['/#/', '/#/stats', '/#/piles', '/#/settings']) {
       await page.goto(route);

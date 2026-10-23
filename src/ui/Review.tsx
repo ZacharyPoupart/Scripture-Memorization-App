@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { formatRef } from '../core/reference.ts';
-import { nextPile, pileVerses, streakInfo, todaySummary, verseStatus } from '../core/schedule.ts';
+import { easierPile, movePile, nextPile, pileVerses, restorePile, streakInfo, todaySummary, verseStatus } from '../core/schedule.ts';
 import { doneLine } from '../core/milestones.ts';
 import { feedback } from '../services/feedback.ts';
 import { cueFor, planFor } from '../core/practice.ts';
 import { tooManyMistakes } from '../core/quiz.ts';
-import { PILES, type AppData, type LevelUp, type ReviewMode, type Verse } from '../core/types.ts';
+import { PILES, type AppData, type LevelUp, type Pile, type ReviewMode, type Verse } from '../core/types.ts';
 import { back, navigate, type Route } from '../router.ts';
-import { completeReview, showToast, useApp } from '../store.ts';
-import { CheckMark, Coin, Confetti, Icon, PileBadge, PILE_INFO, pileProgress } from './common.tsx';
+import { act, completeReview, showToast, useApp } from '../store.ts';
+import { CheckMark, Coin, Confetti, Icon, PileBadge, PILE_INFO, pileProgress, progressUnitPlural } from './common.tsx';
 import { MODES } from './ModePicker.tsx';
 import { Overlay } from './common.tsx';
 import { Blanks } from './modes/Blanks.tsx';
@@ -93,7 +93,7 @@ function ResultProgress({ verse, data }: { verse: Verse; data: AppData }) {
             <i style={{ width: `${p.pct}%` }} />
           </div>
           <div class="muted small" style={{ marginTop: '4px' }}>
-            {p.earned} of {p.target} days toward {PILE_INFO[next].label}
+            {p.earned} of {p.target} {progressUnitPlural(verse.pile)} toward {PILE_INFO[next].label}
           </div>
         </div>
       ) : (
@@ -125,6 +125,8 @@ export function Review({ route }: { route: Route }) {
   }, []);
   const [idx, setIdx] = useState(0);
   const [attempt, setAttempt] = useState(0);
+  const [restarts, setRestarts] = useState(0); // wrong answers in this verse's review so far
+  const [easier, setEasier] = useState<Pile | null>(null); // a lower pile to offer after a hard time
   const [result, setResult] = useState<{ counted: boolean; levelUps: LevelUp[]; todayComplete: boolean; seeds: number } | null>(null);
   const [tally, setTally] = useState({ counted: 0, practice: 0, ups: 0, seeds: 0 });
   const advanceTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -155,7 +157,9 @@ export function Review({ route }: { route: Route }) {
   const next = () => {
     clearTimeout(advanceTimer.current);
     setResult(null);
+    setEasier(null);
     setAttempt(0);
+    setRestarts(0);
     setIdx((i) => i + 1);
   };
 
@@ -165,7 +169,18 @@ export function Review({ route }: { route: Route }) {
     setResult({ counted: r.counted, levelUps: r.levelUps, todayComplete: r.todayComplete, seeds: r.seeds });
     feedback.complete();
     setTally((t) => ({ counted: t.counted + (r.counted ? 1 : 0), practice: t.practice + (r.counted ? 0 : 1), ups: t.ups + r.levelUps.length, seeds: t.seeds + r.seeds }));
-    advanceTimer.current = setTimeout(next, 1100);
+    // a verse that took many tries in a pile that allows no slips is offered more frequent practice; wait for the answer
+    const offer = r.counted && r.levelUps.length === 0 ? easierPile(verse.pile, restarts) : null;
+    setEasier(offer);
+    if (!offer) advanceTimer.current = setTimeout(next, 1100);
+  };
+
+  const moveDown = (to: Pile) => {
+    if (!verse) return;
+    const id = verse.id;
+    const snap = act((d, t) => movePile(d, id, to, t));
+    showToast(`Moved to ${PILE_INFO[to].label}.`, { label: 'Undo', run: () => act((d, t) => restorePile(d, id, snap, t)) });
+    next();
   };
 
   /** Swap the review type: the verse in front of you starts over in the new type, and the rest of the session uses it too. */
@@ -178,6 +193,7 @@ export function Review({ route }: { route: Route }) {
 
   const onRestart = () => {
     showToast('Let’s try that verse again from the start.');
+    setRestarts((n) => n + 1);
     setAttempt((a) => a + 1);
   };
 
@@ -272,6 +288,19 @@ export function Review({ route }: { route: Route }) {
               </p>
             )}
             {result.todayComplete && <p class="status-ready">That’s everything for today.</p>}
+            {easier && (
+              <div class="stack" style={{ marginTop: '14px' }} data-testid="easier-suggestion" onClick={(e) => e.stopPropagation()}>
+                <p class="muted small" style={{ margin: 0 }}>
+                  That one took a few tries. Want to see it more often for a while?
+                </p>
+                <button class="btn block" onClick={() => moveDown(easier)} data-testid="easier-move">
+                  Move to {PILE_INFO[easier].label}
+                </button>
+                <button class="btn ghost block" onClick={next} data-testid="easier-keep">
+                  Keep it in {PILE_INFO[verse.pile].label}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       ) : (

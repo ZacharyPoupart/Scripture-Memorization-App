@@ -1585,18 +1585,6 @@ button.streak {
   stroke: currentColor;
   opacity: 0.35;
 }
-.pring.frozen {
-  opacity: 0.75;
-}
-.pring.frozen .pring-arc {
-  stroke-dasharray: 3 4 !important;
-}
-.pring-pause {
-  fill: none;
-  stroke: var(--muted);
-  stroke-width: 2.5;
-  stroke-linecap: round;
-}
 @media (prefers-reduced-motion: reduce) {
   .pring-arc {
     transition: none;

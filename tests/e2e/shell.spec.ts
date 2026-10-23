@@ -5,7 +5,7 @@ test('about page: purpose, rules, feedback link and version', async ({ page }) =
   await blockLookups(page);
   await openApp(page, '/#/about');
   await expect(page.getByText('The four piles')).toBeVisible();
-  await expect(page.getByText('Streaks and freezes')).toBeVisible();
+  await expect(page.getByText('Streaks and progress')).toBeVisible();
   await expect(page.getByTestId('feedback')).toHaveAttribute('href', /github\.com\/.*\/issues\/new/);
   await expect(page.getByTestId('version')).toContainText(/version \d+\.\d+\.\d+/);
 });

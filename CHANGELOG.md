@@ -5,6 +5,17 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.33.0] - 2026-10-23
+
+### Changed
+- Weekly, Monthly and Yearly verses now follow the calendar. Review a Weekly verse any day from Sunday to Saturday and it is covered until the next Sunday; Monthly covers the calendar month, Yearly the calendar year. Anything still undone on Saturday (or the last day of the month, or Dec 31) ends the streak that day.
+- Progress moves only when a verse is up to date. A Daily verse earns a day with one counted review that day. A Weekly or Monthly review earns that whole week or month; a week or month that was skipped just doesn't count and is never made up. The "freeze" after three quiet days is gone, and progress already earned is kept.
+- Moving up takes 15 reviewed weeks in Weekly and 6 reviewed months in Monthly (it used to be 90 and 365 days). The rings and Stats say "Week 7 of 15" and "Month 3 of 6".
+- Only the week a verse arrives in from Daily is free. A verse that moves up to Monthly or Yearly has to be reviewed in the month or year it arrives.
+
+### Added
+- After a review that took a few tries in Weekly, Monthly or Yearly, the result card offers to move the verse down a pile so you see it more often. You choose; there is an Undo.
+
 ## [1.32.0] - 2026-10-22
 
 ### Added

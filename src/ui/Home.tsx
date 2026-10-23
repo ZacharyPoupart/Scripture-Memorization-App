@@ -1,7 +1,7 @@
 import { dayKeyOf, formatDuration } from '../core/dates.ts';
 import { formatRef } from '../core/reference.ts';
 import { nextReviewInfo } from '../core/today.ts';
-import { daysUntilFreeze, isFrozen, isPaused, liveVerses, pileVerses, streakInfo, todaySummary, verseStatus } from '../core/schedule.ts';
+import { isPaused, liveVerses, pileVerses, streakInfo, todaySummary, verseStatus } from '../core/schedule.ts';
 import { PILES } from '../core/types.ts';
 import { navigate } from '../router.ts';
 import { shouldNudgeBackup } from '../core/nudges.ts';
@@ -18,8 +18,6 @@ export function Home() {
   const today = todaySummary(data, now);
   const streak = streakInfo(data, now);
   const onBreak = isPaused(data, dayKeyOf(now));
-  const frozen = isFrozen(data, now) && verses.length > 0 && !onBreak;
-  const untilFreeze = daysUntilFreeze(data, now);
   const readyAll = verses.filter((v) => verseStatus(data, v, now).state === 'ready').length;
   const todayList = verses
     .map((v) => ({ v, s: verseStatus(data, v, now) }))
@@ -101,16 +99,6 @@ export function Home() {
               </button>
             </div>
           </div>
-
-          {frozen && (
-            <div class="banner" data-testid="freeze-banner">
-              <strong>Progress is paused.</strong> You've gone more than 3 days without reviewing. Do any review today and your verses start counting
-              days toward their next pile again.
-            </div>
-          )}
-          {!frozen && !onBreak && untilFreeze !== null && untilFreeze <= 1 && today.total > 0 && (
-            <div class="banner">A review today keeps your verses moving. (After 3 days without one, progress simply pauses — nothing is lost.)</div>
-          )}
 
           <div class="card stack today-card">
             <ModePicker blurb={false} />

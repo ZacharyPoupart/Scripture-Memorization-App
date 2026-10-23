@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { exportBackup, normalizeData, parseBackup } from '../../src/core/backup.ts';
 import { mergeData } from '../../src/core/merge.ts';
-import { liveVerses, settle, streakInfo, totalReviews } from '../../src/core/schedule.ts';
+import { liveVerses, progressDays, settle, streakInfo, totalReviews } from '../../src/core/schedule.ts';
 import { Storage } from '../../src/services/storage.ts';
 import { at } from './helpers.ts';
 
@@ -114,5 +114,27 @@ describe('data written by v1.13.0 (avatar) keeps its avatar', () => {
     expect(normalizeData(old).avatar).toBeUndefined();
     const merged = mergeData(old, av);
     expect(merged.avatar?.owned).toEqual(['hair-bun', 'out-hoodie-sky']);
+  });
+});
+
+describe('progress days (v1.33.0): what older versions had earned is kept', () => {
+  it('filling in each verse’s own list from the ledger keeps the progress the old rule showed (only today, which now counts once reviewed, can differ)', () => {
+    const data = parseBackup(BACKUP);
+    const now = at('2026-03-15', '09:00');
+    const before = Object.fromEntries(liveVerses(data).map((v) => [v.id, progressDays(data, v, now)]));
+    expect(Object.values(before).some((n) => n > 0)).toBe(true);
+    settle(data, now);
+    for (const v of liveVerses(data)) {
+      expect(v.prog, v.id).toBeDefined();
+      if (v.pile !== 'yearly') expect(progressDays(data, v, now), v.id).toBeGreaterThanOrEqual(before[v.id] - 1);
+    }
+  });
+
+  it('a backup that carries the progress lists loads unchanged and merges into itself as a no-op', () => {
+    const file = read('backup-v1.33.0-progress.json');
+    const data = parseBackup(file);
+    expect(liveVerses(data).every((v) => Array.isArray(v.prog))).toBe(true);
+    expect(parseBackup(exportBackup(data, '9.9.9', at('2026-03-15')))).toEqual(data);
+    expect(mergeData(data, data)).toEqual(data);
   });
 });

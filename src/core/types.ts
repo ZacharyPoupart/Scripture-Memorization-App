@@ -24,6 +24,12 @@ export interface Verse {
   createdAt: number;
   /** Timestamps of *counted* reviews (extra practice is not stored). Pruned to ~60 days + latest. */
   reviews: number[];
+  /**
+   * The days that have counted as progress toward the next pile, as offsets (1 = the day after `pileSince`), sorted. Together with
+   * pile + pileSince it moves as a group when the pile changes. Absent on verses saved by older versions: settle() fills it in once
+   * from the ledger so nothing already earned is lost.
+   */
+  prog?: number[];
   deletedAt?: number;
 }
 

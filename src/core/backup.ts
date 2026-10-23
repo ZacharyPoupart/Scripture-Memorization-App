@@ -66,6 +66,7 @@ function cleanVerse(id: string, raw: unknown): Verse {
     createdAt: r.createdAt as number,
     reviews: [...new Set(reviews)],
   };
+  if (Array.isArray(r.prog)) v.prog = [...new Set(r.prog.filter((n): n is number => Number.isInteger(n) && n >= 1 && n <= 400))].sort((a, b) => a - b);
   if (isNum(r.deletedAt)) v.deletedAt = r.deletedAt;
   return v;
 }

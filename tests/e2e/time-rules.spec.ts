@@ -66,22 +66,24 @@ test('daily spacing, streak and the local-midnight rollover', async ({ page }) =
   await expect(page.getByTestId('streak')).toHaveAttribute('title', 'Longest streak: 1');
 });
 
-test('freeze: 3 days without reviewing pauses progress, reviewing resumes it', async ({ page }) => {
+test('progress: only days the verse was reviewed count, and a quiet stretch just waits', async ({ page }) => {
   await page.clock.install({ time: at('2026-03-10T08:00:00') });
   await page.clock.resume();
   await blockLookups(page);
   await openApp(page);
   await addVerse(page, JOHN316);
-  await travel(page, '2026-03-12T09:00:00'); // one day lapsed
+  await travel(page, '2026-03-11T09:00:00');
+  await oneReview(page); // day 1 of the pile, reviewed: it counts
+  await page.goto('/#/pile/daily');
+  await expect(page.getByTestId('progress-ring')).toHaveAttribute('aria-label', 'Day 1 of 90 toward Weekly');
+  await travel(page, '2026-03-16T09:00:00'); // five quiet days
   await page.goto('/#/');
-  await expect(page.getByTestId('freeze-banner')).toBeHidden();
-  await travel(page, '2026-03-15T09:00:00'); // days lapsed: 11, 12, 13, 14
-  await page.goto('/#/');
-  await expect(page.getByTestId('freeze-banner')).toBeVisible();
-  await expect(page.getByTestId('freeze-banner')).toContainText('paused');
-  await oneReview(page); // any review resumes progress
-  await page.goto('/#/');
-  await expect(page.getByTestId('freeze-banner')).toBeHidden();
+  await expect(page.getByTestId('freeze-banner')).toHaveCount(0); // nothing to worry about or catch up on
+  await page.goto('/#/pile/daily');
+  await expect(page.getByTestId('progress-ring')).toHaveAttribute('aria-label', 'Day 1 of 90 toward Weekly'); // nothing lost, nothing added
+  await oneReview(page); // reviewing adds today at once
+  await page.goto('/#/pile/daily');
+  await expect(page.getByTestId('progress-ring')).toHaveAttribute('aria-label', 'Day 2 of 90 toward Weekly');
 });
 
 test('a verse that earned its promotion moves up with a celebration', async ({ page }) => {
@@ -97,13 +99,14 @@ test('a verse that earned its promotion moves up with a celebration', async ({ p
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   };
   const v = Object.values<any>(data.verses)[0];
-  v.pileSince = day(-90);
-  v.addedDay = day(-90);
-  data.createdDay = day(-90);
-  data.settledThrough = day(-91);
+  v.pileSince = day(-91);
+  delete v.prog; // saved by an older version: its earned days are worked out from the ledger
+  v.addedDay = day(-91);
+  data.createdDay = day(-91);
+  data.settledThrough = day(-92);
   data.ledger = {};
   v.reviews = [];
-  for (let n = -89; n < 0; n++) for (const h of [8, 11, 14]) v.reviews.push(new Date(2026, 2, 10 + n, h).getTime());
+  for (let n = -90; n < 0; n++) for (const h of [8, 11, 14]) v.reviews.push(new Date(2026, 2, 10 + n, h).getTime());
   const file = JSON.stringify({ app: 'memorize-for-life', format: 1, appVersion: '1.0.0', exportedAt: new Date().toISOString(), data });
 
   await page.goto('/#/settings');

@@ -31,6 +31,11 @@ export function mergeVerse(a: Verse, b: Verse): Verse {
     JSON.stringify([x.pile, x.pileSince]) >= JSON.stringify([y.pile, y.pileSince]) ? x : y,
   );
   const reviews = [...new Set([...a.reviews, ...b.reviews])].sort((x, y) => x - y);
+  // Progress days belong to the pile they were earned in: copies in the same pile (same start day) are joined so no device loses
+  // a day; a verse that has since moved takes the newer pile's days. A copy from an older version has no list and adds nothing.
+  const sameEpoch = (x: Verse) => x.pile === pile.pile && x.pileSince === pile.pileSince;
+  const progLists = [a, b].filter((x) => sameEpoch(x) && x.prog !== undefined).map((x) => x.prog as number[]);
+  const prog = progLists.length ? [...new Set(progLists.flat())].sort((x, y) => x - y) : undefined;
   const deletedAt =
     a.deletedAt !== undefined && b.deletedAt !== undefined
       ? Math.max(a.deletedAt, b.deletedAt)
@@ -53,6 +58,7 @@ export function mergeVerse(a: Verse, b: Verse): Verse {
     createdAt: older.createdAt,
     reviews,
   };
+  if (prog) merged.prog = prog;
   if (deletedAt !== undefined) merged.deletedAt = deletedAt;
   return merged;
 }

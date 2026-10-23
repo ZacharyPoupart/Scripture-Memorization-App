@@ -50,7 +50,7 @@ The automated tests run in Chromium, which behaves differently from iPhone Safar
 ## Today, rings and flashcards (v1.6–1.7)
 - [ ] Today: one big **Start today's reviews** button at the bottom; the list above it shows what is ready / waiting / done. After finishing, the button disappears and the card says when the next review unlocks (no greyed-out button).
 - [ ] The mode choice (Flashcard / Blanks / Type / Speak) is visible on Today and sticks.
-- [ ] Verse cards show a small ring ("Day N of 90 toward Weekly"); a verse in a frozen period looks dashed and paused; Yearly shows a tick.
+- [ ] Verse cards show a small ring ("Day N of 90 toward Weekly"); the number goes up the day you review that verse (and only then, for Daily verses); Yearly shows a tick.
 - [ ] Flashcard: tap the card (or **Flip**) to turn it; tap again to flip back; **Nailed it** / **Needs work** only; no reference-entry step afterwards.
 - [ ] **Uncover bit by bit**: tapping the covered text or the big button reveals a phrase at a time; **By word**, **Show all**, **Start over** work; the page never jumps and a long verse (Psalm 23:1-6) scrolls inside its area.
 - [ ] Type it out: a wrong letter shows the missed word (dotted underline) and carries on; the keyboard stays up.
@@ -61,7 +61,7 @@ The automated tests run in Chromium, which behaves differently from iPhone Safar
 - [ ] The bottom bar has five tabs: Today · Piles · Add · Stats · Settings. Each responds to a single tap and clears the home indicator.
 
 ## Take a break (v1.9)
-- [ ] Settings → Take a break → Start break: Today says **On a break**, the main button reads **Review anyway**, and there is no freeze banner.
+- [ ] Settings → Take a break → Start break: Today says **On a break**, the main button reads **Review anyway**, and there is no banner about progress.
 - [ ] End the break from Today (or Settings): Today returns to normal.
 - [ ] After a real break, your streak number is the same as before it.
 
