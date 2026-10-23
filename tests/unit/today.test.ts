@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildTodayQueue, nextReviewInfo, progressRing } from '../../src/core/today.ts';
+import { buildTodayQueue, nextReviewInfo, progressRing, shuffled } from '../../src/core/today.ts';
 import { recordReview, settle, todaySummary, streakInfo } from '../../src/core/schedule.ts';
 import { at, D0, day, DEVICE, john316, newData } from './helpers.ts';
 
@@ -112,5 +112,30 @@ describe('progressRing', () => {
     expect(r.label).toBe('Day 1 of 90 toward Weekly');
     recordReview(data, v.id, at(day(6), '09:30'), DEVICE); // reviewing adds the day at once
     expect(progressRing(data, v, at(day(6), '10:00')).earned).toBe(2);
+  });
+});
+
+describe('shuffled (the order a session visits the verses in)', () => {
+  const ids = ['a', 'b', 'c', 'd', 'e', 'f'];
+  it('is a permutation: every verse exactly once, nothing added or lost, and the original list is untouched', () => {
+    for (const r of [() => 0, () => 0.999999, Math.random, () => 0.5]) {
+      const out = shuffled(ids, r);
+      expect([...out].sort()).toEqual([...ids].sort());
+      expect(out).toHaveLength(ids.length);
+    }
+    expect(ids).toEqual(['a', 'b', 'c', 'd', 'e', 'f']);
+  });
+  it('is deterministic for a given random source, and actually reorders', () => {
+    expect(shuffled(['a', 'b', 'c'], () => 0)).toEqual(['b', 'c', 'a']);
+    expect(shuffled(ids, () => 0)).toEqual(shuffled(ids, () => 0));
+    let moved = 0;
+    let seed = 7;
+    const rng = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+    for (let k = 0; k < 20; k++) if (shuffled(ids, rng).join() !== ids.join()) moved++;
+    expect(moved).toBeGreaterThan(15);
+  });
+  it('copes with nothing and with one verse', () => {
+    expect(shuffled([])).toEqual([]);
+    expect(shuffled(['only'])).toEqual(['only']);
   });
 });

@@ -14,6 +14,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 ### Added
 - After a review that took a few tries in Weekly, Monthly or Yearly, the result card offers to move the verse down a pile so you see it more often. You choose; there is an Undo.
 
+## [1.32.0] - 2026-10-22
+
+### Added
+- A small shuffle button beside the review type bar (on Today, a pile page and in Settings). Turn it on and a review session visits your verses in a random order instead of longest-held first. It is remembered on this device, and it only changes the order: what is due and what counts toward your streak and progress stays the same.
+
 ## [1.31.0] - 2026-10-22
 
 ### Changed

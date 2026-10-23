@@ -12,6 +12,19 @@ export function buildTodayQueue(data: AppData, now: number): string[] {
   return PILES.flatMap((p) => pileVerses(data, p).filter((v) => verseStatus(data, v, now).state === 'ready')).map((v) => v.id);
 }
 
+/**
+ * The same items in a random order (Fisher–Yates). `random` returns a number in [0, 1). Only the order a session visits the verses
+ * in changes: what is due, what counts and everything else about the schedule is decided elsewhere and never looks at this.
+ */
+export function shuffled<T>(items: readonly T[], random: () => number = Math.random): T[] {
+  const out = [...items];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.min(i, Math.floor(random() * (i + 1)));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
 export type NextReview =
   | { kind: 'none' }
   | { kind: 'soon'; waitMs: number } // a Daily verse unlocks later today

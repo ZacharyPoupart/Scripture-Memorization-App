@@ -545,6 +545,34 @@ textarea.input {
   color: var(--text);
   box-shadow: var(--shadow);
 }
+.mode-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mode-row .seg {
+  flex: 1;
+  min-width: 0;
+}
+.shuffle-btn {
+  flex: none;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--muted);
+}
+.shuffle-btn svg {
+  width: 22px;
+  height: 22px;
+}
+.shuffle-btn[aria-pressed='true'] {
+  background: var(--accent);
+  color: var(--on-accent, #fff);
+}
 .error-text {
   color: var(--bad);
   font-size: 0.88rem;
