@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.34.0] - 2026-10-23
+
 ### Added
 - A guided tour of about five minutes in seven short lessons: the basics, your first review, the review types and practice order, piles and progress (with a little simulator where you watch a verse move up), streak and breaks, your knight, and backups and sync. It runs on the real screens with practice verses, so nothing you do in it is saved or counted. New users are offered it after the welcome; everyone can find it in Settings, About and the empty Today screen.
 - The Shield of Faith is now earned by finishing the tour (people who had already lit their first flame keep it).
