@@ -7,8 +7,9 @@ test.describe('adding, editing and organizing verses', () => {
     await page.goto('/');
     await expect(page.getByTestId('onboarding')).toBeVisible();
     for (let i = 0; i < 4; i++) await page.getByTestId('onboarding-next').click();
-    await page.getByTestId('onboarding-next').click(); // "Get started"
+    await page.getByTestId('onboarding-later').click(); // "Not now" (the other button starts the tour)
     await expect(page.getByTestId('onboarding')).toBeHidden();
+    await expect(page.getByTestId('tour')).toHaveCount(0);
     await saved(page);
     await page.reload();
     await expect(page.getByTestId('onboarding')).toBeHidden(); // remembered

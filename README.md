@@ -21,6 +21,7 @@ A calm, offline-first app for memorizing Bible verses and **keeping them memoriz
 | Monthly | once a calendar month | 6 reviewed months |
 | Yearly | once a year | stays for life |
 
+- **Tour:** a five-minute guided tour (Settings → Help) runs on practice verses so nothing is saved; finishing it earns the shield.
 - **Progress:** a verse moves up only when it is up to date. Daily earns a day with one counted review that day; Weekly (Sunday–Saturday) and Monthly (calendar month) earn the whole week or month with one review any time in it, and a skipped one just doesn't count. Yearly is due once a calendar year. Only the week a verse arrives in from Daily is free. After a review that took several tries in Weekly or beyond, the app offers to move the verse down a pile.
 - **Streak:** +1 for each day you finish all your due reviews; resets if you miss a day. Verses added today don't count against you; days with nothing due neither add nor break it.
 - Extra practice is always allowed and never counts toward the schedule. In each pile, the verses you've held longest are at the top.

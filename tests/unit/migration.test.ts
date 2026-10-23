@@ -138,3 +138,14 @@ describe('progress days (v1.33.0): what older versions had earned is kept', () =
     expect(mergeData(data, data)).toEqual(data);
   });
 });
+
+describe('the guided tour (v1.34.0): finishing it is remembered with the data', () => {
+  it('older backups have no tour and still load; a backup that carries it loads unchanged and merges into itself as a no-op', () => {
+    expect(parseBackup(BACKUP).tourAt).toBeUndefined();
+    const data = parseBackup(read('backup-v1.34.0-tour.json'));
+    expect(data.tourAt).toBe(1773583200000);
+    expect(parseBackup(exportBackup(data, '9.9.9', at('2026-03-15')))).toEqual(data);
+    expect(mergeData(data, data)).toEqual(data);
+    expect(mergeData(parseBackup(BACKUP), data).tourAt).toBe(1773583200000);
+  });
+});

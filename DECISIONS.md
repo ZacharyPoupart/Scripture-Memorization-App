@@ -406,3 +406,10 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Data:** additive `Verse.prog` (optional); schema stays 1; fixture `backup-v1.33.0-progress.json`.
 **Test changes:** freeze tests removed (the freeze no longer exists); due-date, graduation and cascade tests rewritten for calendar periods and the new targets; e2e specs that built a 90-day-old verse now start it a day earlier and mark it as older data; new `tests/unit/progress-days.test.ts`, `tests/e2e/easier-pile.spec.ts`.
 **Undo:** roll back to the `v1.32.0-shuffle` tag.
+
+## v1.34.0 — Guided tour, shield and sword rewards (owner request)
+**What:** a seven-lesson interactive tour (about five minutes), hands-on on the real screens with throw-away practice verses, a "Watch it happen" simulator, spotlight coach marks, auto-start for new users, replay from Settings/About/empty Today. Finishing it earns the Shield of Faith; the Sword of the Spirit now needs a first verse added AND practised.
+**Choices (tell me if you want them different):** (1) The tour runs in an in-memory sandbox: your data and settings are set aside and come back untouched; sync, saving, backup, import and erase are off during it, and a reload mid-tour just returns the real data. (2) The shield is also still earned by a 1-day streak, so nobody who already had it loses it; the sword stays for anyone with a verse and a counted review. (3) Finishing the tour gives no coins, only the shield. (4) "Not now" on the welcome skips the tour for good; it stays one tap away. (5) The simulator uses a pretend date and the real schedule functions, so it can never disagree with the app.
+**Data:** additive `AppData.tourAt` (max-merged), device `settings.tour.done`; schema stays 1; fixture `backup-v1.34.0-tour.json`.
+**Test changes:** avatar reward test rewritten for the new sword and shield rules; new `tests/unit/tour.test.ts`, `tests/e2e/tour.spec.ts` (walks every lesson, nothing saved, sandbox leave/reload, simulator, card on screen, sword), migration fixture test.
+**Undo:** roll back to the `v1.33.0-progress-days` tag.

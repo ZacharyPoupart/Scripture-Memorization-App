@@ -88,13 +88,13 @@ test.describe('avatar and seeds', () => {
     await page.getByTestId('slot-chest').click();
     await expect(page.getByTestId('item-chest-iron-bulwark')).toContainText('Wearing');
     await expect(page.getByTestId('item-chest-sulestial')).toContainText('🔒');
-    // the free set's sword came with the first verse; its shield waits for a first streak
+    // the free set's sword waits for a first practice (adding the verse is not enough); its shield waits for the tour or a first streak
     await page.getByTestId('slot-weapon').click();
-    await expect(page.getByTestId('item-weapon-iron-bulwark')).toContainText('Owned');
+    await expect(page.getByTestId('item-weapon-iron-bulwark')).toContainText('🔒 first practice');
     await page.getByTestId('slot-shield').click();
-    await expect(page.getByTestId('item-shield-iron-bulwark')).toContainText('🔒 1-day');
+    await expect(page.getByTestId('item-shield-iron-bulwark')).toContainText('🔒 finish the tour');
     await page.getByTestId('item-shield-iron-bulwark').click();
-    await expect(page.getByTestId('unlock-hint')).toContainText('1-day streak');
+    await expect(page.getByTestId('unlock-hint')).toContainText('Finish the tour');
   });
 
   test('while testing, all armor is free to wear with no seeds and no streak', async ({ page }) => {

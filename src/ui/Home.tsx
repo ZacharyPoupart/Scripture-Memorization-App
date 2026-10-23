@@ -6,7 +6,7 @@ import { PILES } from '../core/types.ts';
 import { navigate } from '../router.ts';
 import { shouldNudgeBackup } from '../core/nudges.ts';
 import { currentLook, seedsBalance } from '../core/avatar.ts';
-import { downloadBackup, stopBreak, updateSettings, useApp } from '../store.ts';
+import { downloadBackup, openTourMenu, stopBreak, updateSettings, useApp } from '../store.ts';
 import { AvatarFigure } from './AvatarFigure.tsx';
 import { Coin, Icon, PILE_INFO } from './common.tsx';
 import { ModePicker } from './ModePicker.tsx';
@@ -61,6 +61,11 @@ export function Home() {
             <button class="btn primary block" onClick={() => navigate('/add')}>
               Add a verse
             </button>
+            {!data.tourAt && !settings.tour.done.length && (
+              <button class="btn ghost block" onClick={() => openTourMenu(true)} data-testid="empty-tour">
+                New here? Take the five-minute tour
+              </button>
+            )}
           </div>
         </div>
       </div>
