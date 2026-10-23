@@ -418,3 +418,9 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **What:** the lesson rows were centred (the button style centres its contents) so the titles drifted around; they now read left to right with the number, and the sheet scrolls when the screen is short. CSS and one class only.
 **Test changes:** none (visual); checked at iPhone 14 and iPhone SE sizes, dark theme.
 **Undo:** roll back to the `v1.34.0-tour` tag.
+
+## Settings trimmed: celebrations switch, vibration, calendar reminders (owner request)
+**What:** removed the Full/Calm celebrations switch (always the full celebration now), the Vibration switch (and the vibration code) and the Daily reminders card (and the .ics builder). Quiet sounds stay.
+**Choices (tell me if you want them different):** people who had picked Calm now get confetti too. The saved values (`celebrations`, `hapticsOn`, `reminderTimes`) are simply ignored if an older version left them on a device, so nothing breaks; nothing synced is affected.
+**Test changes:** deleted `tests/unit/reminders.test.ts` and the e2e checks for the calendar file, the vibration switch and Calm mode, because those features no longer exist; the sound e2e and unit tests keep their sound checks.
+**Undo:** roll back to the previous stage tag (the code for all three is in git history if you want any back).

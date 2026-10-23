@@ -5,6 +5,9 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Removed
+- The Calm celebrations switch (celebrations always include the confetti), the Vibration switch, and the Daily reminders (Calendar file) card are gone from Settings. Quiet sounds, the avatar switch and everything else stay.
+
 ## [1.34.1] - 2026-10-23
 
 ### Fixed
