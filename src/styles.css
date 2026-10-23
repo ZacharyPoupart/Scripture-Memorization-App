@@ -1933,14 +1933,17 @@ button.streak {
 .tour-scrim,
 .tour-block {
   position: fixed;
-  background: rgba(31, 40, 42, 0.62);
   pointer-events: auto;
 }
 .tour-scrim {
-  inset: 0;
+  background: rgba(12, 18, 20, 0.8);
 }
-.tour-block.clear {
-  background: transparent;
+/* the dimming around a highlighted element is the ring's own huge shadow, so the cut-out has the ring's rounded corners; the blocks only catch taps */
+.tour-ring.dim {
+  box-shadow: 0 0 0 3px var(--accent), 0 0 0 9999px rgba(12, 18, 20, 0.8);
+}
+.tour-scrim {
+  inset: 0;
 }
 .tour-ring {
   position: fixed;
@@ -1962,9 +1965,9 @@ button.streak {
   padding: 16px 16px 12px;
   background: var(--surface);
   color: var(--text);
-  border: 1px solid var(--border);
+  border: 2px solid var(--accent);
   border-radius: 20px;
-  box-shadow: 0 10px 34px rgba(31, 40, 42, 0.28);
+  box-shadow: 0 0 0 5px rgba(12, 18, 20, 0.55), 0 14px 38px rgba(0, 0, 0, 0.45);
   pointer-events: auto;
   animation: tour-in 0.22s ease both;
 }
@@ -2026,12 +2029,21 @@ button.streak {
 .tour-lesson {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: flex-start; /* .btn centres its content; the list reads left to right */
+  gap: 14px;
   text-align: left;
+  padding: 8px 16px;
+  min-height: 54px;
+}
+.sheet.tour-sheet {
+  overflow-y: auto; /* small screens: the list scrolls and Close stays reachable */
 }
 .tour-lesson-text {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 2px;
 }
 .tour-lesson-text small {
