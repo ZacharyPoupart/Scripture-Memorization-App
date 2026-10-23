@@ -61,6 +61,8 @@ Step-by-step with screenshots-in-words: [docs/SETUP.md](docs/SETUP.md).
 ### Turn on sync (optional)
 Sync stores one encrypted blob per link code in Cloudflare KV. In Cloudflare: *Workers & Pages → KV → Create namespace* (e.g. `memorize-sync`), then in your Pages project *Settings → Bindings → Add → KV namespace*, variable name **`SYNC`**, for Production (and Preview, ideally a separate namespace). Redeploy. The app works fully without it; if the binding is missing the Settings screen says so.
 
+Friends and groups use the same KV namespace (no extra setup): everything under `/api/social/` is stored there under its own key prefixes, and friends only see a name, a knight, streaks and counts, never verses. Writes are kept rare because the free tier allows 1,000 a day for everything combined.
+
 Privacy: data is encrypted on your device (AES-GCM, key derived from your 20-character code) before upload; the server only stores ciphertext under an id derived from the code. Anyone with the code can read the data, so keep it private. Free-tier KV allows 1,000 writes/day; the app only writes when something changed and batches changes.
 
 ### NIV text via API.Bible (optional)
