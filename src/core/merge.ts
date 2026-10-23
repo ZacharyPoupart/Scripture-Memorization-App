@@ -98,6 +98,11 @@ export function mergeData(a: AppData, b: AppData): AppData {
     prefs: { value: { ...prefs.value }, at: Math.max(a.prefs.at, b.prefs.at) },
   };
   if (pause) merged.pause = { ...pause };
+  // one identity per person: the earliest wins (ties by id) so every device lands on the same one
+  const identities = [a.social, b.social].filter((x): x is NonNullable<AppData['social']> => !!x).sort((x, y) => x.at - y.at || x.id.localeCompare(y.id));
+  if (identities.length) merged.social = { ...identities[0] };
+  const sharing = a.sharing && b.sharing ? pickLater(a.sharing.at, b.sharing.at, a.sharing, b.sharing, jsonTie) : (a.sharing ?? b.sharing);
+  if (sharing) merged.sharing = { ...sharing };
   if (a.tourAt !== undefined || b.tourAt !== undefined) merged.tourAt = Math.max(a.tourAt ?? 0, b.tourAt ?? 0);
   if (a.avatar || b.avatar) {
     // items are only ever added (union); what is worn is the later decision
