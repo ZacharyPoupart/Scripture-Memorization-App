@@ -413,3 +413,8 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Data:** additive `AppData.tourAt` (max-merged), device `settings.tour.done`; schema stays 1; fixture `backup-v1.34.0-tour.json`.
 **Test changes:** avatar reward test rewritten for the new sword and shield rules; new `tests/unit/tour.test.ts`, `tests/e2e/tour.spec.ts` (walks every lesson, nothing saved, sandbox leave/reload, simulator, card on screen, sword), migration fixture test.
 **Undo:** roll back to the `v1.33.0-progress-days` tag.
+
+## v1.34.1 — Tour lesson list layout (owner screenshot)
+**What:** the lesson rows were centred (the button style centres its contents) so the titles drifted around; they now read left to right with the number, and the sheet scrolls when the screen is short. CSS and one class only.
+**Test changes:** none (visual); checked at iPhone 14 and iPhone SE sizes, dark theme.
+**Undo:** roll back to the `v1.34.0-tour` tag.

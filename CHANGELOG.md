@@ -5,6 +5,9 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Fixed
+- The tour's lesson list is tidied on iPhone: each lesson reads left to right with its number, and the list scrolls on small screens so Close is always reachable.
+
 ## [1.34.0] - 2026-10-23
 
 ### Added

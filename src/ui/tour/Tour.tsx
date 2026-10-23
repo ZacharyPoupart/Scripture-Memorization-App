@@ -204,7 +204,7 @@ function TourMenu({ pos }: { pos?: TourPos }) {
   const close = () => openTourMenu(false);
   return (
     <Overlay onClose={close} label="Tour lessons">
-      <div class="sheet stack" data-testid="tour-menu">
+      <div class="sheet stack tour-sheet" data-testid="tour-menu">
         <h2>Tour lessons</h2>
         <div class="hint-text">About five minutes in all. Practice verses only, so nothing you do in the tour is saved.</div>
         <div class="stack" style={{ '--gap': '8px' } as never}>
