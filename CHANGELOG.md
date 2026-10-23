@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.35.0] - 2026-10-23
+
 ### Added
 - Fifteen painted backgrounds for your knight (a sunlit castle, a frost keep, a seaside palace, an ember fortress, a forest waterfall, moonlit ruins and more), all free. Pick one from the new Background button on the avatar screen; the plain morning sky is still the start.
 
