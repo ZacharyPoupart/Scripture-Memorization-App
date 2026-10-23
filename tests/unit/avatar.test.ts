@@ -46,18 +46,18 @@ const rich = () => {
 };
 
 describe('backgrounds', () => {
-  it('are fifteen painted pictures, all free, plus the drawn morning sky as the default', () => {
+  it('are fifteen painted pictures, all free, and the first is what everyone starts with (the old drawn sky is gone)', () => {
     const scenes = ITEMS.filter((i) => i.slot === 'scene');
-    expect(scenes).toHaveLength(SCENES.length + 1);
+    expect(scenes).toHaveLength(SCENES.length);
     expect(SCENES).toHaveLength(15);
-    expect(defaultLook().scene).toBe('scene-sky');
+    expect(defaultLook().scene).toBe('scene-sunlit-castle');
+    expect(itemById('scene-sky')).toBeUndefined();
     const d = newData();
     for (const s of scenes) {
       expect(s.cost, s.id).toBe(0);
       expect(s.unlock, s.id).toBeUndefined();
       expect(owns(d, s), s.id).toBe(true); // free for everyone, nothing to earn
     }
-    expect(sceneUrl('scene-sky')).toBeNull();
     expect(sceneUrl('scene-frost-keep')).toBe('/scenes/frost-keep.webp');
     expect(sceneUrl('scene-nope')).toBeNull();
   });
@@ -68,7 +68,7 @@ describe('backgrounds', () => {
     expect(equipItem(d, 'scene-frost-keep', 5)).toBe(true);
     expect(currentLook(d).scene).toBe('scene-frost-keep');
     d.avatar!.look.scene = 'scene-from-the-future';
-    expect(currentLook(d).scene).toBe('scene-sky');
+    expect(currentLook(d).scene).toBe('scene-sunlit-castle'); // also what a saved look from the sky days falls back to
   });
 });
 

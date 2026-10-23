@@ -15,6 +15,7 @@ import {
   seedsBalance,
   shortUnlock,
   SLOTS,
+  EXTRA_SLOTS,
   SLOT_LABELS,
   testing,
   type Item,
@@ -100,19 +101,27 @@ export function AvatarScreen() {
             </p>
           </div>
 
-          <div class="slot-chips" role="group" aria-label="What to change">
-            {SLOTS.map((s) => (
-              <button
-                key={s}
-                aria-pressed={s === slot}
-                class={`chip-btn ${s === slot ? 'on' : ''}`}
-                onClick={() => (setSlot(s), setPick(null))}
-                data-testid={`slot-${s}`}
-              >
-                {SLOT_LABELS[s]}
-              </button>
-            ))}
-          </div>
+          {[
+            { label: 'Armor', slots: SLOTS.filter((s) => !EXTRA_SLOTS.includes(s)) },
+            { label: 'Extras', slots: EXTRA_SLOTS },
+          ].map((group) => (
+            <div key={group.label} class="stack" style={{ '--gap': '6px' } as never}>
+              <div class="muted small slot-group-label">{group.label}</div>
+              <div class="slot-chips" role="group" aria-label={group.label}>
+                {group.slots.map((s) => (
+                  <button
+                    key={s}
+                    aria-pressed={s === slot}
+                    class={`chip-btn ${s === slot ? 'on' : ''}`}
+                    onClick={() => (setSlot(s), setPick(null))}
+                    data-testid={`slot-${s}`}
+                  >
+                    {SLOT_LABELS[s]}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
           {armorInfo && (
             <p class="muted small" style={{ margin: 0 }} data-testid="armor-verse">
               {armorInfo.title} · {armorInfo.verse}

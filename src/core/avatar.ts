@@ -10,8 +10,10 @@ import type { AppData } from './types.ts';
 
 export type Slot = 'helmet' | 'chest' | 'belt' | 'boots' | 'cape' | 'shield' | 'weapon' | 'scene';
 
-/** Everything you can change, in the order the avatar screen lists it: the six armor pieces, the cape, then the background. */
+/** Everything you can change, in the order the avatar screen lists it: the six armor pieces, then the extras (cape and background). */
 export const SLOTS: Slot[] = ['helmet', 'chest', 'belt', 'boots', 'shield', 'weapon', 'cape', 'scene'];
+/** The avatar screen keeps these two under "Extras", apart from the armor. */
+export const EXTRA_SLOTS: Slot[] = ['cape', 'scene'];
 export const SLOT_LABELS: Record<Slot, string> = {
   helmet: 'Helmet',
   chest: 'Chest plate',
@@ -23,7 +25,7 @@ export const SLOT_LABELS: Record<Slot, string> = {
   scene: 'Background',
 };
 
-/** The painted backgrounds (v1.35.0, from the owner's sheet; pictures in `public/scenes/<id>.webp`). All free. The drawn morning sky stays the default. */
+/** The painted backgrounds (v1.35.0, from the owner's sheet; pictures in `public/scenes/<id>.webp`). All free; the first one is what everyone starts with (the old drawn morning sky is gone). */
 export const SCENES = [
   { id: 'sunlit-castle', name: 'Sunlit Castle' },
   { id: 'frost-keep', name: 'Frost Keep' },
@@ -149,7 +151,6 @@ export const ITEMS: Item[] = [
   I('weapon', 'weapon-none', 'None'),
   ...piecesOf('weapon'),
   // ---- backgrounds (all free)
-  I('scene', 'scene-sky', 'Morning sky'),
   ...SCENES.map((s) => I('scene', `scene-${s.id}`, s.name)),
 ];
 
@@ -168,7 +169,7 @@ export function defaultLook(): Look {
     cape: 'cape-none',
     shield: 'shield-none',
     weapon: 'weapon-none',
-    scene: 'scene-sky',
+    scene: 'scene-sunlit-castle',
   };
 }
 
