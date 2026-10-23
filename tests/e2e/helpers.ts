@@ -24,11 +24,32 @@ export const BOOK_NAMES: Record<number, string> = { 19: 'Psalms', 43: 'John', 45
 
 /** Open the app fresh and dismiss the first-run walkthrough. */
 export async function openApp(page: Page, path = '/') {
+  await closeRevealsAutomatically(page);
   await page.goto(path);
   const skip = page.getByTestId('onboarding-skip');
   await skip.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {});
   if (await skip.isVisible()) await skip.click();
   await expect(page.getByTestId('onboarding')).toBeHidden();
+}
+
+const revealsWanted = new WeakSet<Page>();
+const revealsHandled = new WeakSet<Page>();
+
+/**
+ * The "you got something new" popup is a modal (a first review lights the flame and earns the shield, a restored backup can too).
+ * Unless a test is about the popup itself, close it whenever it covers something the test wants to tap.
+ */
+async function closeRevealsAutomatically(page: Page) {
+  if (revealsWanted.has(page) || revealsHandled.has(page)) return;
+  revealsHandled.add(page);
+  // several items can be waiting (the shield, then the sword): the next one reuses the button, so do not wait for it to go away
+  await page.addLocatorHandler(
+    page.getByTestId('reveal-close'),
+    async (btn) => {
+      await btn.click();
+    },
+    { noWaitAfter: true },
+  );
 }
 
 /** Stop any real network lookups; offline-style typing is what these tests exercise. */
@@ -181,10 +202,12 @@ export async function completeBlanks(page: Page, text: string) {
  * The "Day one" streak card (and later milestones) pop up over Today after a review. Tests that are not
  * about celebrations let Playwright close the card automatically when it blocks a click.
  */
-export async function autoDismissMilestones(page: Page) {
+export async function autoDismissMilestones(page: Page, { reveals = true } = {}) {
   await page.addLocatorHandler(page.getByTestId('milestone-close'), async (btn) => {
     await btn.click();
   });
+  if (reveals) await closeRevealsAutomatically(page);
+  else revealsWanted.add(page);
 }
 
 /** Fill-in-the-blank, second half: choose book, chapter, verse (and topic, if the verse has one) from the options. */

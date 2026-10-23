@@ -17,7 +17,7 @@ async function dismissReveals(page: Page) {
 }
 
 test.beforeEach(async ({ page }) => {
-  await autoDismissMilestones(page);
+  await autoDismissMilestones(page, { reveals: false }); // these tests are about the popup itself
   await blockLookups(page);
 });
 
