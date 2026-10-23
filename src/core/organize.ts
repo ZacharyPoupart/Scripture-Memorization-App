@@ -87,6 +87,22 @@ export function topicsOf(data: AppData): string[] {
   );
 }
 
+/** How many live verses carry each topic. */
+export function topicCounts(data: AppData): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const v of Object.values(data.verses)) if (!v.deletedAt && v.topic) out[v.topic] = (out[v.topic] ?? 0) + 1;
+  return out;
+}
+
+/** Up to this many topics are shown as buttons; more than that collapse into one searchable list. */
+export const TOPIC_CHIPS_MAX = 6;
+
+/** Topics whose name contains what was typed (case and accents ignored), in the given order. */
+export function matchTopics(topics: string[], query: string): string[] {
+  const q = norm(query.trim());
+  return q ? topics.filter((t) => norm(t).includes(q)) : topics;
+}
+
 export interface TopicChange {
   id: string;
   topic: string;

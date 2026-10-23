@@ -451,4 +451,9 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **What:** a Friends tab in the bottom bar (Today, Piles, Add, Friends, Stats, Settings). The invite and group links keep it highlighted. The Friends button on Progress and the one in Settings → Help are removed, and the screen has no Back button because it is now a tab.
 **Choices (tell me if you want them different):** six tabs is the most that fit comfortably on an iPhone; each is still at least 44 points wide. If it ever feels crowded, Stats could move into the gear/Settings area or Add could become a button on Piles.
 **Test changes:** the navigation test and the touch-target test now include Friends (and Stats); a new friends test checks the tab and that join links highlight it.
+
+## v1.40.0 — Topic list for many topics (owner request)
+**What:** on the verse lists, more than six topics fold into one "Topic: all (N)" button that opens a searchable list with verse counts; the chosen topic shows on the button with Clear and Rename next to it. Six or fewer topics are still plain buttons.
+**Choices (tell me if you want them different):** the limit of six is `TOPIC_CHIPS_MAX`; the list is A to Z. Ideas for later if it is still too much: grouping topics into folders, or pinning favourites.
+**Test changes:** none to existing tests; new `tests/e2e/topics.spec.ts` and unit tests for the counts and the search.
 **Undo:** roll back to the previous stage tag.

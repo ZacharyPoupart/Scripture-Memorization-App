@@ -2039,8 +2039,9 @@ button.streak {
   padding: 8px 16px;
   min-height: 54px;
 }
-.sheet.tour-sheet {
-  overflow-y: auto; /* small screens: the list scrolls and Close stays reachable */
+.sheet.tour-sheet,
+.sheet.scrolls {
+  overflow-y: auto; /* a long list scrolls inside the sheet and Close stays reachable */
 }
 .tour-lesson-text {
   flex: 1;
@@ -2101,6 +2102,35 @@ button.streak {
     animation: none;
     transition: none;
   }
+}
+
+/* the searchable topic list (used when there are many topics) */
+.topic-list {
+  overflow-y: auto;
+  min-height: 0;
+}
+.topic-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+}
+.topic-row.on {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
+}
+.topic-row small {
+  opacity: 0.8;
 }
 
 /* a painted background in the avatar list: the picture fills a rounded square */
@@ -2356,9 +2386,6 @@ button.streak {
   font-size: 0.9rem;
   color: var(--accent-strong);
   text-decoration: underline;
-}
-.sheet.scrolls {
-  overflow-y: auto; /* a long sheet scrolls inside itself and its buttons stay reachable */
 }
 .cheer-btn {
   font-size: 1.3rem;
