@@ -8,10 +8,12 @@
 import { STREAK_MILESTONES } from './milestones.ts';
 import type { AppData } from './types.ts';
 
-export type Slot = 'helmet' | 'chest' | 'belt' | 'boots' | 'cape' | 'shield' | 'weapon';
+export type Slot = 'helmet' | 'chest' | 'belt' | 'boots' | 'cape' | 'shield' | 'weapon' | 'scene';
 
-/** Everything you can change, in the order the avatar screen lists it: the six armor pieces, then the cape. */
-export const SLOTS: Slot[] = ['helmet', 'chest', 'belt', 'boots', 'shield', 'weapon', 'cape'];
+/** Everything you can change, in the order the avatar screen lists it: the six armor pieces, then the extras (cape and background). */
+export const SLOTS: Slot[] = ['helmet', 'chest', 'belt', 'boots', 'shield', 'weapon', 'cape', 'scene'];
+/** The avatar screen keeps these two under "Extras", apart from the armor. */
+export const EXTRA_SLOTS: Slot[] = ['cape', 'scene'];
 export const SLOT_LABELS: Record<Slot, string> = {
   helmet: 'Helmet',
   chest: 'Chest plate',
@@ -20,7 +22,33 @@ export const SLOT_LABELS: Record<Slot, string> = {
   cape: 'Cape',
   shield: 'Shield',
   weapon: 'Sword',
+  scene: 'Background',
 };
+
+/** The painted backgrounds (v1.35.0, from the owner's sheet; pictures in `public/scenes/<id>.webp`). All free; the first one is what everyone starts with (the old drawn morning sky is gone). */
+export const SCENES = [
+  { id: 'sunlit-castle', name: 'Sunlit Castle' },
+  { id: 'frost-keep', name: 'Frost Keep' },
+  { id: 'seaside-palace', name: 'Seaside Palace' },
+  { id: 'ember-fortress', name: 'Ember Fortress' },
+  { id: 'forest-falls', name: 'Forest Falls' },
+  { id: 'moonlit-keep', name: 'Moonlit Keep' },
+  { id: 'twilight-lake', name: 'Twilight Lake' },
+  { id: 'frozen-peak', name: 'Frozen Peak' },
+  { id: 'sunset-ruins', name: 'Sunset Ruins' },
+  { id: 'sky-islands', name: 'Sky Islands' },
+  { id: 'moonlit-ruins', name: 'Moonlit Ruins' },
+  { id: 'harbor-town', name: 'Harbor Town' },
+  { id: 'mountain-lake', name: 'Mountain Lake' },
+  { id: 'marble-court', name: 'Marble Court' },
+  { id: 'island-castle', name: 'Island Castle' },
+] as const;
+
+/** The picture for a background item id (`scene-frost-keep`), or null for the drawn sky. */
+export function sceneUrl(id: string): string | null {
+  const key = id.replace(/^scene-/, '');
+  return SCENES.some((s) => s.id === key) ? `/scenes/${key}.webp` : null;
+}
 
 /** The six pieces of the armor of God, with where each is named (Ephesians 6:14-17). */
 export const ARMOR_SLOTS = ['helmet', 'chest', 'belt', 'boots', 'shield', 'weapon'] as const;
@@ -122,6 +150,8 @@ export const ITEMS: Item[] = [
   // ---- swords
   I('weapon', 'weapon-none', 'None'),
   ...piecesOf('weapon'),
+  // ---- backgrounds (all free)
+  ...SCENES.map((s) => I('scene', `scene-${s.id}`, s.name)),
 ];
 
 const BY_ID = new Map(ITEMS.map((i) => [i.id, i]));
@@ -139,6 +169,7 @@ export function defaultLook(): Look {
     cape: 'cape-none',
     shield: 'shield-none',
     weapon: 'weapon-none',
+    scene: 'scene-sunlit-castle',
   };
 }
 

@@ -47,6 +47,14 @@ test.describe('avatar and seeds', () => {
     await page.getByTestId('item-helmet-silver-vanguard').click();
     await expect(page.getByTestId('item-helmet-silver-vanguard')).toContainText('Wearing');
     await saved(page);
+    // the offline copy has to be fully stored before the network is cut (more pictures to store means this takes longer)
+    await page.evaluate(async () => {
+      const reg = await navigator.serviceWorker.ready;
+      if (!reg.active) throw new Error('no active service worker');
+    });
+    await page.reload();
+    await page.evaluate(() => navigator.serviceWorker.ready);
+    await page.waitForFunction(() => !!navigator.serviceWorker.controller);
     await context.setOffline(true);
     await page.reload();
     await expect(page.getByTestId('item-helmet-silver-vanguard')).toContainText('Wearing');
