@@ -2138,3 +2138,258 @@ button.streak {
   object-fit: cover;
   border-radius: 14px;
 }
+
+/* ============================== "You got something new" =======================
+   The item grows in the middle of the screen with a soft golden glow, slowly turning rays and a few sparkles. */
+.reveal-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 450;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 24px;
+  background: rgba(12, 18, 20, 0.94);
+  animation: fade 0.25s ease both;
+}
+.reveal-stage {
+  position: relative;
+  width: 280px;
+  height: 280px;
+  display: grid;
+  place-items: center;
+}
+.reveal-glow {
+  position: absolute;
+  inset: -30px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 226, 140, 0.75) 0%, rgba(255, 200, 90, 0.32) 42%, rgba(255, 200, 90, 0) 70%);
+  animation: reveal-pulse 2.6s ease-in-out infinite;
+}
+.reveal-rays {
+  position: absolute;
+  inset: -90px;
+  border-radius: 50%;
+  background: repeating-conic-gradient(from 0deg, rgba(255, 226, 140, 0.28) 0deg 9deg, rgba(255, 226, 140, 0) 9deg 24deg);
+  -webkit-mask-image: radial-gradient(circle, #000 18%, transparent 68%);
+  mask-image: radial-gradient(circle, #000 18%, transparent 68%);
+  animation: reveal-spin 24s linear infinite;
+}
+.reveal-imgwrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+.reveal-img {
+  position: relative;
+  max-width: 250px;
+  max-height: 250px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 14px rgba(255, 226, 140, 0.85)) drop-shadow(0 6px 10px rgba(0, 0, 0, 0.5));
+  animation: reveal-pop 0.7s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+.reveal-img.scene {
+  width: 240px;
+  height: 240px;
+  object-fit: cover;
+  border-radius: 28px;
+}
+.reveal-sparkle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--s);
+  height: var(--s);
+  margin: calc(var(--s) / -2);
+  border-radius: 50%;
+  background: #fff3c4;
+  box-shadow: 0 0 8px 2px rgba(255, 226, 140, 0.9);
+  transform: rotate(var(--a)) translateX(var(--d));
+  opacity: 0;
+  animation: reveal-twinkle 1.8s ease-in-out var(--delay) infinite;
+}
+.reveal-text {
+  text-align: center;
+  color: #f6f3ec;
+  animation: reveal-rise 0.5s ease 0.35s both;
+}
+.reveal-kicker {
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+.reveal-name {
+  margin: 4px 0 16px;
+  font-size: 1.5rem;
+  color: #fff8e1;
+}
+@keyframes reveal-pulse {
+  0%,
+  100% {
+    transform: scale(0.92);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+@keyframes reveal-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes reveal-pop {
+  from {
+    transform: scale(0.35);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes reveal-rise {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+@keyframes reveal-twinkle {
+  0%,
+  100% {
+    opacity: 0;
+    transform: rotate(var(--a)) translateX(calc(var(--d) * 0.7)) scale(0.4);
+  }
+  50% {
+    opacity: 1;
+    transform: rotate(var(--a)) translateX(var(--d)) scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal-glow,
+  .reveal-rays,
+  .reveal-sparkle,
+  .reveal-img,
+  .reveal-text {
+    animation: none;
+  }
+  .reveal-sparkle {
+    opacity: 0.7;
+  }
+}
+
+/* ============================== Friends and groups ============================== */
+.friend-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.friend-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+}
+.friend-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.friend-name {
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.friend-streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--text);
+  font-weight: 700;
+}
+.friend-streak svg {
+  width: 14px;
+  height: 14px;
+}
+.friend-counts {
+  display: flex;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.friend-counts span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.friend-counts i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--pile, var(--accent));
+}
+.invite-code {
+  text-align: center;
+  font-family: 'Fraunces', serif;
+  font-size: 2.3rem;
+  letter-spacing: 0.12em;
+  padding: 14px 8px;
+  border-radius: 18px;
+  background: var(--surface-2);
+  user-select: all;
+  -webkit-user-select: all;
+}
+.guild-members {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.guild-members li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.guild-member-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.link-btn {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--accent-strong);
+  text-decoration: underline;
+}
+.cheer-btn {
+  font-size: 1.3rem;
+}
+.cheer-btn.done {
+  opacity: 0.45;
+}

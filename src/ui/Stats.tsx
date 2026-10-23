@@ -41,7 +41,7 @@ export function Stats() {
   return (
     <div class="scroll">
       <div class="narrow stack" data-testid="stats">
-        <h1>Progress</h1>
+        <h1 style={{ margin: 0 }}>Progress</h1>
 
         <div class="grid2">
           <div class="card stat" data-testid="stat-streak">

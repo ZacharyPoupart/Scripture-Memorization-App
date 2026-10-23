@@ -8,6 +8,23 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 ### Changed
 - With more than six topics, the row of topic buttons folds into one "Topic: all" button. It opens a searchable list (with how many verses each topic has); pick one and you can clear it or rename it from the same row. Six or fewer topics still show as buttons.
 
+## [1.39.0] - 2026-10-23
+
+### Changed
+- Friends has its own tab in the bottom bar (between Add and Stats). The Friends button on Progress and the one in Settings are gone, since the tab replaces them.
+
+## [1.38.0] - 2026-10-23
+
+### Added
+- When you buy or earn something for your knight (an armor piece, a cape, the sword or the shield), it now appears in the middle of the screen with a soft golden glow, turning rays and a few sparkles. Tap Nice (or Wear it, for something you have just earned) to carry on.
+
+## [1.37.0] - 2026-10-23
+
+### Added
+- Friends. Settings → Friends and groups (or the Friends button on Progress): turn it on with your name, tap Invite a friend, and send the link or code. When they open it, you each see the other's knight, streak, how many verses are in each pile and how many reviews were done this week. Never the verses themselves. Only people you invite can see you, and either of you can remove the other, or stop sharing and delete your profile, at any time.
+- Groups. Start a group (a youth group, a family, a study group), invite people with a code, and work together toward a shared weekly goal of reviews. Invite only, up to 30 people.
+- Cheers. Tap 👏 on a friend to cheer them on once a day; they see it for a week.
+
 ## [1.36.0] - 2026-10-23
 
 ### Removed

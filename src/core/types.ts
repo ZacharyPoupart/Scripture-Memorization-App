@@ -77,6 +77,10 @@ export interface AppData {
   avatar?: { owned: string[]; look: Partial<Record<string, string>>; lookAt: number };
   /** When the guided tour was finished (ms). Grow-only: merged with the latest. Unlocks the shield. */
   tourAt?: number;
+  /** Who this person is for friends and guilds: a private random id and secret that never leave the synced, encrypted data (and your own backups). The earliest one wins when devices meet. */
+  social?: { id: string; secret: string; at: number };
+  /** What is shared with friends: the name they see and whether sharing is on. The later decision wins. */
+  sharing?: { name: string; on: boolean; at: number };
 }
 
 export type ReviewMode = 'flashcard' | 'blanks' | 'type' | 'speak';
@@ -108,6 +112,8 @@ export interface Settings {
   practice: PracticeOrder;
   /** Show the avatar and seeds on Today. On by default; switching off only hides them. */
   avatarOn: boolean;
+  /** Achievement items (sword, shield) already shown in the "new item" popup on this device; `null` until first looked at (then everything already earned is just remembered). */
+  seenUnlocks: string[] | null;
   /** The guided tour: lesson ids this device has finished (so the menu can tick them). */
   tour: { done: string[] };
 }

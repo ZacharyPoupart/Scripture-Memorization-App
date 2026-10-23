@@ -6,6 +6,8 @@ import { ErrorBoundary } from './ErrorBoundary.tsx';
 import { AvatarScreen } from './AvatarScreen.tsx';
 import { AddVerse } from './AddVerse.tsx';
 import { Celebrations } from './Celebrations.tsx';
+import { ItemReveal } from './ItemReveal.tsx';
+import { Friends } from './Friends.tsx';
 import { Home } from './Home.tsx';
 import { Onboarding } from './Onboarding.tsx';
 import { TourLayer } from './tour/Tour.tsx';
@@ -29,6 +31,9 @@ const TITLES: Record<string, string> = {
   settings: 'Settings',
   avatar: 'Your avatar',
   about: 'About',
+  friends: 'Friends',
+  join: 'Friends',
+  guild: 'Friends',
 };
 
 function CrashProbe() {
@@ -38,7 +43,7 @@ function CrashProbe() {
 
 export function App({ onReload }: { onReload: () => void }) {
   useVisibleViewport();
-  const { ready, settings, sandbox } = useApp();
+  const { ready, settings, sandbox, tour: tourOn } = useApp();
   const route = useRoute();
   const [intro, setIntro] = useState(false);
   const section = route.path[0] ?? '';
@@ -59,6 +64,9 @@ export function App({ onReload }: { onReload: () => void }) {
   else if (a === 'edit' && b) ((screen = <AddVerse key={`edit-${b}`} editId={b} />), (tab = '/piles'));
   else if (a === 'review') screen = <Review route={route} key={route.query.toString()} />;
   else if (a === 'stats') ((screen = <Stats />), (tab = '/stats'));
+  else if (a === 'friends') ((screen = <Friends />), (tab = '/friends'));
+  else if (a === 'join') ((screen = <Friends key={`join-${b}`} joinCode={b ?? ''} />), (tab = '/friends'));
+  else if (a === 'guild') ((screen = <Friends key={`guild-${b}`} guildCode={b ?? ''} />), (tab = '/friends'));
   else if (a === 'avatar') ((screen = <AvatarScreen />), (tab = '/'));
   else if (a === 'settings') ((screen = <Settings onShowIntro={() => setIntro(true)} />), (tab = '/settings'));
   else if (a === 'about') ((screen = <About onShowIntro={() => setIntro(true)} />), (tab = '/settings'));
@@ -75,6 +83,7 @@ export function App({ onReload }: { onReload: () => void }) {
       </main>
       {!inReview && <TabBar current={tab} />}
       <Celebrations suppressed={inReview || !settings.onboarded || sandbox} />
+      <ItemReveal suppressed={inReview || !settings.onboarded || sandbox || !!tourOn} />
       <ToastHost tabs={!inReview} />
       {(!settings.onboarded || intro) && (
         <Onboarding
