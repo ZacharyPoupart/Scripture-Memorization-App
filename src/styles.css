@@ -2108,3 +2108,112 @@ button.streak {
   object-fit: cover;
   border-radius: 14px;
 }
+
+/* ============================== Friends and groups ============================== */
+.friend-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.friend-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+}
+.friend-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.friend-name {
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.friend-streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--text);
+  font-weight: 700;
+}
+.friend-streak svg {
+  width: 14px;
+  height: 14px;
+}
+.friend-counts {
+  display: flex;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.friend-counts span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.friend-counts i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--pile, var(--accent));
+}
+.invite-code {
+  text-align: center;
+  font-family: 'Fraunces', serif;
+  font-size: 2.3rem;
+  letter-spacing: 0.12em;
+  padding: 14px 8px;
+  border-radius: 18px;
+  background: var(--surface-2);
+  user-select: all;
+  -webkit-user-select: all;
+}
+.guild-members {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.guild-members li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.guild-member-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.link-btn {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--accent-strong);
+  text-decoration: underline;
+}
+.sheet.scrolls {
+  overflow-y: auto; /* a long sheet scrolls inside itself and its buttons stay reachable */
+}
+.cheer-btn {
+  font-size: 1.3rem;
+}
+.cheer-btn.done {
+  opacity: 0.45;
+}

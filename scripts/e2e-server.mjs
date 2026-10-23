@@ -5,6 +5,7 @@ import { readFile, stat } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { handleSync } from '../functions/_lib/sync.js';
+import { handleSocial } from '../functions/_lib/social.js';
 
 const root = process.env.DIST_DIR ? join(process.env.DIST_DIR, '/') : fileURLToPath(new URL('../dist/', import.meta.url));
 const port = Number(process.env.PORT || 4173);
@@ -28,6 +29,9 @@ const kv = {
   async put(key, value) {
     store.set(key, value);
   },
+  async delete(key) {
+    store.delete(key);
+  },
 };
 
 async function readBody(req) {
@@ -42,6 +46,13 @@ const server = createServer(async (req, res) => {
     if (url.pathname.startsWith('/api/sync/')) {
       const body = req.method === 'GET' || req.method === 'HEAD' ? undefined : await readBody(req);
       const response = await handleSync(new Request(url, { method: req.method, body }), kv, url.pathname.split('/').pop());
+      res.writeHead(response.status, Object.fromEntries(response.headers));
+      res.end(Buffer.from(await response.arrayBuffer()));
+      return;
+    }
+    if (url.pathname.startsWith('/api/social/')) {
+      const body = req.method === 'GET' || req.method === 'HEAD' ? undefined : await readBody(req);
+      const response = await handleSocial(new Request(url, { method: req.method, body }), kv, url.pathname.split('/').pop());
       res.writeHead(response.status, Object.fromEntries(response.headers));
       res.end(Buffer.from(await response.arrayBuffer()));
       return;

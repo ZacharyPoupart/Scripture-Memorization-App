@@ -77,6 +77,10 @@ export interface AppData {
   avatar?: { owned: string[]; look: Partial<Record<string, string>>; lookAt: number };
   /** When the guided tour was finished (ms). Grow-only: merged with the latest. Unlocks the shield. */
   tourAt?: number;
+  /** Who this person is for friends and guilds: a private random id and secret that never leave the synced, encrypted data (and your own backups). The earliest one wins when devices meet. */
+  social?: { id: string; secret: string; at: number };
+  /** What is shared with friends: the name they see and whether sharing is on. The later decision wins. */
+  sharing?: { name: string; on: boolean; at: number };
 }
 
 export type ReviewMode = 'flashcard' | 'blanks' | 'type' | 'speak';
