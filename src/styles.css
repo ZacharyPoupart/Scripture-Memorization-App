@@ -1747,6 +1747,10 @@ button.streak {
   overflow-x: auto;
   padding-bottom: 4px;
 }
+.slot-chips.wrap {
+  flex-wrap: wrap;
+  overflow: visible;
+}
 .chip-btn {
   flex: none;
   border: 1px solid var(--border);

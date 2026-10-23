@@ -107,7 +107,7 @@ export function AvatarScreen() {
           ].map((group) => (
             <div key={group.label} class="stack" style={{ '--gap': '6px' } as never}>
               <div class="muted small slot-group-label">{group.label}</div>
-              <div class="slot-chips" role="group" aria-label={group.label}>
+              <div class="slot-chips wrap" role="group" aria-label={group.label}>
                 {group.slots.map((s) => (
                   <button
                     key={s}
