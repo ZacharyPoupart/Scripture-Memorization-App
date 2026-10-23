@@ -98,6 +98,7 @@ export function mergeData(a: AppData, b: AppData): AppData {
     prefs: { value: { ...prefs.value }, at: Math.max(a.prefs.at, b.prefs.at) },
   };
   if (pause) merged.pause = { ...pause };
+  if (a.tourAt !== undefined || b.tourAt !== undefined) merged.tourAt = Math.max(a.tourAt ?? 0, b.tourAt ?? 0);
   if (a.avatar || b.avatar) {
     // items are only ever added (union); what is worn is the later decision
     const owned = [...new Set([...(a.avatar?.owned ?? []), ...(b.avatar?.owned ?? [])])].sort();

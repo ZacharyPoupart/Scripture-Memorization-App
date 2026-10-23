@@ -15,7 +15,7 @@ export function TabBar({ current }: { current: string }) {
   return (
     <nav class="tabbar" aria-label="Main">
       {TABS.map((t) => (
-        <a key={t.path} class="tab" href={`#${t.path}`} aria-current={current === t.path ? 'page' : undefined} onClick={(e) => (e.preventDefault(), navigate(t.path))}>
+        <a key={t.path} class="tab" data-testid={`tab-${t.path.slice(1) || 'today'}`} href={`#${t.path}`} aria-current={current === t.path ? 'page' : undefined} onClick={(e) => (e.preventDefault(), navigate(t.path))}>
           <Icon name={t.icon} />
           <span>{t.label}</span>
         </a>

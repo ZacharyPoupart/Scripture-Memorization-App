@@ -38,7 +38,9 @@ export type Unlock =
   | { kind: 'reviews'; n: number }
   | { kind: 'levelups'; n: number }
   | { kind: 'verses'; n: number }
-  | { kind: 'yearly' };
+  | { kind: 'yearly' }
+  | { kind: 'tour' }
+  | { kind: 'practiced' };
 
 export interface Item {
   id: string;
@@ -96,8 +98,8 @@ const NOUN = { helmet: 'helm', chest: 'chest plate', belt: 'belt', boots: 'boots
 type SetSlot = keyof typeof SHARE;
 const setPrice = (set: ArmorSet, slot: SetSlot) => Math.round((set.price * SHARE[slot]) / 5) * 5;
 const setNeeds = (set: ArmorSet): Unlock[] => [...(set.streak ? [streak(set.streak)] : []), ...(set.verses ? [{ kind: 'verses', n: set.verses } as Unlock] : [])];
-/** The free set's sword and shield are rewards, not purchases: the sword for adding your first verse, the shield for your first streak (the day the flame lights). */
-const REWARD: Partial<Record<SetSlot, Unlock>> = { weapon: { kind: 'verses', n: 1 }, shield: { kind: 'streak', days: 1 } };
+/** The free set's sword and shield are rewards, not purchases: the sword for adding your first verse and practising it, the shield for finishing the guided tour (or lighting your first flame, which is how it used to be earned). */
+const REWARD: Partial<Record<SetSlot, Unlock>> = { weapon: { kind: 'practiced' }, shield: { kind: 'tour' } };
 const setPiece = (slot: SetSlot, set: ArmorSet): Item =>
   art(slot, `${slot}-${set.id}`, `${set.name} ${NOUN[slot]}`, setPrice(set, slot), setNeeds(set), {
     set: set.n,
@@ -164,11 +166,17 @@ export function describeUnlock(u: Unlock): string {
       return u.n === 1 ? 'Add your first verse' : `Have ${u.n} verses`;
     case 'yearly':
       return 'Get a verse all the way to Yearly';
+    case 'tour':
+      return 'Finish the tour (or light your first flame)';
+    case 'practiced':
+      return 'Add a verse and practice it';
   }
 }
 
 /** The short form shown on a locked tile, one line each: "365-day streak", "60 verses". */
 export function shortUnlock(u: Unlock): string {
+  if (u.kind === 'tour') return 'finish the tour';
+  if (u.kind === 'practiced') return 'first practice';
   return u.kind === 'streak' ? `${u.days}-day streak` : u.kind === 'verses' ? (u.n === 1 ? 'first verse' : `${u.n} verses`) : describeUnlock(u);
 }
 
@@ -231,6 +239,10 @@ export function meets(data: AppData, u: Unlock): boolean {
       return data.levelUps.length >= u.n;
     case 'verses':
       return Object.values(data.verses).filter((v) => !v.deletedAt).length >= u.n;
+    case 'tour':
+      return !!data.tourAt || data.longestStreak >= 1;
+    case 'practiced':
+      return Object.values(data.verses).some((v) => !v.deletedAt) && totalCounted(data) >= 1;
     case 'yearly':
       return data.levelUps.some((l) => l.to === 'yearly') || Object.values(data.verses).some((v) => !v.deletedAt && v.pile === 'yearly');
   }

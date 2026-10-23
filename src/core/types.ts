@@ -75,6 +75,8 @@ export interface AppData {
   pause?: { from: DayKey; until: DayKey; at: number };
   /** Optional avatar: items bought (grow-only, merged by union) and what is being worn (last decision `lookAt` wins). */
   avatar?: { owned: string[]; look: Partial<Record<string, string>>; lookAt: number };
+  /** When the guided tour was finished (ms). Grow-only: merged with the latest. Unlocks the shield. */
+  tourAt?: number;
 }
 
 export type ReviewMode = 'flashcard' | 'blanks' | 'type' | 'speak';
@@ -112,6 +114,8 @@ export interface Settings {
   practice: PracticeOrder;
   /** Show the avatar and seeds on Today. On by default; switching off only hides them. */
   avatarOn: boolean;
+  /** The guided tour: lesson ids this device has finished (so the menu can tick them). */
+  tour: { done: string[] };
 }
 
 export const TRANSLATIONS = ['ESV', 'NIV', 'NLT', 'NASB', 'NKJV', 'CSB', 'KJV', 'WEB'] as const;

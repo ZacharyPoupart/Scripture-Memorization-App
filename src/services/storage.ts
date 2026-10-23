@@ -91,6 +91,7 @@ export function defaultSettings(): Settings {
     speakWords: true,
     practice: { before: [], after: ['citation', 'topic'] },
     shuffle: false,
+    tour: { done: [] },
   };
 }
 

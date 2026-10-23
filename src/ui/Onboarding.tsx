@@ -6,10 +6,10 @@ const SLIDES = [
   { icon: '➕', title: 'Add verses', body: 'Pick a book, chapter and verses. The text is looked up for you when you’re online, or you can type or paste it any time — even offline.' },
   { icon: '🗂️', title: 'Four piles', body: 'New verses start in Daily (3 reviews a day). After 90 days they move to Weekly, then Monthly, then Yearly — reviewed less and less, but never forgotten.' },
   { icon: '🧠', title: 'Four ways to practice', body: 'Flashcards, fill in the blanks, typing first letters, or speaking aloud. You’ll also recall where each verse is found.' },
-  { icon: '🔥', title: 'Build your streak', body: 'Finish your due reviews each day to grow your streak. See your whole history on the Stats tab. If you step away for a few days, progress simply pauses — nothing is ever erased.' },
+  { icon: '🔥', title: 'Build your streak', body: 'Do your due reviews to grow your streak. See your whole history on the Stats tab. If you step away, progress simply waits — nothing is ever erased. A short tour (about five minutes) shows you around, and earns your first shield.' },
 ];
 
-export function Onboarding({ onClose }: { onClose: () => void }) {
+export function Onboarding({ onClose, onTour }: { onClose: () => void; onTour: () => void }) {
   const [i, setI] = useState(0);
   const s = SLIDES[i];
   const last = i === SLIDES.length - 1;
@@ -32,8 +32,13 @@ export function Onboarding({ onClose }: { onClose: () => void }) {
               Skip
             </button>
           )}
-          <button class="btn primary grow" onClick={() => (last ? onClose() : setI(i + 1))} data-testid="onboarding-next">
-            {last ? 'Get started' : 'Next'}
+          {last && (
+            <button class="btn ghost" onClick={onClose} data-testid="onboarding-later">
+              Not now
+            </button>
+          )}
+          <button class="btn primary grow" onClick={() => (last ? onTour() : setI(i + 1))} data-testid="onboarding-next">
+            {last ? 'Take the tour' : 'Next'}
           </button>
         </div>
       </div>

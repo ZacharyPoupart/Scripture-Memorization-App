@@ -5,6 +5,8 @@ import { buyItem, equipItem, resetAvatar, seedsEarned, testing, type BuyResult }
 import { addDays, dayKeyOf } from './core/dates.ts';
 import { mergeData } from './core/merge.ts';
 import { createData, endPause, recordReview, setPause, settle } from './core/schedule.ts';
+import { LESSONS, START, doneLessons, nextPos, sampleTourData, type TourPos } from './core/tour.ts';
+import { navigate } from './router.ts';
 import type { AppData, LevelUp, Settings } from './core/types.ts';
 import { setFeedbackPrefs } from './services/feedback.ts';
 import { Storage, requestPersistence } from './services/storage.ts';
@@ -36,6 +38,12 @@ export interface AppState {
   updateReady: boolean;
   /** Test hook: makes a screen throw so the friendly error screen can be verified. */
   debugCrash?: boolean;
+  /** The guided tour is running on throw-away practice verses: nothing is saved, synced or counted until it ends. */
+  sandbox: boolean;
+  /** Where the tour is, and whether its lesson list is open. `null` when no tour is running. */
+  tour: { pos: TourPos; menu: boolean } | null;
+  /** The lesson list on its own (from Settings or the welcome), before the tour has begun. */
+  tourMenu: boolean;
 }
 
 const storage = new Storage();
@@ -64,12 +72,16 @@ let state: AppState = {
     speakWords: true,
     practice: { before: [], after: ['citation', 'topic'] },
     shuffle: false,
+    tour: { done: [] },
   },
   tick: 0,
   toast: null,
   sync: { kind: 'off' },
   online: typeof navigator === 'undefined' ? true : navigator.onLine,
   updateReady: false,
+  sandbox: false,
+  tour: null,
+  tourMenu: false,
 };
 
 const listeners = new Set<() => void>();
@@ -98,6 +110,7 @@ export function useApp(): AppState {
 
 let saveChain: Promise<void> = Promise.resolve();
 function persist() {
+  if (state.sandbox) return; // the tour's practice verses are never saved
   const snapshot = state.data;
   const today = dayKeyOf(Date.now());
   saveChain = saveChain
@@ -109,6 +122,7 @@ function persist() {
 export const flushSaves = (): Promise<void> => saveChain;
 
 function persistSettings() {
+  if (state.sandbox) return;
   const s = state.settings;
   saveChain = saveChain.then(() => storage.saveSettings(s)).catch((e) => console.error('settings save failed', e));
 }
@@ -209,9 +223,89 @@ export function applyTheme() {
   else document.documentElement.setAttribute('data-theme', t);
 }
 
+// ---------------------------------------------------------------- the guided tour
+
+/** True (and says so) while the tour is running: real backups, imports, sync and erasing are switched off in it. */
+function inTour(): boolean {
+  if (!state.sandbox) return false;
+  showToast('That is switched off in the tour, so your own data stays safe.');
+  return true;
+}
+
+let real: { data: AppData; settings: Settings } | null = null;
+let doneInTour: string[] = [];
+
+/** Begin (or jump within) the tour on throw-away practice verses. The owner's own data is set aside and comes back untouched. */
+export function startTour(pos: TourPos = START) {
+  if (!state.sandbox) {
+    real = { data: state.data, settings: state.settings };
+    doneInTour = [];
+    const now = Date.now();
+    set({
+      sandbox: true,
+      data: sampleTourData(now),
+      settings: { ...state.settings, practice: { before: [], after: ['citation', 'topic'] }, shuffle: false, defaultMode: 'flashcard', nudgeDismissedAt: now, onboarded: true },
+      tour: { pos, menu: false },
+      tourMenu: false,
+    });
+  } else {
+    set({ tour: { pos, menu: false } });
+  }
+}
+
+export function setTourPos(pos: TourPos) {
+  if (!state.tour) return;
+  // finishing a lesson (moving past its last step) ticks it off
+  if (pos.lesson > state.tour.pos.lesson) doneInTour = [...new Set([...doneInTour, LESSONS[state.tour.pos.lesson].id])];
+  set({ tour: { ...state.tour, pos } });
+}
+
+export function openTourMenu(open: boolean) {
+  if (state.tour) set({ tour: { ...state.tour, menu: open } });
+  else set({ tourMenu: open });
+}
+
+/** Leave the tour: practice verses are dropped and the real data and settings come back. `finished` also earns the shield. */
+export function endTour(finished: boolean) {
+  if (!state.sandbox || !real) {
+    set({ tour: null, tourMenu: false });
+    return;
+  }
+  const lastDone = finished ? LESSONS.map((l) => l.id) : doneInTour;
+  const back = real;
+  real = null;
+  set({ sandbox: false, tour: null, tourMenu: false, data: back.data, settings: back.settings });
+  applyTheme();
+  setFeedbackPrefs({ sound: state.settings.soundOn, haptics: state.settings.hapticsOn });
+  updateSettings({ onboarded: true, tour: { done: doneLessons([...state.settings.tour.done, ...lastDone]) } });
+  doneInTour = [];
+  scheduleSync();
+  if (finished) {
+    act((d, now) => {
+      d.tourAt = Math.max(d.tourAt ?? 0, now);
+    });
+    navigate('/avatar');
+    showToast('Tour finished. You earned the Shield of Faith.');
+  } else navigate('/');
+}
+
+/** After the last step. */
+export function finishTour() {
+  endTour(true);
+}
+
+/** Move on one step (ending the tour after the last one). */
+export function tourNext() {
+  if (!state.tour) return;
+  const n = nextPos(state.tour.pos);
+  if (n) setTourPos(n);
+  else finishTour();
+}
+
 // ---------------------------------------------------------------- backup
 
 export function downloadBackup() {
+  if (inTour()) return;
   const text = exportBackup(state.data, __APP_VERSION__, Date.now());
   const blob = new Blob([text], { type: 'application/json' });
   const a = document.createElement('a');
@@ -231,6 +325,7 @@ export function previewBackup(text: string): { data: AppData; verses: number } {
 
 /** Merge (default) keeps everything you have; replace swaps your data for the file's. */
 export function importBackup(data: AppData, mode: 'merge' | 'replace') {
+  if (inTour()) return;
   const before = state.data;
   const next = mode === 'merge' ? mergeData(before, data) : data;
   set({ data: next });
@@ -250,6 +345,7 @@ export async function listSnapshots() {
 }
 
 export async function restoreSnapshot(key: string): Promise<boolean> {
+  if (inTour()) return false;
   const snap = await storage.loadSnapshot(key);
   if (!snap) return false;
   importBackup(snap, 'replace');
@@ -259,6 +355,7 @@ export async function restoreSnapshot(key: string): Promise<boolean> {
 /** Erase everything on this device. The previous data is kept in memory and (as always) in the saved
  *  "previous copy" + daily snapshots, so the toast can offer a real undo. */
 export function resetEverything() {
+  if (inTour()) return;
   const before = state.data;
   set({ data: createData(Date.now()) });
   persist();
@@ -280,14 +377,14 @@ let syncTimer: ReturnType<typeof setTimeout> | undefined;
 let syncing = false;
 
 function scheduleSync() {
-  if (!state.settings.syncCode) return;
+  if (state.sandbox || !state.settings.syncCode) return;
   clearTimeout(syncTimer);
   syncTimer = setTimeout(() => void syncNow(), 6000);
 }
 
 export async function syncNow(): Promise<void> {
   const code = state.settings.syncCode;
-  if (!code || syncing) return;
+  if (!code || syncing || state.sandbox) return;
   if (!state.online) {
     set({ sync: { kind: 'idle' } });
     return;
@@ -296,6 +393,11 @@ export async function syncNow(): Promise<void> {
   set({ sync: { kind: 'syncing' } });
   try {
     const result = await runSync(code, state.data);
+    if (state.sandbox) {
+      // the tour began while this sync was in flight: its practice verses must never mix with the real data; sync again afterwards
+      set({ sync: { kind: 'idle' } });
+      return;
+    }
     // Merge into the *current* data: changes made while syncing are kept (merge is idempotent).
     const merged = mergeData(state.data, result.merged);
     const changed = stable(merged) !== stable(state.data);
@@ -312,6 +414,7 @@ export async function syncNow(): Promise<void> {
 }
 
 export async function enableSync(input?: string): Promise<string | null> {
+  if (inTour()) return null;
   const code = input ? normalizeSyncCode(input) : generateSyncCode();
   if (!code) return null;
   updateSettings({ syncCode: code });

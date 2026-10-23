@@ -2,6 +2,13 @@
 
 The automated tests run in Chromium, which behaves differently from iPhone Safari in exactly the ways that have bitten before. Run through this on a real iPhone after each release (use the Cloudflare preview link for a pull request, or the live site after merging). Takes about 10 minutes. **Back up first** (Settings → Export backup): deleting a home-screen app on iOS also deletes its stored data.
 
+## Guided tour
+- [ ] First launch: the welcome slides end with "Take the tour"; "Not now" leaves you at an empty Today with a small tour link.
+- [ ] Every card is fully on screen (notch, home indicator, tab bar) and the highlighted spot is where the card says.
+- [ ] Type lesson: the keyboard opens when you tap the verse, and the small card at the top does not cover the words.
+- [ ] Leave the tour part-way (Lessons, Leave the tour): your own verses and streak are exactly as before. Force-quit mid tour and reopen: same.
+- [ ] Finish it: the Shield of Faith shows on the avatar screen.
+
 ## Install and offline
 - [ ] Open the link in **Safari** → Share → **Add to Home Screen**. It opens full screen (no Safari address bar).
 - [ ] With Wi-Fi on, open the app once and use it for a moment (this lets it save itself for offline).
