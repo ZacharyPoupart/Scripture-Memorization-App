@@ -5,6 +5,9 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Added
+- When you buy or earn something for your knight (an armor piece, a cape, the sword or the shield), it now appears in the middle of the screen with a soft golden glow, turning rays and a few sparkles. Tap Nice (or Wear it, for something you have just earned) to carry on. Calm celebrations mode keeps just the glow.
+
 ## [1.35.0] - 2026-10-23
 
 ### Added

@@ -92,6 +92,7 @@ export function defaultSettings(): Settings {
     practice: { before: [], after: ['citation', 'topic'] },
     shuffle: false,
     tour: { done: [] },
+    seenUnlocks: null,
   };
 }
 

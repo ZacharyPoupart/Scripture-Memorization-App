@@ -420,3 +420,10 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Data:** no new fields: the choice is stored in the existing worn-items list. Schema stays 1; an older version that does not know a picture falls back to the sky.
 **Test changes:** the avatar offline test now waits for the offline copy before cutting the network (this also removes the occasional flake); the "avatar screen lists ..." unit test now expects the Background slot; new unit tests (fifteen free pictures, files exist, wearing and fallback) and `tests/e2e/backgrounds.spec.ts`.
 **Undo:** roll back to the `v1.34.0-tour` tag.
+
+## v1.36.0 — "You got something new" popup (owner request)
+**What:** buying an item, or earning the sword or the shield, shows the item large in the middle of the screen with a golden glow, turning rays and sparkles (calm mode: glow only; reduced motion: no movement).
+**Choices (tell me if you want them different):** bought items are already worn, so the button just says Nice; earned items offer Wear it / Later. It waits until a review, the tour or a level-up celebration is finished, and queues if several arrive at once (the first review of all gives the shield and then the sword). Capes and backgrounds get it too when bought; they are free, so they do not. People who already own the sword or shield are not shown it again (it is remembered the first time the app runs this version). A sound plays only if sound is on.
+**Data:** device-only `settings.seenUnlocks`; nothing synced; schema stays 1.
+**Test changes:** new unit test (`freshUnlocks`), new `tests/e2e/item-reveal.spec.ts` (buy, earned sword and shield in order, never twice, never in the tour).
+**Undo:** roll back to the `v1.35.0` tag (or the stage tag of the backgrounds release).

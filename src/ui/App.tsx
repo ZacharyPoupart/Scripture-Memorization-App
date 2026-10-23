@@ -6,6 +6,7 @@ import { ErrorBoundary } from './ErrorBoundary.tsx';
 import { AvatarScreen } from './AvatarScreen.tsx';
 import { AddVerse } from './AddVerse.tsx';
 import { Celebrations } from './Celebrations.tsx';
+import { ItemReveal } from './ItemReveal.tsx';
 import { Home } from './Home.tsx';
 import { Onboarding } from './Onboarding.tsx';
 import { TourLayer } from './tour/Tour.tsx';
@@ -38,7 +39,7 @@ function CrashProbe() {
 
 export function App({ onReload }: { onReload: () => void }) {
   useVisibleViewport();
-  const { ready, settings, sandbox } = useApp();
+  const { ready, settings, sandbox, tour: tourOn } = useApp();
   const route = useRoute();
   const [intro, setIntro] = useState(false);
   const section = route.path[0] ?? '';
@@ -75,6 +76,7 @@ export function App({ onReload }: { onReload: () => void }) {
       </main>
       {!inReview && <TabBar current={tab} />}
       <Celebrations suppressed={inReview || !settings.onboarded || sandbox} />
+      <ItemReveal suppressed={inReview || !settings.onboarded || sandbox || !!tourOn} />
       <ToastHost tabs={!inReview} />
       {(!settings.onboarded || intro) && (
         <Onboarding

@@ -24,6 +24,8 @@ import {
   STREAK_SEED_BONUS,
   SCENES,
   sceneUrl,
+  unlockedIds,
+  freshUnlocks,
 } from '../../src/core/avatar.ts';
 import { mergeData } from '../../src/core/merge.ts';
 import { recordReview, settle } from '../../src/core/schedule.ts';
@@ -44,6 +46,21 @@ const rich = () => {
   d.reviewsByDevice = { x: 1000 }; // 1000 seeds worth of counted reviews
   return d;
 };
+
+describe('the "new item" popup', () => {
+  it('announces only achievement items earned since the last look, and never what you already had', () => {
+    const d = newData();
+    expect(unlockedIds(d)).toEqual([]);
+    expect(freshUnlocks(d, null)).toEqual([]); // first look: nothing is announced, it is only remembered
+    john316(d, 1000);
+    d.reviewsByDevice = { x: 1 };
+    expect(unlockedIds(d)).toEqual(['weapon-iron-bulwark']);
+    expect(freshUnlocks(d, [])).toEqual(['weapon-iron-bulwark']);
+    expect(freshUnlocks(d, ['weapon-iron-bulwark'])).toEqual([]);
+    d.tourAt = 5;
+    expect(freshUnlocks(d, ['weapon-iron-bulwark'])).toEqual(['shield-iron-bulwark']);
+  });
+});
 
 describe('backgrounds', () => {
   it('are fifteen painted pictures, all free, and the first is what everyone starts with (the old drawn sky is gone)', () => {

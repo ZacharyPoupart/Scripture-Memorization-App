@@ -44,6 +44,10 @@ export interface AppState {
   tour: { pos: TourPos; menu: boolean } | null;
   /** The lesson list on its own (from Settings or the welcome), before the tour has begun. */
   tourMenu: boolean;
+  /** Items waiting to be shown in the "new item" popup, first one on screen. */
+  reveals: string[];
+  /** A level-up or streak celebration is on screen: the "new item" popup waits for it to be closed. */
+  celebrating: boolean;
 }
 
 const storage = new Storage();
@@ -73,6 +77,7 @@ let state: AppState = {
     practice: { before: [], after: ['citation', 'topic'] },
     shuffle: false,
     tour: { done: [] },
+    seenUnlocks: null,
   },
   tick: 0,
   toast: null,
@@ -82,6 +87,8 @@ let state: AppState = {
   sandbox: false,
   tour: null,
   tourMenu: false,
+  reveals: [],
+  celebrating: false,
 };
 
 const listeners = new Set<() => void>();
@@ -151,11 +158,26 @@ export function completeReview(verseId: string): { counted: boolean; levelUps: L
 
 /** Spend seeds on an item and wear it right away. */
 export function buyAndWear(id: string): BuyResult {
-  return act((d, now) => {
+  const r = act((d, now) => {
     const r = buyItem(d, id, now);
     if (r.ok) equipItem(d, id, now);
     return r;
   });
+  if (r.ok) queueReveal(id);
+  return r;
+}
+
+/** Show the "new item" popup for an item (one at a time, in order). */
+export function queueReveal(id: string) {
+  if (!state.reveals.includes(id)) set({ reveals: [...state.reveals, id] });
+}
+
+export function setCelebrating(on: boolean) {
+  if (state.celebrating !== on) set({ celebrating: on });
+}
+
+export function dismissReveal() {
+  set({ reveals: state.reveals.slice(1) });
 }
 
 /** Take off and forget everything bought or worn (seeds come back). */
