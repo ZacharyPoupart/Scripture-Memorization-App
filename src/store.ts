@@ -9,6 +9,8 @@ import { LESSONS, START, doneLessons, nextPos, sampleTourData, type TourPos } fr
 import { navigate } from './router.ts';
 import type { AppData, LevelUp, Settings } from './core/types.ts';
 import { setFeedbackPrefs } from './services/feedback.ts';
+import { cleanName, MAX_GUILD_NAME, type Cheer, newIdentity, sameSnapshot, socialSnapshot, type FriendCard, type GuildView, type Snapshot } from './core/social.ts';
+import { api, socialMessage, SocialError, type Auth } from './services/social.ts';
 import { Storage, requestPersistence } from './services/storage.ts';
 import { runSync, stable, SyncError } from './services/sync.ts';
 import { generateSyncCode, normalizeSyncCode } from './services/syncCrypto.ts';
@@ -23,6 +25,20 @@ export interface Toast {
   id: number;
   message: string;
   action?: { label: string; run: () => void };
+}
+
+export interface SocialState {
+  friends: FriendCard[] | null;
+  /** Friends who cheered you in the last week, and the friends you have cheered today (this session). */
+  cheers: Cheer[];
+  cheered: string[];
+  guilds: GuildView[] | null;
+  busy: boolean;
+  /** A short sentence for the screen when the last attempt failed; '' when all is well. */
+  error: string;
+  loadedAt: number;
+  invite: { code: string; expiresAt: number } | null;
+  guildInvites: Record<string, { code: string; expiresAt: number }>;
 }
 
 export interface AppState {
@@ -48,6 +64,8 @@ export interface AppState {
   reveals: string[];
   /** A level-up or streak celebration is on screen: the "new item" popup waits for it to be closed. */
   celebrating: boolean;
+  /** Friends and guilds, as last fetched (null until the first load). */
+  social: SocialState;
 }
 
 const storage = new Storage();
@@ -86,6 +104,7 @@ let state: AppState = {
   tourMenu: false,
   reveals: [],
   celebrating: false,
+  social: { friends: null, cheers: [], cheered: [], guilds: null, busy: false, error: '', loadedAt: 0, invite: null, guildInvites: {} },
 };
 
 const listeners = new Set<() => void>();
@@ -146,11 +165,13 @@ export function act<T>(fn: (data: AppData, now: number, deviceId: string) => T):
 }
 
 export function completeReview(verseId: string): { counted: boolean; levelUps: LevelUp[]; todayComplete: boolean; seeds: number } {
-  return act((d, now, device) => {
+  const r = act((d, now, device) => {
     const before = seedsEarned(d);
     const r = recordReview(d, verseId, now, device);
     return { ...r, seeds: Math.max(0, seedsEarned(d) - before) };
   });
+  schedulePush();
+  return r;
 }
 
 /** Spend seeds on an item and wear it right away. */
@@ -240,6 +261,190 @@ export function applyTheme() {
   const t = state.settings.theme;
   if (t === 'system') document.documentElement.removeAttribute('data-theme');
   else document.documentElement.setAttribute('data-theme', t);
+}
+
+// ---------------------------------------------------------------- friends and guilds
+
+const PUSH_EVERY = 30 * 60_000; // an unchanged-or-changed profile is sent at most this often (the server's free storage allows few writes)
+let lastPush = { at: 0, snap: null as Snapshot | null, name: '' };
+let pushTimer: ReturnType<typeof setTimeout> | undefined;
+
+const patchSocial = (p: Partial<SocialState>) => set({ social: { ...state.social, ...p } });
+/** The private id and secret, when friends are on and this is not the tour. */
+function authOf(): Auth | null {
+  const d = state.data;
+  return !state.sandbox && d.social && d.sharing?.on ? { id: d.social.id, secret: d.social.secret } : null;
+}
+export const sharingOn = (): boolean => !!authOf();
+
+async function guarded<T>(fn: () => Promise<T>): Promise<T | undefined> {
+  patchSocial({ busy: true, error: '' });
+  try {
+    const r = await fn();
+    patchSocial({ busy: false });
+    return r;
+  } catch (e) {
+    patchSocial({ busy: false, error: socialMessage(e) });
+    return undefined;
+  }
+}
+
+/** Send what friends can see (if it changed, and not too often). `force` sends it now. */
+export async function pushProfile(force = false): Promise<void> {
+  const auth = authOf();
+  const name = state.data.sharing?.name ?? '';
+  if (!auth || !name) return;
+  const now = Date.now();
+  const snap = socialSnapshot(state.data, now);
+  const unchanged = sameSnapshot(lastPush.snap, snap) && lastPush.name === name;
+  if (!force && (unchanged || now - lastPush.at < PUSH_EVERY)) return;
+  try {
+    await api.profile(auth, name, snap);
+    lastPush = { at: now, snap, name };
+  } catch (e) {
+    if (e instanceof SocialError && e.code !== 'offline') patchSocial({ error: socialMessage(e) });
+  }
+}
+
+/** Soon after a review, send the new numbers (one send for a whole run of reviews). */
+function schedulePush() {
+  if (!authOf()) return;
+  clearTimeout(pushTimer);
+  pushTimer = setTimeout(() => void pushProfile(), 60_000);
+}
+
+export async function refreshSocial(): Promise<void> {
+  const auth = authOf();
+  if (!auth) return;
+  await pushProfile();
+  await guarded(async () => {
+    const [f, g] = await Promise.all([api.friends(auth), api.guilds(auth)]);
+    patchSocial({ friends: f.friends, cheers: f.cheers ?? [], guilds: g.guilds, loadedAt: Date.now() });
+  });
+}
+
+/** Turn friends on: makes this person's private identity (once), saves the name, sends the profile and loads friends. */
+export async function enableSharing(rawName: string): Promise<boolean> {
+  const name = cleanName(rawName);
+  if (!name || state.sandbox) return false;
+  act((d, now) => {
+    d.social ??= newIdentity(now);
+    d.sharing = { name, on: true, at: now };
+  });
+  lastPush = { at: 0, snap: null, name: '' };
+  const auth = authOf()!;
+  const ok = await guarded(async () => {
+    await api.profile(auth, name, socialSnapshot(state.data, Date.now()));
+    lastPush = { at: Date.now(), snap: socialSnapshot(state.data, Date.now()), name };
+    return true;
+  });
+  if (!ok) {
+    act((d, now) => void (d.sharing = { name, on: false, at: now })); // could not reach the server: stay off rather than half on
+    return false;
+  }
+  void refreshSocial();
+  return true;
+}
+
+export async function renameSharing(rawName: string): Promise<boolean> {
+  const name = cleanName(rawName);
+  if (!name || !state.data.sharing) return false;
+  act((d, now) => {
+    d.sharing = { name, on: d.sharing?.on ?? true, at: now };
+  });
+  await pushProfile(true);
+  return true;
+}
+
+/** Stop sharing. With `erase`, also remove this person's profile, friendships and guild places from the server. */
+export async function stopSharing(erase: boolean): Promise<boolean> {
+  const d = state.data;
+  const auth = d.social ? { id: d.social.id, secret: d.social.secret } : null;
+  if (erase && auth) {
+    const ok = await guarded(() => api.remove(auth));
+    if (ok === undefined) return false;
+  }
+  act((dd, now) => {
+    dd.sharing = { name: dd.sharing?.name ?? '', on: false, at: now };
+  });
+  patchSocial({ friends: null, cheers: [], cheered: [], guilds: null, invite: null, guildInvites: {}, error: '' });
+  return true;
+}
+
+export async function makeInvite(): Promise<string | null> {
+  const auth = authOf();
+  if (!auth) return null;
+  if (state.social.invite && state.social.invite.expiresAt > Date.now() + 86_400_000) return state.social.invite.code;
+  await pushProfile(true);
+  const r = await guarded(() => api.invite(auth));
+  if (!r) return null;
+  patchSocial({ invite: r });
+  return r.code;
+}
+
+export async function acceptFriend(code: string): Promise<FriendCard | null> {
+  const auth = authOf();
+  if (!auth) return null;
+  await pushProfile(true);
+  const r = await guarded(() => api.accept(auth, code));
+  if (!r) return null;
+  void refreshSocial();
+  return r.friend;
+}
+
+export async function removeFriend(id: string): Promise<boolean> {
+  const auth = authOf();
+  if (!auth) return false;
+  const r = await guarded(() => api.unfriend(auth, id));
+  if (r) patchSocial({ friends: (state.social.friends ?? []).filter((f) => f.id !== id) });
+  return !!r;
+}
+
+/** A friendly 👏 for a friend (one a day each; the server keeps the count honest). */
+export async function cheerFriend(id: string): Promise<boolean> {
+  const auth = authOf();
+  if (!auth) return false;
+  const r = await guarded(() => api.cheer(auth, id));
+  if (r) patchSocial({ cheered: [...new Set([...state.social.cheered, id])] });
+  return !!r;
+}
+
+export async function createGuild(rawName: string): Promise<boolean> {
+  const auth = authOf();
+  const name = cleanName(rawName, MAX_GUILD_NAME);
+  if (!auth || !name) return false;
+  await pushProfile(true);
+  const r = await guarded(() => api.guildCreate(auth, name));
+  if (r) await refreshSocial();
+  return !!r;
+}
+
+export async function makeGuildInvite(gid: string): Promise<string | null> {
+  const auth = authOf();
+  if (!auth) return null;
+  const have = state.social.guildInvites[gid];
+  if (have && have.expiresAt > Date.now() + 86_400_000) return have.code;
+  const r = await guarded(() => api.guildInvite(auth, gid));
+  if (!r) return null;
+  patchSocial({ guildInvites: { ...state.social.guildInvites, [gid]: r } });
+  return r.code;
+}
+
+export async function joinGuild(code: string): Promise<boolean> {
+  const auth = authOf();
+  if (!auth) return false;
+  await pushProfile(true);
+  const r = await guarded(() => api.guildJoin(auth, code));
+  if (r) await refreshSocial();
+  return !!r;
+}
+
+export async function leaveGuild(gid: string): Promise<boolean> {
+  const auth = authOf();
+  if (!auth) return false;
+  const r = await guarded(() => api.guildLeave(auth, gid));
+  if (r) patchSocial({ guilds: (state.social.guilds ?? []).filter((g) => g.id !== gid) });
+  return !!r;
 }
 
 // ---------------------------------------------------------------- the guided tour
@@ -488,10 +693,12 @@ export async function init(): Promise<void> {
     if (document.visibilityState === 'visible') {
       refresh();
       void syncNow();
+      void pushProfile();
     }
   });
   setInterval(refresh, 30_000);
   if (settings.syncCode) void syncNow();
+  void pushProfile();
 }
 
 // For tests / debugging

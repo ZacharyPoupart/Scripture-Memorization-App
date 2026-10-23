@@ -149,3 +149,17 @@ describe('the guided tour (v1.34.0): finishing it is remembered with the data', 
     expect(mergeData(parseBackup(BACKUP), data).tourAt).toBe(1773583200000);
   });
 });
+
+describe('friends (v1.37.0): the private identity and sharing choice travel with the data', () => {
+  it('older backups have neither; a backup that carries them loads unchanged and merges into itself as a no-op', () => {
+    const old = parseBackup(BACKUP);
+    expect(old.social).toBeUndefined();
+    expect(old.sharing).toBeUndefined();
+    const data = parseBackup(read('backup-v1.37.0-social.json'));
+    expect(data.social?.id).toBe('0123456789abcdef0123456789abcdef');
+    expect(data.sharing).toEqual({ name: 'Sam L.', on: true, at: 1773583300000 });
+    expect(parseBackup(exportBackup(data, '9.9.9', at('2026-03-15')))).toEqual(data);
+    expect(mergeData(data, data)).toEqual(data);
+    expect(mergeData(old, data).social).toEqual(data.social);
+  });
+});

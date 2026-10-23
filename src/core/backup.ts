@@ -147,6 +147,10 @@ export function normalizeData(raw: unknown): AppData {
   };
   if (pause) out.pause = pause;
   if (isNum(raw.tourAt) && raw.tourAt > 0) out.tourAt = raw.tourAt;
+  if (isObj(raw.social) && isStr(raw.social.id) && /^[a-f0-9]{32}$/.test(raw.social.id) && isStr(raw.social.secret) && /^[A-Za-z0-9_-]{32,64}$/.test(raw.social.secret) && isNum(raw.social.at))
+    out.social = { id: raw.social.id, secret: raw.social.secret, at: raw.social.at };
+  if (isObj(raw.sharing) && isStr(raw.sharing.name) && typeof raw.sharing.on === 'boolean' && isNum(raw.sharing.at))
+    out.sharing = { name: raw.sharing.name.replace(/\s+/g, ' ').trim().slice(0, 40), on: raw.sharing.on, at: raw.sharing.at };
   if (avatar && (avatar.owned.length || Object.keys(avatar.look).length)) out.avatar = avatar;
   return out;
 }
