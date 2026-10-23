@@ -2086,3 +2086,35 @@ button.streak {
     transition: none;
   }
 }
+
+/* the searchable topic list (used when there are many topics) */
+.topic-list {
+  overflow-y: auto;
+  min-height: 0;
+}
+.topic-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+}
+.topic-row.on {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
+}
+.topic-row small {
+  opacity: 0.8;
+}
+.sheet.scrolls {
+  overflow-y: auto; /* a long list scrolls inside the sheet and the Close button stays reachable */
+}

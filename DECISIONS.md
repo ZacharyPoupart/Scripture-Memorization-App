@@ -413,3 +413,9 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Data:** additive `AppData.tourAt` (max-merged), device `settings.tour.done`; schema stays 1; fixture `backup-v1.34.0-tour.json`.
 **Test changes:** avatar reward test rewritten for the new sword and shield rules; new `tests/unit/tour.test.ts`, `tests/e2e/tour.spec.ts` (walks every lesson, nothing saved, sandbox leave/reload, simulator, card on screen, sword), migration fixture test.
 **Undo:** roll back to the `v1.33.0-progress-days` tag.
+
+## Topic list for many topics (owner request)
+**What:** on the verse lists, more than six topics fold into one "Topic: all (N)" button that opens a searchable list with verse counts; the chosen topic shows on the button with Clear and Rename next to it. Six or fewer topics are still plain buttons.
+**Choices (tell me if you want them different):** the limit of six is `TOPIC_CHIPS_MAX`; the list is A to Z. Ideas for later if it is still too much: grouping topics into folders, or pinning favourites.
+**Test changes:** none to existing tests; new `tests/e2e/topics.spec.ts` and unit tests for the counts and the search.
+**Undo:** roll back to the previous stage tag.

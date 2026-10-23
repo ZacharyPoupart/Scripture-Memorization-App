@@ -1,6 +1,6 @@
 import { useState } from 'preact/hooks';
-import { renameTopic, restoreTopics, SORT_LABELS, type SortKey } from '../core/organize.ts';
-import { act, showToast } from '../store.ts';
+import { matchTopics, renameTopic, restoreTopics, SORT_LABELS, topicCounts, TOPIC_CHIPS_MAX, type SortKey } from '../core/organize.ts';
+import { act, showToast, useApp } from '../store.ts';
 import { Field, Overlay } from './common.tsx';
 
 export interface ListState {
@@ -25,7 +25,10 @@ export const useListState = (): [ListState, (p: Partial<ListState>) => void] => 
 export const filtersActive = (s: ListState) => !!(s.query || s.ready || s.topic);
 
 export function ListControls({ state, update, topics }: { state: ListState; update: (p: Partial<ListState>) => void; topics: string[] }) {
+  const { data } = useApp();
   const [renaming, setRenaming] = useState(false);
+  const [picking, setPicking] = useState(false);
+  const [find, setFind] = useState('');
   const [name, setName] = useState('');
   const chip = (active: boolean) => ({ border: 0, background: active ? 'var(--accent)' : undefined, color: active ? 'var(--on-accent)' : undefined });
 
@@ -83,7 +86,32 @@ export function ListControls({ state, update, topics }: { state: ListState; upda
           Ready now
         </button>
       </div>
-      {topics.length > 0 && (
+      {topics.length > TOPIC_CHIPS_MAX && (
+        <div class="row wrap" role="group" aria-label="Filter by topic">
+          <button class={`chip ${state.topic ? 'on' : ''}`} style={{ ...chip(!!state.topic), minHeight: '40px', padding: '0 14px' }} onClick={() => (setFind(''), setPicking(true))} aria-haspopup="dialog" data-testid="topic-open">
+            {state.topic ? `#${state.topic}` : `Topic: all (${topics.length})`} ▾
+          </button>
+          {state.topic && (
+            <>
+              <button class="chip" style={{ minHeight: '40px' }} onClick={() => update({ topic: '' })} aria-label="Show all topics" data-testid="topic-clear">
+                ✕ Clear
+              </button>
+              <button
+                class="chip"
+                style={{ minHeight: '40px' }}
+                onClick={() => {
+                  setName(state.topic);
+                  setRenaming(true);
+                }}
+                data-testid="rename-topic"
+              >
+                Rename…
+              </button>
+            </>
+          )}
+        </div>
+      )}
+      {topics.length > 0 && topics.length <= TOPIC_CHIPS_MAX && (
         <div class="row wrap" role="group" aria-label="Filter by topic">
           <button
             class="chip"
@@ -118,6 +146,42 @@ export function ListControls({ state, update, topics }: { state: ListState; upda
             </button>
           )}
         </div>
+      )}
+      {picking && (
+        <Overlay onClose={() => setPicking(false)} label="Choose a topic">
+          <div class="sheet stack scrolls" data-testid="topic-sheet">
+            <h2>Topics</h2>
+            <input
+              class="input"
+              type="search"
+              placeholder="Find a topic…"
+              aria-label="Find a topic"
+              value={find}
+              onInput={(e) => setFind(e.currentTarget.value)}
+              autocomplete="off"
+              autocapitalize="off"
+              data-testid="topic-search"
+            />
+            <div class="stack topic-list" style={{ '--gap': '4px' } as never}>
+              {!find.trim() && (
+                <button class={`topic-row ${state.topic === '' ? 'on' : ''}`} onClick={() => (update({ topic: '' }), setPicking(false))} data-testid="topic-option-all">
+                  <span>All topics</span>
+                  <small>{Object.values(topicCounts(data)).reduce((a, b) => a + b, 0)}</small>
+                </button>
+              )}
+              {matchTopics(topics, find).map((t) => (
+                <button key={t} class={`topic-row ${state.topic === t ? 'on' : ''}`} onClick={() => (update({ topic: t }), setPicking(false))} data-testid={`topic-option-${t}`}>
+                  <span>#{t}</span>
+                  <small>{topicCounts(data)[t]}</small>
+                </button>
+              ))}
+              {matchTopics(topics, find).length === 0 && <p class="muted small">No topic matches that.</p>}
+            </div>
+            <button class="btn ghost block" onClick={() => setPicking(false)}>
+              Close
+            </button>
+          </div>
+        </Overlay>
       )}
       {renaming && (
         <Overlay center onClose={() => setRenaming(false)} label="Rename topic">

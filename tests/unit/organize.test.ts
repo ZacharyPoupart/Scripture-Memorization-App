@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { filterVerses, matchesQuery, renameTopic, restoreTopics, sortVerses, topicsOf } from '../../src/core/organize.ts';
+import { filterVerses, matchesQuery, matchTopics, renameTopic, restoreTopics, sortVerses, topicCounts, TOPIC_CHIPS_MAX, topicsOf } from '../../src/core/organize.ts';
 import { mergeData } from '../../src/core/merge.ts';
 import { addVerse, pileVerses, recordReview, settle } from '../../src/core/schedule.ts';
-import { at, D0, day, newData } from './helpers.ts';
+import { at, D0, day, john316, newData } from './helpers.ts';
 
 function library() {
   const data = newData();
@@ -108,5 +108,25 @@ describe('topics', () => {
     expect(mergeData(data, other).verses[ps.id].topic).toBe('Faith');
     expect(mergeData(other, data).verses[ps.id].topic).toBe('Faith');
     void D0;
+  });
+});
+
+describe('many topics', () => {
+  it('counts verses per topic, and finds topics by typing (ignoring case and accents)', () => {
+    const d = newData();
+    const a = john316(d, 1000);
+    a.topic = 'Trust';
+    const b = john316(d, 1000);
+    b.topic = 'Trust';
+    const c = john316(d, 1000);
+    c.topic = 'Évangile';
+    const gone = john316(d, 1000);
+    gone.topic = 'Old';
+    gone.deletedAt = 5;
+    expect(topicCounts(d)).toEqual({ Trust: 2, Évangile: 1 });
+    expect(matchTopics(['Évangile', 'Faith', 'Trust'], 'evang')).toEqual(['Évangile']);
+    expect(matchTopics(['Faith', 'Trust'], 'TR')).toEqual(['Trust']);
+    expect(matchTopics(['Faith', 'Trust'], '  ')).toEqual(['Faith', 'Trust']);
+    expect(TOPIC_CHIPS_MAX).toBeGreaterThanOrEqual(4);
   });
 });

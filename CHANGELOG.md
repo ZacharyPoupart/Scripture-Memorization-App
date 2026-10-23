@@ -5,6 +5,9 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Changed
+- With more than six topics, the row of topic buttons folds into one "Topic: all" button. It opens a searchable list (with how many verses each topic has); pick one and you can clear it or rename it from the same row. Six or fewer topics still show as buttons.
+
 ## [1.34.0] - 2026-10-23
 
 ### Added
