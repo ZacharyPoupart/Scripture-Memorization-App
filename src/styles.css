@@ -2086,3 +2086,9 @@ button.streak {
     transition: none;
   }
 }
+
+/* a painted background in the avatar list: the picture fills a rounded square */
+.piece-img.scene-img {
+  object-fit: cover;
+  border-radius: 14px;
+}

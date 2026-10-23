@@ -1,8 +1,10 @@
-import { armorWorn, type Look } from '../core/avatar.ts';
+import { armorWorn, sceneUrl, type Look } from '../core/avatar.ts';
 import { ArmorLayers } from './ArmorArt.tsx';
 
-/** One calm morning sky behind the knight. */
-function Background() {
+/** A painted background if one is chosen, otherwise one calm morning sky behind the knight. */
+function Background({ scene }: { scene: string }) {
+  const url = sceneUrl(scene);
+  if (url) return <image href={url} x="0" y="0" width="120" height="120" preserveAspectRatio="xMidYMid slice" />;
   return (
     <g>
       <rect width="120" height="120" fill="#cfe6ea" />
@@ -35,8 +37,8 @@ export function AvatarFigure({ look, size = 120, title, view = 'full' }: { look:
         <clipPath id={`avc-${view}${size}`}>{face ? <rect x="30" y="2" width="60" height="60" rx="13" /> : <rect width="120" height="120" rx="26" />}</clipPath>
       </defs>
       <g clip-path={`url(#avc-${view}${size})`}>
-        <Background />
-        {full && <circle cx="60" cy="62" r="54" fill="#fff6c9" opacity="0.4" />}
+        <Background scene={look.scene} />
+        {full && !sceneUrl(look.scene) && <circle cx="60" cy="62" r="54" fill="#fff6c9" opacity="0.4" />}
         <g transform={`translate(60 ${116 - 250 * K}) scale(${K})`}>
           <ArmorLayers look={look} />
         </g>

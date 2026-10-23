@@ -413,3 +413,10 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Data:** additive `AppData.tourAt` (max-merged), device `settings.tour.done`; schema stays 1; fixture `backup-v1.34.0-tour.json`.
 **Test changes:** avatar reward test rewritten for the new sword and shield rules; new `tests/unit/tour.test.ts`, `tests/e2e/tour.spec.ts` (walks every lesson, nothing saved, sandbox leave/reload, simulator, card on screen, sword), migration fixture test.
 **Undo:** roll back to the `v1.33.0-progress-days` tag.
+
+## v1.35.0 — Fifteen free backgrounds (owner request)
+**What:** a new Background choice on the avatar screen with the owner's fifteen painted pictures plus the old drawn morning sky (the default). All free, nothing to earn. The picture is drawn behind the knight on Today, the avatar screen and the tiles.
+**Choices (tell me if you want them different):** the names are mine (Sunlit Castle, Frost Keep, Seaside Palace, Ember Fortress, Forest Falls, Moonlit Keep, Twilight Lake, Frozen Peak, Sunset Ruins, Sky Islands, Moonlit Ruins, Harbor Town, Mountain Lake, Marble Court, Island Castle); the pictures are cropped to a square from the middle and kept at their original size (about 36 KB each, saved for offline use). The "glow" behind a full set of armor only shows on the plain sky. Prices can be added later per picture.
+**Data:** no new fields: the choice is stored in the existing worn-items list. Schema stays 1; an older version that does not know a picture falls back to the sky.
+**Test changes:** the "avatar screen lists ..." unit test now expects the Background slot; new unit tests (fifteen free pictures, files exist, wearing and fallback) and `tests/e2e/backgrounds.spec.ts`.
+**Undo:** roll back to the `v1.34.0-tour` tag.

@@ -2,6 +2,7 @@ import { useState } from 'preact/hooks';
 import {
   ARMOR_NAMES,
   ARMOR_SLOTS,
+  sceneUrl,
   armorWorn,
   currentLook,
   describeUnlock,
@@ -133,6 +134,8 @@ export function AvatarScreen() {
                 >
                   {armorUrl(item.id) ? (
                     <img class="piece-img" src={armorUrl(item.id)!} alt="" width="72" height="72" loading="lazy" style={item.slot === 'weapon' ? { transform: 'rotate(180deg)' } : undefined} />
+                  ) : sceneUrl(item.id) ? (
+                    <img class="piece-img scene-img" src={sceneUrl(item.id)!} alt="" width="72" height="72" loading="lazy" />
                   ) : item.id.endsWith('-none') ? (
                     <span class="piece-img piece-none" aria-hidden="true">
                       —
