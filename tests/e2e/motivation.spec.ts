@@ -101,14 +101,12 @@ test.describe('feedback and celebrations', () => {
     await expect(page.getByTestId('milestone')).toBeHidden(); // celebrated once
   });
 
-  for (const mode of ['full', 'calm'] as const) {
-    test(`a verse moving up: ${mode === 'full' ? 'confetti in Full mode' : 'Calm mode keeps it quiet'}`, async ({ page }) => {
+  {
+    test('a verse moving up: a celebration with confetti', async ({ page }) => {
       await page.clock.install({ time: new Date(2026, 2, 10, 13, 0) });
       await page.clock.resume();
       await blockLookups(page);
       await openApp(page);
-      await page.goto('/#/settings');
-      await page.getByRole('button', { name: mode === 'full' ? 'Full' : 'Calm', exact: true }).click();
       await addVerse(page, JOHN316);
       const data = await page.evaluate(() => structuredClone((window as any).__mfl.getState().data));
       const day = (n: number) => localDay(2026, 2, 10 + n);
@@ -124,16 +122,15 @@ test.describe('feedback and celebrations', () => {
       await replaceDataWith(page, data);
       await page.goto('/#/');
       await expect(page.getByTestId('celebration')).toBeVisible();
-      await expect(page.locator('.confetti')).toHaveCount(mode === 'full' ? 1 : 0);
+      await expect(page.locator('.confetti')).toHaveCount(1);
       await page.getByTestId('celebration-close').click();
       await expect(page.getByTestId('celebration')).toBeHidden();
     });
   }
 
-  test('sound and vibration are off by default and only used when switched on', async ({ page }) => {
+  test('sound is off by default and only used when switched on', async ({ page }) => {
     await page.addInitScript(() => {
       (window as any).__audio = 0;
-      (window as any).__vibes = 0;
       (window as any).AudioContext = class {
         currentTime = 0;
         destination = {};
@@ -150,44 +147,27 @@ test.describe('feedback and celebrations', () => {
           return Promise.resolve();
         }
       };
-      navigator.vibrate = () => ((window as any).__vibes++, true);
     });
     await autoDismissMilestones(page);
     await blockLookups(page);
     await openApp(page);
     await addVerse(page, JOHN316);
     await finishOneFlashcard(page);
-    expect(await page.evaluate(() => [(window as any).__audio, (window as any).__vibes])).toEqual([0, 0]);
+    expect(await page.evaluate(() => (window as any).__audio)).toBe(0);
 
     await page.goto('/#/settings');
     await expect(page.getByTestId('toggle-sound')).toHaveAttribute('aria-checked', 'false');
-    await expect(page.getByTestId('toggle-haptics')).toHaveAttribute('aria-checked', 'false');
     await page.getByTestId('toggle-sound').click();
-    await page.getByTestId('toggle-haptics').click();
     await expect(page.getByTestId('toggle-sound')).toHaveAttribute('aria-checked', 'true');
     await saved(page);
     await page.reload();
     await expect(page.getByTestId('toggle-sound')).toHaveAttribute('aria-checked', 'true'); // remembered
-    const before = await page.evaluate(() => [(window as any).__audio, (window as any).__vibes]);
     await finishOneFlashcard(page);
-    const after = await page.evaluate(() => [(window as any).__audio, (window as any).__vibes]);
-    expect(after[0]).toBeGreaterThan(0);
-    expect(after[1]).toBeGreaterThan(before[1]);
+    expect(await page.evaluate(() => (window as any).__audio)).toBeGreaterThan(0);
     // and off again
     await page.goto('/#/settings');
     await page.getByTestId('toggle-sound').click();
-    await page.getByTestId('toggle-haptics').click();
     await expect(page.getByTestId('toggle-sound')).toHaveAttribute('aria-checked', 'false');
-  });
-
-  test('vibration switch explains itself where the device cannot vibrate (iPhone web apps)', async ({ page }) => {
-    await page.addInitScript(() => {
-      Object.defineProperty(Navigator.prototype, 'vibrate', { value: undefined, configurable: true });
-    });
-    await blockLookups(page);
-    await openApp(page, '/#/settings');
-    await expect(page.getByTestId('toggle-haptics')).toBeDisabled();
-    await expect(page.getByTestId('feedback-card')).toContainText('iPhone web apps can’t vibrate');
   });
 
   test('wording stays kind: a long time away never scolds', async ({ page }) => {

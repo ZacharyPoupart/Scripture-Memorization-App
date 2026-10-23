@@ -6,12 +6,22 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 ## [Unreleased]
 
 ### Added
-- When you buy or earn something for your knight (an armor piece, a cape, the sword or the shield), it now appears in the middle of the screen with a soft golden glow, turning rays and a few sparkles. Tap Nice (or Wear it, for something you have just earned) to carry on. Calm celebrations mode keeps just the glow.
+- When you buy or earn something for your knight (an armor piece, a cape, the sword or the shield), it now appears in the middle of the screen with a soft golden glow, turning rays and a few sparkles. Tap Nice (or Wear it, for something you have just earned) to carry on.
+
+## [1.36.0] - 2026-10-23
+
+### Removed
+- The Calm celebrations switch (celebrations always include the confetti), the Vibration switch, and the Daily reminders (Calendar file) card are gone from Settings. Quiet sounds, the avatar switch and everything else stay.
 
 ## [1.35.0] - 2026-10-23
 
 ### Added
 - Fifteen painted backgrounds for your knight (a sunlit castle, a frost keep, a seaside palace, an ember fortress, a forest waterfall, moonlit ruins and more), all free. Pick one from the new Background button on the avatar screen; the cape and the background now sit together under "Extras" on the avatar screen. The old drawn morning sky is gone: everyone starts with the sunlit castle.
+
+## [1.34.1] - 2026-10-23
+
+### Fixed
+- The tour is easier to read on iPhone: the rest of the screen is darker, the highlighted spot has rounded corners, the card has a clear outline, and the lesson list reads left to right and scrolls on small screens so Close is always reachable.
 
 ## [1.34.0] - 2026-10-23
 

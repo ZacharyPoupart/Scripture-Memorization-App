@@ -136,7 +136,7 @@ function Coach({ pos }: { pos: TourPos }) {
           {(!adv || adv.kind === 'next') && <div class="tour-block clear" style={box({ top: hole.top, left: hole.left, width: hole.width, height: hole.height })} />}
         </>
       )}
-      {hole && step.target && <div class="tour-ring" style={box({ top: hole.top, left: hole.left, width: hole.width, height: hole.height  })} data-testid="tour-ring" />}
+      {hole && step.target && <div class={`tour-ring ${dim ? 'dim' : ''}`} style={box({ top: hole.top, left: hole.left, width: hole.width, height: hole.height  })} data-testid="tour-ring" />}
       <section
         class={`tour-card ${atTop ? 'top' : step.target ? 'bottom' : 'center'} ${inReview ? 'no-tabs compact' : ''}`}
         role="dialog"
@@ -204,7 +204,7 @@ function TourMenu({ pos }: { pos?: TourPos }) {
   const close = () => openTourMenu(false);
   return (
     <Overlay onClose={close} label="Tour lessons">
-      <div class="sheet stack" data-testid="tour-menu">
+      <div class="sheet stack tour-sheet" data-testid="tour-menu">
         <h2>Tour lessons</h2>
         <div class="hint-text">About five minutes in all. Practice verses only, so nothing you do in the tour is saved.</div>
         <div class="stack" style={{ '--gap': '8px' } as never}>

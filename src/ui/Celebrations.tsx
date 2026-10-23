@@ -12,7 +12,7 @@ import { Confetti, Icon, Overlay, PILE_INFO } from './common.tsx';
  *  small  (3 / 7-day streak)            -> a quiet card, no confetti
  *  medium (verse moves up; 14-99 days)  -> card + a little confetti
  *  large  (moves to Yearly; 100+ days)  -> card + full confetti
- * "Calm" mode never shows confetti. Nothing here ever scolds; missed days are simply not mentioned.
+ * Nothing here ever scolds; missed days are simply not mentioned.
  */
 export function Celebrations({ suppressed }: { suppressed: boolean }) {
   const { data, settings } = useApp();
@@ -34,14 +34,13 @@ export function Celebrations({ suppressed }: { suppressed: boolean }) {
   }, [show]);
 
   if (!show) return null;
-  const calm = settings.celebrations === 'calm';
 
   if (ups.length) {
     const toYearly = ups.some((u) => u.to === 'yearly');
     const close = () => markLevelUpsSeen(ups.map((u) => u.id));
     return (
       <>
-        {!calm && <Confetti count={toYearly ? 90 : 40} />}
+        <Confetti count={toYearly ? 90 : 40} />
         <Overlay center label="Level up" onClose={close}>
           <div class="modal stack center" data-testid="celebration">
             <div class="hero">{toYearly ? '🌳' : '🎉'}</div>
@@ -73,7 +72,7 @@ export function Celebrations({ suppressed }: { suppressed: boolean }) {
   const close = () => markMilestoneSeen(mid);
   return (
     <>
-      {!calm && size !== 'small' && <Confetti count={size === 'large' ? 90 : 36} />}
+      {size !== 'small' && <Confetti count={size === 'large' ? 90 : 36} />}
       <Overlay center label="Streak milestone" onClose={close}>
         <div class="modal stack center" data-testid="milestone">
           <div class="milestone-flame">

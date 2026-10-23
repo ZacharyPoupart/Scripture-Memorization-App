@@ -42,16 +42,14 @@ export function ItemReveal({ suppressed }: { suppressed: boolean }) {
 
   const worn = currentLook(data)[item.slot] === item.id;
   const src = sceneUrl(item.id) ?? armorUrl(item.id);
-  const calm = settings.celebrations === 'calm';
   const close = () => dismissReveal();
 
   return (
-    <div class={`reveal-layer ${calm ? 'calm' : ''}`} role="dialog" aria-modal="true" aria-label={`New: ${item.name}`} onClick={close} data-testid="item-reveal" key={item.id}>
+    <div class="reveal-layer" role="dialog" aria-modal="true" aria-label={`New: ${item.name}`} onClick={close} data-testid="item-reveal" key={item.id}>
       <div class="reveal-stage" onClick={(e) => e.stopPropagation()}>
         <div class="reveal-glow" aria-hidden="true" />
-        {!calm && <div class="reveal-rays" aria-hidden="true" />}
-        {!calm &&
-          SPARKLES.map((s, i) => (
+        <div class="reveal-rays" aria-hidden="true" />
+        {SPARKLES.map((s, i) => (
             <i key={i} class="reveal-sparkle" aria-hidden="true" style={{ '--a': `${s.angle}deg`, '--d': `${s.dist}px`, '--delay': `${s.delay}s`, '--s': `${s.size}px` } as never} />
           ))}
         {src && (
