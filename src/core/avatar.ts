@@ -279,6 +279,17 @@ export function meets(data: AppData, u: Unlock): boolean {
   }
 }
 
+/** Ids of the achievement items (the sword, the shield) that have been unlocked by now. */
+export function unlockedIds(data: AppData): string[] {
+  return ITEMS.filter((i) => i.unlock && meets(data, i.unlock)).map((i) => i.id);
+}
+
+/** Achievement items unlocked but not yet shown to this person. `seen` is `null` the first time (nothing is announced: it is just remembered). */
+export function freshUnlocks(data: AppData, seen: string[] | null): string[] {
+  if (seen === null) return [];
+  return unlockedIds(data).filter((id) => !seen.includes(id));
+}
+
 export function isUnlocked(data: AppData, item: Item): boolean {
   return item.unlock ? meets(data, item.unlock) : false;
 }
