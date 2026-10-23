@@ -96,14 +96,8 @@ export interface Settings {
   seenLevelUps: string[];
   /** Quiet sound on correct answers / completed reviews. Off by default. */
   soundOn: boolean;
-  /** Short vibration where the device supports it (not iOS Safari). Off by default. */
-  hapticsOn: boolean;
-  /** 'full' = confetti for big moments; 'calm' = quiet notes only, no confetti. */
-  celebrations: 'full' | 'calm';
   /** Milestone ids already celebrated on this device (e.g. "streak:7:2026-03-01"). */
   seenMilestones: string[];
-  /** Times (HH:MM) used when building the optional calendar reminders file. */
-  reminderTimes: string[];
   /** Last time the "back up your verses" nudge was dismissed (ms). */
   nudgeDismissedAt: number;
   /** Speak it: show the verse's words while you speak (read along), or keep them hidden until you finish (from memory). */

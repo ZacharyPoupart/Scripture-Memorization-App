@@ -44,12 +44,10 @@ The automated tests run in Chromium, which behaves differently from iPhone Safar
 - [ ] Switch iPhone between Light and Dark (Settings → Display): the app follows. Check Settings → Appearance → Light/Dark overrides.
 - [ ] Text is comfortable to read for a few minutes; the verse looks like the main thing on screen.
 - [ ] The tab bar and the green/teal bottom button clear the home indicator; nothing sits under the notch.
-- [ ] Settings → Celebrations: Full shows confetti on a level-up, Calm doesn't.
+- [ ] A level-up shows confetti and a celebration card.
 
 ## Optional features
 - [ ] Settings → **Quiet sounds** on: a soft tone after correct answers (ringer/volume permitting). Off by default.
-- [ ] **Vibration** switch is greyed out with an explanation (iPhone web apps can't vibrate).
-- [ ] **Daily reminders:** set times, tap *Add reminders to Calendar*, choose Add All. If nothing happens, open the page in Safari (not the home-screen app) and try again. Alerts then come from Calendar.
 - [ ] **Speak it** (experimental): the microphone prompt appears; words colour as you speak. If it can't work in the home-screen app, the screen offers Type mode instead.
 - [ ] **Sync** (needs the Cloudflare KV setup): link a second device with the code; changes appear on both.
 - [ ] **Export backup** and **Import backup** work from the Files / share sheet.

@@ -207,7 +207,7 @@ export function Review({ route }: { route: Route }) {
         <div class="verse-area center stack" style={{ paddingTop: '48px' }}>
           {fullyDone ? (
             <div class="alldone" data-testid="all-done">
-              {settings.celebrations === 'full' && <Confetti count={36} />}
+              <Confetti count={36} />
               <CheckMark size={72} />
               <h1>All done for today</h1>
               <p class="muted" style={{ margin: 0 }}>

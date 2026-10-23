@@ -9,8 +9,8 @@ Make Scripture memory a consistent daily habit and make verses stick for life. A
 Preact + TypeScript + Vite, installable PWA (vite-plugin-pwa / Workbox). Data in IndexedDB (localStorage fallback). Optional sync: a Cloudflare Pages Function + KV storing one end-to-end-encrypted blob per link code. Hosting: Cloudflare Pages (Git integration). Tests: Vitest (unit) + Playwright (e2e, Chromium).
 
 ## Layout
-- `src/core/` — **pure logic, no DOM**. `schedule.ts` is the heart (piles, due dates, spacing, graduation, progress days, streak). Also `dates.ts`, `merge.ts` (sync merge), `backup.ts` (export/import validation), `quiz.ts`, `speech.ts`, `text.ts`, `books.ts`, `reference.ts`, `versification.ts` (generated), and read-only helpers that never affect scheduling: `stats.ts` (streak history, heatmap, totals), `milestones.ts`, `organize.ts` (search/sort/filter/topic rename), `reminders.ts` (.ics builder), `nudges.ts`.
-- `src/services/` — `storage.ts` (IndexedDB, atomic saves + snapshots), `lookup.ts` (verse text APIs), `sync.ts` + `syncCrypto.ts`, `feedback.ts` (optional quiet sound/vibration; off by default).
+- `src/core/` — **pure logic, no DOM**. `schedule.ts` is the heart (piles, due dates, spacing, graduation, progress days, streak). Also `dates.ts`, `merge.ts` (sync merge), `backup.ts` (export/import validation), `quiz.ts`, `speech.ts`, `text.ts`, `books.ts`, `reference.ts`, `versification.ts` (generated), and read-only helpers that never affect scheduling: `stats.ts` (streak history, heatmap, totals), `milestones.ts`, `organize.ts` (search/sort/filter/topic rename), `nudges.ts`.
+- `src/services/` — `storage.ts` (IndexedDB, atomic saves + snapshots), `lookup.ts` (verse text APIs), `sync.ts` + `syncCrypto.ts`, `feedback.ts` (optional quiet sound; off by default).
 - `src/store.ts` — app state; all mutations go through `act()` (clone → settle days → mutate → save → schedule sync).
 - `src/ui/` — screens; `src/ui/modes/` — the review modes and reference recall.
 - `functions/` — Cloudflare Pages Function for sync (`functions/_lib/sync.js` is shared with the e2e server).
