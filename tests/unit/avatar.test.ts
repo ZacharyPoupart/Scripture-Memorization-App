@@ -1,5 +1,6 @@
 // Avatar + seeds: seeds are EARNED from real, counted practice (never lost, never expire); items are bought with them or
 // unlocked by achievements. Everything is derived from synced data so devices agree and nothing can be taken away.
+import { existsSync } from 'node:fs';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { exportBackup, normalizeData, parseBackup } from '../../src/core/backup.ts';
 import {
@@ -21,6 +22,8 @@ import {
   armorWorn,
   resetAvatar,
   STREAK_SEED_BONUS,
+  SCENES,
+  sceneUrl,
 } from '../../src/core/avatar.ts';
 import { mergeData } from '../../src/core/merge.ts';
 import { recordReview, settle } from '../../src/core/schedule.ts';
@@ -41,6 +44,33 @@ const rich = () => {
   d.reviewsByDevice = { x: 1000 }; // 1000 seeds worth of counted reviews
   return d;
 };
+
+describe('backgrounds', () => {
+  it('are fifteen painted pictures, all free, and the first is what everyone starts with (the old drawn sky is gone)', () => {
+    const scenes = ITEMS.filter((i) => i.slot === 'scene');
+    expect(scenes).toHaveLength(SCENES.length);
+    expect(SCENES).toHaveLength(15);
+    expect(defaultLook().scene).toBe('scene-sunlit-castle');
+    expect(itemById('scene-sky')).toBeUndefined();
+    const d = newData();
+    for (const s of scenes) {
+      expect(s.cost, s.id).toBe(0);
+      expect(s.unlock, s.id).toBeUndefined();
+      expect(owns(d, s), s.id).toBe(true); // free for everyone, nothing to earn
+    }
+    expect(sceneUrl('scene-frost-keep')).toBe('/scenes/frost-keep.webp');
+    expect(sceneUrl('scene-nope')).toBeNull();
+  });
+
+  it('every background has its picture file, and wearing one is remembered and falls back safely when unknown', () => {
+    for (const s of SCENES) expect(existsSync(`public/scenes/${s.id}.webp`), s.id).toBe(true);
+    const d = newData();
+    expect(equipItem(d, 'scene-frost-keep', 5)).toBe(true);
+    expect(currentLook(d).scene).toBe('scene-frost-keep');
+    d.avatar!.look.scene = 'scene-from-the-future';
+    expect(currentLook(d).scene).toBe('scene-sunlit-castle'); // also what a saved look from the sky days falls back to
+  });
+});
 
 describe('catalog', () => {
   it('has unique ids, a free default in every slot, sane prices, and unlock items that are free to equip', () => {
@@ -74,8 +104,8 @@ describe('the knight', () => {
     expect(armorWorn(look)).toBe(0);
   });
 
-  it('the avatar screen lists the six armor pieces and then the cape, and nothing else (no extras)', () => {
-    expect(SLOTS).toEqual(['helmet', 'chest', 'belt', 'boots', 'shield', 'weapon', 'cape']);
+  it('the avatar screen lists the six armor pieces, then the cape and the background, and nothing else (no extras)', () => {
+    expect(SLOTS).toEqual(['helmet', 'chest', 'belt', 'boots', 'shield', 'weapon', 'cape', 'scene']);
     expect([...new Set(ITEMS.map((i) => i.slot))].sort()).toEqual([...SLOTS].sort());
   });
 

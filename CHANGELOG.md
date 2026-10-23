@@ -8,6 +8,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 ### Removed
 - The Calm celebrations switch (celebrations always include the confetti), the Vibration switch, and the Daily reminders (Calendar file) card are gone from Settings. Quiet sounds, the avatar switch and everything else stay.
 
+## [1.35.0] - 2026-10-23
+
+### Added
+- Fifteen painted backgrounds for your knight (a sunlit castle, a frost keep, a seaside palace, an ember fortress, a forest waterfall, moonlit ruins and more), all free. Pick one from the new Background button on the avatar screen; the cape and the background now sit together under "Extras" on the avatar screen. The old drawn morning sky is gone: everyone starts with the sunlit castle.
+
 ## [1.34.1] - 2026-10-23
 
 ### Fixed
