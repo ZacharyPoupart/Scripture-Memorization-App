@@ -414,6 +414,23 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Test changes:** avatar reward test rewritten for the new sword and shield rules; new `tests/unit/tour.test.ts`, `tests/e2e/tour.spec.ts` (walks every lesson, nothing saved, sandbox leave/reload, simulator, card on screen, sword), migration fixture test.
 **Undo:** roll back to the `v1.33.0-progress-days` tag.
 
+## v1.34.1 — Tour lesson list layout (owner screenshot)
+**What:** the lesson rows were centred (the button style centres its contents) so the titles drifted around; they now read left to right with the number, and the sheet scrolls when the screen is short. CSS and one class only.
+**Test changes:** none (visual); checked at iPhone 14 and iPhone SE sizes, dark theme.
+
+## v1.35.0 — Fifteen free backgrounds (owner request)
+**What:** a new Background choice on the avatar screen with the owner's fifteen painted pictures (the Sunlit Castle is the default; the old drawn morning sky was removed at the owner's request). The cape and the background sit together under an Extras heading on the avatar screen, apart from the six armor pieces. All free, nothing to earn. The picture is drawn behind the knight on Today, the avatar screen and the tiles.
+**Choices (tell me if you want them different):** the names are mine (Sunlit Castle, Frost Keep, Seaside Palace, Ember Fortress, Forest Falls, Moonlit Keep, Twilight Lake, Frozen Peak, Sunset Ruins, Sky Islands, Moonlit Ruins, Harbor Town, Mountain Lake, Marble Court, Island Castle); the pictures are cropped to a square from the middle and kept at their original size (about 36 KB each, saved for offline use). The faint "glow" behind a full set of armor went with the sky. Prices can be added later per picture.
+**Data:** no new fields: the choice is stored in the existing worn-items list. Schema stays 1; an older version that does not know a picture falls back to the sky.
+**Test changes:** the avatar offline test now waits for the offline copy before cutting the network (this also removes the occasional flake); the "avatar screen lists ..." unit test now expects the Background slot; new unit tests (fifteen free pictures, files exist, wearing and fallback) and `tests/e2e/backgrounds.spec.ts`.
+**Undo:** roll back to the `v1.34.0-tour` tag.
+
+## Settings trimmed: celebrations switch, vibration, calendar reminders (owner request)
+**What:** removed the Full/Calm celebrations switch (always the full celebration now), the Vibration switch (and the vibration code) and the Daily reminders card (and the .ics builder). Quiet sounds stay.
+**Choices (tell me if you want them different):** people who had picked Calm now get confetti too. The saved values (`celebrations`, `hapticsOn`, `reminderTimes`) are simply ignored if an older version left them on a device, so nothing breaks; nothing synced is affected.
+**Test changes:** deleted `tests/unit/reminders.test.ts` and the e2e checks for the calendar file, the vibration switch and Calm mode, because those features no longer exist; the sound e2e and unit tests keep their sound checks.
+**Undo:** roll back to the previous stage tag (the code for all three is in git history if you want any back).
+
 ## Topic list for many topics (owner request)
 **What:** on the verse lists, more than six topics fold into one "Topic: all (N)" button that opens a searchable list with verse counts; the chosen topic shows on the button with Clear and Rename next to it. Six or fewer topics are still plain buttons.
 **Choices (tell me if you want them different):** the limit of six is `TOPIC_CHIPS_MAX`; the list is A to Z. Ideas for later if it is still too much: grouping topics into folders, or pinning favourites.

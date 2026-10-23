@@ -8,6 +8,21 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 ### Changed
 - With more than six topics, the row of topic buttons folds into one "Topic: all" button. It opens a searchable list (with how many verses each topic has); pick one and you can clear it or rename it from the same row. Six or fewer topics still show as buttons.
 
+## [1.36.0] - 2026-10-23
+
+### Removed
+- The Calm celebrations switch (celebrations always include the confetti), the Vibration switch, and the Daily reminders (Calendar file) card are gone from Settings. Quiet sounds, the avatar switch and everything else stay.
+
+## [1.35.0] - 2026-10-23
+
+### Added
+- Fifteen painted backgrounds for your knight (a sunlit castle, a frost keep, a seaside palace, an ember fortress, a forest waterfall, moonlit ruins and more), all free. Pick one from the new Background button on the avatar screen; the cape and the background now sit together under "Extras" on the avatar screen. The old drawn morning sky is gone: everyone starts with the sunlit castle.
+
+## [1.34.1] - 2026-10-23
+
+### Fixed
+- The tour is easier to read on iPhone: the rest of the screen is darker, the highlighted spot has rounded corners, the card has a clear outline, and the lesson list reads left to right and scrolls on small screens so Close is always reachable.
+
 ## [1.34.0] - 2026-10-23
 
 ### Added
