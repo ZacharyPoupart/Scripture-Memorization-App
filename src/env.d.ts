@@ -12,6 +12,23 @@ declare module '*/functions/_lib/sync.js' {
   ): Promise<Response>;
 }
 
+declare module '*/functions/_lib/social.js' {
+  export function cleanName(raw: unknown, max?: number): string;
+  export function cleanSnap(raw: unknown): Record<string, unknown> | null;
+  export function handleSocial(
+    request: Request,
+    kv:
+      | {
+          get(key: string, type?: string): Promise<any>;
+          put(key: string, value: string, opts?: { expirationTtl?: number }): Promise<void>;
+          delete(key: string): Promise<void>;
+        }
+      | undefined,
+    action: string,
+    now?: number,
+  ): Promise<Response>;
+}
+
 declare module '*/functions/_lib/verse.js' {
   export const USFM: string[];
   export function clearBibleIdCache(): void;
