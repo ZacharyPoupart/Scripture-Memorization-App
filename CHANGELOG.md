@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.33.0] - 2026-10-23
+
 ### Changed
 - Weekly, Monthly and Yearly verses now follow the calendar. Review a Weekly verse any day from Sunday to Saturday and it is covered until the next Sunday; Monthly covers the calendar month, Yearly the calendar year. Anything still undone on Saturday (or the last day of the month, or Dec 31) ends the streak that day.
 - Progress moves only when a verse is up to date. A Daily verse earns a day with one counted review that day. A Weekly or Monthly review earns that whole week or month; a week or month that was skipped just doesn't count and is never made up. The "freeze" after three quiet days is gone, and progress already earned is kept.
