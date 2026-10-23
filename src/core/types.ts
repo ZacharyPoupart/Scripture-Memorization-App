@@ -112,6 +112,8 @@ export interface Settings {
   practice: PracticeOrder;
   /** Show the avatar and seeds on Today. On by default; switching off only hides them. */
   avatarOn: boolean;
+  /** Achievement items (sword, shield) already shown in the "new item" popup on this device; `null` until first looked at (then everything already earned is just remembered). */
+  seenUnlocks: string[] | null;
   /** The guided tour: lesson ids this device has finished (so the menu can tick them). */
   tour: { done: string[] };
 }

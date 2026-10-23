@@ -4,7 +4,7 @@ import { isStreakMilestone, streakMilestoneId, streakMilestoneSize, streakMilest
 import { formatRef } from '../core/reference.ts';
 import { streakInfo } from '../core/schedule.ts';
 import { feedback } from '../services/feedback.ts';
-import { markLevelUpsSeen, markMilestoneSeen, useApp } from '../store.ts';
+import { markLevelUpsSeen, markMilestoneSeen, setCelebrating, useApp } from '../store.ts';
 import { Confetti, Icon, Overlay, PILE_INFO } from './common.tsx';
 
 /**
@@ -28,6 +28,10 @@ export function Celebrations({ suppressed }: { suppressed: boolean }) {
   useEffect(() => {
     if (show) feedback.milestone();
   }, [show, key]);
+  useEffect(() => {
+    setCelebrating(show);
+    return () => setCelebrating(false);
+  }, [show]);
 
   if (!show) return null;
 

@@ -8,6 +8,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 ### Changed
 - Friends has its own tab in the bottom bar (between Add and Stats). The Friends button on Progress and the one in Settings are gone, since the tab replaces them.
 
+## [1.38.0] - 2026-10-23
+
+### Added
+- When you buy or earn something for your knight (an armor piece, a cape, the sword or the shield), it now appears in the middle of the screen with a soft golden glow, turning rays and a few sparkles. Tap Nice (or Wear it, for something you have just earned) to carry on.
+
 ## [1.37.0] - 2026-10-23
 
 ### Added
