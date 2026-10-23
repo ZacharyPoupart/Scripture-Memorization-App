@@ -153,7 +153,7 @@ describe('the knight', () => {
     for (const slot of ['helmet', 'chest', 'belt', 'boots', 'cape', 'weapon', 'shield']) expect(cost(slot, 'iron-bulwark'), slot).toBe(0);
   });
 
-  it('the free set\'s sword is a reward for adding a first verse, and its shield for a first streak (the first day, when the flame lights)', () => {
+  it('the free set\'s sword is a reward for adding a first verse and practising it, and its shield for finishing the tour (or a first streak)', () => {
     const d = newData();
     const sword = itemById('weapon-iron-bulwark')!;
     const shield = itemById('shield-iron-bulwark')!;
@@ -162,12 +162,22 @@ describe('the knight', () => {
     expect(owns(d, sword)).toBe(false);
     expect(owns(d, shield)).toBe(false);
     expect(equipItem(d, sword.id, 1)).toBe(false);
-    john316(d, 1000);
+    const v = john316(d, 1000);
+    expect(owns(d, sword)).toBe(false); // adding is not enough: it has to be practised too
+    d.reviewsByDevice = { x: 1 };
     expect(owns(d, sword)).toBe(true);
     expect(equipItem(d, sword.id, 2)).toBe(true);
+    // a deleted verse does not count
+    v.deletedAt = 5;
+    expect(owns(d, sword)).toBe(false);
+    delete v.deletedAt;
     expect(owns(d, shield)).toBe(false);
-    d.longestStreak = 1;
+    d.tourAt = 1234;
     expect(owns(d, shield)).toBe(true);
+    // people who already lit their first flame keep the shield they had
+    const old = newData();
+    old.longestStreak = 1;
+    expect(owns(old, shield)).toBe(true);
     expect(buyItem(d, sword.id, 3)).toMatchObject({ ok: false, reason: 'owned' });
     // every other set's sword and shield are still bought with seeds
     expect(itemById('weapon-silver-vanguard')!.unlock).toBeUndefined();
@@ -285,7 +295,7 @@ describe('earning seeds', () => {
 
 describe('buying, unlocking and equipping', () => {
   const hat = ITEMS.find((i) => i.slot === 'helmet' && i.cost > 0)!;
-  const locked = ITEMS.find((i) => i.unlock?.kind === 'streak')!;
+  const locked = ITEMS.find((i) => i.unlock?.kind === 'tour')!;
 
   it('buying spends exactly the price, once, and the item is yours for good', () => {
     const d = rich();

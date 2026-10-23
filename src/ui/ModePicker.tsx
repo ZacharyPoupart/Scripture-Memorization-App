@@ -13,7 +13,7 @@ export function ModePicker({ onChange, blurb = true }: { onChange?: (m: ReviewMo
   const { settings } = useApp();
   return (
     <div class="stack" style={{ '--gap': '8px' } as never}>
-      <div class="mode-row">
+      <div class="mode-row" data-testid="mode-picker">
         <Seg
           label="Review mode"
           value={settings.defaultMode}

@@ -10,6 +10,7 @@ import {
   downloadBackup,
   enableSync,
   importBackup,
+  openTourMenu,
   listSnapshots,
   previewBackup,
   resetArmor,
@@ -642,6 +643,9 @@ export function Settings({ onShowIntro }: { onShowIntro: () => void }) {
 
         <div class="card stack">
           <h2>Help</h2>
+          <button class="btn primary block" onClick={() => openTourMenu(true)} data-testid="take-tour">
+            Take the tour
+          </button>
           <button class="btn block" onClick={onShowIntro} data-testid="show-intro">
             Show the walkthrough again
           </button>

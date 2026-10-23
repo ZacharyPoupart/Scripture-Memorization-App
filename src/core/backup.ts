@@ -146,6 +146,7 @@ export function normalizeData(raw: unknown): AppData {
     prefs,
   };
   if (pause) out.pause = pause;
+  if (isNum(raw.tourAt) && raw.tourAt > 0) out.tourAt = raw.tourAt;
   if (avatar && (avatar.owned.length || Object.keys(avatar.look).length)) out.avatar = avatar;
   return out;
 }

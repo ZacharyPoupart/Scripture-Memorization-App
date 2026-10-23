@@ -133,7 +133,7 @@ export function Home() {
             )}
           </div>
 
-          <nav class="pile-row" aria-label="Your piles">
+          <nav class="pile-row" aria-label="Your piles" data-testid="pile-row">
             {PILES.map((p) => {
               const vs = pileVerses(data, p);
               const ready = vs.filter((v) => verseStatus(data, v, now).state === 'ready').length;

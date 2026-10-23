@@ -1,6 +1,7 @@
 import { FEEDBACK_URL } from '../config.ts';
 import { GRADUATION_DAYS } from '../core/schedule.ts';
 import { back } from '../router.ts';
+import { openTourMenu } from '../store.ts';
 import { Icon } from './common.tsx';
 
 export function About({ onShowIntro }: { onShowIntro: () => void }) {
@@ -51,6 +52,9 @@ export function About({ onShowIntro }: { onShowIntro: () => void }) {
         <div class="card stack">
           <h2>Review modes</h2>
           <p style={{ margin: 0 }}>Flashcard, fill in the blank, type the first letters, or speak it aloud. After the verse, you also recall where it is found. New verses allow a few slips; once a verse has moved past Daily it has to be perfect.</p>
+          <button class="btn block" onClick={() => openTourMenu(true)} data-testid="about-tour">
+            Take the tour
+          </button>
           <button class="btn block" onClick={onShowIntro}>
             Show the walkthrough
           </button>

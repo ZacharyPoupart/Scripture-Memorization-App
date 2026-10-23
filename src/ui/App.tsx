@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'preact/hooks';
 import { useRoute } from '../router.ts';
-import { updateSettings, useApp } from '../store.ts';
+import { startTour, updateSettings, useApp } from '../store.ts';
 import { About } from './About.tsx';
 import { ErrorBoundary } from './ErrorBoundary.tsx';
 import { AvatarScreen } from './AvatarScreen.tsx';
@@ -8,6 +8,7 @@ import { AddVerse } from './AddVerse.tsx';
 import { Celebrations } from './Celebrations.tsx';
 import { Home } from './Home.tsx';
 import { Onboarding } from './Onboarding.tsx';
+import { TourLayer } from './tour/Tour.tsx';
 import { PilePage, PilesOverview } from './Piles.tsx';
 import { Review } from './Review.tsx';
 import { Settings } from './Settings.tsx';
@@ -37,7 +38,7 @@ function CrashProbe() {
 
 export function App({ onReload }: { onReload: () => void }) {
   useVisibleViewport();
-  const { ready, settings } = useApp();
+  const { ready, settings, sandbox } = useApp();
   const route = useRoute();
   const [intro, setIntro] = useState(false);
   const section = route.path[0] ?? '';
@@ -73,7 +74,7 @@ export function App({ onReload }: { onReload: () => void }) {
         </ErrorBoundary>
       </main>
       {!inReview && <TabBar current={tab} />}
-      <Celebrations suppressed={inReview || !settings.onboarded} />
+      <Celebrations suppressed={inReview || !settings.onboarded || sandbox} />
       <ToastHost tabs={!inReview} />
       {(!settings.onboarded || intro) && (
         <Onboarding
@@ -81,8 +82,13 @@ export function App({ onReload }: { onReload: () => void }) {
             setIntro(false);
             if (!settings.onboarded) updateSettings({ onboarded: true });
           }}
+          onTour={() => {
+            setIntro(false);
+            startTour();
+          }}
         />
       )}
+      <TourLayer />
     </>
   );
 }
