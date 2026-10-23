@@ -125,6 +125,22 @@ test('friends see your progress after you practice', async ({ browser }) => {
   await expect(sam.getByTestId('friend-row')).toContainText('1 review this week');
 });
 
+test('a friend can cheer you on, and you see it', async ({ browser }) => {
+  const zach = await person(browser, 'Zach P.');
+  const sam = await person(browser, 'Sam L.');
+  await zach.getByTestId('friends-invite').click();
+  const code = (await zach.getByTestId('invite-code').innerText()).trim();
+  await sam.getByTestId('friends-code').fill(code);
+  await sam.getByTestId('friends-add').click();
+  await expect(sam.getByTestId('friend-name')).toHaveText('Zach P.');
+  await sam.getByTestId('friend-cheer').click();
+  await expect(sam.getByTestId('toast')).toContainText('You cheered Zach P.');
+  await expect(sam.getByTestId('friend-cheer')).toBeDisabled(); // one a day
+  await zach.goto('/#/stats');
+  await zach.goto('/#/friends');
+  await expect(zach.getByTestId('cheers')).toContainText('Sam L. cheered you!');
+});
+
 test('groups: create, invite, join, see a shared weekly goal, leave', async ({ browser }) => {
   const zach = await person(browser, 'Zach P.');
   const sam = await person(browser, 'Sam L.');

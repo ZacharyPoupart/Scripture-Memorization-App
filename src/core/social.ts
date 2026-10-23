@@ -23,6 +23,12 @@ export interface FriendCard {
   at: number;
 }
 
+export interface Cheer {
+  id: string;
+  name: string;
+  at: number;
+}
+
 export interface GuildView {
   id: string;
   name: string;
@@ -98,3 +104,11 @@ export function inviteMessage(link: string, name: string): string {
 
 /** "Zach P." -> "Z", for a small round avatar when there is no picture. */
 export const initialOf = (name: string): string => (name.trim()[0] ?? '?').toUpperCase();
+
+/** "Sam L. cheered you!", "Sam L. and Ana B. cheered you!", "Sam L., Ana B. and 2 others cheered you!" */
+export function cheerLine(names: string[]): string {
+  const uniq = [...new Set(names)];
+  if (uniq.length === 1) return `${uniq[0]} cheered you!`;
+  if (uniq.length === 2) return `${uniq[0]} and ${uniq[1]} cheered you!`;
+  return `${uniq[0]}, ${uniq[1]} and ${uniq.length - 2} other${uniq.length === 3 ? '' : 's'} cheered you!`;
+}

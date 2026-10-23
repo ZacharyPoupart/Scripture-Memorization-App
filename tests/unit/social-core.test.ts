@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { exportBackup, normalizeData, parseBackup } from '../../src/core/backup.ts';
 import { mergeData } from '../../src/core/merge.ts';
 import { recordReview } from '../../src/core/schedule.ts';
-import { cleanName, codeFrom, formatCode, guildLink, initialOf, inviteLink, inviteMessage, newIdentity, sameSnapshot, socialSnapshot } from '../../src/core/social.ts';
+import { cheerLine, cleanName, codeFrom, formatCode, guildLink, initialOf, inviteLink, inviteMessage, newIdentity, sameSnapshot, socialSnapshot } from '../../src/core/social.ts';
 import { cleanSnap } from '../../functions/_lib/social.js';
 import { at, D0, day, DEVICE, john316, newData } from './helpers.ts';
 
@@ -108,5 +108,15 @@ describe('the identity travels with your data', () => {
     const clean = normalizeData(raw);
     expect(clean.social).toBeUndefined();
     expect(clean.sharing).toBeUndefined();
+  });
+});
+
+describe('the cheer message', () => {
+  it('reads naturally for one, two, three and more people, without repeats', () => {
+    expect(cheerLine(['Sam L.'])).toBe('Sam L. cheered you!');
+    expect(cheerLine(['Sam L.', 'Sam L.'])).toBe('Sam L. cheered you!');
+    expect(cheerLine(['Sam L.', 'Ana B.'])).toBe('Sam L. and Ana B. cheered you!');
+    expect(cheerLine(['Sam L.', 'Ana B.', 'Joe'])).toBe('Sam L., Ana B. and 1 other cheered you!');
+    expect(cheerLine(['A', 'B', 'C', 'D'])).toBe('A, B and 2 others cheered you!');
   });
 });

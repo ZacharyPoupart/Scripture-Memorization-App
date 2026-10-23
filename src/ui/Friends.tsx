@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'preact/hooks';
 import { currentLook, defaultLook, type Look } from '../core/avatar.ts';
-import { cleanName, codeFrom, formatCode, guildLink, inviteLink, inviteMessage, MAX_GUILD_NAME, MAX_NAME, type FriendCard, type GuildView } from '../core/social.ts';
+import { cleanName, cheerLine, codeFrom, formatCode, guildLink, inviteLink, inviteMessage, MAX_GUILD_NAME, MAX_NAME, type FriendCard, type GuildView } from '../core/social.ts';
 import { api, socialMessage } from '../services/social.ts';
 import { back, navigate } from '../router.ts';
 import {
@@ -12,6 +12,7 @@ import {
   makeGuildInvite,
   makeInvite,
   refreshSocial,
+  cheerFriend,
   removeFriend,
   renameSharing,
   showToast,
@@ -59,7 +60,7 @@ function Counts({ card }: { card: FriendCard }) {
   );
 }
 
-function FriendRow({ card, onRemove }: { card: FriendCard; onRemove: () => void }) {
+function FriendRow({ card, cheered, onCheer, onRemove }: { card: FriendCard; cheered: boolean; onCheer: () => void; onRemove: () => void }) {
   return (
     <li class="friend-row" data-testid="friend-row">
       <Face card={card} />
@@ -75,6 +76,9 @@ function FriendRow({ card, onRemove }: { card: FriendCard; onRemove: () => void 
         </div>
         <Counts card={card} />
       </div>
+      <button class={`icon-btn cheer-btn ${cheered ? 'done' : ''}`} aria-label={cheered ? `You cheered ${card.name} today` : `Cheer ${card.name}`} disabled={cheered} onClick={onCheer} data-testid="friend-cheer">
+        <span aria-hidden="true">👏</span>
+      </button>
       <button class="icon-btn" aria-label={`Options for ${card.name}`} onClick={onRemove} data-testid="friend-menu">
         <Icon name="more" />
       </button>
@@ -365,6 +369,12 @@ export function Friends({ joinCode = '', guildCode = '' }: { joinCode?: string; 
           </div>
         )}
 
+        {social.cheers.length > 0 && (
+          <div class="banner good" data-testid="cheers">
+            👏 {cheerLine(social.cheers.map((c) => c.name))}
+          </div>
+        )}
+
         <div class="card stack" data-testid="me-card">
           <div class="row" style={{ gap: '12px' }}>
             <AvatarFigure look={currentLook(data)} size={52} view="face" title="Your knight" />
@@ -414,7 +424,7 @@ export function Friends({ joinCode = '', guildCode = '' }: { joinCode?: string; 
           ) : (
             <ul class="friend-list" data-testid="friend-list">
               {friends.map((f) => (
-                <FriendRow key={f.id} card={f} onRemove={() => setRemoving(f)} />
+                <FriendRow key={f.id} card={f} cheered={social.cheered.includes(f.id)} onCheer={() => void cheerFriend(f.id).then((ok) => ok && showToast(`You cheered ${f.name}.`))} onRemove={() => setRemoving(f)} />
               ))}
             </ul>
           )}

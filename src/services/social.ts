@@ -1,6 +1,6 @@
 // The network side of friends and guilds: small JSON calls to /api/social/<action>. Everything is optional and fails
 // quietly: with no connection (or no server set up) the app works exactly as before.
-import type { FriendCard, GuildView, Snapshot } from '../core/social.ts';
+import type { Cheer, FriendCard, GuildView, Snapshot } from '../core/social.ts';
 
 export type SocialErrorCode = 'offline' | 'not-configured' | 'forbidden' | 'not-found' | 'full' | 'own-code' | 'server';
 
@@ -70,7 +70,8 @@ export const api = {
   invite: (a: Auth) => socialCall<{ code: string; expiresAt: number }>('invite', a),
   inviteInfo: (code: string) => socialCall<{ name: string }>('invite-info', { code }),
   accept: (a: Auth, code: string) => socialCall<{ friend: FriendCard }>('accept', { ...a, code }),
-  friends: (a: Auth) => socialCall<{ friends: FriendCard[] }>('friends', a),
+  friends: (a: Auth) => socialCall<{ friends: FriendCard[]; cheers: Cheer[] }>('friends', a),
+  cheer: (a: Auth, friendId: string) => socialCall<{ ok: true; already?: boolean }>('cheer', { ...a, friendId }),
   unfriend: (a: Auth, friendId: string) => socialCall<{ ok: true }>('unfriend', { ...a, friendId }),
   remove: (a: Auth) => socialCall<{ ok: true }>('delete', a),
   guilds: (a: Auth) => socialCall<{ guilds: GuildView[] }>('guilds', a),

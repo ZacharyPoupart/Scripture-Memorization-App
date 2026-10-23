@@ -2211,3 +2211,9 @@ button.streak {
 .sheet.scrolls {
   overflow-y: auto; /* a long sheet scrolls inside itself and its buttons stay reachable */
 }
+.cheer-btn {
+  font-size: 1.3rem;
+}
+.cheer-btn.done {
+  opacity: 0.45;
+}

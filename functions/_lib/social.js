@@ -6,6 +6,7 @@
 //   u:<id>   a profile {sh (hash of the secret), name, snap, at}      f:<id>  a person's friend ids
 //   inv:<code> {from}  ui:<id> {code, exp}                             g:<gid> a guild {name, owner, members, at}
 //   gi:<code> {gid}   gu:<gid> {code, exp}                             ug:<id> a person's guild ids
+//   ch:<id>  recent cheers received [{from, at}] (a fixed 👏, never text)
 // Each person only ever writes their own profile; a friendship is "both lists contain the other", so removing someone works at once.
 
 const ID = /^[a-f0-9]{32}$/;
@@ -19,6 +20,7 @@ const MAX_GUILD_MEMBERS = 30;
 const MAX_GUILDS = 5;
 const FRIEND_INVITE_TTL = 7 * 86400;
 const GUILD_INVITE_TTL = 14 * 86400;
+const CHEER_KEEP = 7 * 86400_000; // how long a cheer stays on someone's page
 const GOAL_PER_MEMBER = 25; // counted reviews each member adds to the guild's week
 
 const json = (body, status = 200) =>
@@ -182,7 +184,23 @@ export async function handleSocial(request, kv, action, now = Date.now()) {
         }),
       );
       cards.sort((a, b) => a.name.localeCompare(b.name) || a.id.localeCompare(b.id));
-      return json({ friends: cards });
+      const names = new Map(cards.map((c) => [c.id, c.name]));
+      const cheers = (await cheersOf(id, now))
+        .filter((c) => names.has(c.from))
+        .map((c) => ({ id: c.from, name: names.get(c.from), at: c.at }));
+      return json({ friends: cards, cheers });
+    }
+
+    case 'cheer': {
+      if (!ID.test(body.friendId || '') || body.friendId === id) return fail('bad-request', 400);
+      const fid = body.friendId;
+      const [mine, theirs] = await Promise.all([listOf(`f:${id}`), listOf(`f:${fid}`)]);
+      if (!mine.includes(fid) || !theirs.includes(id)) return fail('not-found', 404);
+      const list = await cheersOf(fid, now);
+      const today = new Date(now).toISOString().slice(0, 10);
+      if (list.some((c) => c.from === id && new Date(c.at).toISOString().slice(0, 10) === today)) return json({ ok: true, already: true });
+      await put(`ch:${fid}`, [...list, { from: id, at: now }].slice(-30), 8 * 86400);
+      return json({ ok: true });
     }
 
     case 'unfriend': {
@@ -201,7 +219,7 @@ export async function handleSocial(request, kv, action, now = Date.now()) {
         if (theirs.includes(id)) await put(`f:${fid}`, theirs.filter((x) => x !== id));
       }
       for (const gid of await listOf(`ug:${id}`)) await leaveGuild(kv, gid, id);
-      await Promise.all([kv.delete(`u:${id}`), kv.delete(`f:${id}`), kv.delete(`ug:${id}`), kv.delete(`ui:${id}`)]);
+      await Promise.all([kv.delete(`u:${id}`), kv.delete(`f:${id}`), kv.delete(`ug:${id}`), kv.delete(`ui:${id}`), kv.delete(`ch:${id}`)]);
       return json({ ok: true });
     }
 
@@ -271,6 +289,11 @@ export async function handleSocial(request, kv, action, now = Date.now()) {
 
     default:
       return fail('not-found', 404);
+  }
+
+  async function cheersOf(who, at) {
+    const v = await get(`ch:${who}`);
+    return Array.isArray(v) ? v.filter((c) => c && typeof c.from === 'string' && typeof c.at === 'number' && at - c.at < CHEER_KEEP) : [];
   }
 
   async function memberGuild(store, gid, who) {

@@ -9,7 +9,7 @@ import { LESSONS, START, doneLessons, nextPos, sampleTourData, type TourPos } fr
 import { navigate } from './router.ts';
 import type { AppData, LevelUp, Settings } from './core/types.ts';
 import { setFeedbackPrefs } from './services/feedback.ts';
-import { cleanName, MAX_GUILD_NAME, newIdentity, sameSnapshot, socialSnapshot, type FriendCard, type GuildView, type Snapshot } from './core/social.ts';
+import { cleanName, MAX_GUILD_NAME, type Cheer, newIdentity, sameSnapshot, socialSnapshot, type FriendCard, type GuildView, type Snapshot } from './core/social.ts';
 import { api, socialMessage, SocialError, type Auth } from './services/social.ts';
 import { Storage, requestPersistence } from './services/storage.ts';
 import { runSync, stable, SyncError } from './services/sync.ts';
@@ -29,6 +29,9 @@ export interface Toast {
 
 export interface SocialState {
   friends: FriendCard[] | null;
+  /** Friends who cheered you in the last week, and the friends you have cheered today (this session). */
+  cheers: Cheer[];
+  cheered: string[];
   guilds: GuildView[] | null;
   busy: boolean;
   /** A short sentence for the screen when the last attempt failed; '' when all is well. */
@@ -97,7 +100,7 @@ let state: AppState = {
   sandbox: false,
   tour: null,
   tourMenu: false,
-  social: { friends: null, guilds: null, busy: false, error: '', loadedAt: 0, invite: null, guildInvites: {} },
+  social: { friends: null, cheers: [], cheered: [], guilds: null, busy: false, error: '', loadedAt: 0, invite: null, guildInvites: {} },
 };
 
 const listeners = new Set<() => void>();
@@ -297,7 +300,7 @@ export async function refreshSocial(): Promise<void> {
   await pushProfile();
   await guarded(async () => {
     const [f, g] = await Promise.all([api.friends(auth), api.guilds(auth)]);
-    patchSocial({ friends: f.friends, guilds: g.guilds, loadedAt: Date.now() });
+    patchSocial({ friends: f.friends, cheers: f.cheers ?? [], guilds: g.guilds, loadedAt: Date.now() });
   });
 }
 
@@ -345,7 +348,7 @@ export async function stopSharing(erase: boolean): Promise<boolean> {
   act((dd, now) => {
     dd.sharing = { name: dd.sharing?.name ?? '', on: false, at: now };
   });
-  patchSocial({ friends: null, guilds: null, invite: null, guildInvites: {}, error: '' });
+  patchSocial({ friends: null, cheers: [], cheered: [], guilds: null, invite: null, guildInvites: {}, error: '' });
   return true;
 }
 
@@ -375,6 +378,15 @@ export async function removeFriend(id: string): Promise<boolean> {
   if (!auth) return false;
   const r = await guarded(() => api.unfriend(auth, id));
   if (r) patchSocial({ friends: (state.social.friends ?? []).filter((f) => f.id !== id) });
+  return !!r;
+}
+
+/** A friendly 👏 for a friend (one a day each; the server keeps the count honest). */
+export async function cheerFriend(id: string): Promise<boolean> {
+  const auth = authOf();
+  if (!auth) return false;
+  const r = await guarded(() => api.cheer(auth, id));
+  if (r) patchSocial({ cheered: [...new Set([...state.social.cheered, id])] });
   return !!r;
 }
 

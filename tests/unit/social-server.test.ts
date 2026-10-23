@@ -184,6 +184,52 @@ describe('friends: invite only, both sides agree', () => {
   });
 });
 
+describe('cheers: a friendly 👏, once a day each, only between friends', () => {
+  async function friends() {
+    await join(1, 'Zach P.');
+    await join(2, 'Sam L.');
+    const code = (await call('invite', who(1))).body.code;
+    await call('accept', { ...who(2), code });
+  }
+  const DAY = 86_400_000;
+
+  it('a friend can cheer you; you see who, by name, on the friends list', async () => {
+    await friends();
+    expect((await call('cheer', { ...who(2), friendId: hex(1) }, 5 * DAY)).body.ok).toBe(true);
+    const mine = (await call('friends', who(1), 5 * DAY + 1000)).body;
+    expect(mine.cheers).toEqual([{ id: hex(2), name: 'Sam L.', at: 5 * DAY }]);
+    expect((await call('friends', who(2), 5 * DAY + 1000)).body.cheers).toEqual([]); // cheering does not show on your own page
+  });
+
+  it('only once a day each (a second one is ignored), then again the next day', async () => {
+    await friends();
+    await call('cheer', { ...who(2), friendId: hex(1) }, 5 * DAY + 1000);
+    expect((await call('cheer', { ...who(2), friendId: hex(1) }, 5 * DAY + 2000)).body.already).toBe(true);
+    expect(JSON.parse(kv.m.get(`ch:${hex(1)}`)!)).toHaveLength(1);
+    await call('cheer', { ...who(2), friendId: hex(1) }, 6 * DAY + 1000);
+    expect(JSON.parse(kv.m.get(`ch:${hex(1)}`)!)).toHaveLength(2);
+  });
+
+  it('strangers, yourself and removed friends cannot cheer; old cheers fade after a week', async () => {
+    await friends();
+    await join(3, 'Ana B.');
+    expect((await call('cheer', { ...who(3), friendId: hex(1) })).status).toBe(404);
+    expect((await call('cheer', { ...who(1), friendId: hex(1) })).status).toBe(400);
+    await call('cheer', { ...who(2), friendId: hex(1) }, 5 * DAY);
+    expect((await call('friends', who(1), 5 * DAY + 8 * DAY)).body.cheers).toEqual([]);
+    await call('unfriend', { ...who(1), friendId: hex(2) });
+    expect((await call('cheer', { ...who(2), friendId: hex(1) }, 20 * DAY)).status).toBe(404);
+    expect((await call('friends', who(1), 5 * DAY + 1000)).body.cheers).toEqual([]); // cheers from someone no longer a friend are hidden
+  });
+
+  it('deleting a profile clears the cheers it received', async () => {
+    await friends();
+    await call('cheer', { ...who(2), friendId: hex(1) }, 5 * DAY);
+    await call('delete', who(1));
+    expect(kv.m.has(`ch:${hex(1)}`)).toBe(false);
+  });
+});
+
 describe('guilds: invite only', () => {
   async function guild() {
     await join(1, 'Zach P.', snap({ week: 10 }));
