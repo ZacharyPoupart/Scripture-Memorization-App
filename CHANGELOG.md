@@ -8,7 +8,7 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 ## [1.34.1] - 2026-10-23
 
 ### Fixed
-- The tour's lesson list is tidied on iPhone: each lesson reads left to right with its number, and the list scrolls on small screens so Close is always reachable.
+- The tour is easier to read on iPhone: the rest of the screen is darker, the highlighted spot has rounded corners, the card has a clear outline, and the lesson list reads left to right and scrolls on small screens so Close is always reachable.
 
 ## [1.34.0] - 2026-10-23
 

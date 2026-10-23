@@ -136,7 +136,7 @@ function Coach({ pos }: { pos: TourPos }) {
           {(!adv || adv.kind === 'next') && <div class="tour-block clear" style={box({ top: hole.top, left: hole.left, width: hole.width, height: hole.height })} />}
         </>
       )}
-      {hole && step.target && <div class="tour-ring" style={box({ top: hole.top, left: hole.left, width: hole.width, height: hole.height  })} data-testid="tour-ring" />}
+      {hole && step.target && <div class={`tour-ring ${dim ? 'dim' : ''}`} style={box({ top: hole.top, left: hole.left, width: hole.width, height: hole.height  })} data-testid="tour-ring" />}
       <section
         class={`tour-card ${atTop ? 'top' : step.target ? 'bottom' : 'center'} ${inReview ? 'no-tabs compact' : ''}`}
         role="dialog"
