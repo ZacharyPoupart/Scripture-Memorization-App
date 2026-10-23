@@ -445,3 +445,10 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Data:** device-only `settings.seenUnlocks`; nothing synced; schema stays 1.
 **Test changes:** new unit test (`freshUnlocks`), new `tests/e2e/item-reveal.spec.ts` (buy, earned sword and shield in order, never twice, never in the tour). Because a first review now pops the shield up over Today, `openApp` in `tests/e2e/helpers.ts` closes the popup automatically (and `autoDismissMilestones` can opt out) so the other specs are not blocked; the popup spec opts out.
 **Undo:** roll back to the `v1.35.0` tag (or the stage tag of the backgrounds release).
+
+
+## v1.39.0 — Friends gets its own tab (owner request)
+**What:** a Friends tab in the bottom bar (Today, Piles, Add, Friends, Stats, Settings). The invite and group links keep it highlighted. The Friends button on Progress and the one in Settings → Help are removed, and the screen has no Back button because it is now a tab.
+**Choices (tell me if you want them different):** six tabs is the most that fit comfortably on an iPhone; each is still at least 44 points wide. If it ever feels crowded, Stats could move into the gear/Settings area or Add could become a button on Piles.
+**Test changes:** the navigation test and the touch-target test now include Friends (and Stats); a new friends test checks the tab and that join links highlight it.
+**Undo:** roll back to the previous stage tag.

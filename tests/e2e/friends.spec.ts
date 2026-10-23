@@ -169,3 +169,12 @@ test('the friends page fits a phone and has no horizontal scrolling', async ({ b
   await zach.getByRole('button', { name: 'Done' }).click();
   expect(await zach.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
 });
+
+test('Friends has its own tab, and invite links keep it highlighted', async ({ page }) => {
+  await openApp(page);
+  await page.getByTestId('tab-friends').click();
+  await expect(page.getByTestId('friends-on')).toBeVisible();
+  await expect(page.getByTestId('tab-friends')).toHaveAttribute('aria-current', 'page');
+  await page.goto('/#/join/ABCD-EFGH');
+  await expect(page.getByTestId('tab-friends')).toHaveAttribute('aria-current', 'page');
+});

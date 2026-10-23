@@ -44,6 +44,9 @@ test('navigation tabs work and the streak chip is shown', async ({ page }) => {
   await expect(page.getByTestId('streak')).toBeVisible();
   await page.getByRole('link', { name: 'Piles' }).click();
   await expect(page.getByRole('heading', { name: 'All verses' })).toBeVisible();
+  await page.getByRole('link', { name: 'Friends' }).click();
+  await expect(page.getByRole('heading', { name: 'Friends' })).toBeVisible();
+  await expect(page.getByTestId('tab-friends')).toHaveAttribute('aria-current', 'page');
   await page.getByRole('link', { name: 'Settings' }).click();
   await expect(page.getByRole('heading', { name: 'Settings' })).toBeVisible();
 });

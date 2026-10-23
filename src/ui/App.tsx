@@ -64,9 +64,9 @@ export function App({ onReload }: { onReload: () => void }) {
   else if (a === 'edit' && b) ((screen = <AddVerse key={`edit-${b}`} editId={b} />), (tab = '/piles'));
   else if (a === 'review') screen = <Review route={route} key={route.query.toString()} />;
   else if (a === 'stats') ((screen = <Stats />), (tab = '/stats'));
-  else if (a === 'friends') ((screen = <Friends />), (tab = '/stats'));
-  else if (a === 'join') ((screen = <Friends key={`join-${b}`} joinCode={b ?? ''} />), (tab = '/stats'));
-  else if (a === 'guild') ((screen = <Friends key={`guild-${b}`} guildCode={b ?? ''} />), (tab = '/stats'));
+  else if (a === 'friends') ((screen = <Friends />), (tab = '/friends'));
+  else if (a === 'join') ((screen = <Friends key={`join-${b}`} joinCode={b ?? ''} />), (tab = '/friends'));
+  else if (a === 'guild') ((screen = <Friends key={`guild-${b}`} guildCode={b ?? ''} />), (tab = '/friends'));
   else if (a === 'avatar') ((screen = <AvatarScreen />), (tab = '/'));
   else if (a === 'settings') ((screen = <Settings onShowIntro={() => setIntro(true)} />), (tab = '/settings'));
   else if (a === 'about') ((screen = <About onShowIntro={() => setIntro(true)} />), (tab = '/settings'));

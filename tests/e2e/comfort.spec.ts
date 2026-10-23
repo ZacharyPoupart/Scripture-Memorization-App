@@ -101,7 +101,7 @@ test.describe('taps are never blocked or sticky', () => {
       });
       expect(ok, id).toBe(true);
     }
-    for (const name of ['Today', 'Piles', 'Add', 'Settings']) {
+    for (const name of ['Today', 'Piles', 'Add', 'Friends', 'Stats', 'Settings']) {
       const ok = await page.getByRole('link', { name }).evaluate((el) => {
         const r = el.getBoundingClientRect();
         const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
@@ -120,7 +120,7 @@ test.describe('taps are never blocked or sticky', () => {
       const b = (await page.getByTestId(id).boundingBox())!;
       expect(b.height).toBeGreaterThanOrEqual(44);
     }
-    for (const name of ['Today', 'Piles', 'Add', 'Settings']) {
+    for (const name of ['Today', 'Piles', 'Add', 'Friends', 'Stats', 'Settings']) {
       const b = (await page.getByRole('link', { name }).boundingBox())!;
       expect(b.height).toBeGreaterThanOrEqual(44);
       expect(b.width).toBeGreaterThanOrEqual(44);
