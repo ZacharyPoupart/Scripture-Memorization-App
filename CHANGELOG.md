@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.39.0] - 2026-10-23
+
 ### Changed
 - Friends has its own tab in the bottom bar (between Add and Stats). The Friends button on Progress and the one in Settings are gone, since the tab replaces them.
 
