@@ -8,6 +8,12 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 ### Added
 - Friends. Settings → Friends and groups (or the Friends button on Progress): turn it on with your name, tap Invite a friend, and send the link or code. When they open it, you each see the other's knight, streak, how many verses are in each pile and how many reviews were done this week. Never the verses themselves. Only people you invite can see you, and either of you can remove the other, or stop sharing and delete your profile, at any time.
 - Groups. Start a group (a youth group, a family, a study group), invite people with a code, and work together toward a shared weekly goal of reviews. Invite only, up to 30 people.
+- Cheers. Tap 👏 on a friend to cheer them on once a day; they see it for a week.
+
+## [1.36.0] - 2026-10-23
+
+### Removed
+- The Calm celebrations switch (celebrations always include the confetti), the Vibration switch, and the Daily reminders (Calendar file) card are gone from Settings. Quiet sounds, the avatar switch and everything else stay.
 
 ## [1.35.0] - 2026-10-23
 

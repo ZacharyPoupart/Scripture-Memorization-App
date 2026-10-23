@@ -25,61 +25,9 @@ import {
   useApp,
 } from '../store.ts';
 import { Confirm, Field, Overlay, Seg, Toggle } from './common.tsx';
-import { feedback, hapticsSupported } from '../services/feedback.ts';
-import { buildReminderIcs, MAX_REMINDERS } from '../core/reminders.ts';
+import { feedback } from '../services/feedback.ts';
 import { describeOrder, normalizeOrder, PRESETS, presetOf, type PracticeOrder, type PracticePart } from '../core/practice.ts';
 import { ModePicker } from './ModePicker.tsx';
-
-function RemindersCard() {
-  const { settings } = useApp();
-  // Three fixed slots (an empty one is simply skipped), so clearing one never shifts the others.
-  const slots = Array.from({ length: MAX_REMINDERS }, (_, i) => settings.reminderTimes?.[i] ?? '');
-  const hasAny = slots.some(Boolean);
-  const set = (i: number, v: string) => {
-    const next = slots.slice();
-    next[i] = v;
-    updateSettings({ reminderTimes: next });
-  };
-  const download = () => {
-    const ics = buildReminderIcs(slots, Date.now());
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' }));
-    a.download = 'memorize-for-life-reminders.ics';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(a.href), 10_000);
-  };
-  return (
-    <div class="card stack" data-testid="reminders-card">
-      <h2>Daily reminders</h2>
-      <p class="muted small" style={{ margin: 0 }}>
-        Web apps on iPhone can't send their own notifications without a server, so reminders use your Calendar app instead: pick up to three times,
-        tap the button, then choose “Add All”. Your Calendar will alert you at those times, even offline. To change them later, delete the “Memorize
-        For Life” events and add again.
-      </p>
-      <div class="grid3">
-        {slots.map((t, i) => (
-          <label class="field" key={i}>
-            <span>Time {i + 1}</span>
-            <input
-              class="input"
-              type="time"
-              value={t}
-              onInput={(e) => set(i, e.currentTarget.value)}
-              aria-label={`Reminder time ${i + 1}`}
-              data-testid={`reminder-${i}`}
-            />
-          </label>
-        ))}
-      </div>
-      <button class="btn block" disabled={!hasAny} onClick={download} data-testid="reminders-download">
-        Add reminders to Calendar
-      </button>
-      <div class="hint-text">Leave a time empty to skip it. If nothing happens on your iPhone, open this page in Safari and try again.</div>
-    </div>
-  );
-}
 
 function SyncCard() {
   const { settings, sync, online } = useApp();
@@ -585,7 +533,7 @@ export function Settings({ onShowIntro }: { onShowIntro: () => void }) {
         </div>
 
         <div class="card stack" data-testid="feedback-card">
-          <h2>Feedback &amp; celebrations</h2>
+          <h2>Feedback</h2>
           <p class="muted small" style={{ margin: 0 }}>
             Gentle by design. Everything here is optional and can be switched off.
           </p>
@@ -600,19 +548,6 @@ export function Settings({ onShowIntro }: { onShowIntro: () => void }) {
             testid="toggle-sound"
           />
           <Toggle
-            label="Vibration"
-            hint={
-              hapticsSupported() ? 'A tiny tap on correct answers.' : 'Not available here — iPhone web apps can’t vibrate. Many Android phones can.'
-            }
-            checked={settings.hapticsOn && hapticsSupported()}
-            disabled={!hapticsSupported()}
-            onChange={(hapticsOn) => {
-              updateSettings({ hapticsOn });
-              if (hapticsOn) feedback.correct();
-            }}
-            testid="toggle-haptics"
-          />
-          <Toggle
             label="Avatar and coins"
             hint="Earn coins for reviewing and dress your avatar. Hides it from Today when off; nothing is lost."
             checked={settings.avatarOn}
@@ -620,24 +555,8 @@ export function Settings({ onShowIntro }: { onShowIntro: () => void }) {
             testid="toggle-avatar"
           />
           <ResetArmor />
-          <Field
-            group
-            label="Celebrations"
-            hint="Full adds confetti for big moments (a verse moving up, long streaks). Calm keeps it to a quiet message."
-          >
-            <Seg<'full' | 'calm'>
-              label="Celebrations"
-              value={settings.celebrations}
-              options={[
-                { value: 'full', label: 'Full' },
-                { value: 'calm', label: 'Calm' },
-              ]}
-              onChange={(celebrations) => updateSettings({ celebrations })}
-            />
-          </Field>
         </div>
 
-        <RemindersCard />
         <SyncCard />
         <BackupCard />
 

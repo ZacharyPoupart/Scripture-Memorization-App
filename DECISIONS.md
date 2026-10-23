@@ -425,6 +425,12 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Test changes:** the avatar offline test now waits for the offline copy before cutting the network (this also removes the occasional flake); the "avatar screen lists ..." unit test now expects the Background slot; new unit tests (fifteen free pictures, files exist, wearing and fallback) and `tests/e2e/backgrounds.spec.ts`.
 **Undo:** roll back to the `v1.34.0-tour` tag.
 
+## Settings trimmed: celebrations switch, vibration, calendar reminders (owner request)
+**What:** removed the Full/Calm celebrations switch (always the full celebration now), the Vibration switch (and the vibration code) and the Daily reminders card (and the .ics builder). Quiet sounds stay.
+**Choices (tell me if you want them different):** people who had picked Calm now get confetti too. The saved values (`celebrations`, `hapticsOn`, `reminderTimes`) are simply ignored if an older version left them on a device, so nothing breaks; nothing synced is affected.
+**Test changes:** deleted `tests/unit/reminders.test.ts` and the e2e checks for the calendar file, the vibration switch and Calm mode, because those features no longer exist; the sound e2e and unit tests keep their sound checks.
+**Undo:** roll back to the previous stage tag (the code for all three is in git history if you want any back).
+
 ## v1.37.0 — Friends and groups (owner request: real names, invite only, teens and children)
 **What:** an opt-in Friends screen (Progress → Friends, or Settings → Friends and groups). Turn it on with a name, invite by code or link (`/#/join/CODE`, shared with the phone's share sheet), see friends' knight, streak, pile counts and reviews this week. Groups ("guilds") are small invite-only teams (up to 30 people, up to 5 per person) with a shared weekly goal (25 counted reviews per member). Server: `functions/_lib/social.js` + `functions/api/social/[action].js`, using the SAME Cloudflare KV namespace as sync (binding `SYNC`), so nothing new to set up.
 **What friends can see:** name, how the knight looks, streak and longest streak, how many verses are in each pile, counted reviews this week. Never verses, references, topics or dates. Nobody can search for people; the only way in is a private code someone sends you (valid 7 days for friends, 14 for groups).

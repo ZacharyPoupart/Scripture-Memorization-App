@@ -6,7 +6,7 @@ A calm, offline-first app for memorizing Bible verses and **keeping them memoriz
 - Add a verse or range (book, chapter, verses), pick a translation, text is looked up automatically when online — or type/paste it any time.
 - Four review modes (flashcard, fill in the blank, type first letters, speak it) + recalling *where* the verse is.
 - Streaks, a Progress tab (streak history, calendar heatmap, what's nearly ready to move up), level-up and streak celebrations that scale with the achievement, light/dark mode (follows your phone).
-- Search, sort and filter your verses; rename topics; daily reminders through your Calendar app.
+- Search, sort and filter your verses; rename topics.
 - Export/import backups; optional private sync between your phone and computer with a link code (no email/password).
 
 **Trying a new version on your iPhone?** Use [docs/IOS-CHECKLIST.md](docs/IOS-CHECKLIST.md). Changes and reasoning are logged in [DECISIONS.md](DECISIONS.md).

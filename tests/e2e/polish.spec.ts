@@ -1,5 +1,4 @@
 import { expect, test } from '@playwright/test';
-import { readFileSync } from 'node:fs';
 import { addVerse, blockLookups, JOHN316, openApp, PSALM23_1, ROMANS8_28, saved } from './helpers';
 
 async function library(page: import('@playwright/test').Page) {
@@ -69,29 +68,6 @@ test.describe('search, sort and filter', () => {
     await page.getByTestId('toast').getByRole('button', { name: 'Undo' }).click();
     await expect(page.getByRole('button', { name: '#Trust', exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: '#Faith', exact: true })).toHaveCount(0);
-  });
-});
-
-test.describe('daily reminders (calendar file)', () => {
-  test('explains the iPhone limit and downloads a valid calendar file with the chosen times', async ({ page }) => {
-    await blockLookups(page);
-    await openApp(page, '/#/settings');
-    await expect(page.getByTestId('reminders-card')).toContainText("can't send their own notifications");
-    await page.getByTestId('reminder-0').fill('07:30');
-    await page.getByTestId('reminder-1').fill('');
-    await page.getByTestId('reminder-2').fill('21:15');
-    const [download] = await Promise.all([page.waitForEvent('download'), page.getByTestId('reminders-download').click()]);
-    expect(download.suggestedFilename()).toBe('memorize-for-life-reminders.ics');
-    const ics = readFileSync((await download.path())!, 'utf8');
-    expect(ics).toContain('BEGIN:VCALENDAR');
-    expect(ics.match(/BEGIN:VEVENT/g)).toHaveLength(2);
-    expect(ics).toMatch(/DTSTART:\d{8}T073000/);
-    expect(ics).toMatch(/DTSTART:\d{8}T211500/);
-    expect(ics).toContain('RRULE:FREQ=DAILY');
-    expect(ics).toContain('BEGIN:VALARM');
-    await saved(page);
-    await page.reload();
-    await expect(page.getByTestId('reminder-0')).toHaveValue('07:30');
   });
 });
 

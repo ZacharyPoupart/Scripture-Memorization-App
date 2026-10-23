@@ -81,10 +81,7 @@ let state: AppState = {
     lastSyncAt: 0,
     seenLevelUps: [],
     soundOn: false,
-    hapticsOn: false,
-    celebrations: 'full',
     seenMilestones: [],
-    reminderTimes: ['08:00', '13:00', '19:00'],
     nudgeDismissedAt: 0,
     avatarOn: true,
     speakWords: true,
@@ -193,7 +190,7 @@ export function updateSettings(patch: Partial<Settings>) {
   set({ settings: { ...state.settings, ...patch } });
   persistSettings();
   applyTheme();
-  setFeedbackPrefs({ sound: state.settings.soundOn, haptics: state.settings.hapticsOn });
+  setFeedbackPrefs({ sound: state.settings.soundOn });
 }
 
 export function markMilestoneSeen(id: string) {
@@ -481,7 +478,7 @@ export function endTour(finished: boolean) {
   real = null;
   set({ sandbox: false, tour: null, tourMenu: false, data: back.data, settings: back.settings });
   applyTheme();
-  setFeedbackPrefs({ sound: state.settings.soundOn, haptics: state.settings.hapticsOn });
+  setFeedbackPrefs({ sound: state.settings.soundOn });
   updateSettings({ onboarded: true, tour: { done: doneLessons([...state.settings.tour.done, ...lastDone]) } });
   doneInTour = [];
   scheduleSync();
@@ -660,7 +657,7 @@ export async function init(): Promise<void> {
   settle(next, Date.now());
   state = { ...state, data: next, sync: settings.syncCode ? { kind: 'idle' } : { kind: 'off' } };
   applyTheme();
-  setFeedbackPrefs({ sound: settings.soundOn, haptics: settings.hapticsOn });
+  setFeedbackPrefs({ sound: settings.soundOn });
   persist();
   set({ ready: true });
   void requestPersistence();
