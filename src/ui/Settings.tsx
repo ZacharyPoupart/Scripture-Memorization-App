@@ -565,9 +565,6 @@ export function Settings({ onShowIntro }: { onShowIntro: () => void }) {
           <button class="btn primary block" onClick={() => openTourMenu(true)} data-testid="take-tour">
             Take the tour
           </button>
-          <button class="btn block" onClick={() => navigate('/friends')} data-testid="settings-friends">
-            Friends and groups
-          </button>
           <button class="btn block" onClick={onShowIntro} data-testid="show-intro">
             Show the walkthrough again
           </button>

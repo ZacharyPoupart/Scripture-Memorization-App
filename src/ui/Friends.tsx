@@ -2,7 +2,7 @@ import { useEffect, useState } from 'preact/hooks';
 import { currentLook, defaultLook, type Look } from '../core/avatar.ts';
 import { cleanName, cheerLine, codeFrom, formatCode, guildLink, inviteLink, inviteMessage, MAX_GUILD_NAME, MAX_NAME, type FriendCard, type GuildView } from '../core/social.ts';
 import { api, socialMessage } from '../services/social.ts';
-import { back, navigate } from '../router.ts';
+import { navigate } from '../router.ts';
 import {
   acceptFriend,
   createGuild,
@@ -268,14 +268,7 @@ export function Friends({ joinCode = '', guildCode = '' }: { joinCode?: string; 
     return (
       <div class="scroll">
         <div class="narrow stack">
-          <div class="row spread">
-            <button class="icon-btn" aria-label="Back" onClick={() => back('/stats')}>
-              <Icon name="back" />
-            </button>
-            <h1 class="grow" style={{ margin: 0 }}>
-              Friends
-            </h1>
-          </div>
+          <h1 style={{ margin: 0 }}>Friends</h1>
           {(invitedBy || invitedGuild) && (
             <div class="banner good" data-testid="invited-banner">
               {invitedBy ? `${invitedBy} invited you to be friends.` : `You are invited to join “${invitedGuild}”.`} Turn on friends below to say yes.
@@ -320,14 +313,7 @@ export function Friends({ joinCode = '', guildCode = '' }: { joinCode?: string; 
   return (
     <div class="scroll">
       <div class="narrow stack">
-        <div class="row spread">
-          <button class="icon-btn" aria-label="Back" onClick={() => back('/stats')}>
-            <Icon name="back" />
-          </button>
-          <h1 class="grow" style={{ margin: 0 }}>
-            Friends
-          </h1>
-        </div>
+        <h1 style={{ margin: 0 }}>Friends</h1>
 
         {friendCode && invitedBy && (
           <div class="card stack" data-testid="join-card">
