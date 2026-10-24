@@ -9,7 +9,7 @@ export const MODES: { value: ReviewMode; label: string; long: string; blurb: str
   { value: 'speak', label: 'Speak', long: 'Speak it', blurb: 'Recite aloud and get word-by-word feedback.' },
 ];
 
-export function ModePicker({ onChange, blurb = true }: { onChange?: (m: ReviewMode) => void; blurb?: boolean }) {
+export function ModePicker({ onChange }: { onChange?: (m: ReviewMode) => void }) {
   const { settings } = useApp();
   return (
     <div class="stack" style={{ '--gap': '8px' } as never}>
@@ -35,7 +35,6 @@ export function ModePicker({ onChange, blurb = true }: { onChange?: (m: ReviewMo
           <Icon name="shuffle" />
         </button>
       </div>
-      {blurb && <div class="hint-text">{MODES.find((m) => m.value === settings.defaultMode)?.blurb}{settings.shuffle ? ' Shuffle is on: verses come in a random order.' : ''}</div>}
     </div>
   );
 }

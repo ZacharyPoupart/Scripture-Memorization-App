@@ -55,9 +55,6 @@ export function Celebrations({ suppressed }: { suppressed: boolean }) {
                 </div>
               ))}
             </div>
-            <p class="muted small" style={{ margin: 0 }}>
-              {toYearly ? 'Kept for life — you will see it once a year.' : 'It is becoming part of you. Fewer reviews from here.'}
-            </p>
             <button class="btn primary block" onClick={close} data-testid="celebration-close">
               Wonderful
             </button>
