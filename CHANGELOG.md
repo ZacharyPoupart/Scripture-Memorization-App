@@ -5,6 +5,9 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Changed
+- The hardest Fill in the blank hides every word of the verse. Weekly, Monthly and Yearly verses always use it.
+
 ## [1.40.0] - 2026-10-23
 
 ### Changed

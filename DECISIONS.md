@@ -457,3 +457,9 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Choices (tell me if you want them different):** the limit of six is `TOPIC_CHIPS_MAX`; the list is A to Z. Ideas for later if it is still too much: grouping topics into folders, or pinning favourites.
 **Test changes:** none to existing tests; new `tests/e2e/topics.spec.ts` and unit tests for the counts and the search.
 **Undo:** roll back to the previous stage tag.
+
+## v1.43.0 — Hardest Fill in the blank hides every word (owner request)
+**What:** on Hard, every word is a blank (it used to be three out of four). Weekly, Monthly and Yearly verses always use Hard, so they now ask for the whole verse, word by word, with five choices each.
+**Choices (tell me if you want them different):** I read "no words" as every word blank. Weekly and later piles inherit it because they always use the hardest level; if you would rather keep those a little easier I can give them their own level. Easy and Medium are unchanged.
+**Test changes:** new unit test (the hardest level blanks every word).
+**Undo:** roll back to the previous stage tag.

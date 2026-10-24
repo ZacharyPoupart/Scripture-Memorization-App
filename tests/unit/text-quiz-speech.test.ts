@@ -29,6 +29,12 @@ describe('tokenize', () => {
 });
 
 describe('fill in the blank', () => {
+  it('the hardest level hides every word', () => {
+    const { words, blanks } = makeBlanks(JOHN, 'hard', makeRng(5));
+    expect(blanks).toHaveLength(words.length);
+    expect(blanks.map((b) => b.index)).toEqual(words.map((w) => w.index));
+  });
+
   it('makes more blanks and more options on harder levels', () => {
     const easy = makeBlanks(JOHN, 'easy', makeRng(1));
     const hard = makeBlanks(JOHN, 'hard', makeRng(1));
