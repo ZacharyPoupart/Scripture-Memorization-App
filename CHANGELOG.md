@@ -5,6 +5,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.42.0] - 2026-10-24
+
+### Changed
+- The "Default review mode" choice is gone from Settings. The app now simply stays on the review type you picked last, whether you picked it on Today, in a pile or in the middle of a review.
+
 ## [1.41.0] - 2026-10-24
 
 ### Changed

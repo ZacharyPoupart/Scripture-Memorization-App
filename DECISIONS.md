@@ -463,3 +463,10 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Kept on purpose (tell me if you want any of these cut too):** the confirmations that protect data (Erase everything, Replace everything with the backup, Delete this verse, Turn off sync, Reset armor), "Keep this code private" next to the sync code, the NIV copyright line, the short note under Friends that says what friends can see, and the note asking a child to check with a parent before turning friends on.
 **Test changes:** the break test now looks for "Until" on Today and the mode-switch test checks the sheet no longer says the verse starts over on the result card. No rule or data changed.
 **Undo:** roll back to the `v1.40.0-topic-list` tag.
+
+## v1.42.0 — The review type stays where you left it (owner request)
+**What:** removed "Default review mode" from Settings. The type you last picked (the bar on Today and on a pile, the buttons on a verse's page, or the type swap in the middle of a review) is remembered and used next time. Before, swapping in the middle of a review lasted for that session only.
+**Data:** no change; it is the same device setting as before (`settings.defaultMode`), so nothing needs migrating.
+**Also gone:** the shuffle button that sat beside that picker in Settings. It stays on Today and on each pile page.
+**Test changes:** the mid-review swap test now expects the new type to be remembered; the accessibility and shuffle tests no longer look for the type bar or shuffle button in Settings.
+**Undo:** roll back to the previous stage tag.

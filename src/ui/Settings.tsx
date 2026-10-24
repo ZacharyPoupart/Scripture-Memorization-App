@@ -27,7 +27,6 @@ import {
 import { Confirm, Field, Overlay, Seg, Toggle } from './common.tsx';
 import { feedback } from '../services/feedback.ts';
 import { describeOrder, normalizeOrder, PRESETS, presetOf, type PracticeOrder, type PracticePart } from '../core/practice.ts';
-import { ModePicker } from './ModePicker.tsx';
 
 function SyncCard() {
   const { settings, sync, online } = useApp();
@@ -508,9 +507,6 @@ export function Settings({ onShowIntro }: { onShowIntro: () => void }) {
               ]}
               onChange={(fillDifficulty) => updateSettings({ fillDifficulty })}
             />
-          </Field>
-          <Field group label="Default review mode">
-            <ModePicker />
           </Field>
           <PracticeOrderField />
         </div>

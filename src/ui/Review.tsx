@@ -7,7 +7,7 @@ import { cueFor, planFor } from '../core/practice.ts';
 import { tooManyMistakes } from '../core/quiz.ts';
 import { PILES, type AppData, type LevelUp, type Pile, type ReviewMode, type Verse } from '../core/types.ts';
 import { back, navigate, type Route } from '../router.ts';
-import { act, completeReview, showToast, useApp } from '../store.ts';
+import { act, completeReview, showToast, updateSettings, useApp } from '../store.ts';
 import { CheckMark, Coin, Confetti, Icon, PileBadge, PILE_INFO, pileProgress, progressUnitPlural } from './common.tsx';
 import { MODES } from './ModePicker.tsx';
 import { Overlay } from './common.tsx';
@@ -116,7 +116,10 @@ function SkipVerse({ onSkip }: { onSkip: () => void }) {
 export function Review({ route }: { route: Route }) {
   const { data, settings } = useApp();
   const startMode = (MODES.find((m) => m.value === route.query.get('mode'))?.value ?? settings.defaultMode) as ReviewMode;
-  const [chosen, setChosen] = useState<ReviewMode | null>(null); // a type picked during this session (the default is not changed)
+  const [chosen, setChosen] = useState<ReviewMode | null>(null); // a type picked during this session
+  useEffect(() => {
+    if (startMode !== settings.defaultMode) updateSettings({ defaultMode: startMode }); // the type you last chose stays
+  }, []);
   const [switching, setSwitching] = useState(false);
   const mode = chosen ?? startMode;
   const queue = useMemo(() => {
@@ -187,6 +190,7 @@ export function Review({ route }: { route: Route }) {
     setSwitching(false);
     if (m === mode) return;
     setChosen(m);
+    updateSettings({ defaultMode: m });
     if (!result) setAttempt((a) => a + 1);
   };
 
