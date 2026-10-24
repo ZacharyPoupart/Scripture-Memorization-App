@@ -937,6 +937,15 @@ textarea.input {
   min-height: 108px;
   align-content: start;
 }
+/* six choices sit in even rows: two by three on a phone, three by two on wider screens */
+.options:has(> :nth-child(6):last-child) {
+  grid-template-columns: repeat(2, 1fr);
+}
+@media (min-width: 480px) {
+  .options:has(> :nth-child(6):last-child) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
 .option {
   min-height: 48px;
   border-radius: 12px;

@@ -5,6 +5,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.43.0] - 2026-10-24
+
+### Changed
+- The hardest Fill in the blank hides every word of the verse and offers six choices, laid out in even rows. Weekly, Monthly and Yearly verses always use it.
+
 ## [1.42.0] - 2026-10-24
 
 ### Changed
