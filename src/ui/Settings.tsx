@@ -42,11 +42,7 @@ function SyncCard() {
     return (
       <div class="card stack" data-testid="sync-card">
         <h2>Sync between devices</h2>
-        <p class="muted small" style={{ margin: 0 }}>
-          Optional. Link your phone and computer with a private code — no email or password. Your verses are encrypted on your device before they're
-          sent.
-        </p>
-        {!secure && <div class="banner">Sync needs a secure (https) connection. It will work on your live site.</div>}
+        {!secure && <div class="banner">Sync needs a secure (https) connection.</div>}
         {!linking ? (
           <div class="row wrap">
             <button
@@ -123,7 +119,7 @@ function SyncCard() {
       )}
       <div>
         <div class="muted small" style={{ marginBottom: '4px' }}>
-          Link code — enter this on your other device:
+          Link code
         </div>
         <div class="row">
           <code style={{ fontSize: '1.1rem', letterSpacing: '0.04em', flex: 1 }} data-testid="sync-code">
@@ -144,7 +140,7 @@ function SyncCard() {
             Copy
           </button>
         </div>
-        <div class="hint-text">Anyone with this code can read your verses. Keep it private.</div>
+        <div class="hint-text">Keep this code private.</div>
       </div>
       <div class="row wrap">
         <button class="btn grow" onClick={() => void syncNow()} disabled={sync.kind === 'syncing'} data-testid="sync-now">
@@ -157,7 +153,7 @@ function SyncCard() {
       {confirmOff && (
         <Confirm
           title="Turn off sync?"
-          body="Your verses stay on this device. Other devices keep their copies too. You can link again any time with the same code."
+          body="Your verses stay on every device. You can link again with the same code."
           confirmLabel="Turn off"
           onConfirm={() => {
             setConfirmOff(false);
@@ -181,7 +177,7 @@ function ResetArmor() {
       {ask && (
         <Confirm
           title="Reset your armor?"
-          body="Your knight goes back to the free start, and everything you bought is forgotten. The coins you spent come back. Your verses and progress are not touched. With sync on, other devices that own armor would bring it back."
+          body="Your knight goes back to the free start and the coins you spent come back. Your verses and progress are not touched."
           confirmLabel="Reset"
           onConfirm={() => {
             setAsk(false);
@@ -230,7 +226,6 @@ function BackupCard() {
           : days === 0
             ? 'Last exported today.'
             : `Last exported ${days} day${days === 1 ? '' : 's'} ago.`}{' '}
-        A backup file contains all your verses, progress and streaks.
       </p>
       <div class="row wrap">
         <button class="btn grow" onClick={downloadBackup} data-testid="export">
@@ -259,7 +254,7 @@ function BackupCard() {
               <button
                 class="btn small"
                 onClick={async () => {
-                  if (await restoreSnapshot(s.key)) showToast('Restored. Undo is available just below.');
+                  if (await restoreSnapshot(s.key)) showToast('Restored.');
                 }}
               >
                 Restore
@@ -283,7 +278,7 @@ function BackupCard() {
               }}
               data-testid="import-merge"
             >
-              Merge with what I have (safe)
+              Merge with what I have
             </button>
             <button
               class="btn block danger"
@@ -325,7 +320,7 @@ function BreakCard() {
       {active ? (
         <>
           <p style={{ margin: 0 }} data-testid="break-status">
-            On a break until {until}. Nothing is due, your streak waits, and nothing is lost.
+            On a break until {until}.
           </p>
           <button class="btn" onClick={stopBreak} data-testid="break-end">
             End the break now
@@ -333,9 +328,6 @@ function BreakCard() {
         </>
       ) : (
         <>
-          <p class="muted" style={{ margin: 0 }}>
-            Away or busy? Pause for a while: nothing is due, and your streak waits. Verses just don't earn days while you're away.
-          </p>
           <div class="row">
             <select class="input grow" aria-label="Length of the break" value={days} onChange={(e) => setDays(Number(e.currentTarget.value))} data-testid="break-length">
               {BREAK_CHOICES.map((c) => (
@@ -376,11 +368,7 @@ function PracticeOrderField() {
   const both = order.before.length === 2;
   return (
     <div class="stack" data-testid="practice-order">
-      <Field
-        group
-        label="Practice order"
-        hint="For Fill in the blank, Type it out and Speak it. A topic is only asked for verses that have one. Flashcards show the reference on the card and ask nothing."
-      >
+      <Field group label="Practice order">
         <div class="slot-chips" role="group" aria-label="Practice order presets">
           {PRESETS.map((p) => (
             <button key={p.id} type="button" aria-pressed={preset?.id === p.id} class={`chip-btn ${preset?.id === p.id ? 'on' : ''}`} title={p.hint} onClick={() => save(p.order)} data-testid={`practice-preset-${p.id}`}>
@@ -391,10 +379,9 @@ function PracticeOrderField() {
         <div class="practice-preview" data-testid="practice-preview" aria-live="polite">
           {describeOrder(order)}
         </div>
-        {preset && <div class="hint-text">{preset.hint}</div>}
       </Field>
-      <Toggle label="Ask the topic before the verse" hint="You see the citation as a cue until you start typing." checked={order.before.includes('topic')} onChange={(on) => setBefore('topic', on)} testid="practice-before-topic" />
-      <Toggle label="Ask the citation before the verse" hint="You see the topic (or the first words) as a cue until you start answering." checked={order.before.includes('citation')} onChange={(on) => setBefore('citation', on)} testid="practice-before-citation" />
+      <Toggle label="Ask the topic before the verse" checked={order.before.includes('topic')} onChange={(on) => setBefore('topic', on)} testid="practice-before-topic" />
+      <Toggle label="Ask the citation before the verse" checked={order.before.includes('citation')} onChange={(on) => setBefore('citation', on)} testid="practice-before-citation" />
       {both && (
         <Field group label="Before the verse, ask first">
           <Seg<'topic' | 'citation'>
@@ -409,7 +396,7 @@ function PracticeOrderField() {
         </Field>
       )}
       <Toggle label="Ask the citation after the verse" checked={order.after.includes('citation')} onChange={(on) => setAfter('citation', on)} testid="practice-after-citation" />
-      <Toggle label="Ask the topic after the verse" hint="After the verse, the citation always comes before the topic." checked={order.after.includes('topic')} onChange={(on) => setAfter('topic', on)} testid="practice-after-topic" />
+      <Toggle label="Ask the topic after the verse" checked={order.after.includes('topic')} onChange={(on) => setAfter('topic', on)} testid="practice-after-topic" />
     </div>
   );
 }
@@ -420,7 +407,7 @@ function SpacingField({ hours, onChange }: { hours: number; onChange: (hours: nu
   const [minutes, setMinutes] = useState(String(Math.round(hours * 60)));
   const selected = custom ? 'custom' : String(hours);
   return (
-    <Field label="Time between Daily reviews" hint="Each Daily verse is reviewed 3 times a day, at least this far apart.">
+    <Field label="Time between Daily reviews">
       <select
         class="input"
         value={selected}
@@ -510,11 +497,7 @@ export function Settings({ onShowIntro }: { onShowIntro: () => void }) {
             </select>
           </Field>
           <SpacingField hours={data.prefs.value.spacingHours} onChange={(spacingHours) => setPrefs({ spacingHours })} />
-          <Field
-            group
-            label="Fill-in-the-blank difficulty (Daily verses)"
-            hint="Verses in Weekly, Monthly and Yearly always use the hardest version."
-          >
+          <Field group label="Fill-in-the-blank difficulty (Daily verses)">
             <Seg<FillDifficulty>
               label="Difficulty"
               value={settings.fillDifficulty}
@@ -534,12 +517,8 @@ export function Settings({ onShowIntro }: { onShowIntro: () => void }) {
 
         <div class="card stack" data-testid="feedback-card">
           <h2>Feedback</h2>
-          <p class="muted small" style={{ margin: 0 }}>
-            Gentle by design. Everything here is optional and can be switched off.
-          </p>
           <Toggle
             label="Quiet sounds"
-            hint="A soft tone for correct answers and finished reviews. Off by default."
             checked={settings.soundOn}
             onChange={(soundOn) => {
               updateSettings({ soundOn });
@@ -549,7 +528,7 @@ export function Settings({ onShowIntro }: { onShowIntro: () => void }) {
           />
           <Toggle
             label="Avatar and coins"
-            hint="Earn coins for reviewing and dress your avatar. Hides it from Today when off; nothing is lost."
+            hint="Hides it from Today when off. Nothing is lost."
             checked={settings.avatarOn}
             onChange={(avatarOn) => updateSettings({ avatarOn })}
             testid="toggle-avatar"
@@ -578,7 +557,7 @@ export function Settings({ onShowIntro }: { onShowIntro: () => void }) {
           <button class="btn block danger" onClick={() => setReset(true)}>
             Erase all data on this device
           </button>
-          <div class="hint-text">If sync is on, other devices keep their copies and would sync them back. Export a backup first.</div>
+          <div class="hint-text">With sync on, other devices would sync their copies back.</div>
         </div>
       </div>
       {reset && (

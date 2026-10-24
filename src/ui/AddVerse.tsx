@@ -116,7 +116,7 @@ export function AddVerse({ editId }: { editId?: string }) {
           </select>
         </Field>
 
-        <Field label="Verse text" hint="Looked up automatically when you're online. You can always type or paste your own.">
+        <Field label="Verse text">
           <textarea class="input" value={text} placeholder="The verse text appears here…" onInput={(e) => { setText(e.currentTarget.value); setManual(true); }} data-testid="text" />
         </Field>
         <div class="row">
@@ -124,7 +124,7 @@ export function AddVerse({ editId }: { editId?: string }) {
             {lookup.kind === 'loading' ? 'Looking up…' : 'Look up text'}
           </button>
           <span class={`small ${lookup.kind === 'error' ? 'error-text' : 'muted'}`} data-testid="lookup-status" role="status">
-            {lookup.kind === 'ok' ? 'Found it.' : lookup.kind === 'error' ? lookup.message : !online ? "Offline — type or paste the text." : ''}
+            {lookup.kind === 'ok' ? 'Found it.' : lookup.kind === 'error' ? lookup.message : !online ? 'Offline.' : ''}
           </span>
         </div>
 
@@ -147,11 +147,11 @@ export function AddVerse({ editId }: { editId?: string }) {
           <details class="quiet-details" open={daysIn > 0}>
             <summary>Already know this one? Start partway</summary>
             <DaysSlider value={daysIn} max={maxDaysIn('daily')} onChange={setDaysIn} testid="days-in" />
-            <div class="hint-text">It counts as that many days already spent in Daily, so it moves up sooner. Leave at 0 for a brand-new verse.</div>
+            <div class="hint-text">Counts as days already spent in Daily.</div>
           </details>
         )}
 
-        {duplicate && <div class="banner info small">You already have {formatRef(duplicate)} ({duplicate.translation}) in {duplicate.pile}. You can still add it.</div>}
+        {duplicate && <div class="banner info small">You already have {formatRef(duplicate)} ({duplicate.translation}) in {duplicate.pile}.</div>}
         {error && <div class="banner bad" role="alert" data-testid="form-error">{error}</div>}
         <button class="btn primary block" onClick={save} data-testid="save-verse">
           {existing ? 'Save changes' : 'Add to Daily'}

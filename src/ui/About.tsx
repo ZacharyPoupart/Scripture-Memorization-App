@@ -1,10 +1,9 @@
 import { FEEDBACK_URL } from '../config.ts';
 import { GRADUATION_DAYS } from '../core/schedule.ts';
 import { back } from '../router.ts';
-import { openTourMenu } from '../store.ts';
 import { Icon } from './common.tsx';
 
-export function About({ onShowIntro }: { onShowIntro: () => void }) {
+export function About() {
   return (
     <div class="scroll">
       <div class="narrow stack">
@@ -17,47 +16,27 @@ export function About({ onShowIntro }: { onShowIntro: () => void }) {
 
         <div class="card stack">
           <h2>Why this app exists</h2>
-          <p style={{ margin: 0 }}>
-            Memorize For Life helps you make Scripture memory a daily habit and keep it for good. A new verse is practiced often, then reviewed less and less as it becomes solid — without ever being forgotten.
-          </p>
+          <p style={{ margin: 0 }}>Make Scripture memory a daily habit, and keep it for good.</p>
         </div>
 
         <div class="card stack">
           <h2>The four piles</h2>
-          <p style={{ margin: 0 }}>Every verse lives in one pile and moves up on its own as time passes.</p>
           <ul style={{ margin: 0, paddingLeft: '1.2em' }}>
-            <li><strong>Daily</strong> — reviewed 3 times a day, with some time between reviews. After {GRADUATION_DAYS.daily} days it moves to Weekly.</li>
-            <li><strong>Weekly</strong> — reviewed once a week (any day, Sunday to Saturday). After {GRADUATION_DAYS.weekly} weeks it moves to Monthly.</li>
-            <li><strong>Monthly</strong> — reviewed once in each calendar month. After {GRADUATION_DAYS.monthly} months it moves to Yearly.</li>
-            <li><strong>Yearly</strong> — reviewed once a year. It stays here for life.</li>
+            <li><strong>Daily</strong> — 3 reviews a day, for {GRADUATION_DAYS.daily} days.</li>
+            <li><strong>Weekly</strong> — once a week, for {GRADUATION_DAYS.weekly} weeks.</li>
+            <li><strong>Monthly</strong> — once a month, for {GRADUATION_DAYS.monthly} months.</li>
+            <li><strong>Yearly</strong> — once a year, for life.</li>
           </ul>
-          <p class="muted small" style={{ margin: 0 }}>
-            You can move a verse to another pile yourself (with undo), and you can always practice extra — extra practice never counts toward the schedule. In each pile, the verses you've held longest are at the top.
-          </p>
         </div>
 
         <div class="card stack">
           <h2>Streaks and progress</h2>
           <p style={{ margin: 0 }}>
-            <strong>Streak:</strong> it grows by one each day every due verse gets at least one review (three a day is the goal, but one keeps your flame), and resets if a due verse is missed for a day. Weekly verses are due by Saturday, Monthly by the last day of the month, so anything left undone on those days ends it. Practising on any day, even your first, earns it. Verses you add today don't count against you, and days when nothing is due don't break it.
+            <strong>Streak:</strong> grows each day every due verse gets at least one review. Weekly verses are due by Saturday, Monthly by the last day of the month.
           </p>
           <p style={{ margin: 0 }}>
-            <strong>Progress:</strong> a verse earns a day toward its next pile on days it is up to date. A Daily verse earns it with one review that day. Review a Weekly verse any time in the week and the whole week counts; do the same in a month for a Monthly verse. A week or month it was skipped just doesn't count — nothing is lost, and the next one starts fresh. A verse that moves up from Daily gets the rest of that week free; one that moves up to Monthly or Yearly just needs a review in the month or year it arrives. Weekly takes 15 weeks that were reviewed and Monthly takes 6 months.
+            <strong>Progress:</strong> a verse moves up after enough days (Daily), weeks (Weekly) or months (Monthly) with a review. A skipped week or month just does not count.
           </p>
-          <p style={{ margin: 0 }}>
-            <strong>Breaks:</strong> need time away? Settings has a "Take a break". While it lasts nothing is due, your streak waits. Verses don't earn days while you're away, and nothing is lost. Reviewing anyway is always welcome.
-          </p>
-        </div>
-
-        <div class="card stack">
-          <h2>Review modes</h2>
-          <p style={{ margin: 0 }}>Flashcard, fill in the blank, type the first letters, or speak it aloud. After the verse, you also recall where it is found. New verses allow a few slips; once a verse has moved past Daily it has to be perfect.</p>
-          <button class="btn block" onClick={() => openTourMenu(true)} data-testid="about-tour">
-            Take the tour
-          </button>
-          <button class="btn block" onClick={onShowIntro}>
-            Show the walkthrough
-          </button>
         </div>
 
         <div class="card stack">

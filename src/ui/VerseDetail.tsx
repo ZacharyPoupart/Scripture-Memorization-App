@@ -1,5 +1,4 @@
 import { useState } from 'preact/hooks';
-import { BOOKS } from '../core/books.ts';
 import { bibleGatewayUrl, formatRef } from '../core/reference.ts';
 import { GRADUATION_DAYS, deleteVerse, maxDaysIn, movePile, nextPile, restorePile, restoreVerse, verseStatus } from '../core/schedule.ts';
 import { PILES, type Pile } from '../core/types.ts';
@@ -26,7 +25,6 @@ export function VerseDetail({ id }: { id: string }) {
             </button>
             <h1>Verse not found</h1>
           </div>
-          <p class="muted">It may have been deleted on another device.</p>
         </div>
       </div>
     );
@@ -106,7 +104,6 @@ export function VerseDetail({ id }: { id: string }) {
               </button>
             ))}
           </div>
-          {status.state !== 'ready' && <div class="hint-text">This one isn't due yet, so it will be extra practice (not counted toward the schedule).</div>}
         </div>
 
         <div class="row wrap">
@@ -125,18 +122,15 @@ export function VerseDetail({ id }: { id: string }) {
             Delete
           </button>
         </div>
-        <div class="hint-text">Opens {BOOKS[v.book - 1].name} {v.chapter} on BibleGateway so you can read the verse in context.</div>
       </div>
 
       {moving && (
         <Overlay onClose={() => (setMoving(false), setDaysIn(0))} label="Move to pile">
           <div class="sheet stack">
             <h2>Move to which pile?</h2>
-            <div class="hint-text">Its time-in-pile starts over in the new pile, unless you say it has already been there a while. You can undo right after.</div>
             <details class="quiet-details" open={daysIn > 0}>
               <summary>Already know this one? Start partway</summary>
               <DaysSlider value={daysIn} max={366} onChange={setDaysIn} testid="days-in" />
-              <div class="hint-text">Up to {maxDaysIn('daily')} days for Daily, {maxDaysIn('weekly')} for Weekly, {maxDaysIn('monthly')} for Monthly, {maxDaysIn('yearly')} for Yearly.</div>
             </details>
             {PILES.map((p2) => (
               <button key={p2} class={`btn block pile-${p2}`} disabled={p2 === v.pile} onClick={() => doMove(p2)} data-testid={`move-${p2}`}>
@@ -149,7 +143,7 @@ export function VerseDetail({ id }: { id: string }) {
           </div>
         </Overlay>
       )}
-      {deleting && <Confirm title="Delete this verse?" body={`${formatRef(v)} and its progress will be removed. You'll be able to undo right after.`} confirmLabel="Delete" danger onConfirm={doDelete} onCancel={() => setDeleting(false)} />}
+      {deleting && <Confirm title="Delete this verse?" body={`${formatRef(v)} and its progress will be removed.`} confirmLabel="Delete" danger onConfirm={doDelete} onCancel={() => setDeleting(false)} />}
     </div>
   );
 }
