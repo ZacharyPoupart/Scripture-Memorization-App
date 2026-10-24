@@ -5,6 +5,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.41.0] - 2026-10-24
+
+### Changed
+- Fewer words. Help text the tour already covers is gone from Settings (sync, break, practice order, reviewing and feedback), Today, the piles, Progress, a verse's page, Add a verse, the review result card, the level-up card, the avatar screen and Friends, and so are small disclaimers that explain themselves. The About page is a short summary and the welcome slides are one line each. Warnings that protect your data (erasing, replacing, deleting, keeping the sync code private) and the note asking children to check with a parent stay.
+
 ## [1.40.0] - 2026-10-23
 
 ### Changed

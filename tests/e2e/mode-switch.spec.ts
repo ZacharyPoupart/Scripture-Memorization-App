@@ -62,7 +62,7 @@ test.describe('review type picker and switching', () => {
     await expect(page.getByTestId('card-front')).toBeVisible();
     await finishFlashcard(page);
     await page.getByTestId('switch-mode').click(); // on the result card
-    await expect(page.getByTestId('mode-sheet')).toContainText('The next verse will use it');
+    await expect(page.getByTestId('mode-sheet')).not.toContainText('starts over'); // nothing to restart on the result card
     await page.getByTestId('switch-to-blanks').click();
     await expect(page.getByTestId('review')).toHaveAttribute('data-mode', 'blanks');
     await expect(page.getByTestId('verse-result')).toBeVisible(); // the result card is untouched
