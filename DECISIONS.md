@@ -457,3 +457,9 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Choices (tell me if you want them different):** the limit of six is `TOPIC_CHIPS_MAX`; the list is A to Z. Ideas for later if it is still too much: grouping topics into folders, or pinning favourites.
 **Test changes:** none to existing tests; new `tests/e2e/topics.spec.ts` and unit tests for the counts and the search.
 **Undo:** roll back to the previous stage tag.
+
+## v1.42.0 — The review type stays where you left it (owner request)
+**What:** removed "Default review mode" from Settings. The type you last picked (the bar on Today and on a pile, the buttons on a verse's page, or the type swap in the middle of a review) is remembered and used next time. Before, swapping in the middle of a review lasted for that session only.
+**Data:** no change; it is the same device setting as before (`settings.defaultMode`), so nothing needs migrating.
+**Test changes:** the mid-review swap test now expects the new type to be remembered.
+**Undo:** roll back to the previous stage tag.
