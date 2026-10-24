@@ -5,6 +5,9 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Fixed
+- In Fill in the blank, names such as God, Jesus and Lord always keep their capital letter in the choices. They used to appear as "god" or "jesus" when the answer was a lowercase word.
+
 ## [1.40.0] - 2026-10-23
 
 ### Changed

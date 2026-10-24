@@ -457,3 +457,9 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Choices (tell me if you want them different):** the limit of six is `TOPIC_CHIPS_MAX`; the list is A to Z. Ideas for later if it is still too much: grouping topics into folders, or pinning favourites.
 **Test changes:** none to existing tests; new `tests/e2e/topics.spec.ts` and unit tests for the counts and the search.
 **Undo:** roll back to the previous stage tag.
+
+## v1.44.0 — Names keep their capital in Fill in the blank (owner request)
+**What:** a wrong choice such as "jesus" or "god" used to be lowercased to match a lowercase answer. Now a name keeps its capital in every choice. Names are God, Jesus, Christ, Lord, Spirit, Father, Son, Holy, Messiah, Savior, Almighty, Jehovah, Israel, Jerusalem, Zion, David, Abraham, Moses and Satan, plus any word that is capitalized in the middle of a sentence in that verse.
+**Choices (tell me if you want them different):** your message stopped after "should be", so I read it as "should be capitalized in the choices" (you confirmed). Other wrong choices are still cased like the answer, so a capital letter does not give the answer away. If you meant something else, such as names always being blanked, say so.
+**Test changes:** new unit test (names keep their capital over 80 random draws at every level).
+**Undo:** roll back to the previous stage tag.
