@@ -17,7 +17,7 @@ test('take a break: Today rests, reviewing anyway still works, and the break can
 
   await page.goto('/#/');
   await expect(page.getByTestId('today-title')).toHaveText('On a break');
-  await expect(page.getByTestId('today-sub')).toContainText('nothing is lost');
+  await expect(page.getByTestId('today-sub')).toContainText('Until');
   await expect(page.getByTestId('start-today')).toContainText('Review anyway');
 
   // reviewing anyway still works

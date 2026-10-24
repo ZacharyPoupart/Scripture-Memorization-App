@@ -19,7 +19,7 @@ test.describe('review type picker and switching', () => {
     await expect(page.getByTestId('today-list')).toBeVisible();
   });
 
-  test('mid review, the type can be swapped: the verse starts over in the new type, slips do not carry over, the default is unchanged', async ({ page }) => {
+  test('mid review, the type can be swapped: the verse starts over in the new type, slips do not carry over, and the new type is remembered', async ({ page }) => {
     await page.goto('/#/pile/daily');
     await page.getByTestId('verse-card').first().click();
     await page.getByTestId('review-blanks').click();
@@ -35,9 +35,9 @@ test.describe('review type picker and switching', () => {
     await page.getByTestId('type-input').focus();
     await page.keyboard.type(firstLetters(JOHN_TEXT));
     await expect(page.getByTestId('type-ref')).toBeVisible({ timeout: 6000 });
-    // the saved default is still flashcards
+    // the last type chosen stays for next time
     const mode = await page.evaluate(() => (window as any).__mfl.getState().settings.defaultMode);
-    expect(mode).toBe('flashcard');
+    expect(mode).toBe('type');
   });
 
   test('the sheet marks the current type, and cancelling changes nothing', async ({ page }) => {
@@ -62,7 +62,7 @@ test.describe('review type picker and switching', () => {
     await expect(page.getByTestId('card-front')).toBeVisible();
     await finishFlashcard(page);
     await page.getByTestId('switch-mode').click(); // on the result card
-    await expect(page.getByTestId('mode-sheet')).toContainText('The next verse will use it');
+    await expect(page.getByTestId('mode-sheet')).not.toContainText('starts over'); // nothing to restart on the result card
     await page.getByTestId('switch-to-blanks').click();
     await expect(page.getByTestId('review')).toHaveAttribute('data-mode', 'blanks');
     await expect(page.getByTestId('verse-result')).toBeVisible(); // the result card is untouched

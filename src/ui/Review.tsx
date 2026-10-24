@@ -7,7 +7,7 @@ import { cueFor, planFor } from '../core/practice.ts';
 import { tooManyMistakes } from '../core/quiz.ts';
 import { PILES, type AppData, type LevelUp, type Pile, type ReviewMode, type Verse } from '../core/types.ts';
 import { back, navigate, type Route } from '../router.ts';
-import { act, completeReview, showToast, useApp } from '../store.ts';
+import { act, completeReview, showToast, updateSettings, useApp } from '../store.ts';
 import { CheckMark, Coin, Confetti, Icon, PileBadge, PILE_INFO, pileProgress, progressUnitPlural } from './common.tsx';
 import { MODES } from './ModePicker.tsx';
 import { Overlay } from './common.tsx';
@@ -97,7 +97,7 @@ function ResultProgress({ verse, data }: { verse: Verse; data: AppData }) {
           </div>
         </div>
       ) : (
-        <div class="muted small">Kept for life — reviewed once a year.</div>
+        <div class="muted small">Kept for life.</div>
       )}
       {sum.total > 0 && (
         <div class="muted small">
@@ -116,7 +116,10 @@ function SkipVerse({ onSkip }: { onSkip: () => void }) {
 export function Review({ route }: { route: Route }) {
   const { data, settings } = useApp();
   const startMode = (MODES.find((m) => m.value === route.query.get('mode'))?.value ?? settings.defaultMode) as ReviewMode;
-  const [chosen, setChosen] = useState<ReviewMode | null>(null); // a type picked during this session (the default is not changed)
+  const [chosen, setChosen] = useState<ReviewMode | null>(null); // a type picked during this session
+  useEffect(() => {
+    if (startMode !== settings.defaultMode) updateSettings({ defaultMode: startMode }); // the type you last chose stays
+  }, []);
   const [switching, setSwitching] = useState(false);
   const mode = chosen ?? startMode;
   const queue = useMemo(() => {
@@ -142,7 +145,6 @@ export function Review({ route }: { route: Route }) {
         <div class="verse-area center stack">
           <div class="hero">🌿</div>
           <h2>Nothing to review right now</h2>
-          <p class="muted">Come back when a review unlocks — or open any verse for extra practice.</p>
           <button class="btn primary" onClick={() => navigate('/', true)}>
             Back home
           </button>
@@ -188,6 +190,7 @@ export function Review({ route }: { route: Route }) {
     setSwitching(false);
     if (m === mode) return;
     setChosen(m);
+    updateSettings({ defaultMode: m });
     if (!result) setAttempt((a) => a + 1);
   };
 
@@ -239,7 +242,7 @@ export function Review({ route }: { route: Route }) {
           )}
           {!fullyDone && sum.remaining > 0 && (
             <p class="muted small" data-testid="more-later">
-              {sum.remaining} more due today — {sum.readyNow > 0 ? 'ready whenever you are.' : 'the next one unlocks a little later.'}
+              {sum.remaining} more due today.
             </p>
           )}
           <div class="row" style={{ justifyContent: 'center' }}>
@@ -279,7 +282,7 @@ export function Review({ route }: { route: Route }) {
           <div class="result-card">
             <div class="result-check">{result.counted ? <CheckMark size={64} /> : <div class="big">＋</div>}</div>
             <h2 style={{ marginTop: '10px' }}>{formatRef(verse)}</h2>
-            <p class="muted">{result.counted ? `Review counted. ${doneLine(tally.counted)}` : 'Extra practice — it doesn’t change the schedule.'}</p>
+            <p class="muted">{result.counted ? `Review counted. ${doneLine(tally.counted)}` : 'Extra practice.'}</p>
             <ResultProgress verse={verse} data={data} />
             {result.levelUps.length > 0 && <p>Level up! Now in {PILE_INFO[result.levelUps[result.levelUps.length - 1].to].label}.</p>}
             {result.seeds > 0 && settings.avatarOn && queue.length === 1 && (
@@ -291,7 +294,7 @@ export function Review({ route }: { route: Route }) {
             {easier && (
               <div class="stack" style={{ marginTop: '14px' }} data-testid="easier-suggestion" onClick={(e) => e.stopPropagation()}>
                 <p class="muted small" style={{ margin: 0 }}>
-                  That one took a few tries. Want to see it more often for a while?
+                  That one took a few tries.
                 </p>
                 <button class="btn block" onClick={() => moveDown(easier)} data-testid="easier-move">
                   Move to {PILE_INFO[easier].label}
@@ -310,7 +313,7 @@ export function Review({ route }: { route: Route }) {
         <Overlay onClose={() => setSwitching(false)} label="Change review type">
           <div class="sheet stack" data-testid="mode-sheet">
             <h2>Change review type</h2>
-            <div class="hint-text">{result ? 'The next verse will use it.' : 'This verse starts over in the new type, and the rest of the session uses it.'}</div>
+            {!result && <div class="hint-text">This verse starts over.</div>}
             <div class="stack" style={{ '--gap': '8px' } as never}>
               {MODES.map((m) => (
                 <button key={m.value} class={`btn block ${m.value === mode ? 'primary' : ''}`} aria-pressed={m.value === mode} onClick={() => switchTo(m.value)} data-testid={`switch-to-${m.value}`}>

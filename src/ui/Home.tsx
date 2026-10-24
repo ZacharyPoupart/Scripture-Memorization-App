@@ -42,7 +42,7 @@ export function Home() {
         ? 'All done for today!'
         : 'Nothing due today';
   const subline = onBreak
-    ? `Until ${breakEnds}. Your streak and progress are resting; nothing is lost. Review any time you like.`
+    ? `Until ${breakEnds}.`
     : readyAll > 0
       ? today.remaining > readyAll
         ? `${today.remaining - readyAll} more unlock later today`
@@ -57,7 +57,6 @@ export function Home() {
           <div class="card center stack" data-testid="empty-home">
             <div class="hero">📖</div>
             <h2>Add your first verse</h2>
-            <p class="muted">Pick a verse, and it will be in your Daily pile. Review it three times a day and it will become part of you.</p>
             <button class="btn primary block" onClick={() => navigate('/add')}>
               Add a verse
             </button>
@@ -80,7 +79,7 @@ export function Home() {
             <div>
               {!online && (
                 <div class="offline-note small muted" data-testid="offline-note">
-                  Offline. Reviewing and your progress all work as normal.
+                  Offline.
                 </div>
               )}
             </div>
@@ -106,7 +105,7 @@ export function Home() {
           </div>
 
           <div class="card stack today-card">
-            <ModePicker blurb={false} />
+            <ModePicker />
             <div class="row spread today-head">
               <div class="grow">
                 <h2 data-testid="today-title">{headline}</h2>
@@ -160,7 +159,7 @@ export function Home() {
           }) && (
             <div class="banner info" data-testid="backup-nudge">
               <div style={{ marginBottom: '8px' }}>
-                Your verses live on this device. A quick backup (or turning on sync in Settings) keeps them safe if you ever lose or reset your phone.
+                Keep your verses safe with a backup or sync.
               </div>
               <div class="row wrap">
                 <button class="btn small primary" onClick={downloadBackup}>

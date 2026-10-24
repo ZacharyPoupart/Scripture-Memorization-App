@@ -95,10 +95,6 @@ export function AvatarScreen() {
                 ))}
               </span>
             </div>
-            <p class="muted small" style={{ margin: 0 }}>
-              Everyone starts in the same basic armor. Swap any piece: pieces cost coins (1 per review, 5 for a finished day, 25 when a verse moves up), and the
-              finest also need a long streak. Coins are never taken away.
-            </p>
           </div>
 
           {[

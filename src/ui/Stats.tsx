@@ -30,7 +30,6 @@ export function Stats() {
           <div class="card center stack" data-testid="stats-empty">
             <div class="hero">🌱</div>
             <h2>Your progress will grow here</h2>
-            <p class="muted" style={{ margin: 0 }}>Add a verse and start reviewing. Streaks, a calendar of your practice and how close each verse is to its next pile will show up on this page.</p>
             <button class="btn primary" onClick={() => navigate('/add')}>Add a verse</button>
           </div>
         </div>
@@ -124,7 +123,6 @@ export function Stats() {
 
         <div class="card stack">
           <h2>Streak history</h2>
-          {runs.length === 0 && <p class="muted small" style={{ margin: 0 }}>Streaks of two days or more will be listed here.</p>}
           {runs.map((r) => (
             <div key={r.start} class="row spread" data-testid="run">
               <span>
