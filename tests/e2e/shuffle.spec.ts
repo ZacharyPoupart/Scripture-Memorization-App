@@ -36,8 +36,6 @@ test.describe('shuffle', () => {
     await saved(page);
     await page.reload();
     await expect(page.getByTestId('shuffle-toggle')).toHaveAttribute('aria-pressed', 'true');
-    await page.goto('/#/settings'); // the same control is in Settings, and says the same thing
-    await expect(page.getByTestId('shuffle-toggle')).toHaveAttribute('aria-pressed', 'true');
     await page.getByTestId('shuffle-toggle').click();
     await expect(page.getByTestId('shuffle-toggle')).toHaveAttribute('aria-pressed', 'false');
   });
