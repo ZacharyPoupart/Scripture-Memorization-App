@@ -459,7 +459,7 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Undo:** roll back to the previous stage tag.
 
 ## v1.43.0 — Hardest Fill in the blank hides every word (owner request)
-**What:** on Hard, every word is a blank (it used to be three out of four). Weekly, Monthly and Yearly verses always use Hard, so they now ask for the whole verse, word by word, with five choices each.
+**What:** on Hard, every word is a blank (it used to be three out of four) and there are six choices instead of five, laid out two by three on a phone and three by two on wider screens so the rows are even. Weekly, Monthly and Yearly verses always use Hard, so they now ask for the whole verse, word by word, with five choices each.
 **Choices (tell me if you want them different):** I read "no words" as every word blank. Weekly and later piles inherit it because they always use the hardest level; if you would rather keep those a little easier I can give them their own level. Easy and Medium are unchanged.
 **Test changes:** new unit test (the hardest level blanks every word).
 **Undo:** roll back to the previous stage tag.

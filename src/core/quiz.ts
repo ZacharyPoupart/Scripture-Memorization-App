@@ -50,7 +50,7 @@ interface Level {
 export const LEVELS: Record<FillDifficulty, Level> = {
   easy: { ratio: 0.2, options: 3, minLen: 4 },
   medium: { ratio: 0.4, options: 4, minLen: 3 },
-  hard: { ratio: 1, options: 5, minLen: 1 }, // every word is a blank
+  hard: { ratio: 1, options: 6, minLen: 1 }, // every word is a blank, six choices (two or three even rows)
 };
 
 /** Established verses (anything past Daily) always get the hardest version. */
