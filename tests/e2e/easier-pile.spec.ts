@@ -39,7 +39,7 @@ test('a verse that took many tries offers to move down, and it can be undone', a
   await typeWholeVerse(page, JOHN_TEXT);
   await typeReference(page, JOHN316);
   await expect(page.getByTestId('easier-suggestion')).toBeVisible();
-  await expect(page.getByTestId('easier-suggestion')).toContainText('more often');
+  await expect(page.getByTestId('easier-suggestion')).toContainText('a few tries');
   await page.getByTestId('easier-move').click();
   await expect(page.getByTestId('toast')).toContainText('Moved to Daily');
   await page.getByTestId('toast').getByRole('button', { name: 'Undo' }).click();
