@@ -42,6 +42,24 @@ describe('fill in the blank', () => {
     expect(easy.blanks[0].options).toHaveLength(LEVELS.easy.options);
     expect(hard.blanks[0].options).toHaveLength(LEVELS.hard.options);
   });
+  it('names such as God and Jesus always keep their capital letter in the choices', () => {
+    const text = 'For God so loved the world, that he gave his only Son. Jesus wept and the Lord answered.';
+    const names = /^(god|jesus|lord|son)$/i;
+    let seen = 0;
+    for (let seed = 1; seed <= 80; seed++) {
+      for (const level of ['easy', 'medium', 'hard'] as const) {
+        for (const b of makeBlanks(text, level, makeRng(seed)).blanks) {
+          for (const o of b.options) {
+            if (!names.test(o)) continue;
+            seen++;
+            expect(o, `${o} (answer ${b.answer})`).toMatch(/^[A-Z]/);
+          }
+        }
+      }
+    }
+    expect(seen).toBeGreaterThan(50);
+  });
+
   it('every blank has the answer exactly once among unique options', () => {
     for (const level of ['easy', 'medium', 'hard'] as const) {
       for (let seed = 0; seed < 25; seed++) {

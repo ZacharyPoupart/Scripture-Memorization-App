@@ -474,4 +474,9 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **What:** on Hard, every word is a blank (it used to be three out of four) and there are six choices instead of five, laid out two by three on a phone and three by two on wider screens so the rows are even. Weekly, Monthly and Yearly verses always use Hard, so they now ask for the whole verse, word by word, with five choices each.
 **Choices (tell me if you want them different):** I read "no words" as every word blank. Weekly and later piles inherit it because they always use the hardest level; if you would rather keep those a little easier I can give them their own level. Easy and Medium are unchanged.
 **Test changes:** new unit test (the hardest level blanks every word).
+
+## v1.44.0 — Names keep their capital in Fill in the blank (owner request)
+**What:** a wrong choice such as "jesus" or "god" used to be lowercased to match a lowercase answer. Now a name keeps its capital in every choice. Names are God, Jesus, Christ, Lord, Spirit, Father, Son, Holy, Messiah, Savior, Almighty, Jehovah, Israel, Jerusalem, Zion, David, Abraham, Moses and Satan, plus any word that is capitalized in the middle of a sentence in that verse.
+**Choices (tell me if you want them different):** your message stopped after "should be", so I read it as "should be capitalized in the choices" (you confirmed). Other wrong choices are still cased like the answer, so a capital letter does not give the answer away. If you meant something else, such as names always being blanked, say so.
+**Test changes:** new unit test (names keep their capital over 80 random draws at every level).
 **Undo:** roll back to the previous stage tag.

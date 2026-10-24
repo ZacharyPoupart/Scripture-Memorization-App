@@ -72,6 +72,12 @@ const FILLER = [
   'power', 'mercy', 'hope', 'joy', 'strength', 'wisdom', 'kingdom', 'glory', 'goodness', 'righteous', 'forever',
 ];
 
+/** Names that are always written with a capital, whatever else is in the verse. */
+const NAMES = new Set([
+  'god', 'jesus', 'christ', 'lord', 'spirit', 'father', 'son', 'holy', 'messiah', 'savior', 'saviour', 'almighty', 'jehovah',
+  'israel', 'jerusalem', 'zion', 'david', 'abraham', 'moses', 'satan',
+]);
+
 const core = (raw: string) => raw.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '');
 
 export function makeBlanks(text: string, level: FillDifficulty, rng: () => number): { words: Word[]; blanks: Blank[] } {
@@ -83,6 +89,14 @@ export function makeBlanks(text: string, level: FillDifficulty, rng: () => numbe
   const chosen = shuffle(pool, rng).slice(0, want).sort((a, b) => a.index - b.index);
 
   const verseWords = [...new Set(words.map((w) => core(w.raw)).filter(Boolean))];
+  // Names in this verse: capitalized in the middle of a sentence (so not just the first word of one).
+  const proper = new Set(NAMES);
+  words.forEach((w, i) => {
+    const c = core(w.raw);
+    const startsSentence = i === 0 || /[.!?:;“"‘]$/.test(words[i - 1].raw.trim()) || /^[“"‘]/.test(w.raw);
+    if (/^\p{Lu}/u.test(c) && !startsSentence) proper.add(c.toLowerCase());
+  });
+  const isName = (x: string) => proper.has(x.toLowerCase());
   const blanks: Blank[] = chosen.map((w) => {
     const answer = core(w.raw);
     const answerLower = answer.toLowerCase();
@@ -96,7 +110,9 @@ export function makeBlanks(text: string, level: FillDifficulty, rng: () => numbe
     const distractors: string[] = [];
     for (const cand of [...fromVerse, ...extras]) {
       if (distractors.length >= cfg.options - 1) break;
-      distractors.push(capital ? cand.charAt(0).toUpperCase() + cand.slice(1) : cand.charAt(0).toLowerCase() + cand.slice(1));
+      // A name keeps its capital wherever it appears; other words are cased to match the answer so the capital gives nothing away.
+      const up = isName(cand) || capital;
+      distractors.push(up ? cand.charAt(0).toUpperCase() + cand.slice(1) : cand.charAt(0).toLowerCase() + cand.slice(1));
     }
     return { index: w.index, answer, options: shuffle([answer, ...distractors], rng) };
   });
