@@ -213,8 +213,8 @@ export function TypeIt({ verse, onMistake, onDone, mistakes, after }: ModeProps)
           {inTopic
             ? `Typing ${typedShown ? `"${typedShown}"` : 'the first letters'} narrows the choices. Tap the text to bring the keyboard back.`
             : inRef
-              ? 'Colon and dash are optional. A wrong character shows it (counts as a slip) and you carry on.'
-              : `A wrong letter shows the word (counts as a slip) and you carry on. Word ${Math.min(pos + 1, words.length)} of ${words.length}.`}
+              ? 'Colon and dash are optional.'
+              : `Word ${Math.min(pos + 1, words.length)} of ${words.length}.`}
         </div>
       </Dock>
     </>

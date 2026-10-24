@@ -2,11 +2,11 @@ import { useState } from 'preact/hooks';
 import { Overlay } from './common.tsx';
 
 const SLIDES = [
-  { icon: '📖', title: 'Keep Scripture for life', body: 'Memorize For Life makes verse memory a calm daily habit — and makes the verses stick, long term.' },
-  { icon: '➕', title: 'Add verses', body: 'Pick a book, chapter and verses. The text is looked up for you when you’re online, or you can type or paste it any time — even offline.' },
-  { icon: '🗂️', title: 'Four piles', body: 'New verses start in Daily (3 reviews a day). After 90 days they move to Weekly, then Monthly, then Yearly — reviewed less and less, but never forgotten.' },
-  { icon: '🧠', title: 'Four ways to practice', body: 'Flashcards, fill in the blanks, typing first letters, or speaking aloud. You’ll also recall where each verse is found.' },
-  { icon: '🔥', title: 'Build your streak', body: 'Do your due reviews to grow your streak. See your whole history on the Stats tab. If you step away, progress simply waits — nothing is ever erased. A short tour (about five minutes) shows you around, and earns your first shield.' },
+  { icon: '📖', title: 'Keep Scripture for life', body: 'A calm daily habit that makes verses stick.' },
+  { icon: '➕', title: 'Add verses', body: 'Pick a book, chapter and verses. The text is looked up for you, or paste your own.' },
+  { icon: '🗂️', title: 'Four piles', body: 'New verses start in Daily. As they settle they move up to Weekly, Monthly and Yearly.' },
+  { icon: '🧠', title: 'Four ways to practice', body: 'Flashcards, blanks, typing or speaking.' },
+  { icon: '🔥', title: 'Build your streak', body: 'A short tour shows you around and earns your first shield.' },
 ];
 
 export function Onboarding({ onClose, onTour }: { onClose: () => void; onTour: () => void }) {

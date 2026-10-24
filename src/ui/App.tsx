@@ -69,7 +69,7 @@ export function App({ onReload }: { onReload: () => void }) {
   else if (a === 'guild') ((screen = <Friends key={`guild-${b}`} guildCode={b ?? ''} />), (tab = '/friends'));
   else if (a === 'avatar') ((screen = <AvatarScreen />), (tab = '/'));
   else if (a === 'settings') ((screen = <Settings onShowIntro={() => setIntro(true)} />), (tab = '/settings'));
-  else if (a === 'about') ((screen = <About onShowIntro={() => setIntro(true)} />), (tab = '/settings'));
+  else if (a === 'about') ((screen = <About />), (tab = '/settings'));
   else screen = <Home />;
 
   return (

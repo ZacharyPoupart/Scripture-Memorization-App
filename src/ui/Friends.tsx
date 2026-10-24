@@ -110,7 +110,7 @@ function InviteSheet({ title, code, link, message, onClose }: { title: string; c
         >
           Copy the link
         </button>
-        <div class="hint-text">Anyone you send this to can join for the next week. You can make a new code any time.</div>
+        <div class="hint-text">Good for a week.</div>
         <button class="btn ghost block" onClick={onClose}>
           Done
         </button>
@@ -278,7 +278,7 @@ export function Friends({ joinCode = '', guildCode = '' }: { joinCode?: string; 
             <div class="hero center">🤝</div>
             <h2 style={{ textAlign: 'center' }}>Learn together</h2>
             <p class="muted" style={{ margin: 0 }}>
-              Invite people you know and see how their knights and streaks are growing. Only people you invite can see your name, your knight, your streak and how many verses you have. Never the verses themselves. You can stop any time.
+              See how your friends’ knights and streaks are growing. Only people you invite can see your name, knight, streak and pile counts. Never your verses.
             </p>
             <label class="field">
               <span class="field-label">Your name</span>
@@ -405,7 +405,7 @@ export function Friends({ joinCode = '', guildCode = '' }: { joinCode?: string; 
           ) : friends.length === 0 ? (
             <div class="card center stack" data-testid="friends-empty">
               <div class="hero">🌱</div>
-              <div class="muted">No friends yet. Tap “Invite a friend”, send the link, and their progress will show up here once they join.</div>
+              <div class="muted">No friends yet.</div>
             </div>
           ) : (
             <ul class="friend-list" data-testid="friend-list">
@@ -438,7 +438,7 @@ export function Friends({ joinCode = '', guildCode = '' }: { joinCode?: string; 
         <section class="stack" aria-label="Your guilds">
           <h2 style={{ margin: 0 }}>Groups</h2>
           <p class="muted small" style={{ margin: 0 }}>
-            A group is a small team that works toward a goal together each week. Only people you invite can join.
+            A small team with a weekly goal.
           </p>
           {(guilds ?? []).map((g) => (
             <GuildCard key={g.id} g={g} me={data.social!.id} onInvite={() => void showGuildInvite(g)} onLeave={() => setLeaving(g)} />
@@ -490,7 +490,7 @@ export function Friends({ joinCode = '', guildCode = '' }: { joinCode?: string; 
         <div class="card stack">
           <h3 style={{ margin: 0 }}>What your friends can see</h3>
           <p class="muted small" style={{ margin: 0 }}>
-            Your name, your knight, your streak, how many verses are in each pile, and how many reviews you did this week. Never your verses, and nobody can find you without your invite. Friends can remove you any time, and so can you.
+            Friends see your name, knight, streak, pile counts and this week’s reviews. Never your verses.
           </p>
           <button class="btn ghost" onClick={() => setStopping(true)} data-testid="friends-stop">
             Stop sharing…
@@ -502,7 +502,7 @@ export function Friends({ joinCode = '', guildCode = '' }: { joinCode?: string; 
       {removing && (
         <Confirm
           title={`Remove ${removing.name}?`}
-          body="You will no longer see each other’s progress. You can invite each other again any time."
+          body="You will no longer see each other’s progress."
           confirmLabel="Remove"
           danger
           onCancel={() => setRemoving(null)}
@@ -532,7 +532,7 @@ export function Friends({ joinCode = '', guildCode = '' }: { joinCode?: string; 
           <div class="sheet stack">
             <h2>Stop sharing?</h2>
             <p class="muted" style={{ margin: 0 }}>
-              Friends will stop seeing your progress. Your own verses and streak are not affected.
+              Friends stop seeing your progress.
             </p>
             <button
               class="btn block"
@@ -554,7 +554,7 @@ export function Friends({ joinCode = '', guildCode = '' }: { joinCode?: string; 
             >
               Stop and delete my profile
             </button>
-            <div class="hint-text">Deleting removes your name, your friendships and your place in groups from the server.</div>
+            <div class="hint-text">Deleting removes your profile from the server.</div>
             <button class="btn ghost block" onClick={() => setStopping(false)}>
               Cancel
             </button>

@@ -458,6 +458,12 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Test changes:** none to existing tests; new `tests/e2e/topics.spec.ts` and unit tests for the counts and the search.
 **Undo:** roll back to the previous stage tag.
 
+## v1.41.0 — Fewer words (owner request)
+**What:** removed text that the tour already explains and small disclaimers that explain themselves, across Settings, Today, the piles, Progress, a verse's page, Add a verse, the review result card, the level-up card, the avatar screen, Friends, About and the welcome slides. The tour wording itself is unchanged.
+**Kept on purpose (tell me if you want any of these cut too):** the confirmations that protect data (Erase everything, Replace everything with the backup, Delete this verse, Turn off sync, Reset armor), "Keep this code private" next to the sync code, the NIV copyright line, the short note under Friends that says what friends can see, and the note asking a child to check with a parent before turning friends on.
+**Test changes:** the break test now looks for "Until" on Today and the mode-switch test checks the sheet no longer says the verse starts over on the result card. No rule or data changed.
+**Undo:** roll back to the `v1.40.0-topic-list` tag.
+
 ## v1.42.0 — The review type stays where you left it (owner request)
 **What:** removed "Default review mode" from Settings. The type you last picked (the bar on Today and on a pile, the buttons on a verse's page, or the type swap in the middle of a review) is remembered and used next time. Before, swapping in the middle of a review lasted for that session only.
 **Data:** no change; it is the same device setting as before (`settings.defaultMode`), so nothing needs migrating.

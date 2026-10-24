@@ -32,7 +32,7 @@ export function PilesOverview() {
         )}
         {filtersActive(list) && total === 0 && (
           <div class="card center muted" data-testid="no-matches">
-            Nothing matches. Try fewer words, or clear the filters.
+            Nothing matches.
           </div>
         )}
         {shown.map(({ pile: p, vs }) => (
@@ -79,7 +79,7 @@ export function PilePage({ pile }: { pile: Pile }) {
             <h1>{PILE_INFO[pile].label}</h1>
           </div>
           <p class="muted" style={{ marginTop: '-8px' }}>
-            {PILE_INFO[pile].blurb} Longest-held verses are at the top.
+            {PILE_INFO[pile].blurb}
           </p>
           {all.length > 0 && (
             <div class="card stack">
@@ -94,9 +94,6 @@ export function PilePage({ pile }: { pile: Pile }) {
                 ]}
                 onChange={setScope}
               />
-              {scope === 'all' && (
-                <div class="hint-text">Extra practice beyond what's due is welcome — it just doesn't count toward the schedule.</div>
-              )}
             </div>
           )}
           {all.length > 1 && <ListControls state={list} update={update} topics={topicsOf(data)} />}
@@ -115,11 +112,6 @@ export function PilePage({ pile }: { pile: Pile }) {
             {!all.length && (
               <div class="card center muted">
                 No verses in {PILE_INFO[pile].label} yet.
-                {pile !== 'daily' && (
-                  <div class="small" style={{ marginTop: '6px' }}>
-                    Verses move here by themselves after enough steady practice — nothing to do.
-                  </div>
-                )}
                 {pile === 'daily' && (
                   <div style={{ marginTop: '10px' }}>
                     <button class="btn primary" onClick={() => navigate('/add')}>
