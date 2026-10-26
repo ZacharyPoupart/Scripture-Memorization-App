@@ -481,6 +481,11 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Test changes:** new unit test (names keep their capital over 80 random draws at every level).
 **Undo:** roll back to the previous stage tag.
 
+## v1.45.0 — Moving back to Daily keeps all but a week (owner request)
+**What:** the "Move to Daily" button offered after a hard review now credits 83 of Daily's 90 days, so the verse is back in Daily with a week to go. It earns the days as usual and moves up to Weekly again after seven more.
+**Choices (tell me if you want them different):** only the move to Daily changed, as you asked. A move from Monthly to Weekly (or Yearly to Monthly) from the same offer still starts that pile fresh; I can give those a "one period to go" credit too. Moving a verse by hand from its page is unchanged.
+**Test changes:** new unit test (`moveDownDaysIn`, and a verse moved back to Daily has seven days left); the move-down e2e test now checks the ring says Day 83 of 90.
+
 ## Housekeeping — a stray `node_modules` link removed from the repo (no version bump)
 **What:** while working in temporary copies of the repo I linked `node_modules` into them, and my `git add -A` committed that link (it was merged to `main` with v1.42.0 by mistake). It points at itself, so a fresh checkout has a broken `node_modules` until `npm ci` replaces it; CI was not affected. It is now removed and `.gitignore` ignores `node_modules` even when it is a link.
 **Nothing changes in the app.** No version bump, so no new release tag.

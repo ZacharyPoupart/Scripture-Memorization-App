@@ -5,10 +5,15 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
-## [1.44.1] - 2026-10-26
+## [1.45.1] - 2026-10-26
 
 ### Fixed
 - On iPhone the last choices in the book, chapter and verse pickers (Revelation, the last verses) were hidden behind the bottom tab bar. Pop-up sheets now stop above the tab bar, so everything can be reached.
+
+## [1.45.0] - 2026-10-26
+
+### Changed
+- When a Weekly, Monthly or Yearly verse that took many tries is moved back to Daily from the offer, it goes in with only a week to go (Day 83 of 90) instead of starting Daily from the beginning.
 
 ## [1.44.0] - 2026-10-24
 

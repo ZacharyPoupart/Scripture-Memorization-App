@@ -65,6 +65,14 @@ export function easierPile(pile: Pile, restarts: number): Pile | null {
   return restarts >= STRUGGLE_RESTARTS ? previousPile(pile) : null;
 }
 
+/** A verse moved back to Daily from the "needed a few tries" offer keeps all but this many days of Daily's progress. */
+export const MOVE_DOWN_DAYS_LEFT = 7;
+
+/** Days of credit to give a verse the owner moves down from the offer: back in Daily it only has a week to go (the other piles start fresh). */
+export function moveDownDaysIn(to: Pile): number {
+  return to === 'daily' ? GRADUATION_DAYS.daily - MOVE_DOWN_DAYS_LEFT : 0;
+}
+
 export function createData(now: number): AppData {
   const today = dayKeyOf(now);
   return {
