@@ -5,11 +5,33 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.48.0] - 2026-10-26
+
 ### Changed
 - A group's weekly goal is now the reviews its members have due that week added up (a Daily verse counts 3 a day, a Weekly verse once, and so on), rounded to the nearest 5, instead of a flat 25 each.
 
 ### Added
 - 25 coins for every member of a group of two or more when the group reaches its weekly goal. You need at least one review of your own that week, and the coins arrive the next time you open Friends.
+
+## [1.47.0] - 2026-10-26
+
+### Changed
+- The Weekly, Monthly and Yearly pile pages now always have a one-tap "Review all" button, even when nothing is due. It counts as extra practice and does not change the schedule.
+
+## [1.46.0] - 2026-10-26
+
+### Changed
+- The four pile counts (Daily, Weekly, Monthly, Yearly) now sit at the top of Today, above the day's card.
+
+## [1.45.1] - 2026-10-26
+
+### Fixed
+- On iPhone the last choices in the book, chapter and verse pickers (Revelation, the last verses) were hidden behind the bottom tab bar. Pop-up sheets now stop above the tab bar, so everything can be reached.
+
+## [1.45.0] - 2026-10-26
+
+### Changed
+- When a Weekly, Monthly or Yearly verse that took many tries is moved back to Daily from the offer, it goes in with only a week to go (Day 83 of 90) instead of starting Daily from the beginning.
 
 ## [1.44.0] - 2026-10-24
 
