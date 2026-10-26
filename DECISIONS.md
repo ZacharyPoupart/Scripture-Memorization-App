@@ -480,3 +480,9 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Choices (tell me if you want them different):** your message stopped after "should be", so I read it as "should be capitalized in the choices" (you confirmed). Other wrong choices are still cased like the answer, so a capital letter does not give the answer away. If you meant something else, such as names always being blanked, say so.
 **Test changes:** new unit test (names keep their capital over 80 random draws at every level).
 **Undo:** roll back to the previous stage tag.
+
+## v1.45.0 — Moving back to Daily keeps all but a week (owner request)
+**What:** the "Move to Daily" button offered after a hard review now credits 83 of Daily's 90 days, so the verse is back in Daily with a week to go. It earns the days as usual and moves up to Weekly again after seven more.
+**Choices (tell me if you want them different):** only the move to Daily changed, as you asked. A move from Monthly to Weekly (or Yearly to Monthly) from the same offer still starts that pile fresh; I can give those a "one period to go" credit too. Moving a verse by hand from its page is unchanged.
+**Test changes:** new unit test (`moveDownDaysIn`, and a verse moved back to Daily has seven days left); the move-down e2e test now checks the ring says Day 83 of 90.
+**Undo:** roll back to the previous stage tag.
