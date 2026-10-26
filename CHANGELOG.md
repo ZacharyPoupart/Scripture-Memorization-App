@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.45.0] - 2026-10-26
+
 ### Changed
 - When a Weekly, Monthly or Yearly verse that took many tries is moved back to Daily from the offer, it goes in with only a week to go (Day 83 of 90) instead of starting Daily from the beginning.
 
