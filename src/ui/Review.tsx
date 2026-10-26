@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { formatRef } from '../core/reference.ts';
-import { easierPile, movePile, nextPile, pileVerses, restorePile, streakInfo, todaySummary, verseStatus } from '../core/schedule.ts';
+import { easierPile, movePile, moveDownDaysIn, nextPile, pileVerses, restorePile, streakInfo, todaySummary, verseStatus } from '../core/schedule.ts';
 import { doneLine } from '../core/milestones.ts';
 import { feedback } from '../services/feedback.ts';
 import { cueFor, planFor } from '../core/practice.ts';
@@ -180,8 +180,8 @@ export function Review({ route }: { route: Route }) {
   const moveDown = (to: Pile) => {
     if (!verse) return;
     const id = verse.id;
-    const snap = act((d, t) => movePile(d, id, to, t));
-    showToast(`Moved to ${PILE_INFO[to].label}.`, { label: 'Undo', run: () => act((d, t) => restorePile(d, id, snap, t)) });
+    const snap = act((d, t) => movePile(d, id, to, t, moveDownDaysIn(to)));
+    showToast(`Moved to ${PILE_INFO[to].label}${to === 'daily' ? '. A week to go' : ''}.`, { label: 'Undo', run: () => act((d, t) => restorePile(d, id, snap, t)) });
     next();
   };
 
