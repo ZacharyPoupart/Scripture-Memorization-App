@@ -171,4 +171,13 @@ describe('friends (v1.37.0): the private identity and sharing choice travel with
     expect(mergeData(data, data)).toEqual(data);
     expect(mergeData(parseBackup(BACKUP), data).guildWins).toEqual(data.guildWins);
   });
+
+  it('opens a backup that tallies extra practice for the guild goal (v1.51.0) and older ones without it', () => {
+    expect(parseBackup(BACKUP).extraWeek).toBeUndefined();
+    const data = parseBackup(read('backup-v1.51.0-extraweek.json'));
+    expect(data.extraWeek).toEqual({ 'fixture-device': { w: '2026-03-15', n: 4 }, 'phone-2': { w: '2026-03-08', n: 2 } });
+    expect(parseBackup(exportBackup(data, '9.9.9', at('2026-03-15')))).toEqual(data);
+    expect(mergeData(data, data)).toEqual(data);
+    expect(mergeData(parseBackup(BACKUP), data).extraWeek).toEqual(data.extraWeek);
+  });
 });

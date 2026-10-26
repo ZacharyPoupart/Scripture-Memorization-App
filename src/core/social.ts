@@ -16,6 +16,8 @@ export interface Snapshot {
   weekStart: DayKey;
   /** Reviews that are due of this person this week (what their share of a guild's goal is made of). Absent from older versions. */
   due?: number;
+  /** Extra-practice reviews this week (they count toward a guild's goal but not for the schedule). Absent from older versions. */
+  extra?: number;
 }
 
 export interface FriendCard {
@@ -94,7 +96,7 @@ export function guildWinsToClaim(data: AppData, guilds: GuildView[], meId: strin
     const id = `${g.id}:${g.weekStart}`;
     if (g.weekStart !== thisWeek || g.members.length < 2 || g.goal <= 0 || g.progress < g.goal || have.has(id)) continue;
     const mine = g.members.find((m) => m.id === meId);
-    if (!mine || mine.snap.weekStart !== g.weekStart || mine.snap.week < 1) continue;
+    if (!mine || mine.snap.weekStart !== g.weekStart || mine.snap.week + (mine.snap.extra ?? 0) < 1) continue;
     out.push(id);
   }
   return out;
@@ -114,7 +116,8 @@ export function socialSnapshot(data: AppData, now: number): Snapshot {
     }
   }
   const streak = streakInfo(data, now);
-  return { look: { ...currentLook(data) }, streak: streak.count, longest: streak.longest, counts, week: Math.min(week, 99999), weekStart, due: Math.min(weeklyDue(data, now), 99999) };
+  const extra = Object.values(data.extraWeek ?? {}).reduce((n, e) => (e.w === weekStart ? n + e.n : n), 0);
+  return { look: { ...currentLook(data) }, streak: streak.count, longest: streak.longest, counts, week: Math.min(week, 99999), weekStart, due: Math.min(weeklyDue(data, now), 99999), extra: Math.min(extra, 99999) };
 }
 
 export const sameSnapshot = (a: Snapshot | null, b: Snapshot | null): boolean => !!a && !!b && JSON.stringify(a) === JSON.stringify(b);

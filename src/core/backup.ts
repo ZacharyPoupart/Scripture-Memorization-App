@@ -155,6 +155,14 @@ export function normalizeData(raw: unknown): AppData {
     const wins = [...new Set(raw.guildWins.filter((w): w is string => isStr(w) && /^[A-Za-z0-9_-]{1,64}:\d{4}-\d{2}-\d{2}$/.test(w)))].sort().slice(0, 1000);
     if (wins.length) out.guildWins = wins;
   }
+  if (isObj(raw.extraWeek)) {
+    const extra: NonNullable<AppData['extraWeek']> = {};
+    for (const [id, e] of Object.entries(raw.extraWeek).slice(0, 50)) {
+      if (!/^[A-Za-z0-9_-]{1,64}$/.test(id) || id === '__proto__' || !isObj(e)) continue;
+      if (isStr(e.w) && /^\d{4}-\d{2}-\d{2}$/.test(e.w) && isNum(e.n) && Number.isInteger(e.n) && e.n >= 0 && e.n <= 99999) extra[id] = { w: e.w, n: e.n };
+    }
+    if (Object.keys(extra).length) out.extraWeek = extra;
+  }
   if (avatar && (avatar.owned.length || Object.keys(avatar.look).length)) out.avatar = avatar;
   return out;
 }

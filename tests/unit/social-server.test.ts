@@ -255,6 +255,17 @@ describe('guilds: invite only', () => {
     expect(JSON.stringify(g)).not.toContain('"sh"');
   });
 
+  it('extra practice adds to the group\u2019s progress and to a member\u2019s total', async () => {
+    const { code } = await guild();
+    await call('guild-join', { ...who(2), code });
+    await join(2, 'Sam L.', snap({ week: 5, extra: 4 }));
+    const g = (await call('guilds', who(1))).body.guilds[0];
+    expect(g.progress).toBe(19); // 10 + 5 + 4
+    expect(g.members.find((m: any) => m.name === 'Sam L.').snap.extra).toBe(4);
+    await join(1, 'Zach P.', snap({ week: 10, extra: -3 })); // an invalid tally is ignored, not trusted
+    expect((await call('guilds', who(1))).body.guilds[0].progress).toBe(19);
+  });
+
   it('joining twice changes nothing; outsiders cannot invite; made-up codes fail', async () => {
     const { gid, code } = await guild();
     await call('guild-join', { ...who(2), code });
