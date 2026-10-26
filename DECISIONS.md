@@ -480,3 +480,7 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Choices (tell me if you want them different):** your message stopped after "should be", so I read it as "should be capitalized in the choices" (you confirmed). Other wrong choices are still cased like the answer, so a capital letter does not give the answer away. If you meant something else, such as names always being blanked, say so.
 **Test changes:** new unit test (names keep their capital over 80 random draws at every level).
 **Undo:** roll back to the previous stage tag.
+
+## Housekeeping — a stray `node_modules` link removed from the repo (no version bump)
+**What:** while working in temporary copies of the repo I linked `node_modules` into them, and my `git add -A` committed that link (it was merged to `main` with v1.42.0 by mistake). It points at itself, so a fresh checkout has a broken `node_modules` until `npm ci` replaces it; CI was not affected. It is now removed and `.gitignore` ignores `node_modules` even when it is a link.
+**Nothing changes in the app.** No version bump, so no new release tag.
