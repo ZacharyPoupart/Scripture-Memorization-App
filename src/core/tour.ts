@@ -239,7 +239,7 @@ export const LESSONS: TourLesson[] = [
         route: '/avatar',
         target: 'seeds-balance',
         title: 'Coins',
-        body: 'Counted reviews, finished days and level-ups earn coins. You never lose them, and they are only for your knight’s armor.',
+        body: 'Counted reviews, finished days and level-ups earn coins, and a streak makes each one worth more. You never lose them, and they are only for your knight’s armor.',
       },
       {
         id: 'sword',

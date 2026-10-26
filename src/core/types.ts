@@ -81,6 +81,8 @@ export interface AppData {
   social?: { id: string; secret: string; at: number };
   /** What is shared with friends: the name they see and whether sharing is on. The later decision wins. */
   sharing?: { name: string; on: boolean; at: number };
+  /** Extra coins earned by the streak multiplier, per device (each only grows; merged by taking the larger). Whole coins are summed. */
+  coinBonus?: Record<string, number>;
 }
 
 export type ReviewMode = 'flashcard' | 'blanks' | 'type' | 'speak';

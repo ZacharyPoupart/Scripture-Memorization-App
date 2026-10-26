@@ -30,6 +30,7 @@ import {
   startOfLocalDay,
   type DayKey,
 } from './dates.ts';
+import { baseCoins, streakMultiplier } from './coins.ts';
 import { uid } from './ids.ts';
 import {
   DEFAULT_PREFS,
@@ -636,6 +637,8 @@ export function recordReview(
   const v = data.verses[verseId];
   if (!v || v.deletedAt) throw new Error('Verse not found');
   const today = dayKeyOf(now);
+  const coinsBefore = baseCoins(data);
+  const multiplier = streakMultiplier(streakInfo(data, now).count); // the streak you came in with
   const status = verseStatus(data, v, now);
   const counted = status.state === 'ready';
   data.ledger[today] = mergeLedgerDay(data.ledger[today], { r: 1 });
@@ -655,6 +658,11 @@ export function recordReview(
     data.ledger[today] = mergeLedgerDay(data.ledger[today], { o: 'c' });
   }
   data.longestStreak = Math.max(data.longestStreak, streakInfo(data, now).count);
+  if (counted && multiplier > 1) {
+    // every coin this review earned (the review, a finished day, a level-up) is worth more on a streak; kept as a per-device total that only grows
+    const extra = (baseCoins(data) - coinsBefore) * (multiplier - 1);
+    data.coinBonus = { ...(data.coinBonus ?? {}), [deviceId]: Math.round(((data.coinBonus?.[deviceId] ?? 0) + extra) * 100) / 100 };
+  }
   return { counted, levelUps, todayComplete: summary.total > 0 && summary.remaining === 0 };
 }
 

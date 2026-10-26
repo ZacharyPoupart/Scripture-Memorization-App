@@ -5,6 +5,7 @@
 // The avatar is a knight who puts on the full armor of God (Ephesians 6:10-18). Everyone starts in the same basic
 // steel armor (free); every piece can be swapped for another, because all the painted pieces are drawn to the same size.
 // Some pieces cost seeds, some need a long streak first, and the finest take the most of both.
+import { baseCoins, coinBonusTotal } from './coins.ts';
 import { STREAK_MILESTONES } from './milestones.ts';
 import type { AppData } from './types.ts';
 
@@ -230,9 +231,8 @@ export const STREAK_SEED_BONUS: Record<number, number> = {
   1000: 500,
 };
 
-export const SEEDS_PER_REVIEW = 1;
-export const SEEDS_PER_DAY = 5;
-export const SEEDS_PER_LEVELUP = 25;
+export { SEEDS_PER_REVIEW, SEEDS_PER_DAY } from './coins.ts';
+export { SEEDS_PER_LEVELUP } from './coins.ts';
 
 const totalCounted = (data: AppData) => Object.values(data.reviewsByDevice).reduce((a, b) => a + b, 0);
 
@@ -242,10 +242,9 @@ const totalCounted = (data: AppData) => Object.values(data.reviewsByDevice).redu
  * earn nothing: seeds come from real, counted reviews.
  */
 export function seedsEarned(data: AppData): number {
-  const days = Object.values(data.ledger).filter((e) => e.o === 'c').length;
   let bonus = 0;
   for (const m of STREAK_MILESTONES) if (data.longestStreak >= m) bonus += STREAK_SEED_BONUS[m] ?? 0;
-  return totalCounted(data) * SEEDS_PER_REVIEW + days * SEEDS_PER_DAY + data.levelUps.length * SEEDS_PER_LEVELUP + bonus;
+  return baseCoins(data) + coinBonusTotal(data) + bonus;
 }
 
 export function seedsSpent(data: AppData): number {
