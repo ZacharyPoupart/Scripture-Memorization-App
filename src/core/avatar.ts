@@ -109,8 +109,8 @@ export interface ArmorSet {
 }
 export const SETS: ArmorSet[] = [
   { n: 1, id: 'iron-bulwark', name: 'Iron Bulwark', price: 0 },
-  { n: 2, id: 'silver-vanguard', name: 'Silver Vanguard', price: 800 },
-  { n: 3, id: 'forest-guardian', name: 'Forest Guardian', price: 1600 },
+  { n: 2, id: 'silver-vanguard', name: 'Silver Vanguard', price: 400 },
+  { n: 3, id: 'forest-guardian', name: 'Forest Guardian', price: 1000 },
   { n: 4, id: 'knights-oath', name: 'Knight’s Oath', price: 2400 },
   { n: 5, id: 'stormcaller', name: 'Stormcaller', price: 3600 },
   { n: 6, id: 'frostborn', name: 'Frostborn', price: 4800 },
