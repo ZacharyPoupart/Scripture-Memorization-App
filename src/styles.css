@@ -670,6 +670,13 @@ textarea.input {
   align-items: center;
   padding: 20px;
 }
+/* Sheets opened on a screen with the tab bar stop above it (the tab bar stays in view and the last choices are never hidden behind it). */
+.has-tabs .overlay {
+  bottom: calc(var(--tab-h) + var(--safe-bottom) + 1px);
+}
+.has-tabs .sheet {
+  padding-bottom: 16px;
+}
 .sheet {
   width: 100%;
   max-width: 560px;

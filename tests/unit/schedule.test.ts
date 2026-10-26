@@ -4,6 +4,8 @@ import {
   daysInPile,
   dueDay,
   easierPile,
+  GRADUATION_DAYS,
+  moveDownDaysIn,
   previousPile,
   periodEnd,
   periodStart,
@@ -360,5 +362,18 @@ describe('offering more frequent practice', () => {
     expect(easierPile('weekly', 1)).toBeNull();
     expect(easierPile('daily', 5)).toBeNull();
     expect(previousPile('daily')).toBeNull();
+  });
+
+  it('moving back to Daily from the offer leaves only a week to go; the other piles start fresh', () => {
+    expect(moveDownDaysIn('daily')).toBe(GRADUATION_DAYS.daily - 7);
+    expect(moveDownDaysIn('weekly')).toBe(0);
+    expect(moveDownDaysIn('monthly')).toBe(0);
+    const data = newData();
+    const v = john316(data, at(D0, '09:00'));
+    const now = at(D0, '12:00');
+    movePile(data, v.id, 'weekly', now);
+    movePile(data, v.id, 'daily', now, moveDownDaysIn('daily'));
+    expect(v.pile).toBe('daily');
+    expect(GRADUATION_DAYS.daily - progressDays(data, v, now)).toBe(7);
   });
 });
