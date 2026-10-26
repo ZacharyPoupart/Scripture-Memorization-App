@@ -103,6 +103,21 @@ test.describe('cascading verse picker (Book → Chapter → Verse)', () => {
     await expect(page.getByTestId('num-option')).toHaveCount(16);
   });
 
+  test('the last books and numbers are never hidden behind the tab bar (iPhone)', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 760 });
+    const clearOfTabs = async (grid: string, option: string) => {
+      await atRest(page);
+      await page.getByTestId(grid).locator('.pick-scroll').evaluate((el) => (el.scrollTop = el.scrollHeight));
+      const last = (await page.getByTestId(option).last().boundingBox())!;
+      const tabs = (await page.locator('.tabbar').boundingBox())!;
+      expect(last.y + last.height, `${grid}: the last choice is fully above the tab bar`).toBeLessThanOrEqual(tabs.y + 1);
+    };
+    await page.getByTestId('pick-book').click();
+    await clearOfTabs('book-grid', 'book-option');
+    await page.getByTestId('book-option').filter({ hasText: /^Psalms$/ }).click();
+    await clearOfTabs('chapter-grid', 'num-option');
+  });
+
   test('chapter and verse counts are right (Psalms 150, Jude 1 with 25 verses, Obadiah 21)', async ({ page }) => {
     await page.getByTestId('pick-book').click();
     await page.getByTestId('book-option').filter({ hasText: /^Psalms$/ }).click();

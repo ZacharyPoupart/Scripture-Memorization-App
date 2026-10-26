@@ -484,3 +484,9 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 ## Housekeeping — a stray `node_modules` link removed from the repo (no version bump)
 **What:** while working in temporary copies of the repo I linked `node_modules` into them, and my `git add -A` committed that link (it was merged to `main` with v1.42.0 by mistake). It points at itself, so a fresh checkout has a broken `node_modules` until `npm ci` replaces it; CI was not affected. It is now removed and `.gitignore` ignores `node_modules` even when it is a link.
 **Nothing changes in the app.** No version bump, so no new release tag.
+
+## v1.45.1 — Pickers no longer hide their last choices behind the tab bar (owner report)
+**What:** pop-up sheets (the book, chapter and verse pickers, the move-to-pile sheet, the topic list) used to reach the bottom of the screen, under the tab bar. They now end just above it, so the last row can always be scrolled into view. The tab bar stays visible and tappable under them.
+**Not changed:** pop-ups on screens without the tab bar (a review) and the celebration cards still use the whole screen.
+**Test changes:** new `picker.spec` test checks the last book and the last chapter number sit fully above the tab bar on a phone-sized screen (it failed before the fix: 40 px hidden).
+**Undo:** roll back to the previous stage tag.
