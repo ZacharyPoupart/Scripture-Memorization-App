@@ -147,7 +147,7 @@ test('groups: create, invite, join, see a shared weekly goal, leave', async ({ b
   await zach.getByTestId('guild-name-input').fill('Youth Group');
   await zach.getByTestId('guild-create').click();
   await expect(zach.getByTestId('guild-name')).toHaveText('Youth Group');
-  await expect(zach.getByTestId('guild-progress')).toContainText('0 of 25 reviews');
+  await expect(zach.getByTestId('guild-progress')).toContainText('0 of 5 reviews'); // nobody has verses yet: the goal is the smallest, 5
   await zach.getByTestId('guild-invite').click();
   const code = (await zach.getByTestId('invite-code').innerText()).replace('-', '');
   await zach.getByRole('button', { name: 'Done' }).click();
@@ -155,7 +155,8 @@ test('groups: create, invite, join, see a shared weekly goal, leave', async ({ b
   await expect(sam.getByTestId('guild-join-card')).toContainText('Youth Group');
   await sam.getByTestId('guild-join-yes').click();
   await expect(sam.getByTestId('guild-name')).toHaveText('Youth Group');
-  await expect(sam.getByTestId('guild-progress')).toContainText('of 50 reviews');
+  await expect(sam.getByTestId('guild-progress')).toContainText('of 5 reviews');
+  await expect(sam.getByTestId('guild-progress')).toContainText('25 at the goal'); // the coin reward for a group of two or more
   await sam.getByTestId('guild-leave').click();
   await sam.getByRole('button', { name: 'Leave', exact: true }).last().click();
   await expect(sam.getByTestId('guild-card')).toHaveCount(0);

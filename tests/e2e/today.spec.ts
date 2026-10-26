@@ -95,6 +95,9 @@ test('Today is just the verses: no date, greeting, ring or pile cards; the four 
   await addVerse(page, JOHN316);
   await page.goto('/#/');
   await expect(page.getByTestId('today-list')).toContainText('John 3:16');
+  const row = (await page.getByTestId('pile-row').boundingBox())!;
+  const card = (await page.getByTestId('today-title').boundingBox())!;
+  expect(row.y + row.height).toBeLessThan(card.y); // the pile counts sit at the top, above the day's card
   await expect(page.getByRole('heading', { level: 1 })).toHaveCount(0); // no greeting
   await expect(page.locator('main')).not.toContainText(/Good (morning|afternoon|evening)|Still up/);
   await expect(page.locator('main')).not.toContainText(new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' }));

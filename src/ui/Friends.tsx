@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'preact/hooks';
-import { currentLook, defaultLook, type Look } from '../core/avatar.ts';
+import { currentLook, defaultLook, GUILD_WIN_COINS, type Look } from '../core/avatar.ts';
 import { cleanName, cheerLine, codeFrom, formatCode, guildLink, inviteLink, inviteMessage, MAX_GUILD_NAME, MAX_NAME, type FriendCard, type GuildView } from '../core/social.ts';
 import { api, socialMessage } from '../services/social.ts';
 import { navigate } from '../router.ts';
@@ -20,7 +20,7 @@ import {
   useApp,
 } from '../store.ts';
 import { AvatarFigure } from './AvatarFigure.tsx';
-import { Confirm, Icon, Overlay, PILE_INFO } from './common.tsx';
+import { Coin, Confirm, Icon, Overlay, PILE_INFO } from './common.tsx';
 import { PILES } from '../core/types.ts';
 
 const faceLook = (look: Record<string, string>): Look => ({ ...defaultLook(), ...look });
@@ -136,6 +136,12 @@ function GuildCard({ g, me, onInvite, onLeave }: { g: GuildView; me: string; onI
         </div>
         <div class="muted small" style={{ marginTop: '4px' }} data-testid="guild-progress">
           {done ? 'Goal reached this week!' : 'Together this week'}: {g.progress} of {g.goal} reviews
+          {!done && g.members.length > 1 && (
+            <>
+              {' · '}
+              <Coin /> {GUILD_WIN_COINS} at the goal
+            </>
+          )}
         </div>
       </div>
       <ul class="guild-members">
