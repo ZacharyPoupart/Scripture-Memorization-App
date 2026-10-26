@@ -21,7 +21,10 @@ const MAX_GUILDS = 5;
 const FRIEND_INVITE_TTL = 7 * 86400;
 const GUILD_INVITE_TTL = 14 * 86400;
 const CHEER_KEEP = 7 * 86400_000; // how long a cheer stays on someone's page
-const GOAL_PER_MEMBER = 25; // counted reviews each member adds to the guild's week
+/** A guild's weekly goal: every member's reviews due that week added up, rounded to the nearest 5 (never below 5). */
+export const guildGoal = (dues) => Math.max(5, Math.round(dues.reduce((n, d) => n + d, 0) / 5) * 5);
+/** One member's share. Members on an older version share no number yet: count 21 for each Daily verse and 1 for each Weekly one. */
+const dueOf = (snap) => (Number.isInteger(snap.due) ? snap.due : snap.counts.daily * 21 + snap.counts.weekly);
 
 const json = (body, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json', 'cache-control': 'no-store' } });
@@ -61,7 +64,8 @@ export function cleanSnap(raw) {
     if (!/^[a-z]{2,12}$/.test(k) || typeof v !== 'string' || !/^[a-z0-9-]{1,60}$/.test(v)) return null;
     look[k] = v;
   }
-  return { look, streak, longest, counts, week, weekStart: raw.weekStart };
+  const due = int(raw.due, 99999);
+  return due === null ? { look, streak, longest, counts, week, weekStart: raw.weekStart } : { look, streak, longest, counts, week, weekStart: raw.weekStart, due };
 }
 
 async function sha256(text) {
@@ -282,7 +286,7 @@ export async function handleSocial(request, kv, action, now = Date.now()) {
         const thisWeek = (c) => (c.snap.weekStart === weekStart ? c.snap.week : 0); // numbers from an older week count as nothing yet
         members.sort((a, b) => thisWeek(b) - thisWeek(a) || a.name.localeCompare(b.name));
         const progress = members.filter((c) => c.snap.weekStart === weekStart).reduce((n, c) => n + c.snap.week, 0);
-        views.push({ id: gid, name: g.name, owner: g.owner, members, weekStart, goal: GOAL_PER_MEMBER * g.members.length, progress });
+        views.push({ id: gid, name: g.name, owner: g.owner, members, weekStart, goal: guildGoal(members.map((c) => dueOf(c.snap))), progress });
       }
       return json({ guilds: views });
     }

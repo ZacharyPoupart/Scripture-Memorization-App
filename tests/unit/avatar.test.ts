@@ -26,6 +26,7 @@ import {
   sceneUrl,
   unlockedIds,
   freshUnlocks,
+  GUILD_WIN_COINS,
 } from '../../src/core/avatar.ts';
 import { mergeData } from '../../src/core/merge.ts';
 import { recordReview, settle } from '../../src/core/schedule.ts';
@@ -481,5 +482,32 @@ describe('temporary "armor is free" testing switch', () => {
       testing.armorFree = false;
     }
     expect(currentLook(d).weapon).toBe(defaultLook().weapon);
+  });
+});
+
+describe('coins for a guild reaching its weekly goal', () => {
+  it('each goal reached is worth the same number of coins, once, and the coins are derived (never stored)', () => {
+    const d = newData();
+    const before = seedsEarned(d);
+    d.guildWins = ['abc:2026-01-11'];
+    expect(seedsEarned(d)).toBe(before + GUILD_WIN_COINS);
+    d.guildWins = ['abc:2026-01-11', 'abc:2026-01-18'];
+    expect(seedsEarned(d)).toBe(before + 2 * GUILD_WIN_COINS);
+    expect(GUILD_WIN_COINS).toBe(100);
+  });
+
+  it('is kept by merging (union) and by backups, which ignore anything that is not a goal id', () => {
+    const a = newData();
+    const b = newData();
+    a.guildWins = ['g1:2026-01-11'];
+    b.guildWins = ['g1:2026-01-11', 'g2:2026-01-18'];
+    expect(mergeData(a, b).guildWins).toEqual(['g1:2026-01-11', 'g2:2026-01-18']);
+    expect(mergeData(b, a)).toEqual(mergeData(a, b)); // order does not matter
+    expect(normalizeData(JSON.parse(JSON.stringify(a))).guildWins).toEqual(['g1:2026-01-11']);
+    const raw = JSON.parse(JSON.stringify(a));
+    raw.guildWins = ['g1:2026-01-11', 'nonsense', 5, '<script>:2026-01-11', 'g3:2026-01-18'];
+    expect(normalizeData(raw).guildWins).toEqual(['g1:2026-01-11', 'g3:2026-01-18']);
+    raw.guildWins = 'nope';
+    expect(normalizeData(raw).guildWins).toBeUndefined();
   });
 });
