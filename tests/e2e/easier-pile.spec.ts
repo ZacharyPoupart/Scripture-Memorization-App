@@ -42,6 +42,10 @@ test('a verse that took many tries offers to move down, and it can be undone', a
   await expect(page.getByTestId('easier-suggestion')).toContainText('a few tries');
   await page.getByTestId('easier-move').click();
   await expect(page.getByTestId('toast')).toContainText('Moved to Daily');
+  // back in Daily with only a week to go
+  await page.goto('/#/pile/daily');
+  await expect(page.getByTestId('progress-ring').first()).toHaveAttribute('aria-label', 'Day 83 of 90 toward Weekly');
+  await page.goBack();
   await page.getByTestId('toast').getByRole('button', { name: 'Undo' }).click();
   await page.goto('/#/');
   await expect(page.getByTestId('count-weekly')).toHaveText('1');
