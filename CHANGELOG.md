@@ -5,6 +5,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.49.1] - 2026-10-26
+
+### Fixed
+- The sword sits a little further right on the knight, so the grip is in the hand.
+
 ## [1.49.0] - 2026-10-26
 
 ### Changed
