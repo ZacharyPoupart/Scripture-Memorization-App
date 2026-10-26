@@ -490,3 +490,10 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 ## Housekeeping — a stray `node_modules` link removed from the repo (no version bump)
 **What:** while working in temporary copies of the repo I linked `node_modules` into them, and my `git add -A` committed that link (it was merged to `main` with v1.42.0 by mistake). It points at itself, so a fresh checkout has a broken `node_modules` until `npm ci` replaces it; CI was not affected. It is now removed and `.gitignore` ignores `node_modules` even when it is a link.
 **Nothing changes in the app.** No version bump, so no new release tag.
+
+## v1.49.0 — Cheaper first two armor sets (owner request)
+**What:** whole-set prices are now 0 (Iron Bulwark, free), 400 (Silver Vanguard), 1,000 (Forest Guardian), then 2,400, 3,600, 4,800, 6,400, 8,800, 12,000, 16,000 and 22,000 as before. A single piece is still a fixed share of its set, so a Silver Vanguard helmet is 80 coins (was 160).
+**Choices (tell me if you want them different):** you asked for the first two sets only, so the third set (Knight's Oath, 2,400) is unchanged. That leaves a steeper step from 1,000 to 2,400 (2.4 times) and then gentler steps (1.5, 1.3, 1.3, 1.4, 1.4, 1.3, 1.4). If you want a smoother curve I would bring Knight's Oath to about 1,800 and Stormcaller to about 3,000.
+**What happens to people who already bought:** nothing is taken away. Coins are worked out from reviews minus the cost of what you own at today's prices, so anyone who bought Silver Vanguard or Forest Guardian pieces simply sees a higher balance.
+**Test changes:** the price table test expects the new numbers and checks that prices only go up and that the first two are at most 400 and 1,000; the avatar e2e expects an 80-coin helmet.
+**Undo:** roll back to the previous stage tag.
