@@ -156,7 +156,7 @@ test('groups: create, invite, join, see a shared weekly goal, leave', async ({ b
   await sam.getByTestId('guild-join-yes').click();
   await expect(sam.getByTestId('guild-name')).toHaveText('Youth Group');
   await expect(sam.getByTestId('guild-progress')).toContainText('of 5 reviews');
-  await expect(sam.getByTestId('guild-progress')).toContainText('100 at the goal'); // the coin reward for a group of two or more
+  await expect(sam.getByTestId('guild-progress')).toContainText('25 at the goal'); // the coin reward for a group of two or more
   await sam.getByTestId('guild-leave').click();
   await sam.getByRole('button', { name: 'Leave', exact: true }).last().click();
   await expect(sam.getByTestId('guild-card')).toHaveCount(0);

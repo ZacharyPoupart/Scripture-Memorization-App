@@ -493,7 +493,7 @@ describe('coins for a guild reaching its weekly goal', () => {
     expect(seedsEarned(d)).toBe(before + GUILD_WIN_COINS);
     d.guildWins = ['abc:2026-01-11', 'abc:2026-01-18'];
     expect(seedsEarned(d)).toBe(before + 2 * GUILD_WIN_COINS);
-    expect(GUILD_WIN_COINS).toBe(100);
+    expect(GUILD_WIN_COINS).toBe(25);
   });
 
   it('is kept by merging (union) and by backups, which ignore anything that is not a goal id', () => {

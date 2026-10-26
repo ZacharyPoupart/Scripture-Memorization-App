@@ -9,7 +9,7 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 - A group's weekly goal is now the reviews its members have due that week added up (a Daily verse counts 3 a day, a Weekly verse once, and so on), rounded to the nearest 5, instead of a flat 25 each.
 
 ### Added
-- 100 coins for every member of a group of two or more when the group reaches its weekly goal. You need at least one review of your own that week, and the coins arrive the next time you open Friends.
+- 25 coins for every member of a group of two or more when the group reaches its weekly goal. You need at least one review of your own that week, and the coins arrive the next time you open Friends.
 
 ## [1.44.0] - 2026-10-24
 

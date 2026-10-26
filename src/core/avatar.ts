@@ -234,7 +234,7 @@ export const SEEDS_PER_REVIEW = 1;
 export const SEEDS_PER_DAY = 5;
 export const SEEDS_PER_LEVELUP = 25;
 /** Coins for each week a guild you are in reaches its weekly goal. */
-export const GUILD_WIN_COINS = 100;
+export const GUILD_WIN_COINS = 25;
 
 const totalCounted = (data: AppData) => Object.values(data.reviewsByDevice).reduce((a, b) => a + b, 0);
 
