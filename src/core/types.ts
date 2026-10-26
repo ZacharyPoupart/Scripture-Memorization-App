@@ -81,6 +81,8 @@ export interface AppData {
   social?: { id: string; secret: string; at: number };
   /** What is shared with friends: the name they see and whether sharing is on. The later decision wins. */
   sharing?: { name: string; on: boolean; at: number };
+  /** Weeks in which a guild this person is in reached its weekly goal (`<guild id>:<week start>`). Grow-only, merged by union; each is worth coins. */
+  guildWins?: string[];
 }
 
 export type ReviewMode = 'flashcard' | 'blanks' | 'type' | 'speak';
