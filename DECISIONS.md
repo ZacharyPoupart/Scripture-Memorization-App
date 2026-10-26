@@ -484,3 +484,9 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 ## Housekeeping — a stray `node_modules` link removed from the repo (no version bump)
 **What:** while working in temporary copies of the repo I linked `node_modules` into them, and my `git add -A` committed that link (it was merged to `main` with v1.42.0 by mistake). It points at itself, so a fresh checkout has a broken `node_modules` until `npm ci` replaces it; CI was not affected. It is now removed and `.gitignore` ignores `node_modules` even when it is a link.
 **Nothing changes in the app.** No version bump, so no new release tag.
+
+## v1.46.0 — Pile counts at the top of Today (owner request)
+**What:** the quiet row of pile counts (Daily 14, Weekly 8, Monthly 0, Yearly 0) moved from below the day's card to the top of Today, just under the avatar and streak line.
+**Choices (tell me if you want them different):** "the top" is directly under the avatar and streak, not above them; the row itself is unchanged. The tour's "Four piles" step points at the row wherever it is, so it needed no change.
+**Test changes:** the Today layout test now checks the row is above the day's card.
+**Undo:** roll back to the previous stage tag.

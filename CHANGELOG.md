@@ -5,6 +5,9 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Changed
+- The four pile counts (Daily, Weekly, Monthly, Yearly) now sit at the top of Today, above the day's card.
+
 ## [1.44.0] - 2026-10-24
 
 ### Fixed
