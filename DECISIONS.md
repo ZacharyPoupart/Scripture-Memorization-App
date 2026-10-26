@@ -490,3 +490,8 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 ## Housekeeping — a stray `node_modules` link removed from the repo (no version bump)
 **What:** while working in temporary copies of the repo I linked `node_modules` into them, and my `git add -A` committed that link (it was merged to `main` with v1.42.0 by mistake). It points at itself, so a fresh checkout has a broken `node_modules` until `npm ci` replaces it; CI was not affected. It is now removed and `.gitignore` ignores `node_modules` even when it is a link.
 **Nothing changes in the app.** No version bump, so no new release tag.
+
+## v1.49.2 — The armor count under the knight is gone (owner request)
+**What:** removed the line "Armor of God: N of 6 upgraded" with its six dots (and the "Silver Vanguard set..." wording when the pieces matched) from the avatar screen. It counted any piece that was not the free start, which did not mean much.
+**Test changes:** the avatar e2e tests no longer look for it; they still check which piece is being worn.
+**Undo:** roll back to the previous stage tag.
