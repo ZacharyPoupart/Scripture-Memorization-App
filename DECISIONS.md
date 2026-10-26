@@ -484,3 +484,9 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 ## Housekeeping — a stray `node_modules` link removed from the repo (no version bump)
 **What:** while working in temporary copies of the repo I linked `node_modules` into them, and my `git add -A` committed that link (it was merged to `main` with v1.42.0 by mistake). It points at itself, so a fresh checkout has a broken `node_modules` until `npm ci` replaces it; CI was not affected. It is now removed and `.gitignore` ignores `node_modules` even when it is a link.
 **Nothing changes in the app.** No version bump, so no new release tag.
+
+## v1.47.0 — Review a whole pile in one tap (owner request)
+**What:** on the Weekly, Monthly and Yearly pile pages, when nothing is due the button now says "Review all · N verses" and starts the whole pile, instead of being disabled. The Only due / All switch is hidden in that case because there is nothing to choose. It is extra practice, so nothing in the schedule changes.
+**Choices (tell me if you want them different):** Daily is unchanged (it still says "Nothing due" and needs the All switch), because you asked about the other three. I can make Daily work the same way.
+**Test changes:** new e2e test (a verse just moved to Weekly has nothing due; the pile page offers "Review all" and starts a review).
+**Undo:** roll back to the previous stage tag.

@@ -5,6 +5,9 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Changed
+- The Weekly, Monthly and Yearly pile pages now always have a one-tap "Review all" button, even when nothing is due. It counts as extra practice and does not change the schedule.
+
 ## [1.44.0] - 2026-10-24
 
 ### Fixed
