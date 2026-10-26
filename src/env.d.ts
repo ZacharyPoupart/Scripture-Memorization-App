@@ -15,6 +15,7 @@ declare module '*/functions/_lib/sync.js' {
 declare module '*/functions/_lib/social.js' {
   export function cleanName(raw: unknown, max?: number): string;
   export function cleanSnap(raw: unknown): Record<string, unknown> | null;
+  export function guildGoal(dues: number[]): number;
   export function handleSocial(
     request: Request,
     kv:

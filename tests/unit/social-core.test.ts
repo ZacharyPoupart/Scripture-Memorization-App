@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { exportBackup, normalizeData, parseBackup } from '../../src/core/backup.ts';
 import { mergeData } from '../../src/core/merge.ts';
 import { recordReview } from '../../src/core/schedule.ts';
-import { cheerLine, cleanName, codeFrom, formatCode, guildLink, initialOf, inviteLink, inviteMessage, newIdentity, sameSnapshot, socialSnapshot } from '../../src/core/social.ts';
-import { cleanSnap } from '../../functions/_lib/social.js';
+import { cheerLine, cleanName, codeFrom, formatCode, guildLink, initialOf, inviteLink, inviteMessage, newIdentity, sameSnapshot, socialSnapshot, weeklyDue, guildWinsToClaim, type GuildView } from '../../src/core/social.ts';
+import { cleanSnap, guildGoal } from '../../functions/_lib/social.js';
 import { at, D0, day, DEVICE, john316, newData } from './helpers.ts';
 
 describe('your private identity', () => {
@@ -118,5 +118,71 @@ describe('the cheer message', () => {
     expect(cheerLine(['Sam L.', 'Ana B.'])).toBe('Sam L. and Ana B. cheered you!');
     expect(cheerLine(['Sam L.', 'Ana B.', 'Joe'])).toBe('Sam L., Ana B. and 1 other cheered you!');
     expect(cheerLine(['A', 'B', 'C', 'D'])).toBe('A, B and 2 others cheered you!');
+  });
+});
+
+describe('the guild goal', () => {
+  // the week of Sunday 2026-01-11 to Saturday 2026-01-17
+  const week = at('2026-01-14', '12:00');
+
+  it('a Daily verse is due three times on each day of the week (21), but not before the day after it was added', () => {
+    const d = newData();
+    john316(d, at(D0, '07:00')); // added the Saturday before
+    expect(weeklyDue(d, week)).toBe(21);
+    const e = newData('2026-01-14');
+    john316(e, at('2026-01-14', '07:00')); // added on the Wednesday: Thursday to Saturday are due
+    expect(weeklyDue(e, week)).toBe(9);
+  });
+
+  it('a Weekly verse is due once a week, a Monthly one in the week its month ends, a Yearly one in the week its year ends', () => {
+    const d = newData();
+    john316(d, at(D0, '07:00'), { pile: 'weekly', pileSince: '2026-01-01' });
+    john316(d, at(D0, '07:00'), { pile: 'monthly', pileSince: '2026-01-01' });
+    john316(d, at(D0, '07:00'), { pile: 'yearly', pileSince: '2026-01-01' });
+    expect(weeklyDue(d, week)).toBe(1); // only the Weekly one this week
+    expect(weeklyDue(d, at('2026-01-28', '12:00'))).toBe(2); // the week of January 25-31: Weekly + Monthly
+    expect(weeklyDue(d, at('2026-12-30', '12:00'))).toBe(3); // the week of December 27 to January 2: all three
+  });
+
+  it('is shared as part of what friends see', () => {
+    const d = newData();
+    john316(d, at(D0, '07:00'));
+    expect(socialSnapshot(d, week).due).toBe(21);
+    expect(cleanSnap({ ...socialSnapshot(d, week) })).toMatchObject({ due: 21 });
+  });
+
+  it('is the members\' totals added up and rounded to the nearest 5 (never below 5)', () => {
+    expect(guildGoal([21, 21])).toBe(40); // 42
+    expect(guildGoal([21, 22])).toBe(45); // 43
+    expect(guildGoal([44, 44, 44])).toBe(130); // 132
+    expect(guildGoal([2])).toBe(5);
+    expect(guildGoal([0, 0])).toBe(5);
+    expect(guildGoal([])).toBe(5);
+  });
+});
+
+describe('claiming the coins for a guild goal', () => {
+  const now = at('2026-01-14', '12:00'); // the week starting Sunday 2026-01-11
+  const me = 'a'.repeat(32);
+  const member = (id: string, week: number, weekStart = '2026-01-11') => ({ id, name: id.slice(0, 1), at: 0, snap: { look: {}, streak: 0, longest: 0, counts: { daily: 0, weekly: 0, monthly: 0, yearly: 0 }, week, weekStart } });
+  const guild = (over: Partial<GuildView> = {}): GuildView => ({
+    id: 'g1', name: 'Group', owner: me, weekStart: '2026-01-11', goal: 40, progress: 40,
+    members: [member(me, 20), member('b'.repeat(32), 20)], ...over,
+  });
+
+  it('is earned once, for this week, when the goal is reached by at least two people including you', () => {
+    const d = newData();
+    expect(guildWinsToClaim(d, [guild()], me, now)).toEqual(['g1:2026-01-11']);
+    d.guildWins = ['g1:2026-01-11'];
+    expect(guildWinsToClaim(d, [guild()], me, now)).toEqual([]); // already claimed
+  });
+
+  it('is not earned when the goal is not reached, for a group of one, for last week, or without a review of your own this week', () => {
+    const d = newData();
+    expect(guildWinsToClaim(d, [guild({ progress: 39 })], me, now)).toEqual([]);
+    expect(guildWinsToClaim(d, [guild({ members: [member(me, 40)] })], me, now)).toEqual([]);
+    expect(guildWinsToClaim(d, [guild({ weekStart: '2026-01-04' })], me, now)).toEqual([]);
+    expect(guildWinsToClaim(d, [guild({ members: [member(me, 0), member('b'.repeat(32), 40)] })], me, now)).toEqual([]);
+    expect(guildWinsToClaim(d, [guild({ members: [member(me, 20, '2026-01-04'), member('b'.repeat(32), 20)] })], me, now)).toEqual([]);
   });
 });

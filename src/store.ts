@@ -1,7 +1,7 @@
 // App-wide state: the data document, device settings, and the glue to storage and sync.
 import { useEffect, useState } from 'preact/hooks';
 import { BackupError, exportBackup, parseBackup } from './core/backup.ts';
-import { buyItem, equipItem, resetAvatar, seedsEarned, testing, type BuyResult } from './core/avatar.ts';
+import { buyItem, equipItem, GUILD_WIN_COINS, resetAvatar, seedsEarned, testing, type BuyResult } from './core/avatar.ts';
 import { addDays, dayKeyOf } from './core/dates.ts';
 import { mergeData } from './core/merge.ts';
 import { createData, endPause, recordReview, setPause, settle } from './core/schedule.ts';
@@ -9,7 +9,7 @@ import { LESSONS, START, doneLessons, nextPos, sampleTourData, type TourPos } fr
 import { navigate } from './router.ts';
 import type { AppData, LevelUp, Settings } from './core/types.ts';
 import { setFeedbackPrefs } from './services/feedback.ts';
-import { cleanName, MAX_GUILD_NAME, type Cheer, newIdentity, sameSnapshot, socialSnapshot, type FriendCard, type GuildView, type Snapshot } from './core/social.ts';
+import { cleanName, guildWinsToClaim, MAX_GUILD_NAME, type Cheer, newIdentity, sameSnapshot, socialSnapshot, type FriendCard, type GuildView, type Snapshot } from './core/social.ts';
 import { api, socialMessage, SocialError, type Auth } from './services/social.ts';
 import { Storage, requestPersistence } from './services/storage.ts';
 import { runSync, stable, SyncError } from './services/sync.ts';
@@ -320,6 +320,13 @@ export async function refreshSocial(): Promise<void> {
   await guarded(async () => {
     const [f, g] = await Promise.all([api.friends(auth), api.guilds(auth)]);
     patchSocial({ friends: f.friends, cheers: f.cheers ?? [], guilds: g.guilds, loadedAt: Date.now() });
+    // a group that reached its weekly goal pays coins, once
+    const me = state.data.social?.id;
+    const wins = me && !state.sandbox ? guildWinsToClaim(state.data, g.guilds, me, Date.now()) : [];
+    if (wins.length) {
+      act((d) => void (d.guildWins = [...new Set([...(d.guildWins ?? []), ...wins])].sort()));
+      showToast(`Your group reached its weekly goal! +${wins.length * GUILD_WIN_COINS} coins`);
+    }
   });
 }
 
