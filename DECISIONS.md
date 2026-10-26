@@ -496,6 +496,12 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Test changes:** new `picker.spec` test checks the last book and the last chapter number sit fully above the tab bar on a phone-sized screen (it failed before the fix: 40 px hidden).
 **Undo:** roll back to the previous stage tag.
 
+## v1.46.0 — Pile counts at the top of Today (owner request)
+**What:** the quiet row of pile counts (Daily 14, Weekly 8, Monthly 0, Yearly 0) moved from below the day's card to the top of Today, just under the avatar and streak line.
+**Choices (tell me if you want them different):** "the top" is directly under the avatar and streak, not above them; the row itself is unchanged. The tour's "Four piles" step points at the row wherever it is, so it needed no change.
+**Test changes:** the Today layout test now checks the row is above the day's card.
+**Undo:** roll back to the previous stage tag.
+
 ## v1.47.0 — Review a whole pile in one tap (owner request)
 **What:** on the Weekly, Monthly and Yearly pile pages, when nothing is due the button now says "Review all · N verses" and starts the whole pile, instead of being disabled. The Only due / All switch is hidden in that case because there is nothing to choose. It is extra practice, so nothing in the schedule changes.
 **Choices (tell me if you want them different):** Daily is unchanged (it still says "Nothing due" and needs the All switch), because you asked about the other three. I can make Daily work the same way.

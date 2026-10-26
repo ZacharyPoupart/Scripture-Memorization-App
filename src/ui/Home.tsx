@@ -104,6 +104,20 @@ export function Home() {
             </div>
           </div>
 
+          <nav class="pile-row" aria-label="Your piles" data-testid="pile-row">
+            {PILES.map((p) => {
+              const vs = pileVerses(data, p);
+              const ready = vs.filter((v) => verseStatus(data, v, now).state === 'ready').length;
+              return (
+                <button key={p} class={`pile-link pile-${p} ${ready ? 'has-ready' : ''}`} onClick={() => navigate(`/pile/${p}`)} data-testid={`pile-${p}`} aria-label={`${PILE_INFO[p].label}: ${vs.length} verses, ${ready} ready`}>
+                  <i aria-hidden="true" />
+                  <span>{PILE_INFO[p].label}</span>
+                  <b data-testid={`count-${p}`}>{vs.length}</b>
+                </button>
+              );
+            })}
+          </nav>
+
           <div class="card stack today-card">
             <ModePicker />
             <div class="row spread today-head">
@@ -137,19 +151,6 @@ export function Home() {
             )}
           </div>
 
-          <nav class="pile-row" aria-label="Your piles" data-testid="pile-row">
-            {PILES.map((p) => {
-              const vs = pileVerses(data, p);
-              const ready = vs.filter((v) => verseStatus(data, v, now).state === 'ready').length;
-              return (
-                <button key={p} class={`pile-link pile-${p} ${ready ? 'has-ready' : ''}`} onClick={() => navigate(`/pile/${p}`)} data-testid={`pile-${p}`} aria-label={`${PILE_INFO[p].label}: ${vs.length} verses, ${ready} ready`}>
-                  <i aria-hidden="true" />
-                  <span>{PILE_INFO[p].label}</span>
-                  <b data-testid={`count-${p}`}>{vs.length}</b>
-                </button>
-              );
-            })}
-          </nav>
           {shouldNudgeBackup({
             syncOn: !!settings.syncCode,
             verses: verses.length,
