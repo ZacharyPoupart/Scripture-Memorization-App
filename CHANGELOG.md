@@ -5,6 +5,9 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Fixed
+- The sword sits a little further right on the knight, so the grip is in the hand.
+
 ### Changed
 - The first two armor sets you can buy are cheaper: Silver Vanguard is 400 coins for the whole set (was 800) and Forest Guardian 1,000 (was 1,600). The prices of the later sets are unchanged, so it is easy to get started and the finest armor takes real saving. Anything you already bought stays yours, and the coins you spent on it are worked out at the new prices, so your balance goes up by the difference.
 

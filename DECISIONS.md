@@ -497,3 +497,9 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **What happens to people who already bought:** nothing is taken away. Coins are worked out from reviews minus the cost of what you own at today's prices, so anyone who bought Silver Vanguard or Forest Guardian pieces simply sees a higher balance.
 **Test changes:** the price table test expects the new numbers and checks that prices only go up and that the first two are at most 400 and 1,000; the avatar e2e expects an 80-coin helmet.
 **Undo:** roll back to the previous stage tag.
+
+## v1.49.1 — Sword nudged right into the hand (owner request)
+**What:** the sword moved 8 units to the right (placement `dx` 36 to 44; it had been moved in from 48 earlier). Checked with a close-up of the knight holding a sword: the grip now covers the fist.
+**Choices (tell me if you want them different):** one small step; if it still looks off on your phone, tell me which way and I will go again in smaller steps.
+**Test changes:** none (a picture position; checked by eye).
+**Undo:** roll back to the previous stage tag.
