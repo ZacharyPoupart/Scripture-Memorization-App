@@ -48,3 +48,20 @@ test('"today\'s reviews" from Home runs every ready verse in the chosen mode', a
   await expect(page.getByTestId('review')).toHaveAttribute('data-mode', 'type');
   await expect(page.getByTestId('review').locator('.sub')).toHaveText('Verse 1 of 2');
 });
+
+test('a Weekly, Monthly or Yearly pile can be reviewed whole in one tap, even when nothing is due', async ({ page }) => {
+  await blockLookups(page);
+  await openApp(page);
+  await addVerse(page, JOHN316);
+  // a verse that has just moved up from Daily has nothing due in Weekly yet
+  await page.getByTestId('verse-card').first().click();
+  await page.getByTestId('move').click();
+  await page.getByTestId('move-weekly').click();
+  await page.goto('/#/pile/weekly');
+  await expect(page.getByTestId('start-pile')).toBeEnabled();
+  await expect(page.getByTestId('start-pile')).toContainText('Review all · 1 verse');
+  await expect(page.getByRole('button', { name: /Only due/ })).toHaveCount(0);
+  await page.getByTestId('start-pile').click();
+  await expect(page.getByTestId('review')).toBeVisible();
+  await expect(page.getByTestId('card-front')).toBeVisible();
+});
