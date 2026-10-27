@@ -641,3 +641,7 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Choices (tell me if you want them different):** (1) the list is short and plain; no filter is perfect, so a leader or friend can still report an odd name to you by message (there is no report button yet). (2) "Dick" alone is blocked even though it is also a real name; a person can write "Richard". (3) A name that was saved before this version and is now refused will fail quietly to update on the server until it is changed (the app shows the kind message when they rename). (4) Verse topics and other private text are never sent anywhere, so they are not checked.
 **Test changes:** new `moderation.test.ts` (lets real names through, blocks disguises); server test for the 422s; e2e for the friendly message on turning friends on, creating and renaming a group.
 **Undo:** roll back to the previous stage tag.
+
+## v1.64.1 — Flag stand on the right, a bit bigger (owner request)
+**What:** the flag stand moved from the knight's left to the right and the banner grew from about 23 to 30 units wide (the picture is 120 wide). Nothing else changed.
+**Undo:** roll back to the previous stage tag.

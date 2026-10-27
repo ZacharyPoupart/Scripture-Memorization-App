@@ -103,7 +103,7 @@ export function BannerFigure({ banner, size = 34, title }: { banner: Banner; siz
   );
 }
 
-/** A little flag stand for the avatar picture (120 x 120): a pole on the ground with the banner hanging from a crossbar. */
+/** A little flag stand for the avatar picture (120 x 120), on the knight's right: a pole on the ground with the banner hanging from a crossbar. */
 export function FlagStand({ banner }: { banner: Banner }) {
   const spec = bannerSpec(banner);
   const clip = `fsc-${spec}`;
@@ -116,11 +116,11 @@ export function FlagStand({ banner }: { banner: Banner }) {
         </clipPath>
         <Shade id={shade} />
       </defs>
-      <ellipse cx="17" cy="113" rx="9" ry="2.6" fill="#000" opacity="0.2" />
-      <rect x="15.6" y="22" width="2.8" height="91" rx="1.2" fill="#8a6a2a" stroke="#5a4416" stroke-width="0.6" />
-      <circle cx="17" cy="21" r="2.8" fill="#e3b23c" stroke="#7a4f12" stroke-width="0.8" />
-      <rect x="4" y="26" width="26" height="2.6" rx="1.2" fill="#8a6a2a" stroke="#5a4416" stroke-width="0.6" />
-      <g transform="translate(5.5 28.5) scale(0.23)">
+      <ellipse cx="102" cy="113" rx="10" ry="2.8" fill="#000" opacity="0.2" />
+      <rect x="100.6" y="18" width="2.8" height="95" rx="1.2" fill="#8a6a2a" stroke="#5a4416" stroke-width="0.6" />
+      <circle cx="102" cy="17" r="3" fill="#e3b23c" stroke="#7a4f12" stroke-width="0.8" />
+      <rect x="85" y="22" width="34" height="2.8" rx="1.2" fill="#8a6a2a" stroke="#5a4416" stroke-width="0.6" />
+      <g transform="translate(87 24.8) scale(0.3)">
         <path d={SHIELD} fill="#000" opacity="0.22" transform="translate(0 3)" />
         <g clip-path={`url(#${clip})`}>
           <rect x="0" y="0" width="100" height="130" fill={colorHex(banner.field)} />
