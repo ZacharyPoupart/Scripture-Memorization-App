@@ -3,7 +3,7 @@ import { exportBackup, normalizeData, parseBackup } from '../../src/core/backup.
 import { seedsEarned } from '../../src/core/avatar.ts';
 import { mergeData } from '../../src/core/merge.ts';
 import { recordReview } from '../../src/core/schedule.ts';
-import { cheerLine, cleanName, codeFrom, formatCode, guildLink, initialOf, inviteLink, inviteMessage, newIdentity, sameSnapshot, socialSnapshot, weeklyDue, weekEndsAt, countdownText, guildWinsToClaim, type GuildView } from '../../src/core/social.ts';
+import { cheerLine, cleanName, codeFrom, formatCode, guildLink, initialOf, inviteLink, inviteMessage, newIdentity, sameSnapshot, socialSnapshot, weeklyDue, weekEndsAt, countdownText, chestState, guildWinsToClaim, type GuildView } from '../../src/core/social.ts';
 import { cleanSnap, guildGoal } from '../../functions/_lib/social.js';
 import { at, D0, day, DEVICE, john316, newData } from './helpers.ts';
 
@@ -259,5 +259,15 @@ describe('the weekly countdown', () => {
     expect(countdownText(5 * h + 20 * 60000)).toBe('5 h 20 min left');
     expect(countdownText(12 * 60000)).toBe('12 min left');
     expect(countdownText(0)).toBe('A new week is starting');
+  });
+});
+
+describe('the reward chest', () => {
+  it('is locked for a group of one, closed until the goal, open at the goal', () => {
+    expect(chestState({ members: [1], progress: 99, goal: 5 })).toBe('locked');
+    expect(chestState({ members: [1, 2], progress: 4, goal: 5 })).toBe('closed');
+    expect(chestState({ members: [1, 2], progress: 5, goal: 5 })).toBe('open');
+    expect(chestState({ members: [1, 2], progress: 12, goal: 5 })).toBe('open');
+    expect(chestState({ members: [1, 2], progress: 0, goal: 0 })).toBe('closed'); // no goal worked out yet
   });
 });
