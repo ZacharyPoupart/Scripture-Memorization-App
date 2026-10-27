@@ -642,6 +642,12 @@ export function recordReview(
   const status = verseStatus(data, v, now);
   const counted = status.state === 'ready';
   data.ledger[today] = mergeLedgerDay(data.ledger[today], { r: 1 });
+  if (!counted) {
+    // extra practice never touches the schedule or earns coins, but it counts toward a guild's weekly goal
+    const w = periodStart('weekly', today);
+    const prev = data.extraWeek?.[deviceId];
+    data.extraWeek = { ...data.extraWeek, [deviceId]: { w, n: (prev && prev.w === w ? prev.n : 0) + 1 } };
+  }
   if (counted) {
     if (!v.reviews.includes(now)) {
       v.reviews.push(now);

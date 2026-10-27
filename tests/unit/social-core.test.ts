@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { exportBackup, normalizeData, parseBackup } from '../../src/core/backup.ts';
+import { seedsEarned } from '../../src/core/avatar.ts';
 import { mergeData } from '../../src/core/merge.ts';
 import { recordReview } from '../../src/core/schedule.ts';
 import { cheerLine, cleanName, codeFrom, formatCode, guildLink, initialOf, inviteLink, inviteMessage, newIdentity, sameSnapshot, socialSnapshot, weeklyDue, guildWinsToClaim, type GuildView } from '../../src/core/social.ts';
@@ -158,6 +159,64 @@ describe('the guild goal', () => {
     expect(guildGoal([2])).toBe(5);
     expect(guildGoal([0, 0])).toBe(5);
     expect(guildGoal([])).toBe(5);
+  });
+});
+
+describe('extra practice counts toward the guild goal', () => {
+  const week = at('2026-01-14', '12:00'); // the week of Sunday 2026-01-11
+  const setup = () => {
+    const d = newData();
+    const id = john316(d, at(D0, '07:00')).id;
+    return { d, id };
+  };
+
+  it('a review that is not due is tallied for this week and shared, but earns no coin and no progress', () => {
+    const { d, id } = setup();
+    expect(recordReview(d, id, week, DEVICE).counted).toBe(true);
+    const coinsBefore = seedsEarned(d);
+    expect(recordReview(d, id, week + 60_000, DEVICE).counted).toBe(false); // spacing: not ready again yet
+    expect(d.extraWeek).toEqual({ [DEVICE]: { w: '2026-01-11', n: 1 } });
+    expect(seedsEarned(d)).toBe(coinsBefore);
+    expect(d.verses[id].reviews).toHaveLength(1); // nothing stored for the schedule
+    const snap = socialSnapshot(d, week + 60_000);
+    expect(snap.week).toBe(1);
+    expect(snap.extra).toBe(1);
+    expect(cleanSnap({ ...snap })).toMatchObject({ week: 1, extra: 1 });
+  });
+
+  it('starts again each week and ignores last week\u2019s tally', () => {
+    const { d, id } = setup();
+    recordReview(d, id, week, DEVICE);
+    recordReview(d, id, week + 60_000, DEVICE);
+    const next = at('2026-01-19', '12:00'); // the following week
+    recordReview(d, id, next, DEVICE);
+    recordReview(d, id, next + 60_000, DEVICE);
+    expect(d.extraWeek?.[DEVICE]).toEqual({ w: '2026-01-18', n: 1 });
+    expect(socialSnapshot(d, week).extra).toBe(0); // the old week no longer matches
+  });
+
+  it('merges per device: a newer week wins, the same week keeps the larger count', () => {
+    const a = newData();
+    const b = newData();
+    a.extraWeek = { x: { w: '2026-01-11', n: 3 }, y: { w: '2026-01-04', n: 9 } };
+    b.extraWeek = { x: { w: '2026-01-11', n: 5 }, y: { w: '2026-01-11', n: 1 }, z: { w: '2026-01-11', n: 2 } };
+    const m = mergeData(a, b);
+    expect(m.extraWeek).toEqual({ x: { w: '2026-01-11', n: 5 }, y: { w: '2026-01-11', n: 1 }, z: { w: '2026-01-11', n: 2 } });
+    expect(mergeData(b, a).extraWeek).toEqual(m.extraWeek);
+    expect(mergeData(m, m)).toEqual(m);
+  });
+
+  it('bad values in a backup are dropped', () => {
+    const d = normalizeData({ ...newData(), extraWeek: { ok: { w: '2026-01-11', n: 2 }, bad1: { w: 'x', n: 2 }, bad2: { w: '2026-01-11', n: -1 }, bad3: { w: '2026-01-11', n: 1.5 }, __proto__: { w: '2026-01-11', n: 1 } } });
+    expect(d.extraWeek).toEqual({ ok: { w: '2026-01-11', n: 2 } });
+  });
+
+  it('someone who only did extra practice can still claim the coins', () => {
+    const now = at('2026-01-14', '12:00');
+    const me = 'a'.repeat(32);
+    const card = (id: string, week: number, extra: number) => ({ id, name: id.slice(0, 1), at: 0, snap: { look: {}, streak: 0, longest: 0, counts: { daily: 0, weekly: 0, monthly: 0, yearly: 0 }, week, extra, weekStart: '2026-01-11' } });
+    const g = { id: 'g1', name: 'G', owner: me, weekStart: '2026-01-11', goal: 10, progress: 12, members: [card(me, 0, 6), card('b'.repeat(32), 6, 0)] } as GuildView;
+    expect(guildWinsToClaim(newData(), [g], me, now)).toEqual(['g1:2026-01-11']);
   });
 });
 

@@ -72,7 +72,7 @@ function FriendRow({ card, cheered, onCheer, onRemove }: { card: FriendCard; che
           <span class="friend-streak">
             <Icon name="flame" fill /> {card.snap.streak}
           </span>{' '}
-          · {card.snap.week} review{card.snap.week === 1 ? '' : 's'} this week
+          · {card.snap.week + (card.snap.extra ?? 0)} review{card.snap.week + (card.snap.extra ?? 0) === 1 ? '' : 's'} this week
         </div>
         <Counts card={card} />
       </div>
@@ -152,7 +152,7 @@ function GuildCard({ g, me, onInvite, onLeave }: { g: GuildView; me: string; onI
               {m.name}
               {m.id === me ? ' (you)' : ''}
             </span>
-            <span class="muted small">{m.snap.weekStart === g.weekStart ? m.snap.week : 0}</span>
+            <span class="muted small">{m.snap.weekStart === g.weekStart ? m.snap.week + (m.snap.extra ?? 0) : 0}</span>
           </li>
         ))}
       </ul>

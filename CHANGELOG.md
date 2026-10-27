@@ -5,6 +5,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.51.0] - 2026-10-26
+
+### Changed
+- Extra practice (reviewing a verse that is not due, or one you have already finished for the day or week) now counts toward your group's weekly goal and shows in your reviews this week. It still doesn't change the schedule, and it earns no coins.
+
 ## [1.50.0] - 2026-10-26
 
 ### Added

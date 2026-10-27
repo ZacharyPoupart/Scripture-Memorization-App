@@ -85,6 +85,8 @@ export interface AppData {
   coinBonus?: Record<string, number>;
   /** Weeks in which a guild this person is in reached its weekly goal (`<guild id>:<week start>`). Grow-only, merged by union; each is worth coins. */
   guildWins?: string[];
+  /** Extra-practice reviews (ones that did not count for the schedule) done this week, per device, so they can count toward a guild's goal. Only the current week matters: a newer week replaces an older one, the same week keeps the larger count. Never earns coins. */
+  extraWeek?: Record<string, { w: string; n: number }>;
 }
 
 export type ReviewMode = 'flashcard' | 'blanks' | 'type' | 'speak';

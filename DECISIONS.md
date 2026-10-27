@@ -543,3 +543,10 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Why a stored extra:** every other coin is worked out from history, but the multiplier depends on the streak on the day, which cannot be rebuilt later (old reviews are pruned), so each device keeps a running total of the extra it earned. Additive field `coinBonus`, merged by taking each device's largest total; `schema` stays 1.
 **Test changes:** new `coins.test.ts` (the table, a 7-day-streak review paying x1.5 on the review and the finished day, no streak paying nothing extra, whole coins, merge and backup); the "+1 per review, +5 per day" test allows for the 3-day multiplier; migration fixture `backup-v1.50.0-coinbonus.json`.
 **Undo:** roll back to the previous stage tag. Coins already earned stay.
+
+## v1.51.0 — Extra practice counts for the guild goal (owner request)
+**What:** a review of a verse that is not due (extra practice) used to leave no trace, so it could not count for a group. Each device now keeps a small tally of extra practice for the current week (`data.extraWeek`, additive, schema stays 1; a newer week replaces an older one, the same week keeps the larger count; fixture `backup-v1.51.0-extraweek.json`). Friends see it as `extra`, and the server adds it to each member's reviews when it works out the group's progress. A person who only did extra practice this week can also claim the group's coins.
+**Coins (undecided, so unchanged):** extra practice still earns no coins of its own and moves nothing in the schedule or the streak. If you decide it should earn coins, it is a small change and the tally is already there to count.
+**Choices (tell me if you want them different):** every extra review counts for the group, with no daily limit, so tapping through the same verse many times would add up. If that feels like a loophole I can cap it per day.
+**Test changes:** new unit tests for the tally, its weekly reset, merge and backup validation, the shared snapshot, the server's progress sum and claiming with extra practice only.
+**Undo:** roll back to the previous stage tag. Old versions ignore the new field.
