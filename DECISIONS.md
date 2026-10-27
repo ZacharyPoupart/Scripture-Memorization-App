@@ -645,3 +645,10 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 ## v1.64.1 — Flag stand on the right, a bit bigger (owner request)
 **What:** the flag stand moved from the knight's left to the right and the banner grew from about 23 to 30 units wide (the picture is 120 wide). Nothing else changed.
 **Undo:** roll back to the previous stage tag.
+
+## v1.65.0 — Lower streak multipliers (owner request)
+**What:** `STREAK_MULTIPLIERS` is now 1.1 / 1.25 / 1.5 / 1.75 / 2 at 3 / 7 / 14 / 30 / 100 days, then 3 at 365 days (was 1.2 / 1.5 / 2 / 2.5 / 3 at 3 / 7 / 14 / 30 / 100). The coins guide on the avatar screen reads the table, so it shows the new numbers on its own.
+**Coins already earned stay:** the extra a device has earned so far (`data.coinBonus`) only ever grows, so nobody loses coins; only coins earned from now on use the new table.
+**Choices (tell me if you want them different):** the in-between steps (1.1, 1.25, 1.5, 1.75) are my pick to fit "2x at 100 days and 3x at a year"; say if you want other numbers.
+**Test changes:** the multiplier and guide unit tests use the new table; the 7-day coin test now expects a quarter extra instead of a half.
+**Undo:** roll back to the previous stage tag.
