@@ -5,6 +5,8 @@ import type { AppData } from './types.ts';
 export const SEEDS_PER_REVIEW = 1;
 export const SEEDS_PER_DAY = 5;
 export const SEEDS_PER_LEVELUP = 25;
+/** On top of the 5 for a finished day: a full day, when everything due was done all the way (3 reviews of each Daily verse). */
+export const SEEDS_PER_FULL_DAY = 3;
 
 /** The longer the streak, the more every coin earned is worth: from `days` in a row, coins from reviews, finished days and level-ups are multiplied by `x`. */
 export const STREAK_MULTIPLIERS = [
@@ -24,8 +26,9 @@ export function streakMultiplier(streak: number): number {
 /** Coins from counted reviews, finished days and level-ups, before any multiplier. */
 export function baseCoins(data: AppData): number {
   const reviews = Object.values(data.reviewsByDevice).reduce((a, b) => a + b, 0);
-  const days = Object.values(data.ledger).filter((e) => e.o === 'c').length;
-  return reviews * SEEDS_PER_REVIEW + days * SEEDS_PER_DAY + data.levelUps.length * SEEDS_PER_LEVELUP;
+  const finished = Object.values(data.ledger).filter((e) => e.o === 'c');
+  const full = finished.filter((e) => e.f).length;
+  return reviews * SEEDS_PER_REVIEW + finished.length * SEEDS_PER_DAY + full * SEEDS_PER_FULL_DAY + data.levelUps.length * SEEDS_PER_LEVELUP;
 }
 
 /** The extra coins the streak multiplier has earned so far (whole coins). */

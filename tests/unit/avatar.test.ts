@@ -1,5 +1,6 @@
 // Avatar + seeds: seeds are EARNED from real, counted practice (never lost, never expire); items are bought with them or
 // unlocked by achievements. Everything is derived from synced data so devices agree and nothing can be taken away.
+import { coinBonusTotal } from '../../src/core/coins.ts';
 import { existsSync } from 'node:fs';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { exportBackup, normalizeData, parseBackup } from '../../src/core/backup.ts';
@@ -286,18 +287,22 @@ describe('earning seeds', () => {
     expect(seedsBalance(newData())).toBe(0);
   });
 
-  it('+1 per counted review, +5 per completed day; extra practice earns nothing', () => {
+  it('+1 per counted review, +5 per completed day (+3 more when it was a full day); extra practice earns nothing', () => {
     const data = newData();
     const v = john316(data, at(D0, '07:00'));
     for (let i = 1; i <= 3; i++) reviewEverythingDue(data, day(i));
     settle(data, at(day(4), '08:00'));
     const counted = Object.values(data.reviewsByDevice).reduce((a, b) => a + b, 0);
     const doneDays = Object.values(data.ledger).filter((e) => e.o === 'c').length;
+    const fullDays = Object.values(data.ledger).filter((e) => e.o === 'c' && e.f).length;
     expect(counted).toBe(9);
     expect(doneDays).toBe(3);
+    expect(fullDays).toBe(3); // all three reviews of the one Daily verse, each day
     const streakBonus = [1, 3].reduce((n, m) => n + (data.longestStreak >= m ? STREAK_SEED_BONUS[m] : 0), 0); // a 3-day streak was reached
     expect(data.longestStreak).toBe(3);
-    expect(seedsEarned(data)).toBe(counted + doneDays * 5 + streakBonus);
+    // (the 2nd and 3rd reviews of day 3 come after that day made the streak 3, so they, and the full-day coins, are worth 1.2x: a small extra)
+    expect(seedsEarned(data)).toBe(counted + doneDays * 5 + fullDays * 3 + streakBonus + coinBonusTotal(data));
+    expect(coinBonusTotal(data)).toBeLessThanOrEqual(2);
     // the first counted review of a new day pays 1 (+5 because it completes the day for the streak), more on a streak (see coins.test.ts);
     // a second review inside the cooldown is extra practice and pays nothing
     const before = seedsEarned(data);

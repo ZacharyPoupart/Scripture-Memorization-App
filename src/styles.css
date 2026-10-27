@@ -1202,6 +1202,9 @@ textarea.input {
   background: color-mix(in srgb, var(--accent) 42%, var(--surface-2));
 }
 .cell.k-complete {
+  background: color-mix(in srgb, var(--accent) 70%, var(--surface-2));
+}
+.cell.k-full {
   background: var(--accent);
 }
 .cell.k-saved {

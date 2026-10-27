@@ -5,6 +5,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.57.0] - 2026-10-27
+
+### Added
+- A day you finish all the way (every Daily verse reviewed 3 times, and the others reviewed too) is now a **full day**. The Stats page shows three shades: practiced, all done (every verse reviewed once, which keeps your streak) and full day (the deepest), and the line under the map counts each. A full day pays 3 coins on top of the usual 5. Days before this update stay as they were.
+
 ## [1.55.0] - 2026-10-27
 
 ### Changed

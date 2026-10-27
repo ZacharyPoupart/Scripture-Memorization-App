@@ -91,6 +91,7 @@ export function normalizeData(raw: unknown): AppData {
       const entry: LedgerDay = {};
       if (e.r === 1) entry.r = 1;
       if (e.p === 1) entry.p = 1;
+      if (e.f === 1) entry.f = 1;
       if (e.o === 'c' || e.o === 'm' || e.o === 'n') entry.o = e.o;
       ledger[day] = entry;
     }
