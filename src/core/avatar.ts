@@ -5,6 +5,7 @@
 // The avatar is a knight who puts on the full armor of God (Ephesians 6:10-18). Everyone starts in the same basic
 // steel armor (free); every piece can be swapped for another, because all the painted pieces are drawn to the same size.
 // Some pieces cost seeds, some need a long streak first, and the finest take the most of both.
+import { bannerFromScene } from './banner.ts';
 import { baseCoins, coinBonusTotal } from './coins.ts';
 import { STREAK_MILESTONES } from './milestones.ts';
 import type { AppData } from './types.ts';
@@ -156,7 +157,9 @@ export const ITEMS: Item[] = [
 ];
 
 const BY_ID = new Map(ITEMS.map((i) => [i.id, i]));
-export const itemById = (id: string): Item | undefined => BY_ID.get(id);
+export const itemById = (id: string): Item | undefined => BY_ID.get(id) ?? (bannerFromScene(id) ? I('scene', id, 'Group banner') : undefined);
+/** A group's banner as a background you can wear (free, and it is the same wherever it is seen: the design is in the id). */
+export const bannerItem = (id: string, name: string): Item => I('scene', id, name);
 export const itemsIn = (slot: Slot): Item[] => ITEMS.filter((i) => i.slot === slot);
 
 export type Look = Record<Slot, string>;

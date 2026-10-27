@@ -15,12 +15,15 @@ import {
   cheerFriend,
   removeFriend,
   renameGuild,
+  setGuildBanner,
   renameSharing,
   showToast,
   stopSharing,
   useApp,
 } from '../store.ts';
+import { bannerOf, bannerSpec } from '../core/banner.ts';
 import { AvatarFigure } from './AvatarFigure.tsx';
+import { BannerEditor, BannerFigure } from './Banner.tsx';
 import { Coin, Confirm, Icon, Overlay, PILE_INFO } from './common.tsx';
 import { PILES } from '../core/types.ts';
 
@@ -134,7 +137,8 @@ function FriendSheet({ card, groups, cheered, onCheer, onClose }: { card: Friend
             <>
               <div class="muted small">In a group together</div>
               {groups.map((g) => (
-                <div key={g.id} class="friend-group-name">
+                <div key={g.id} class="friend-group-name row" style={{ gap: '8px', justifyContent: 'center' }}>
+                  <BannerFigure banner={bannerOf(g)} size={20} title={`${g.name} banner`} />
                   {g.name}
                 </div>
               ))}
@@ -189,6 +193,7 @@ function InviteSheet({ title, code, link, message, onClose }: { title: string; c
 
 function GuildCard({ g, me, onInvite, onLeave }: { g: GuildView; me: string; onInvite: () => void; onLeave: () => void }) {
   const [renaming, setRenaming] = useState(false);
+  const [designing, setDesigning] = useState(false);
   const [title, setTitle] = useState(g.name);
   const pct = Math.min(100, Math.round((g.progress / Math.max(1, g.goal)) * 100));
   const done = g.progress >= g.goal;
@@ -210,17 +215,26 @@ function GuildCard({ g, me, onInvite, onLeave }: { g: GuildView; me: string; onI
         </div>
       ) : (
         <div class="row spread">
-          <h3 style={{ margin: 0 }} data-testid="guild-name">
-            {g.name}
-          </h3>
+          <div class="row" style={{ gap: '10px', minWidth: 0 }}>
+            <BannerFigure banner={bannerOf(g)} size={30} title={`${g.name} banner`} />
+            <h3 style={{ margin: 0 }} data-testid="guild-name">
+              {g.name}
+            </h3>
+          </div>
           <span class="muted small">{g.members.length} member{g.members.length === 1 ? '' : 's'}</span>
         </div>
       )}
       {g.owner === me && !renaming && (
-        <button class="link-btn" style={{ alignSelf: 'flex-start' }} onClick={() => (setTitle(g.name), setRenaming(true))} data-testid="guild-rename">
-          Rename group
-        </button>
+        <div class="row" style={{ gap: '16px' }}>
+          <button class="link-btn" onClick={() => (setTitle(g.name), setRenaming(true))} data-testid="guild-rename">
+            Rename group
+          </button>
+          <button class="link-btn" onClick={() => setDesigning(true)} data-testid="guild-banner-edit">
+            Edit banner
+          </button>
+        </div>
       )}
+      {designing && <BannerEditor initial={bannerOf(g)} onSave={(b) => setGuildBanner(g.id, bannerSpec(b))} onClose={() => setDesigning(false)} />}
       <div>
         <div class="bar" role="progressbar" aria-valuemin={0} aria-valuemax={g.goal} aria-valuenow={Math.min(g.progress, g.goal)} aria-label="This week's goal">
           <i style={{ width: `${pct}%` }} />

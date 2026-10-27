@@ -2479,3 +2479,52 @@ button.streak {
   background: rgba(0, 0, 0, 0.28);
   border-radius: 50%;
 }
+
+/* group banners */
+.banner-editor {
+  max-width: 380px;
+  gap: 8px;
+  margin-block: auto; /* centred when it fits, scrolls from the top when it does not */
+}
+.banner-preview {
+  display: flex;
+  justify-content: center;
+}
+.banner-designs {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+.banner-tile {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+}
+.banner-pick {
+  display: grid;
+  place-items: center;
+  padding: 4px 0;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  background: var(--surface-2);
+}
+.banner-pick.on {
+  border-color: var(--accent);
+}
+.banner-colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.banner-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  padding: 0;
+}
+.banner-swatch.on {
+  border-color: var(--text);
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent);
+}

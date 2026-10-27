@@ -18,6 +18,8 @@ const MAX_BODY = 4096;
 const MAX_FRIENDS = 200;
 const MAX_GUILD_MEMBERS = 30;
 const MAX_GUILDS = 3;
+/** A group banner: `design-field-pattern`, three plain lowercase words (the app knows which ones are real; the server only keeps the shape safe). */
+const BANNER = /^[a-z]{3,10}-[a-z]{3,10}-[a-z]{3,10}$/;
 const FRIEND_INVITE_TTL = 7 * 86400;
 const GUILD_INVITE_TTL = 14 * 86400;
 const CHEER_KEEP = 7 * 86400_000; // how long a cheer stays on someone's page
@@ -279,6 +281,15 @@ export async function handleSocial(request, kv, action, now = Date.now()) {
       return json({ ok: true });
     }
 
+    case 'guild-banner': {
+      if (typeof body.banner !== 'string' || !BANNER.test(body.banner)) return fail('bad-request', 400);
+      const g = await memberGuild(kv, body.gid, id);
+      if (!g) return fail('not-found', 404);
+      if (g.owner !== id) return fail('forbidden', 403); // only the leader designs the banner
+      if (g.banner !== body.banner) await put(`g:${body.gid}`, { ...g, banner: body.banner });
+      return json({ ok: true });
+    }
+
     case 'guild-leave': {
       if (!ID.test(body.gid || '')) return fail('bad-request', 400);
       await leaveGuild(kv, body.gid, id);
@@ -301,7 +312,7 @@ export async function handleSocial(request, kv, action, now = Date.now()) {
         const thisWeek = (c) => (c.snap.weekStart === weekStart ? doneOf(c.snap) : 0); // numbers from an older week count as nothing yet
         members.sort((a, b) => thisWeek(b) - thisWeek(a) || a.name.localeCompare(b.name));
         const progress = members.filter((c) => c.snap.weekStart === weekStart).reduce((n, c) => n + doneOf(c.snap), 0);
-        views.push({ id: gid, name: g.name, owner: g.owner, members, weekStart, goal: guildGoal(members.map((c) => dueOf(c.snap))), progress });
+        views.push({ id: gid, name: g.name, owner: g.owner, ...(g.banner ? { banner: g.banner } : {}), members, weekStart, goal: guildGoal(members.map((c) => dueOf(c.snap))), progress });
       }
       return json({ guilds: views });
     }

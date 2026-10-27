@@ -206,6 +206,38 @@ test('tapping a friend shows their whole knight, their numbers and the groups yo
   await expect(sam.getByTestId('friend-sheet-cheer')).toContainText('Cheered today');
 });
 
+test('a group has a banner next to its name: the leader designs it, members see it and can wear it as their background', async ({ browser }) => {
+  const zach = await person(browser, 'Zach P.');
+  const sam = await person(browser, 'Sam L.');
+  await zach.getByTestId('guild-name-input').fill('Youth Group');
+  await zach.getByTestId('guild-create').click();
+  await expect(zach.getByTestId('guild-name')).toHaveText('Youth Group');
+  // every group already has a banner (a default); the leader changes it
+  await expect(zach.getByTestId('guild-card').locator('[data-banner]')).toHaveCount(1);
+  await zach.getByTestId('guild-banner-edit').click();
+  await zach.getByTestId('banner-design-chevron').click();
+  await zach.getByTestId('banner-field-crimson').click();
+  await zach.getByTestId('banner-pattern-gold').click();
+  await expect(zach.getByTestId('banner-editor').locator('[data-banner="chevron-crimson-gold"]').first()).toBeVisible(); // the preview follows the choices
+  await zach.getByTestId('banner-save').click();
+  await expect(zach.getByTestId('banner-editor')).toHaveCount(0);
+  await expect(zach.getByTestId('guild-card').locator('[data-banner="chevron-crimson-gold"]')).toBeVisible();
+  // Sam joins: sees it, cannot edit it
+  await zach.getByTestId('guild-invite').click();
+  const code = (await zach.getByTestId('invite-code').innerText()).replace('-', '');
+  await zach.getByRole('button', { name: 'Done' }).click();
+  await sam.goto(`/#/guild/${code}`);
+  await sam.getByTestId('guild-join-yes').click();
+  await expect(sam.getByTestId('guild-card').locator('[data-banner="chevron-crimson-gold"]')).toBeVisible();
+  await expect(sam.getByTestId('guild-banner-edit')).toHaveCount(0);
+  // and Sam can wear it behind the knight
+  await sam.goto('/#/avatar');
+  await sam.getByTestId('slot-scene').click();
+  await sam.getByTestId('item-scene-banner-chevron-crimson-gold').click();
+  await expect(sam.getByTestId('item-scene-banner-chevron-crimson-gold')).toContainText('Wearing');
+  await expect(sam.locator('svg[data-look*="scene-banner-chevron-crimson-gold"]').first()).toBeVisible();
+});
+
 test('the friends page fits a phone and has no horizontal scrolling', async ({ browser }) => {
   const zach = await person(browser, 'Zachariah Longname-Hyphenated III');
   await zach.getByTestId('friends-invite').click();

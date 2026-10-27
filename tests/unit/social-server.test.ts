@@ -319,6 +319,22 @@ describe('guilds: invite only', () => {
     expect(kv.puts).toBe(writes);
   });
 
+  it('only the leader can design the banner; it is checked, shared with every member, and unchanged saves write nothing', async () => {
+    const { gid, code } = await guild();
+    await call('guild-join', { ...who(2), code });
+    expect((await call('guilds', who(2))).body.guilds[0].banner).toBeUndefined(); // none yet: the app shows a default
+    expect((await call('guild-banner', { ...who(2), gid, banner: 'chevron-crimson-gold' })).status).toBe(403); // not the leader
+    expect((await call('guild-banner', { ...who(3), gid, banner: 'chevron-crimson-gold' })).status).toBe(404); // not a member
+    for (const bad of ['', 'chevron', 'a-b-c', 'chevron-crimson-gold-x', 'Chevron-crimson-gold', '<img>-crimson-gold', 'chevron_crimson_gold', 5]) {
+      expect((await call('guild-banner', { ...who(1), gid, banner: bad })).status).toBe(400);
+    }
+    expect((await call('guild-banner', { ...who(1), gid, banner: 'chevron-crimson-gold' })).status).toBe(200);
+    expect((await call('guilds', who(2))).body.guilds[0].banner).toBe('chevron-crimson-gold');
+    const writes = kv.puts;
+    await call('guild-banner', { ...who(1), gid, banner: 'chevron-crimson-gold' });
+    expect(kv.puts).toBe(writes);
+  });
+
   it('deleting a profile also leaves its guilds', async () => {
     const { gid, code } = await guild();
     await call('guild-join', { ...who(2), code });
