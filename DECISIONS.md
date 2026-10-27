@@ -647,6 +647,6 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Undo:** roll back to the previous stage tag.
 
 ## v1.65.1 — Shadows on the group flag stand (owner request)
-**What:** `FlagStand` (the flag on the avatar picture only) draws a soft shadow behind the cloth, a shaded top under the crossbar, a shadow beside the pole (to its left, a darker left edge on the pole) and a pool and longer shadow on the ground. The flag's small picture in a group card and the item tiles use `BannerFigure` and are untouched; the face-only picture does not draw the stand at all.
+**What:** `FlagStand` (the flag on the avatar picture only) draws a soft shadow behind the cloth, a shaded top under the crossbar, a shadow beside the pole (to its left, a darker left edge on the pole) and a pool and longer shadow on the ground, and the gold ball on top is shaded round with its own shadow. The flag's small picture in a group card and the item tiles use `BannerFigure` and are untouched; the face-only picture does not draw the stand at all.
 **Choices (tell me if you want them different):** the light comes from the upper right, so every shadow falls to the left. Strength was raised once at your request and can go higher.
 **Undo:** roll back to the previous stage tag.

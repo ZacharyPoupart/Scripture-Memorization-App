@@ -111,6 +111,7 @@ export function FlagStand({ banner }: { banner: Banner }) {
   const soft = `fsb-${spec}`;
   const tight = `fst-${spec}`;
   const fold = `fsf-${spec}`;
+  const ball = `fsg-${spec}`;
   return (
     <g data-testid="flag-stand" data-flag={spec}>
       <defs>
@@ -124,6 +125,11 @@ export function FlagStand({ banner }: { banner: Banner }) {
         <filter id={tight} x="-40%" y="-40%" width="180%" height="180%">
           <feGaussianBlur stdDeviation="0.7" />
         </filter>
+        <radialGradient id={ball} cx="0.65" cy="0.3" r="0.8">
+          <stop offset="0" stop-color="#f7e0a0" />
+          <stop offset="0.45" stop-color="#e3b23c" />
+          <stop offset="1" stop-color="#9a6a14" />
+        </radialGradient>
         <linearGradient id={fold} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stop-color="#000" stop-opacity="0.34" />
           <stop offset="1" stop-color="#000" stop-opacity="0" />
@@ -137,7 +143,8 @@ export function FlagStand({ banner }: { banner: Banner }) {
       <rect x="100.6" y="18" width="2.8" height="95" rx="1.2" fill="#8a6a2a" stroke="#5a4416" stroke-width="0.6" />
       {/* the pole's lit side is on the right, its left side is in shade */}
       <rect x="100.6" y="18" width="1.2" height="95" rx="0.6" fill="#000" opacity="0.28" />
-      <circle cx="102" cy="17" r="3" fill="#e3b23c" stroke="#7a4f12" stroke-width="0.8" />
+      <circle cx="100" cy="19" r="3.2" fill="#000" opacity="0.6" filter={`url(#${tight})`} />
+      <circle cx="102" cy="17" r="3" fill={`url(#${ball})`} stroke="#7a4f12" stroke-width="0.8" />
       <rect x="85" y="24" width="34" height="2.8" rx="1.2" fill="#000" opacity="0.3" filter={`url(#${tight})`} />
       <rect x="85" y="22" width="34" height="2.8" rx="1.2" fill="#8a6a2a" stroke="#5a4416" stroke-width="0.6" />
       {/* the banner throws a soft shadow onto the scene behind it */}
