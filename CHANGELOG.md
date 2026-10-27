@@ -5,6 +5,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.58.0] - 2026-10-27
+
+### Added
+- On Today, tap any verse in the list to practice just that one, in the review type you last used. It works for verses that are ready, still waiting for their next review, or already done (those count as extra practice).
+
 ## [1.57.0] - 2026-10-27
 
 ### Added

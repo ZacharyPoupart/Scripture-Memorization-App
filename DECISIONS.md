@@ -595,3 +595,10 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Noticed, not changed:** the streak multiplier reads your streak *including today* once today is finished, so the 2nd and 3rd reviews of a day that completes a 3-day streak already count at 1.2x. That is how it worked before this change too; say if you want it to use only the streak you came in with.
 **Test changes:** new `fullday.test.ts` (flag rules, live latching, midnight judgement, ready Weekly verse blocks it, nothing-due days, coins, merge and backup, stats kinds), new fixture `backup-v1.57.0-fullday.json`, new e2e `full-day.spec.ts`. Two existing tests changed because days with 3 reviews are now "full" (stats shade, and the coin sum in `avatar.test.ts`).
 **Undo:** roll back to the previous stage tag. The extra mark is ignored by older versions and nothing else depends on it.
+
+## v1.58.0 — Tap a verse on Today to practice just that one (owner request)
+**What:** each verse in Today's list is now a button. Tapping it starts a review of only that verse, in the review type you last used (the same one-verse review the Piles and verse pages already had). The list looks the same as before.
+**What counts:** the usual rules apply, nothing new: a verse that is ready counts when you finish it; one that is still waiting for its next review, or already done for the day, becomes extra practice (never counted, no coins, but it does count for your group's weekly goal and marks the day as practiced). The big "Start today's reviews" button still goes through everything that is ready.
+**Choices (tell me if you want them different):** the whole row is the tap target (taller than before, 44 px, for thumbs). I did not add a confirmation for waiting or done verses, since practicing more is always fine.
+**Test changes:** new e2e test taps a ready verse (one-verse review), finishes it, then taps it again while waiting.
+**Undo:** roll back to the previous stage tag.
