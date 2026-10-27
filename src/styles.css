@@ -1496,14 +1496,21 @@ button.streak {
   display: grid;
   gap: 2px;
 }
-.today-list li {
+.today-item {
   display: flex;
   align-items: center;
   gap: 10px;
+  width: 100%;
   padding: 7px 2px;
-  min-height: 36px;
+  min-height: 44px;
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
 }
-.today-list li > span {
+.today-item > span {
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -1523,7 +1530,7 @@ button.streak {
 .today-list li.waiting i {
   background: linear-gradient(90deg, var(--pile) 50%, transparent 50%);
 }
-.today-list li.done > span {
+.today-list li.done .today-item > span {
   color: var(--muted);
 }
 .quiet-details > summary {
@@ -1883,15 +1890,17 @@ button.streak {
   gap: 4px;
 }
 .today-list li {
-  padding: 14px 2px;
-  min-height: 52px;
-  gap: 14px;
   border-top: 1px solid var(--border);
 }
 .today-list li:first-child {
   border-top: 0;
 }
-.today-list li > span {
+.today-list .today-item {
+  padding: 14px 2px;
+  min-height: 52px;
+  gap: 14px;
+}
+.today-list .today-item > span {
   font-family: var(--serif);
   font-size: 1.2rem;
 }

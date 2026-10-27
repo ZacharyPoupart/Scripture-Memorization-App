@@ -585,3 +585,10 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Data:** no change to your saved data. The server stores one more short word-string on the group, written only when the leader saves a different banner, and refuses anything that is not three plain lowercase words.
 **Test changes:** new `banner.test.ts` (4 tests), new server test (leader only, shape check, shared with members, no write when unchanged), new e2e (leader designs it, a member sees it, cannot edit, and wears it).
 **Undo:** roll back to the previous stage tag. Banners disappear from the screens and any worn banner background falls back to the default; nothing is lost.
+
+## v1.58.0 — Tap a verse on Today to practice just that one (owner request)
+**What:** each verse in Today's list is now a button. Tapping it starts a review of only that verse, in the review type you last used (the same one-verse review the Piles and verse pages already had). The list looks the same as before.
+**What counts:** the usual rules apply, nothing new: a verse that is ready counts when you finish it; one that is still waiting for its next review, or already done for the day, becomes extra practice (never counted, no coins, but it does count for your group's weekly goal and marks the day as practiced). The big "Start today's reviews" button still goes through everything that is ready.
+**Choices (tell me if you want them different):** the whole row is the tap target (taller than before, 44 px, for thumbs). I did not add a confirmation for waiting or done verses, since practicing more is always fine.
+**Test changes:** new e2e test taps a ready verse (one-verse review), finishes it, then taps it again while waiting.
+**Undo:** roll back to the previous stage tag.

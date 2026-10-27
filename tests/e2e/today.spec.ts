@@ -105,3 +105,20 @@ test('Today is just the verses: no date, greeting, ring or pile cards; the four 
   for (const p of ['daily', 'weekly', 'monthly', 'yearly']) await expect(page.getByTestId(`pile-${p}`)).toBeVisible();
   await expect(page.getByTestId('count-daily')).toHaveText('1');
 });
+
+test('Today: tap a verse in the list to practice just that one, whether it is ready or still waiting', async ({ page }) => {
+  await blockLookups(page);
+  await openApp(page);
+  await addVerse(page, JOHN316);
+  await page.goto('/#/');
+  await page.getByTestId('today-verse').first().click();
+  await expect(page).toHaveURL(/#\/review\?verse=/);
+  await expect(page.getByTestId('review')).toContainText('Verse 1 of 1'); // one verse, not the day's whole queue
+  await finishFlashcard(page);
+  await expect(page.getByTestId('verse-result')).toBeVisible();
+  await page.getByTestId('close-review').click();
+  // it is now waiting for the next review, but can still be practiced
+  await expect(page.getByTestId('today-list')).toContainText('in ');
+  await page.getByTestId('today-verse').first().click();
+  await expect(page.getByTestId('review')).toContainText('Verse 1 of 1');
+});
