@@ -2,7 +2,7 @@
 // quietly: with no connection (or no server set up) the app works exactly as before.
 import type { Cheer, FriendCard, GuildView, Snapshot } from '../core/social.ts';
 
-export type SocialErrorCode = 'offline' | 'not-configured' | 'forbidden' | 'not-found' | 'full' | 'own-code' | 'server';
+export type SocialErrorCode = 'offline' | 'not-configured' | 'forbidden' | 'not-found' | 'full' | 'own-code' | 'name' | 'server';
 
 export class SocialError extends Error {
   constructor(
@@ -20,9 +20,11 @@ const WORDS: Record<SocialErrorCode, string> = {
   'not-found': 'That code did not work. It may have expired, so ask for a new one.',
   full: 'That group is full, or you are already in 3 groups.',
   'own-code': 'That is your own code. Send it to a friend instead.',
+  name: 'Please pick a different name. Keep it kind, the way you would say it to a friend.',
   server: 'Something went wrong. Please try again in a moment.',
 };
 
+export const NAME_MESSAGE = WORDS.name;
 export const socialMessage = (e: unknown): string => (e instanceof SocialError ? WORDS[e.code] : WORDS.server);
 
 type Fetch = typeof fetch;

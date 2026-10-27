@@ -9,6 +9,8 @@
 //   ch:<id>  recent cheers received [{from, at}] (a fixed 👏, never text)
 // Each person only ever writes their own profile; a friendship is "both lists contain the other", so removing someone works at once.
 
+import { isInappropriate } from './moderation.js';
+
 const ID = /^[a-f0-9]{32}$/;
 const SECRET = /^[A-Za-z0-9_-]{32,64}$/;
 const ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // no I, L, O, 0 or 1: easy to read out loud
@@ -153,6 +155,7 @@ export async function handleSocial(request, kv, action, now = Date.now()) {
       const name = cleanName(body.name);
       const snap = cleanSnap(body.snap);
       if (!name || !snap) return fail('bad-request', 400);
+      if (isInappropriate(name)) return fail('name-not-allowed', 422);
       if (me && me.name === name && JSON.stringify(me.snap) === JSON.stringify(snap)) return json({ ok: true, changed: false });
       await put(`u:${id}`, { sh: hash, name, snap, at: now });
       return json({ ok: true, changed: true, created: !me });
@@ -238,6 +241,7 @@ export async function handleSocial(request, kv, action, now = Date.now()) {
     case 'guild-create': {
       const name = cleanName(body.name, 30);
       if (!name) return fail('bad-request', 400);
+      if (isInappropriate(name)) return fail('name-not-allowed', 422);
       const mine = await listOf(`ug:${id}`);
       if (mine.length >= MAX_GUILDS) return fail('full', 409);
       const gid = randomId();
@@ -274,6 +278,7 @@ export async function handleSocial(request, kv, action, now = Date.now()) {
     case 'guild-rename': {
       const name = cleanName(body.name, 30);
       if (!name) return fail('bad-request', 400);
+      if (isInappropriate(name)) return fail('name-not-allowed', 422);
       const g = await memberGuild(kv, body.gid, id);
       if (!g) return fail('not-found', 404);
       if (g.owner !== id) return fail('forbidden', 403); // only the leader renames

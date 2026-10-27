@@ -30,6 +30,10 @@ declare module '*/functions/_lib/social.js' {
   ): Promise<Response>;
 }
 
+declare module '*/functions/_lib/moderation.js' {
+  export function isInappropriate(raw: unknown): boolean;
+}
+
 declare module '*/functions/_lib/verse.js' {
   export const USFM: string[];
   export function clearBibleIdCache(): void;

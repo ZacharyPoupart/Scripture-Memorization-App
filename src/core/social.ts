@@ -1,6 +1,7 @@
 // Friends and guilds, the parts that need no network: who you are to friends, what you share, and the invite links.
 // What is shared is small on purpose: a name, how the knight looks, the streak, how many verses are in each pile and how many
 // reviews were done this week. Never the verses themselves. Presentation only: nothing here touches scheduling.
+import { isInappropriate } from '../../functions/_lib/moderation.js';
 import { currentLook } from './avatar.ts';
 import { addDays, dayKeyOf, type DayKey } from './dates.ts';
 import { liveVerses, periodEnd, periodStart, streakInfo } from './schedule.ts';
@@ -103,6 +104,9 @@ export function guildWinsToClaim(data: AppData, guilds: GuildView[], meId: strin
   }
   return out;
 }
+
+/** Is this name fit to show other people? The server checks the same rule and has the last word. */
+export const nameAllowed = (name: string): boolean => !isInappropriate(name);
 
 /** The moment a group's week is over: local midnight after its Saturday (so the new goal starts at Saturday midnight). */
 export function weekEndsAt(weekStart: DayKey): number {
