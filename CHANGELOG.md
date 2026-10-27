@@ -13,6 +13,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 ### Changed
 - You can be in up to 3 groups at once (it was 5). Anyone already in more keeps them; they just can't join or start another until they are in fewer than 3.
 
+## [1.52.0] - 2026-10-27
+
+### Added
+- Tap a friend on the Friends tab to see their whole knight in a larger picture, with their streak, longest streak, reviews this week, pile counts and any group you share. You can cheer them from there too.
+
 ## [1.51.0] - 2026-10-26
 
 ### Changed
