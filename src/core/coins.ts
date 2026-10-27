@@ -6,7 +6,7 @@ export const SEEDS_PER_REVIEW = 1;
 export const SEEDS_PER_DAY = 5;
 export const SEEDS_PER_LEVELUP = 25;
 /** On top of the 5 for a finished day: a full day, when everything due was done all the way (3 reviews of each Daily verse). */
-export const SEEDS_PER_FULL_DAY = 3;
+export const SEEDS_PER_FULL_DAY = 10;
 
 /** The longer the streak, the more every coin earned is worth: from `days` in a row, coins from reviews, finished days and level-ups are multiplied by `x`. */
 export const STREAK_MULTIPLIERS = [
@@ -21,6 +21,11 @@ export function streakMultiplier(streak: number): number {
   let m = 1;
   for (const t of STREAK_MULTIPLIERS) if (streak >= t.days) m = t.x;
   return m;
+}
+
+/** The next step up in the multiplier, if there is one: how many days the streak has to reach and what it will be worth. */
+export function nextMultiplier(streak: number): { days: number; x: number } | null {
+  return STREAK_MULTIPLIERS.find((t) => streak < t.days) ?? null;
 }
 
 /** Coins from counted reviews, finished days and level-ups, before any multiplier. */

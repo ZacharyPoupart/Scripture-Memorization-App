@@ -5,6 +5,14 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.61.0] - 2026-10-27
+
+### Added
+- Tap your coins or the streak multiplier on the avatar screen for a small box explaining how coins are earned and why the multiplier is what it is (and what the next step is).
+
+### Changed
+- A full day now earns 10 coins (was 3) on top of the 5 for a finished day.
+
 ## [1.58.0] - 2026-10-27
 
 ### Added

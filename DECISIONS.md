@@ -602,3 +602,9 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Choices (tell me if you want them different):** the whole row is the tap target (taller than before, 44 px, for thumbs). I did not add a confirmation for waiting or done verses, since practicing more is always fine.
 **Test changes:** new e2e test taps a ready verse (one-verse review), finishes it, then taps it again while waiting.
 **Undo:** roll back to the previous stage tag.
+
+## v1.61.0 — Coins explainer, full day worth 10 (owner request)
+**What:** on the avatar screen, the coin chip and the multiplier chip are buttons. Each opens a small card: how coins are earned (review, finished day, full day, level-up, group goal, streak bonuses; extra practice earns none) and a line saying your streak, the multiplier it gives, and the next step. Tap again or the x to close. A full day now pays 10 coins (was 3).
+**Choices (tell me if you want them different):** the full-day change applies to every full day in history too, since coins are worked out from history (so balances can rise a little). Nothing is ever deducted.
+**Test changes:** unit tests use `SEEDS_PER_FULL_DAY` instead of 3; new `nextMultiplier` test; new e2e test (clock set so the fixture's streak is live).
+**Undo:** roll back to the previous stage tag.
