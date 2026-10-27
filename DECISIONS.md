@@ -652,6 +652,6 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Undo:** roll back to the previous stage tag.
 
 ## v1.65.2 — Texture on the flag stand (owner request)
-**What:** in the avatar picture only, the flag cloth has a fine woven pattern and soft vertical folds, dashed stitching inside the gold edge, two sewn loops over the crossbar and a small tassel; the pole and crossbar have wood grain (stretched noise) and a thin lit edge. The flag drawn in group cards and item tiles is unchanged.
+**What:** in the avatar picture only, the flag cloth has a fine woven pattern and soft vertical folds, dashed stitching inside the gold edge, two sewn loops over the crossbar and a small tassel; the pole and crossbar have wood grain (stretched noise) and a thin lit edge. The flag drawn in group cards and item tiles is unchanged. The cloth is about 13% wider (the pole is the same) and the crossbar is a little longer. The cloth's shadow no longer sits straight behind it like on a wall: it is the banner's shape leaned over and flattened onto the floor, running left from the pole's foot (a light from the upper right).
 **Choices (tell me if you want them different):** the grain and weave are kept gentle so the colours of a group's design still read clearly; a stronger grain is a one-number change.
 **Undo:** roll back to the previous stage tag.

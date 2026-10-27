@@ -155,7 +155,7 @@ export function FlagStand({ banner }: { banner: Banner }) {
           <feTurbulence type="fractalNoise" baseFrequency="1.3 0.05" numOctaves="2" seed="7" />
           <feColorMatrix type="matrix" values="0 0 0 0 0.14  0 0 0 0 0.07  0 0 0 0 0.01  0 0 0 3.4 -1.3" />
         </filter>
-        <filter id={woodH} x="84" y="21" width="36" height="6" filterUnits="userSpaceOnUse">
+        <filter id={woodH} x="83" y="21" width="38" height="6" filterUnits="userSpaceOnUse">
           <feTurbulence type="fractalNoise" baseFrequency="0.05 1.3" numOctaves="2" seed="4" />
           <feColorMatrix type="matrix" values="0 0 0 0 0.14  0 0 0 0 0.07  0 0 0 0 0.01  0 0 0 3.4 -1.3" />
         </filter>
@@ -163,7 +163,7 @@ export function FlagStand({ banner }: { banner: Banner }) {
           <rect x="100.6" y="18" width="2.8" height="95" rx="1.2" />
         </clipPath>
         <clipPath id={barClip}>
-          <rect x="85" y="22" width="34" height="2.8" rx="1.2" />
+          <rect x="84" y="22" width="36" height="2.8" rx="1.2" />
         </clipPath>
         <linearGradient id={fold} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stop-color="#000" stop-opacity="0.34" />
@@ -172,7 +172,10 @@ export function FlagStand({ banner }: { banner: Banner }) {
       </defs>
       {/* on the ground: a soft pool under the pole and a longer shadow it throws to the left */}
       <ellipse cx="102" cy="113.5" rx="11" ry="3" fill="#000" opacity="0.6" filter={`url(#${soft})`} />
-      <ellipse cx="92" cy="114.2" rx="17" ry="2.6" fill="#000" opacity="0.45" filter={`url(#${soft})`} />
+      {/* the cloth's shadow lies on the ground: the banner is stood up and stretched away from the light (matrix: x leans left with height, y flattens onto the floor) */}
+      <g transform="matrix(0.34 0 0.105 -0.036 54.1 117.6)" opacity="0.5" filter={`url(#${tight})`}>
+        <path d={SHIELD} fill="#000" />
+      </g>
       {/* the pole's own shadow on the scene behind it */}
       <rect x="96.4" y="20.5" width="3.6" height="93.5" rx="1.4" fill="#000" opacity="0.6" filter={`url(#${tight})`} />
       <rect x="100.6" y="18" width="2.8" height="95" rx="1.2" fill="#8a6a2a" stroke="#5a4416" stroke-width="0.6" />
@@ -182,15 +185,11 @@ export function FlagStand({ banner }: { banner: Banner }) {
       <rect x="102.6" y="18" width="0.5" height="95" rx="0.25" fill="#f7e0a0" opacity="0.28" />
       <circle cx="100" cy="19" r="3.2" fill="#000" opacity="0.6" filter={`url(#${tight})`} />
       <circle cx="102" cy="17" r="3" fill={`url(#${ball})`} stroke="#7a4f12" stroke-width="0.8" />
-      <rect x="85" y="24" width="34" height="2.8" rx="1.2" fill="#000" opacity="0.3" filter={`url(#${tight})`} />
-      <rect x="85" y="22" width="34" height="2.8" rx="1.2" fill="#8a6a2a" stroke="#5a4416" stroke-width="0.6" />
-      <rect x="84" y="21" width="36" height="6" clip-path={`url(#${barClip})`} filter={`url(#${woodH})`} />
-      <rect x="85.4" y="22.3" width="33.2" height="0.6" rx="0.3" fill="#f7e0a0" opacity="0.3" />
-      {/* the banner throws a soft shadow onto the scene behind it */}
-      <g transform="translate(83 29.8) scale(0.3)" opacity="0.75" filter={`url(#${soft})`}>
-        <path d={SHIELD} fill="#000" />
-      </g>
-      <g transform="translate(87 24.8) scale(0.3)">
+      <rect x="84" y="24" width="36" height="2.8" rx="1.2" fill="#000" opacity="0.3" filter={`url(#${tight})`} />
+      <rect x="84" y="22" width="36" height="2.8" rx="1.2" fill="#8a6a2a" stroke="#5a4416" stroke-width="0.6" />
+      <rect x="83" y="21" width="38" height="6" clip-path={`url(#${barClip})`} filter={`url(#${woodH})`} />
+      <rect x="84.4" y="22.3" width="35.2" height="0.6" rx="0.3" fill="#f7e0a0" opacity="0.3" />
+      <g transform="translate(85 24.8) scale(0.34 0.3)">
         <g clip-path={`url(#${clip})`}>
           <rect x="0" y="0" width="100" height="130" fill={colorHex(banner.field)} />
           <Pattern design={banner.design} color={colorHex(banner.pattern)} />
@@ -206,7 +205,7 @@ export function FlagStand({ banner }: { banner: Banner }) {
         <path d="M17 17 H83 V70 C83 94 67 106 50 112.5 C33 106 17 94 17 70 Z" fill="none" stroke="#f7e0a0" stroke-width="1.6" stroke-dasharray="5 4" stroke-linecap="round" opacity="0.6" />
       </g>
       {/* sewn loops carrying the cloth on the crossbar */}
-      {[93, 111].map((x) => (
+      {[91.8, 112.2].map((x) => (
         <g key={x}>
           <rect x={x - 1.8} y="22.2" width="3.6" height="7.4" rx="1.1" fill={colorHex(banner.field)} stroke="#3a2a0a" stroke-width="0.5" />
           <rect x={x - 1.8} y="22.2" width="3.6" height="7.4" rx="1.1" fill={`url(#${weave})`} />

@@ -8,7 +8,7 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 ## [1.65.2] - 2026-10-27
 
 ### Changed
-- The group flag beside your knight looks more like a real banner: woven cloth with soft folds, stitching along the edge, two sewn loops over the crossbar and a little gold tassel, on a wooden pole and crossbar with grain.
+- The group flag beside your knight looks more like a real banner: woven cloth with soft folds, stitching along the edge, two sewn loops over the crossbar and a little gold tassel, on a wooden pole and crossbar with grain. The cloth is a hair wider (the pole is not), and its shadow now lies on the ground beside the pole instead of straight behind it.
 
 ## [1.65.1] - 2026-10-27
 
