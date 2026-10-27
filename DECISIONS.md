@@ -601,6 +601,20 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **What counts:** the usual rules apply, nothing new: a verse that is ready counts when you finish it; one that is still waiting for its next review, or already done for the day, becomes extra practice (never counted, no coins, but it does count for your group's weekly goal and marks the day as practiced). The big "Start today's reviews" button still goes through everything that is ready.
 **Choices (tell me if you want them different):** the whole row is the tap target (taller than before, 44 px, for thumbs). I did not add a confirmation for waiting or done verses, since practicing more is always fine.
 **Test changes:** new e2e test taps a ready verse (one-verse review), finishes it, then taps it again while waiting.
+
+## v1.59.0 — The list sort stays where you left it (owner request)
+**What:** the sort menu on the Piles screen and on each pile page ("Longest in pile first", "Bible order", "Newest added", "Due soonest") used to forget your choice when you closed the app (it only lasted while the app stayed open). It is now saved on the device (`settings.listSort`, a device-only setting like the review type) and shared by every list, so choosing "Bible order" once keeps it everywhere until you change it.
+**What did not change:** the default for a new install is still "Longest in pile first", and the order a review visits verses in never looks at this menu. Search words, the "ready" filter and the topic filter are still fresh each time you open the app (they are quick to retype, and a forgotten filter can make a pile look empty).
+**Choices (tell me if you want them different):** one sort for all lists, not one per pile. If you would rather keep a separate sort per pile, say so.
+**Test changes:** new e2e test: pick a sort, go to the Piles screen, reload, and it is still picked; search is empty again after a reload.
+
+## v1.60.0 — The black box above the page on iPhone (owner report; needs a check on the phone)
+**Likely cause:** the page told the phone what colour to paint behind the clock with two `theme-color` tags that follow the *phone's* light/dark setting. With the phone in dark mode and the app on a light page (Settings → Theme set to Light, or the page light for any other reason), the phone painted the dark colour (#161b1c, the same as your black box) above a light page. The white clock text fits a dark phone.
+**What changed:** the app now keeps a single `theme-color` tag equal to the page's own background, updated whenever the theme changes (Light, Dark or Match device, including when the phone switches by itself). On Light the strip should be cream, on Dark near-black, always matching the page.
+**What I could not check:** I cannot run an iPhone here (the tests run Chromium only), so I cannot see the strip itself. The new test proves the colour the page asks for always matches the page; whether iOS then paints it that way is for you to confirm on the preview link.
+**If it is still black:** tell me (1) whether the phone is in dark mode, (2) what Settings → Theme says, (3) whether it also shows in Safari or only on the home-screen app, and (4) your iOS version. Then I will try the next most likely cause (the page being pinned with `position: fixed`, which iOS 26 has been known to tint from).
+**Side effect to know about:** a light page on a dark-mode phone can show white clock text on a cream strip, because the phone chooses the text colour from its own setting. Setting Theme to "Match device" avoids that.
+**Test changes:** new e2e test (phone in dark mode: Match device is dark, Light turns the bar light, switching back and the phone changing both follow).
 **Undo:** roll back to the previous stage tag.
 
 ## v1.61.0 — Coins explainer, full day worth 10 (owner request)

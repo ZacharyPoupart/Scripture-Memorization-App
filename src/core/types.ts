@@ -124,6 +124,8 @@ export interface Settings {
   seenUnlocks: string[] | null;
   /** The latest streak-saved day this device has already shown the "we saved your streak" popup for (empty until one is shown). */
   seenSaved: string;
+  /** How the verse lists are sorted (Piles and each pile page). Remembered between visits and launches, so it is not chosen again every time. */
+  listSort: 'longest' | 'reference' | 'added' | 'due';
   /** The guided tour: lesson ids this device has finished (so the menu can tick them). */
   tour: { done: string[] };
 }

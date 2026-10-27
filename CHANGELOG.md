@@ -13,6 +13,16 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 ### Changed
 - A full day now earns 10 coins (was 3) on top of the 5 for a finished day.
 
+## [1.60.0] - 2026-10-27
+
+### Fixed
+- The colour the iPhone draws behind the clock now always matches the page. Before, it followed the phone's light/dark setting, so a phone in dark mode could show a black box above a light page (when the app's theme was set to Light).
+
+## [1.59.0] - 2026-10-27
+
+### Changed
+- The "Longest in pile first" sort on your lists now stays on whatever you last picked, the next time you open a pile or the app, so you don't have to choose it again. Search and filters still start fresh.
+
 ## [1.58.0] - 2026-10-27
 
 ### Added

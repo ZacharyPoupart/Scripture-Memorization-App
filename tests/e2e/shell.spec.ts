@@ -23,6 +23,28 @@ test('light and dark theme can be chosen and persist', async ({ page }) => {
   expect(light).not.toBe(dark);
 });
 
+test('the colour behind the phone\u2019s clock follows the app\u2019s own theme, not just the phone\u2019s setting', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'dark' }); // a phone in dark mode
+  await blockLookups(page);
+  await openApp(page, '/#/settings');
+  const bar = () => page.evaluate(() => [...document.querySelectorAll('meta[name="theme-color"]')].map((m) => m.getAttribute('content')));
+  const bg = () => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--bg').trim());
+  // following the phone: dark app, dark bar
+  expect(await bar()).toEqual([await bg()]);
+  const dark = await bg();
+  // the app set to Light on a dark phone: the bar is light too (it used to stay dark: a black box above a light page)
+  await page.getByRole('button', { name: 'Light' }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  const light = await bg();
+  expect(light).not.toBe(dark);
+  expect(await bar()).toEqual([light]);
+  // and back, and when the phone itself switches while following it
+  await page.getByRole('button', { name: 'Match device' }).click();
+  expect(await bar()).toEqual([dark]);
+  await page.emulateMedia({ colorScheme: 'light' });
+  await expect.poll(bar).toEqual([light]);
+});
+
 test('installable: manifest, icons and standalone display', async ({ page, request }) => {
   await blockLookups(page);
   await openApp(page);
