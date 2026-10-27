@@ -94,6 +94,7 @@ let state: AppState = {
     tour: { done: [] },
     seenUnlocks: null,
     seenSaved: '',
+    listSort: 'longest',
   },
   tick: 0,
   toast: null,

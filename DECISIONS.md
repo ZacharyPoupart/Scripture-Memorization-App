@@ -585,3 +585,10 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Data:** no change to your saved data. The server stores one more short word-string on the group, written only when the leader saves a different banner, and refuses anything that is not three plain lowercase words.
 **Test changes:** new `banner.test.ts` (4 tests), new server test (leader only, shape check, shared with members, no write when unchanged), new e2e (leader designs it, a member sees it, cannot edit, and wears it).
 **Undo:** roll back to the previous stage tag. Banners disappear from the screens and any worn banner background falls back to the default; nothing is lost.
+
+## v1.59.0 — The list sort stays where you left it (owner request)
+**What:** the sort menu on the Piles screen and on each pile page ("Longest in pile first", "Bible order", "Newest added", "Due soonest") used to forget your choice when you closed the app (it only lasted while the app stayed open). It is now saved on the device (`settings.listSort`, a device-only setting like the review type) and shared by every list, so choosing "Bible order" once keeps it everywhere until you change it.
+**What did not change:** the default for a new install is still "Longest in pile first", and the order a review visits verses in never looks at this menu. Search words, the "ready" filter and the topic filter are still fresh each time you open the app (they are quick to retype, and a forgotten filter can make a pile look empty).
+**Choices (tell me if you want them different):** one sort for all lists, not one per pile. If you would rather keep a separate sort per pile, say so.
+**Test changes:** new e2e test: pick a sort, go to the Piles screen, reload, and it is still picked; search is empty again after a reload.
+**Undo:** roll back to the previous stage tag.

@@ -5,6 +5,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.59.0] - 2026-10-27
+
+### Changed
+- The "Longest in pile first" sort on your lists now stays on whatever you last picked, the next time you open a pile or the app, so you don't have to choose it again. Search and filters still start fresh.
+
 ## [1.56.0] - 2026-10-27
 
 ### Added
