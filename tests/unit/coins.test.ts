@@ -7,25 +7,27 @@ import { recordReview, settle } from '../../src/core/schedule.ts';
 import { at, D0, day, DEVICE, john316, newData, reviewEverythingDue } from './helpers.ts';
 
 describe('the streak multiplier', () => {
-  it('grows with the streak: 1x to 2 days, 1.2x from 3, 1.5x from 7, 2x from 14, 2.5x from 30, 3x from 100', () => {
+  it('grows with the streak: 1x to 2 days, 1.1x from 3, 1.25x from 7, 1.5x from 14, 1.75x from 30, 2x from 100, 3x from a year', () => {
     const at_ = (n: number) => streakMultiplier(n);
     expect([0, 1, 2].map(at_)).toEqual([1, 1, 1]);
-    expect([3, 6].map(at_)).toEqual([1.2, 1.2]);
-    expect([7, 13].map(at_)).toEqual([1.5, 1.5]);
-    expect([14, 29].map(at_)).toEqual([2, 2]);
-    expect([30, 99].map(at_)).toEqual([2.5, 2.5]);
-    expect([100, 365, 5000].map(at_)).toEqual([3, 3, 3]);
+    expect([3, 6].map(at_)).toEqual([1.1, 1.1]);
+    expect([7, 13].map(at_)).toEqual([1.25, 1.25]);
+    expect([14, 29].map(at_)).toEqual([1.5, 1.5]);
+    expect([30, 99].map(at_)).toEqual([1.75, 1.75]);
+    expect([100, 364].map(at_)).toEqual([2, 2]); // never more than 2x until a full year
+    expect([365, 5000].map(at_)).toEqual([3, 3]);
     expect(STREAK_MULTIPLIERS.map((m) => m.days)).toEqual([...STREAK_MULTIPLIERS.map((m) => m.days)].sort((a, b) => a - b));
   });
 });
 
 describe('the coins guide', () => {
   it('says what the next step of the multiplier is, and when there are no more', () => {
-    expect(nextMultiplier(0)).toEqual({ days: 3, x: 1.2 });
-    expect(nextMultiplier(3)).toEqual({ days: 7, x: 1.5 });
-    expect(nextMultiplier(13)).toEqual({ days: 14, x: 2 });
-    expect(nextMultiplier(99)).toEqual({ days: 100, x: 3 });
-    expect(nextMultiplier(100)).toBeNull();
+    expect(nextMultiplier(0)).toEqual({ days: 3, x: 1.1 });
+    expect(nextMultiplier(3)).toEqual({ days: 7, x: 1.25 });
+    expect(nextMultiplier(13)).toEqual({ days: 14, x: 1.5 });
+    expect(nextMultiplier(99)).toEqual({ days: 100, x: 2 });
+    expect(nextMultiplier(100)).toEqual({ days: 365, x: 3 });
+    expect(nextMultiplier(365)).toBeNull();
     expect(nextMultiplier(900)).toBeNull();
   });
 });
@@ -38,13 +40,13 @@ describe('coins earned with a streak', () => {
     return d;
   }
 
-  it('a review on a 7-day streak earns the extra half on its coin and on the finished day', () => {
+  it('a review on a 7-day streak earns the extra quarter on its coin and on the finished day', () => {
     const d = withStreak(7);
     const bonusBefore = Object.values(d.coinBonus ?? {}).reduce((a, b) => a + b, 0);
     settle(d, at(day(8), '08:00'));
     recordReview(d, Object.keys(d.verses)[0], at(day(8), '08:00'), DEVICE);
     const bonus = Object.values(d.coinBonus ?? {}).reduce((a, b) => a + b, 0) - bonusBefore;
-    expect(bonus).toBeCloseTo(3, 5); // 1 coin for the review + 5 for the finished day, 0.5 more on each
+    expect(bonus).toBeCloseTo(1.5, 5); // 1 coin for the review + 5 for the finished day, a quarter more on each
   });
 
   it('earns nothing extra with no streak yet', () => {
