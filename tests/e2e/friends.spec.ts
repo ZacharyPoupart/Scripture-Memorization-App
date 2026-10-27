@@ -162,6 +162,41 @@ test('groups: create, invite, join, see a shared weekly goal, leave', async ({ b
   await expect(sam.getByTestId('guild-card')).toHaveCount(0);
 });
 
+test('tapping a friend shows their whole knight, their numbers and the groups you share', async ({ browser }) => {
+  const zach = await person(browser, 'Zach P.');
+  const sam = await person(browser, 'Sam L.');
+  await zach.getByTestId('friends-invite').click();
+  const friendCode = (await zach.getByTestId('invite-code').innerText()).trim();
+  await zach.getByRole('button', { name: 'Done' }).click();
+  await sam.getByTestId('friends-code').fill(friendCode);
+  await sam.getByTestId('friends-add').click();
+  await expect(sam.getByTestId('friend-name')).toHaveText('Zach P.');
+  // no group yet
+  await sam.getByTestId('friend-open').click();
+  await expect(sam.getByTestId('friend-sheet')).toBeVisible();
+  await expect(sam.getByTestId('friend-sheet-name')).toHaveText('Zach P.');
+  await expect(sam.getByTestId('friend-sheet-streak')).toContainText('0');
+  await expect(sam.getByTestId('friend-sheet-longest')).toHaveText('0');
+  await expect(sam.getByTestId('friend-sheet-week')).toHaveText('0');
+  await expect(sam.getByTestId('friend-sheet-groups')).toContainText('No group together');
+  await expect(sam.getByTestId('friend-sheet').locator('svg').first()).toBeVisible(); // the whole knight
+  await sam.getByRole('button', { name: 'Done' }).click();
+  await expect(sam.getByTestId('friend-sheet')).toHaveCount(0);
+  // now a group together
+  await zach.getByTestId('guild-name-input').fill('Youth Group');
+  await zach.getByTestId('guild-create').click();
+  await zach.getByTestId('guild-invite').click();
+  const code = (await zach.getByTestId('invite-code').innerText()).replace('-', '');
+  await zach.getByRole('button', { name: 'Done' }).click();
+  await sam.goto(`/#/guild/${code}`);
+  await sam.getByTestId('guild-join-yes').click();
+  await expect(sam.getByTestId('guild-name')).toHaveText('Youth Group');
+  await sam.getByTestId('friend-open').click();
+  await expect(sam.getByTestId('friend-sheet-groups')).toContainText('Youth Group');
+  await sam.getByTestId('friend-sheet-cheer').click();
+  await expect(sam.getByTestId('friend-sheet-cheer')).toContainText('Cheered today');
+});
+
 test('the friends page fits a phone and has no horizontal scrolling', async ({ browser }) => {
   const zach = await person(browser, 'Zachariah Longname-Hyphenated III');
   await zach.getByTestId('friends-invite').click();

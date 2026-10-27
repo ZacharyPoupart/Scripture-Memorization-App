@@ -550,3 +550,10 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Choices (tell me if you want them different):** every extra review counts for the group, with no daily limit, so tapping through the same verse many times would add up. If that feels like a loophole I can cap it per day.
 **Test changes:** new unit tests for the tally, its weekly reset, merge and backup validation, the shared snapshot, the server's progress sum and claiming with extra practice only.
 **Undo:** roll back to the previous stage tag. Old versions ignore the new field.
+
+## v1.52.0 — A friend up close (owner request)
+**What:** tapping a friend's picture or name on the Friends tab opens a sheet with their whole knight (the same full-body picture as your own avatar screen), their name, the armor set if their helmet, chest plate, belt and boots match, streak, longest streak, reviews this week, pile counts, and the groups you are both in. A cheer button sits there too.
+**Nothing new is shared:** the sheet shows what friends already received (look, streaks, pile counts, this week's reviews). The groups are worked out on your device from the groups you are in, so the server and the data are unchanged.
+**Choices (tell me if you want them different):** "guild" is shown as the names of the groups you share; I did not add a count of that group's goal progress. The sheet does not show their coins or which pieces they own (that is not shared).
+**Test changes:** new e2e test opens a friend, checks the numbers and the shared group, and cheers.
+**Undo:** roll back to the previous stage tag.
