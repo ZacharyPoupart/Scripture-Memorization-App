@@ -137,9 +137,11 @@ export function Home() {
               <ul class="today-list" aria-label="Verses for today" data-testid="today-list">
                 {todayList.map(({ v, s }) => (
                   <li key={v.id} class={`pile-${v.pile} ${s.state}`}>
-                    <i aria-hidden="true" />
-                    <span>{formatRef(v)}</span>
-                    <small class="muted">{s.state === 'ready' ? (s.countedToday ? `${s.countedToday}/3` : '') : s.state === 'waiting' ? `in ${formatDuration(s.waitMs ?? 0)}` : 'done'}</small>
+                    <button class="today-item" onClick={() => navigate(`/review?verse=${v.id}&mode=${settings.defaultMode}`)} aria-label={`Practice ${formatRef(v)}`} data-testid="today-verse">
+                      <i aria-hidden="true" />
+                      <span>{formatRef(v)}</span>
+                      <small class="muted">{s.state === 'ready' ? (s.countedToday ? `${s.countedToday}/3` : '') : s.state === 'waiting' ? `in ${formatDuration(s.waitMs ?? 0)}` : 'done'}</small>
+                    </button>
                   </li>
                 ))}
               </ul>
