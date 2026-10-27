@@ -132,3 +132,31 @@ test.describe('avatar and seeds', () => {
     await expect(page.getByTestId('avatar-bubble')).toBeHidden();
   });
 });
+
+test('tapping the coins or the multiplier explains where they come from', async ({ page }) => {
+  await page.clock.install({ time: new Date(2026, 2, 13, 9, 0) });
+  await page.clock.resume();
+  await autoDismissMilestones(page);
+  await blockLookups(page);
+  await openApp(page);
+  await replaceDataWith(page, fixture);
+  await page.goto('/#/');
+  if (await page.getByTestId('celebration').isVisible()) await page.getByTestId('celebration-close').click(); // the fixture's level-up
+  await page.goto('/#/avatar');
+  await expect(page.getByTestId('coins-guide')).toHaveCount(0);
+  await page.getByTestId('seeds-balance').click();
+  const guide = page.getByTestId('coins-guide');
+  await expect(guide).toContainText('How you earn coins');
+  await expect(guide).toContainText('for every review that counts');
+  await expect(guide).toContainText('more when it is a full day');
+  await expect(guide).toContainText('Extra practice');
+  await expect(page.getByTestId('multiplier-line')).toContainText('Your streak is');
+  await page.getByTestId('seeds-balance').click(); // tapping again closes it
+  await expect(guide).toHaveCount(0);
+  // the multiplier chip shows once the streak is 3 days or more
+  await page.getByTestId('streak-multiplier').click();
+  await expect(page.getByTestId('coins-guide')).toContainText(/Why it is ×\d/);
+  await expect(page.getByTestId('multiplier-line')).toContainText('worth');
+  await page.getByRole('button', { name: 'Close' }).click();
+  await expect(page.getByTestId('coins-guide')).toHaveCount(0);
+});

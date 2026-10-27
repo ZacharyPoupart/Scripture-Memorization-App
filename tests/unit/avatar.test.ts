@@ -1,6 +1,6 @@
 // Avatar + seeds: seeds are EARNED from real, counted practice (never lost, never expire); items are bought with them or
 // unlocked by achievements. Everything is derived from synced data so devices agree and nothing can be taken away.
-import { coinBonusTotal } from '../../src/core/coins.ts';
+import { coinBonusTotal, SEEDS_PER_FULL_DAY } from '../../src/core/coins.ts';
 import { existsSync } from 'node:fs';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { exportBackup, normalizeData, parseBackup } from '../../src/core/backup.ts';
@@ -287,7 +287,7 @@ describe('earning seeds', () => {
     expect(seedsBalance(newData())).toBe(0);
   });
 
-  it('+1 per counted review, +5 per completed day (+3 more when it was a full day); extra practice earns nothing', () => {
+  it('+1 per counted review, +5 per completed day (+10 more when it was a full day); extra practice earns nothing', () => {
     const data = newData();
     const v = john316(data, at(D0, '07:00'));
     for (let i = 1; i <= 3; i++) reviewEverythingDue(data, day(i));
@@ -301,8 +301,8 @@ describe('earning seeds', () => {
     const streakBonus = [1, 3].reduce((n, m) => n + (data.longestStreak >= m ? STREAK_SEED_BONUS[m] : 0), 0); // a 3-day streak was reached
     expect(data.longestStreak).toBe(3);
     // (the 2nd and 3rd reviews of day 3 come after that day made the streak 3, so they, and the full-day coins, are worth 1.2x: a small extra)
-    expect(seedsEarned(data)).toBe(counted + doneDays * 5 + fullDays * 3 + streakBonus + coinBonusTotal(data));
-    expect(coinBonusTotal(data)).toBeLessThanOrEqual(2);
+    expect(seedsEarned(data)).toBe(counted + doneDays * 5 + fullDays * SEEDS_PER_FULL_DAY + streakBonus + coinBonusTotal(data));
+    expect(coinBonusTotal(data)).toBeLessThanOrEqual(5);
     // the first counted review of a new day pays 1 (+5 because it completes the day for the streak), more on a streak (see coins.test.ts);
     // a second review inside the cooldown is extra practice and pays nothing
     const before = seedsEarned(data);

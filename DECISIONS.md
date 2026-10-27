@@ -617,6 +617,11 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Test changes:** new e2e test (phone in dark mode: Match device is dark, Light turns the bar light, switching back and the phone changing both follow).
 **Undo:** roll back to the previous stage tag.
 
+## v1.61.0 — Coins explainer, full day worth 10 (owner request)
+**What:** on the avatar screen, the coin chip and the multiplier chip are buttons. Each opens a small card: how coins are earned (review, finished day, full day, level-up, group goal, streak bonuses; extra practice earns none) and a line saying your streak, the multiplier it gives, and the next step. Tap again or the x to close. A full day now pays 10 coins (was 3).
+**Choices (tell me if you want them different):** the full-day change applies to every full day in history too, since coins are worked out from history (so balances can rise a little). Nothing is ever deducted.
+**Test changes:** unit tests use `SEEDS_PER_FULL_DAY` instead of 3; new `nextMultiplier` test; new e2e test (clock set so the fixture's streak is live).
+
 ## v1.62.0 — Group banner is a flag on a stand, not the background (owner request)
 **What:** a new avatar slot, Group flag (`flag-<design>-<field>-<pattern>`, free, one per group you are in). It is drawn as a pole with the banner hanging from a crossbar at the knight's left, over the normal background. The old "banner as background" is gone.
 **Follows the group:** this device remembers which group the flag came from (`settings.flagGuild`, device only). Whenever your groups load, or the leader saves a new design, or you leave, `reconcileFlag` swaps the flag for the new design or takes it off. A second device that has no memory of the group finds it by matching the design. No data shape change (one more key in the look, `schema` stays 1).
