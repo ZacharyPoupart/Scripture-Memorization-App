@@ -130,16 +130,18 @@ export function FlagStand({ banner }: { banner: Banner }) {
         </linearGradient>
       </defs>
       {/* on the ground: a soft pool under the pole and a longer shadow it throws to the left */}
-      <ellipse cx="102" cy="113.5" rx="11" ry="3" fill="#000" opacity="0.5" filter={`url(#${soft})`} />
-      <ellipse cx="92" cy="114.2" rx="15" ry="2.4" fill="#000" opacity="0.34" filter={`url(#${soft})`} />
+      <ellipse cx="102" cy="113.5" rx="11" ry="3" fill="#000" opacity="0.6" filter={`url(#${soft})`} />
+      <ellipse cx="92" cy="114.2" rx="17" ry="2.6" fill="#000" opacity="0.45" filter={`url(#${soft})`} />
       {/* the pole's own shadow on the scene behind it */}
-      <rect x="98.6" y="20" width="2.8" height="94" rx="1.2" fill="#000" opacity="0.42" filter={`url(#${tight})`} />
+      <rect x="96.4" y="20.5" width="3.6" height="93.5" rx="1.4" fill="#000" opacity="0.6" filter={`url(#${tight})`} />
       <rect x="100.6" y="18" width="2.8" height="95" rx="1.2" fill="#8a6a2a" stroke="#5a4416" stroke-width="0.6" />
+      {/* the pole's lit side is on the right, its left side is in shade */}
+      <rect x="100.6" y="18" width="1.2" height="95" rx="0.6" fill="#000" opacity="0.28" />
       <circle cx="102" cy="17" r="3" fill="#e3b23c" stroke="#7a4f12" stroke-width="0.8" />
       <rect x="85" y="24" width="34" height="2.8" rx="1.2" fill="#000" opacity="0.3" filter={`url(#${tight})`} />
       <rect x="85" y="22" width="34" height="2.8" rx="1.2" fill="#8a6a2a" stroke="#5a4416" stroke-width="0.6" />
       {/* the banner throws a soft shadow onto the scene behind it */}
-      <g transform="translate(83.8 29.2) scale(0.3)" opacity="0.62" filter={`url(#${soft})`}>
+      <g transform="translate(83 29.8) scale(0.3)" opacity="0.75" filter={`url(#${soft})`}>
         <path d={SHIELD} fill="#000" />
       </g>
       <g transform="translate(87 24.8) scale(0.3)">
