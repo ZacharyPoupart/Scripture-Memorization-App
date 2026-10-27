@@ -27,6 +27,9 @@ import { BannerEditor, BannerFigure } from './Banner.tsx';
 import { Coin, Confirm, Icon, Overlay, PILE_INFO } from './common.tsx';
 import { PILES } from '../core/types.ts';
 
+/** Which half of the screen was open last, kept while the app is open (the link to join a group lands on groups). */
+let lastTab: 'friends' | 'groups' = 'friends';
+
 const faceLook = (look: Record<string, string>): Look => ({ ...defaultLook(), ...look });
 
 /** Send a link with the phone's share sheet when there is one, otherwise copy it. */
@@ -79,7 +82,6 @@ function FriendRow({ card, cheered, onOpen, onCheer, onRemove }: { card: FriendC
           </span>{' '}
           · {card.snap.week + (card.snap.extra ?? 0)} review{card.snap.week + (card.snap.extra ?? 0) === 1 ? '' : 's'} this week
         </div>
-        <Counts card={card} />
       </div>
       </button>
       <button class={`icon-btn cheer-btn ${cheered ? 'done' : ''}`} aria-label={cheered ? `You cheered ${card.name} today` : `Cheer ${card.name}`} disabled={cheered} onClick={onCheer} data-testid="friend-cheer">
@@ -196,10 +198,13 @@ function InviteSheet({ title, code, link, message, onClose }: { title: string; c
 function GuildCard({ g, me, onInvite, onLeave, onOpenMember }: { g: GuildView; me: string; onInvite: () => void; onLeave: () => void; onOpenMember: (m: FriendCard) => void }) {
   const [renaming, setRenaming] = useState(false);
   const [designing, setDesigning] = useState(false);
+  const [membersOpen, setMembersOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const [title, setTitle] = useState(g.name);
   const pct = Math.min(100, Math.round((g.progress / Math.max(1, g.goal)) * 100));
   const done = g.progress >= g.goal;
   const leader = g.members.find((m) => m.id === g.owner);
+  const isLeader = g.owner === me;
   const [now, setNow] = useState(Date.now());
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 30000);
@@ -222,37 +227,24 @@ function GuildCard({ g, me, onInvite, onLeave, onOpenMember }: { g: GuildView; m
           </button>
         </div>
       ) : (
-        <div class="row spread">
-          <div class="row" style={{ gap: '10px', minWidth: 0 }}>
-            <BannerFigure banner={bannerOf(g)} size={30} title={`${g.name} banner`} />
+        <div class="row" style={{ gap: '10px', minWidth: 0 }}>
+          <BannerFigure banner={bannerOf(g)} size={34} title={`${g.name} banner`} />
+          <div class="grow" style={{ minWidth: 0 }}>
             <h3 style={{ margin: 0 }} data-testid="guild-name">
               {g.name}
             </h3>
+            <div class="muted small">
+              <span data-testid="guild-leader">Led by {leader ? (leader.id === me ? 'you' : leader.name) : 'the leader'}</span> · {g.members.length} member{g.members.length === 1 ? '' : 's'}
+            </div>
           </div>
-          <span class="muted small">{g.members.length} member{g.members.length === 1 ? '' : 's'}</span>
-        </div>
-      )}
-      {leader && !renaming && (
-        <div class="muted small" style={{ marginTop: '-6px' }} data-testid="guild-leader">
-          Led by {leader.id === me ? 'you' : leader.name}
-        </div>
-      )}
-      {g.owner === me && !renaming && (
-        <div class="row" style={{ gap: '16px' }}>
-          <button class="link-btn" onClick={() => (setTitle(g.name), setRenaming(true))} data-testid="guild-rename">
-            Rename group
-          </button>
-          <button class="link-btn" onClick={() => setDesigning(true)} data-testid="guild-banner-edit">
-            Edit banner
-          </button>
         </div>
       )}
       {designing && <BannerEditor initial={bannerOf(g)} onSave={(b) => setGuildBanner(g.id, bannerSpec(b))} onClose={() => setDesigning(false)} />}
       <div>
-        <div class="bar" role="progressbar" aria-valuemin={0} aria-valuemax={g.goal} aria-valuenow={Math.min(g.progress, g.goal)} aria-label="This week's goal">
+        <div class="bar" role="progressbar" aria-valuemin={0} aria-valuemax={g.goal} aria-valuenow={Math.min(g.progress, g.goal)} aria-valuetext={`${g.progress} of ${g.goal} reviews`} aria-label="This week's goal">
           <i style={{ width: `${pct}%` }} />
         </div>
-        <div class="muted small" style={{ marginTop: '4px' }} data-testid="guild-progress">
+        <div class="small guild-progress-line" data-testid="guild-progress">
           {done ? 'Goal reached this week!' : 'Together this week'}: {g.progress} of {g.goal} reviews
         </div>
         <div class="muted small guild-reward" data-testid="guild-reward">
@@ -265,34 +257,92 @@ function GuildCard({ g, me, onInvite, onLeave, onOpenMember }: { g: GuildView; m
           <span data-testid="guild-countdown">{countdownText(weekEndsAt(g.weekStart) - now)}</span>
         </div>
       </div>
-      <ul class="guild-members" data-testid="guild-members">
-        {g.members.map((m) => (
-          <li key={m.id}>
-            <button class="guild-member-btn" onClick={() => onOpenMember(m)} aria-label={`${m.name}${m.id === g.owner ? ', leader' : ''}. See their knight.`} data-testid="guild-member">
-              <Face card={m} size={34} />
-              <span class="guild-member-name">
-                {m.name}
-                {m.id === me ? ' (you)' : ''}
-                {m.id === g.owner && <span class="leader-tag"> · Leader</span>}
-              </span>
-              <span class="muted small guild-member-streak">
-                <Icon name="flame" fill /> {m.snap.streak}
-              </span>
-              <span class="guild-member-week" title="Reviews this week">
-                {m.snap.weekStart === g.weekStart ? m.snap.week + (m.snap.extra ?? 0) : 0}
-              </span>
-            </button>
-          </li>
-        ))}
-      </ul>
       <div class="row">
-        <button class="btn grow" onClick={onInvite} data-testid="guild-invite">
+        <button class="btn primary grow" onClick={onInvite} data-testid="guild-invite">
           Invite someone
         </button>
-        <button class="btn ghost" onClick={onLeave} data-testid="guild-leave">
-          Leave
+        <button class="btn" aria-expanded={membersOpen} aria-controls={`members-${g.id}`} onClick={() => setMembersOpen(!membersOpen)} data-testid="guild-members-toggle">
+          Members
+        </button>
+        <button class="icon-btn" aria-label={`More for ${g.name}`} aria-expanded={moreOpen} aria-controls={`more-${g.id}`} onClick={() => setMoreOpen(!moreOpen)} data-testid="guild-more">
+          <Icon name="more" />
         </button>
       </div>
+      {membersOpen && (
+        <ul class="guild-members" id={`members-${g.id}`} data-testid="guild-members">
+          {g.members.map((m) => (
+            <li key={m.id}>
+              <button class="guild-member-btn" onClick={() => onOpenMember(m)} aria-label={`${m.name}${m.id === g.owner ? ', leader' : ''}${m.id === me ? ', you' : ''}. See their knight.`} data-testid="guild-member">
+                <Face card={m} size={34} />
+                <span class="guild-member-name">
+                  {m.name}
+                  {m.id === me ? ' (you)' : ''}
+                  {m.id === g.owner && <span class="leader-tag"> · Leader</span>}
+                </span>
+                <span class="muted small guild-member-streak">
+                  <Icon name="flame" fill /> {m.snap.streak}
+                </span>
+                <span class="guild-member-week" title="Reviews this week">
+                  {m.snap.weekStart === g.weekStart ? m.snap.week + (m.snap.extra ?? 0) : 0}
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      {moreOpen && (
+        <div class="stack more-panel" id={`more-${g.id}`} style={{ '--gap': '4px' } as never}>
+          {isLeader && !renaming && (
+            <button class="menu-item" onClick={() => (setTitle(g.name), setRenaming(true), setMoreOpen(false))} data-testid="guild-rename">
+              Rename group
+            </button>
+          )}
+          {isLeader && (
+            <button class="menu-item" onClick={() => (setDesigning(true), setMoreOpen(false))} data-testid="guild-banner-edit">
+              Edit banner
+            </button>
+          )}
+          <button class="menu-item danger" onClick={onLeave} data-testid="guild-leave">
+            Leave group
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** The two halves of this screen: your friends, and your groups. One at a time keeps each short. */
+function Segments({ tab, onTab, friends, groups }: { tab: 'friends' | 'groups'; onTab: (t: 'friends' | 'groups') => void; friends: number | null; groups: number | null }) {
+  const items = [
+    { id: 'friends' as const, label: 'Friends', n: friends },
+    { id: 'groups' as const, label: 'Groups', n: groups },
+  ];
+  const move = (e: KeyboardEvent, i: number) => {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight' && e.key !== 'Home' && e.key !== 'End') return;
+    e.preventDefault();
+    const next = e.key === 'Home' ? 0 : e.key === 'End' ? items.length - 1 : (i + (e.key === 'ArrowRight' ? 1 : items.length - 1)) % items.length;
+    onTab(items[next].id);
+    (document.getElementById(`seg-${items[next].id}`) as HTMLElement | null)?.focus();
+  };
+  return (
+    <div class="seg" role="tablist" aria-label="Friends or groups">
+      {items.map((it, i) => (
+        <button
+          key={it.id}
+          id={`seg-${it.id}`}
+          role="tab"
+          class={`seg-tab ${tab === it.id ? 'on' : ''}`}
+          aria-selected={tab === it.id}
+          aria-controls={`panel-${it.id}`}
+          tabIndex={tab === it.id ? 0 : -1}
+          onClick={() => onTab(it.id)}
+          onKeyDown={(e) => move(e, i)}
+          data-testid={`friends-tab-${it.id}`}
+        >
+          {it.label}
+          {it.n !== null && it.n > 0 ? ` (${it.n})` : ''}
+        </button>
+      ))}
     </div>
   );
 }
@@ -308,6 +358,14 @@ export function Friends({ joinCode = '', guildCode = '' }: { joinCode?: string; 
   const [guildTyped, setGuildTyped] = useState('');
   const [removing, setRemoving] = useState<FriendCard | null>(null);
   const [opened, setOpened] = useState<string | null>(null);
+  const [tab, setTabState] = useState<'friends' | 'groups'>(guildCode ? 'groups' : lastTab);
+  const setTab = (t: 'friends' | 'groups') => {
+    lastTab = t;
+    setTabState(t);
+  };
+  const [meOpen, setMeOpen] = useState(false);
+  const [codeOpen, setCodeOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
   const [openedMember, setOpenedMember] = useState<FriendCard | null>(null);
   const [leaving, setLeaving] = useState<GuildView | null>(null);
   const [stopping, setStopping] = useState(false);
@@ -361,6 +419,7 @@ export function Friends({ joinCode = '', guildCode = '' }: { joinCode?: string; 
     if (!inviteGuild) return;
     if (await joinGuild(inviteGuild)) {
       showToast(`You joined ${invitedGuild}.`);
+      setTab('groups');
       clearLink();
     }
   };
@@ -498,141 +557,160 @@ export function Friends({ joinCode = '', guildCode = '' }: { joinCode?: string; 
           </div>
         )}
 
-        <div class="card stack" data-testid="me-card">
-          <div class="row" style={{ gap: '12px' }}>
-            <AvatarFigure look={currentLook(data)} size={52} view="face" title="Your knight" />
-            <div class="grow">
-              {editing ? (
-                <div class="row">
-                  <input class="input grow" value={name} maxLength={MAX_NAME} onInput={(e) => setName(e.currentTarget.value)} aria-label="Your name" data-testid="friends-rename-input" />
-                  <button
-                    class="btn primary"
-                    disabled={!cleanName(name)}
-                    onClick={async () => {
-                      if (await renameSharing(name)) setEditing(false);
-                    }}
-                    data-testid="friends-rename-save"
-                  >
-                    Save
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <div class="friend-name" data-testid="my-name">
-                    {data.sharing?.name}
-                  </div>
-                  <button class="link-btn" onClick={() => (setName(data.sharing?.name ?? ''), setEditing(true))} data-testid="friends-rename">
-                    Change my name
-                  </button>
-                </>
-              )}
-            </div>
+        <div class="me-row" data-testid="me-card">
+          <AvatarFigure look={currentLook(data)} size={44} view="face" title="Your knight" />
+          <div class="friend-name grow" data-testid="my-name">
+            {data.sharing?.name}
           </div>
-          <button class="btn primary block" disabled={social.busy} onClick={() => void showInvite()} data-testid="friends-invite">
-            Invite a friend
+          <button class="btn" aria-expanded={meOpen} aria-controls="me-panel" onClick={() => setMeOpen(!meOpen)} data-testid="friends-settings">
+            Your sharing
           </button>
         </div>
-
-        <section class="stack" aria-label="Your friends">
-          <h2 style={{ margin: 0 }}>Friends {friends ? `(${friends.length})` : ''}</h2>
-          {friends === null ? (
-            <div class="muted" data-testid="friends-loading">
-              {social.busy ? 'Loading…' : 'Your friends will show up here.'}
-            </div>
-          ) : friends.length === 0 ? (
-            <div class="card center stack" data-testid="friends-empty">
-              <div class="hero">🌱</div>
-              <div class="muted">No friends yet.</div>
-            </div>
-          ) : (
-            <ul class="friend-list" data-testid="friend-list">
-              {friends.map((f) => (
-                <FriendRow key={f.id} card={f} cheered={social.cheered.includes(f.id)} onOpen={() => setOpened(f.id)} onCheer={() => void cheerFriend(f.id).then((ok) => ok && showToast(`You cheered ${f.name}.`))} onRemove={() => setRemoving(f)} />
-              ))}
-            </ul>
-          )}
-          <div class="card stack">
-            <label class="field">
-              <span class="field-label">Got a code from a friend?</span>
+        {meOpen && (
+          <div class="card stack" id="me-panel" data-testid="me-panel">
+            {editing ? (
               <div class="row">
-                <input
-                  class="input grow"
-                  value={typed}
-                  placeholder="ABCD-EFGH"
-                  autocapitalize="characters"
-                  autocomplete="off"
-                  onInput={(e) => setTyped(e.currentTarget.value)}
-                  data-testid="friends-code"
-                />
-                <button class="btn" disabled={!typed.trim() || social.busy} onClick={() => void addTyped()} data-testid="friends-add">
-                  Add
-                </button>
-              </div>
-            </label>
-          </div>
-        </section>
-
-        <section class="stack" aria-label="Your guilds">
-          <h2 style={{ margin: 0 }}>Groups</h2>
-          <p class="muted small" style={{ margin: 0 }}>
-            A small team with a weekly goal.
-          </p>
-          {(guilds ?? []).map((g) => (
-            <GuildCard key={g.id} g={g} me={data.social!.id} onInvite={() => void showGuildInvite(g)} onLeave={() => setLeaving(g)} onOpenMember={(m) => setOpenedMember(m)} />
-          ))}
-          <div class="card stack">
-            <label class="field">
-              <span class="field-label">Start a group</span>
-              <div class="row">
-                <input
-                  class="input grow"
-                  value={guildName}
-                  maxLength={MAX_GUILD_NAME}
-                  placeholder="For example, Youth Group"
-                  onInput={(e) => setGuildName(e.currentTarget.value)}
-                  data-testid="guild-name-input"
-                />
+                <input class="input grow" value={name} maxLength={MAX_NAME} onInput={(e) => setName(e.currentTarget.value)} aria-label="Your name" data-testid="friends-rename-input" />
                 <button
-                  class="btn"
-                  disabled={!cleanName(guildName, MAX_GUILD_NAME) || social.busy}
+                  class="btn primary"
+                  disabled={!cleanName(name)}
                   onClick={async () => {
-                    if (await createGuild(guildName)) setGuildName('');
+                    if (await renameSharing(name)) setEditing(false);
                   }}
-                  data-testid="guild-create"
+                  data-testid="friends-rename-save"
                 >
-                  Create
+                  Save
                 </button>
               </div>
-            </label>
-            <label class="field">
-              <span class="field-label">Join a group with a code</span>
-              <div class="row">
-                <input
-                  class="input grow"
-                  value={guildTyped}
-                  placeholder="ABCD-EFGH"
-                  autocapitalize="characters"
-                  autocomplete="off"
-                  onInput={(e) => setGuildTyped(e.currentTarget.value)}
-                  data-testid="guild-code"
-                />
-                <button class="btn" disabled={!guildTyped.trim() || social.busy} onClick={() => void joinTyped()} data-testid="guild-join">
-                  Join
-                </button>
-              </div>
-            </label>
+            ) : (
+              <button class="menu-item" onClick={() => (setName(data.sharing?.name ?? ''), setEditing(true))} data-testid="friends-rename">
+                Change my name
+              </button>
+            )}
+            <p class="muted small" style={{ margin: 0 }}>
+              Friends see your name, knight, streak, pile counts and this week’s reviews. Never your verses.
+            </p>
+            <button class="menu-item danger" onClick={() => setStopping(true)} data-testid="friends-stop">
+              Stop sharing…
+            </button>
           </div>
-        </section>
+        )}
 
-        <div class="card stack">
-          <h3 style={{ margin: 0 }}>What your friends can see</h3>
-          <p class="muted small" style={{ margin: 0 }}>
-            Friends see your name, knight, streak, pile counts and this week’s reviews. Never your verses.
-          </p>
-          <button class="btn ghost" onClick={() => setStopping(true)} data-testid="friends-stop">
-            Stop sharing…
-          </button>
-        </div>
+        <Segments tab={tab} onTab={setTab} friends={friends ? friends.length : null} groups={guilds ? guilds.length : null} />
+
+        {tab === 'friends' && (
+          <section class="stack" id="panel-friends" role="tabpanel" aria-labelledby="seg-friends">
+            <button class="btn primary block" disabled={social.busy} onClick={() => void showInvite()} data-testid="friends-invite">
+              Invite a friend
+            </button>
+            {friends === null ? (
+              <div class="muted" data-testid="friends-loading" role="status">
+                {social.busy ? 'Loading…' : 'Your friends will show up here.'}
+              </div>
+            ) : friends.length === 0 ? (
+              <div class="card center stack" data-testid="friends-empty">
+                <div class="hero" aria-hidden="true">
+                  🌱
+                </div>
+                <div class="muted">No friends yet. Invite someone, or add a code below.</div>
+              </div>
+            ) : (
+              <ul class="friend-list" data-testid="friend-list">
+                {friends.map((f) => (
+                  <FriendRow key={f.id} card={f} cheered={social.cheered.includes(f.id)} onOpen={() => setOpened(f.id)} onCheer={() => void cheerFriend(f.id).then((ok) => ok && showToast(`You cheered ${f.name}.`))} onRemove={() => setRemoving(f)} />
+                ))}
+              </ul>
+            )}
+            {friends && friends.length > 0 && (
+              <button class="link-btn" aria-expanded={codeOpen} aria-controls="friend-code-row" onClick={() => setCodeOpen(!codeOpen)} data-testid="friends-code-toggle">
+                Got a code from a friend?
+              </button>
+            )}
+            {(codeOpen || !friends || friends.length === 0) && (
+              <div class="card stack" id="friend-code-row">
+                <label class="field">
+                  <span class="field-label">Got a code from a friend?</span>
+                  <div class="row">
+                    <input
+                      class="input grow"
+                      value={typed}
+                      placeholder="ABCD-EFGH"
+                      autocapitalize="characters"
+                      autocomplete="off"
+                      onInput={(e) => setTyped(e.currentTarget.value)}
+                      data-testid="friends-code"
+                    />
+                    <button class="btn" disabled={!typed.trim() || social.busy} onClick={() => void addTyped()} data-testid="friends-add">
+                      Add
+                    </button>
+                  </div>
+                </label>
+              </div>
+            )}
+          </section>
+        )}
+
+        {tab === 'groups' && (
+          <section class="stack" id="panel-groups" role="tabpanel" aria-labelledby="seg-groups">
+            {(guilds ?? []).length === 0 && (
+              <p class="muted small" style={{ margin: 0 }}>
+                A small team with a weekly goal. Start one, or join with a code.
+              </p>
+            )}
+            {(guilds ?? []).map((g) => (
+              <GuildCard key={g.id} g={g} me={data.social!.id} onInvite={() => void showGuildInvite(g)} onLeave={() => setLeaving(g)} onOpenMember={(m) => setOpenedMember(m)} />
+            ))}
+            {(guilds ?? []).length > 0 && (
+              <button class="link-btn" aria-expanded={addOpen} aria-controls="guild-add" onClick={() => setAddOpen(!addOpen)} data-testid="guild-add-toggle">
+                Start or join another group
+              </button>
+            )}
+            {(addOpen || (guilds ?? []).length === 0) && (
+              <div class="card stack" id="guild-add">
+                <label class="field">
+                  <span class="field-label">Start a group</span>
+                  <div class="row">
+                    <input
+                      class="input grow"
+                      value={guildName}
+                      maxLength={MAX_GUILD_NAME}
+                      placeholder="For example, Youth Group"
+                      onInput={(e) => setGuildName(e.currentTarget.value)}
+                      data-testid="guild-name-input"
+                    />
+                    <button
+                      class="btn"
+                      disabled={!cleanName(guildName, MAX_GUILD_NAME) || social.busy}
+                      onClick={async () => {
+                        if (await createGuild(guildName)) setGuildName('');
+                      }}
+                      data-testid="guild-create"
+                    >
+                      Create
+                    </button>
+                  </div>
+                </label>
+                <label class="field">
+                  <span class="field-label">Join a group with a code</span>
+                  <div class="row">
+                    <input
+                      class="input grow"
+                      value={guildTyped}
+                      placeholder="ABCD-EFGH"
+                      autocapitalize="characters"
+                      autocomplete="off"
+                      onInput={(e) => setGuildTyped(e.currentTarget.value)}
+                      data-testid="guild-code"
+                    />
+                    <button class="btn" disabled={!guildTyped.trim() || social.busy} onClick={() => void joinTyped()} data-testid="guild-join">
+                      Join
+                    </button>
+                  </div>
+                </label>
+              </div>
+            )}
+          </section>
+        )}
       </div>
 
       {invite && <InviteSheet {...invite} onClose={() => setInvite(null)} />}

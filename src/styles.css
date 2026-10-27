@@ -2420,7 +2420,7 @@ button.streak {
 }
 .guild-members {
   list-style: none;
-  margin: 0;
+  margin: 8px 0 0;
   padding: 0;
   display: flex;
   flex-direction: column;
@@ -2597,4 +2597,62 @@ button.chip {
   width: 18px;
   height: 18px;
   flex: none;
+}
+
+/* Friends: one half at a time, quiet rows, big targets */
+.seg {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+.seg-tab {
+  flex: 1;
+  min-height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.seg-tab.on {
+  background: var(--accent-strong);
+  color: var(--on-accent, #fff);
+}
+.me-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.menu-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+.menu-item.danger {
+  color: var(--bad);
+}
+.more-panel {
+  border-top: 1px solid var(--border);
+  padding-top: 6px;
+}
+.link-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+.guild-progress-line {
+  margin-top: 4px;
 }
