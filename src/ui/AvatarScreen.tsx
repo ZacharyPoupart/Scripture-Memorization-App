@@ -1,7 +1,8 @@
-import { useState } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
 import {
   ARMOR_NAMES,
   ARMOR_SLOTS,
+  bannerItem,
   sceneUrl,
   currentLook,
   describeUnlock,
@@ -19,17 +20,19 @@ import {
   type Item,
   type Slot,
 } from '../core/avatar.ts';
+import { bannerFromScene, bannerOf, bannerSceneId, bannerSpec } from '../core/banner.ts';
 import { streakMultiplier } from '../core/coins.ts';
 import { streakInfo } from '../core/schedule.ts';
 import { back } from '../router.ts';
-import { buyAndWear, showToast, useApp, wearItem } from '../store.ts';
+import { buyAndWear, refreshSocial, showToast, useApp, wearItem } from '../store.ts';
 import { armorUrl } from './ArmorArt.tsx';
 import { AvatarFigure } from './AvatarFigure.tsx';
+import { BannerFigure } from './Banner.tsx';
 import { Coin, Icon } from './common.tsx';
 
 /** Your knight: everyone starts in the same basic armor, and any piece can be swapped for another with coins and streaks. */
 export function AvatarScreen() {
-  const { data } = useApp();
+  const { data, social } = useApp();
   const [slot, setSlot] = useState<Slot>('helmet');
   const [pick, setPick] = useState<string | null>(null);
   const look = currentLook(data);
@@ -37,7 +40,14 @@ export function AvatarScreen() {
   const multiplier = streakMultiplier(streakInfo(data, Date.now()).count);
   const picked = pick ? itemById(pick) : undefined;
   const shown = picked ? { ...look, [picked.slot]: picked.id } : look;
-  const items = itemsIn(slot);
+  // the banners of the groups you are in can be worn as a background (the one you are wearing stays listed even after you leave)
+  const banners = slot === 'scene' ? (social.guilds ?? []).map((g) => bannerItem(bannerSceneId(bannerSpec(bannerOf(g))), `${g.name} banner`)) : [];
+  if (slot === 'scene' && bannerFromScene(look.scene) && !banners.some((b) => b.id === look.scene)) banners.push(bannerItem(look.scene, 'Group banner'));
+  const items = [...itemsIn(slot), ...banners];
+  const sharing = !!data.sharing?.on && !!data.social;
+  useEffect(() => {
+    if (sharing && social.guilds === null) void refreshSocial();
+  }, [sharing]);
   const armorInfo = (ARMOR_SLOTS as readonly string[]).includes(slot) ? ARMOR_NAMES[slot as (typeof ARMOR_SLOTS)[number]] : null;
 
   const choose = (item: Item) => {
@@ -131,7 +141,11 @@ export function AvatarScreen() {
                   data-testid={`item-${item.id}`}
                   aria-pressed={isWorn || pick === item.id}
                 >
-                  {armorUrl(item.id) ? (
+                  {bannerFromScene(item.id) ? (
+                    <span class="piece-img banner-tile">
+                      <BannerFigure banner={bannerFromScene(item.id)!} size={50} title={item.name} />
+                    </span>
+                  ) : armorUrl(item.id) ? (
                     <img class="piece-img" src={armorUrl(item.id)!} alt="" width="72" height="72" loading="lazy" style={item.slot === 'weapon' ? { transform: 'rotate(180deg)' } : undefined} />
                   ) : sceneUrl(item.id) ? (
                     <img class="piece-img scene-img" src={sceneUrl(item.id)!} alt="" width="72" height="72" loading="lazy" />

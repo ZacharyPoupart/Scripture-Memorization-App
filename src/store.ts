@@ -456,6 +456,14 @@ export async function renameGuild(gid: string, rawName: string): Promise<boolean
   return !!r;
 }
 
+export async function setGuildBanner(gid: string, banner: string): Promise<boolean> {
+  const auth = authOf();
+  if (!auth) return false;
+  const r = await guarded(() => api.guildBanner(auth, gid, banner));
+  if (r) patchSocial({ guilds: (state.social.guilds ?? []).map((g) => (g.id === gid ? { ...g, banner } : g)) });
+  return !!r;
+}
+
 export async function leaveGuild(gid: string): Promise<boolean> {
   const auth = authOf();
   if (!auth) return false;

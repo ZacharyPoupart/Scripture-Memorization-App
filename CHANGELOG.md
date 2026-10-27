@@ -5,6 +5,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.56.0] - 2026-10-27
+
+### Added
+- Group banners. Every group has a little painted shield next to its name. The leader can change it (Friends → the group → Edit banner): pick one of 15 simple designs and two of 12 colors. Members can wear their group's banner as their avatar background.
+
 ## [1.55.0] - 2026-10-27
 
 ### Changed
