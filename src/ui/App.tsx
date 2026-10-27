@@ -7,6 +7,7 @@ import { AvatarScreen } from './AvatarScreen.tsx';
 import { AddVerse } from './AddVerse.tsx';
 import { Celebrations } from './Celebrations.tsx';
 import { ItemReveal } from './ItemReveal.tsx';
+import { StreakSaved } from './StreakSaved.tsx';
 import { Friends } from './Friends.tsx';
 import { Home } from './Home.tsx';
 import { Onboarding } from './Onboarding.tsx';
@@ -84,6 +85,7 @@ export function App({ onReload }: { onReload: () => void }) {
       {!inReview && <TabBar current={tab} />}
       <Celebrations suppressed={inReview || !settings.onboarded || sandbox} />
       <ItemReveal suppressed={inReview || !settings.onboarded || sandbox || !!tourOn} />
+      <StreakSaved suppressed={inReview || !settings.onboarded || !!tourOn} />
       <ToastHost tabs={!inReview} />
       {(!settings.onboarded || intro) && (
         <Onboarding

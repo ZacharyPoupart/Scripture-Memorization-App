@@ -5,6 +5,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.54.0] - 2026-10-27
+
+### Added
+- Streak saves. Once a month, a day you miss that would have broken your streak is forgiven: the streak carries on. The saved day adds nothing to your streak or to any verse's progress, and a short message tells you when it happens. On the Stats page the day shows in gold.
+
 ## [1.53.0] - 2026-10-27
 
 ### Added

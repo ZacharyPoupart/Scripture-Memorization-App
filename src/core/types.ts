@@ -120,6 +120,8 @@ export interface Settings {
   avatarOn: boolean;
   /** Achievement items (sword, shield) already shown in the "new item" popup on this device; `null` until first looked at (then everything already earned is just remembered). */
   seenUnlocks: string[] | null;
+  /** The latest streak-saved day this device has already shown the "we saved your streak" popup for (empty until one is shown). */
+  seenSaved: string;
   /** The guided tour: lesson ids this device has finished (so the menu can tick them). */
   tour: { done: string[] };
 }
