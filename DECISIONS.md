@@ -530,3 +530,8 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Choices (tell me if you want them different):** one small step; if it still looks off on your phone, tell me which way and I will go again in smaller steps.
 **Test changes:** none (a picture position; checked by eye).
 **Undo:** roll back to the previous stage tag.
+
+## v1.49.2 — The armor count under the knight is gone (owner request)
+**What:** removed the line "Armor of God: N of 6 upgraded" with its six dots (and the "Silver Vanguard set..." wording when the pieces matched) from the avatar screen. It counted any piece that was not the free start, which did not mean much.
+**Test changes:** the avatar e2e tests no longer look for it; they still check which piece is being worn.
+**Undo:** roll back to the previous stage tag.

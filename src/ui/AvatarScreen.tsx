@@ -3,14 +3,12 @@ import {
   ARMOR_NAMES,
   ARMOR_SLOTS,
   sceneUrl,
-  armorWorn,
   currentLook,
   describeUnlock,
   isGated,
   isUnlocked,
   itemById,
   itemsIn,
-  matchedSet,
   owns,
   seedsBalance,
   shortUnlock,
@@ -37,8 +35,6 @@ export function AvatarScreen() {
   const picked = pick ? itemById(pick) : undefined;
   const shown = picked ? { ...look, [picked.slot]: picked.id } : look;
   const items = itemsIn(slot);
-  const worn = armorWorn(look);
-  const matched = matchedSet(look);
   const armorInfo = (ARMOR_SLOTS as readonly string[]).includes(slot) ? ARMOR_NAMES[slot as (typeof ARMOR_SLOTS)[number]] : null;
 
   const choose = (item: Item) => {
@@ -85,16 +81,6 @@ export function AvatarScreen() {
 
           <div class="card center stack avatar-stage">
             <AvatarFigure look={shown} size={200} title="Your knight" />
-            <div class="armor-meter" data-testid="armor-meter">
-              <strong>
-                {matched ? `${matched.name} set — helmet, chest plate, belt and boots match` : worn === ARMOR_SLOTS.length ? 'Full armor of God' : `Armor of God: ${worn} of ${ARMOR_SLOTS.length} upgraded`}
-              </strong>
-              <span class="armor-pips" aria-hidden="true">
-                {ARMOR_SLOTS.map((s) => (
-                  <i key={s} class={look[s].endsWith('-none') ? '' : 'on'} />
-                ))}
-              </span>
-            </div>
           </div>
 
           {[

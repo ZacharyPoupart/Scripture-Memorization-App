@@ -5,6 +5,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.49.2] - 2026-10-26
+
+### Removed
+- The "Armor of God: 2 of 6 upgraded" line and its dots under the knight on the avatar screen.
+
 ## [1.49.1] - 2026-10-26
 
 ### Fixed
