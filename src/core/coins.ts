@@ -10,11 +10,12 @@ export const SEEDS_PER_FULL_DAY = 10;
 
 /** The longer the streak, the more every coin earned is worth: from `days` in a row, coins from reviews, finished days and level-ups are multiplied by `x`. */
 export const STREAK_MULTIPLIERS = [
-  { days: 3, x: 1.2 },
-  { days: 7, x: 1.5 },
-  { days: 14, x: 2 },
-  { days: 30, x: 2.5 },
-  { days: 100, x: 3 },
+  { days: 3, x: 1.1 },
+  { days: 7, x: 1.25 },
+  { days: 14, x: 1.5 },
+  { days: 30, x: 1.75 },
+  { days: 100, x: 2 },
+  { days: 365, x: 3 },
 ] as const;
 
 export function streakMultiplier(streak: number): number {

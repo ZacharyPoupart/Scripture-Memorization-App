@@ -15,6 +15,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 ### Changed
 - The group flag beside your knight now casts soft shadows: on the scene behind it, down its pole and on the ground, and the gold ball on top is shaded. The banner you see in a group card is unchanged.
 
+## [1.65.0] - 2026-10-27
+
+### Changed
+- The streak multiplier is gentler: x1.1 from 3 days, x1.25 from 7, x1.5 from 14, x1.75 from 30, x2 from 100, and x3 only at a full year (365 days). Coins you already earned are never taken away.
+
 ## [1.64.1] - 2026-10-27
 
 ### Changed
