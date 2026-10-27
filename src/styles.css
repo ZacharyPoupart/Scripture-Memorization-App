@@ -695,6 +695,7 @@ textarea.input {
   padding-top: calc(var(--safe-top) + 14px);
 }
 .modal {
+  position: relative;
   width: 100%;
   max-width: 420px;
   background: var(--surface);
@@ -2454,4 +2455,24 @@ button.streak {
   font-family: 'Fraunces', serif;
   font-size: 1.15rem;
   line-height: 1.45;
+}
+
+/* the × in the corner of a pop-up */
+.modal-x {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  color: var(--muted);
+}
+.reveal-x {
+  position: absolute;
+  top: calc(var(--safe-top) + 8px);
+  right: 8px;
+  z-index: 2;
+}
+.reveal-x .modal-x {
+  position: static;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.28);
+  border-radius: 50%;
 }

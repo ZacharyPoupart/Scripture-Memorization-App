@@ -5,7 +5,7 @@ import { formatRef } from '../core/reference.ts';
 import { streakInfo } from '../core/schedule.ts';
 import { feedback } from '../services/feedback.ts';
 import { markLevelUpsSeen, markMilestoneSeen, setCelebrating, useApp } from '../store.ts';
-import { Confetti, Icon, Overlay, PILE_INFO } from './common.tsx';
+import { CloseX, Confetti, Icon, Overlay, PILE_INFO } from './common.tsx';
 
 /**
  * Celebrations scale with the achievement:
@@ -55,9 +55,7 @@ export function Celebrations({ suppressed }: { suppressed: boolean }) {
                 </div>
               ))}
             </div>
-            <button class="btn primary block" onClick={close} data-testid="celebration-close">
-              Wonderful
-            </button>
+            <CloseX onClick={close} testId="celebration-close" />
           </div>
         </Overlay>
       </>
@@ -79,9 +77,7 @@ export function Celebrations({ suppressed }: { suppressed: boolean }) {
           <p class="muted" style={{ margin: 0 }}>
             {text.body}
           </p>
-          <button class="btn primary block" onClick={close} data-testid="milestone-close">
-            Thank you
-          </button>
+          <CloseX onClick={close} testId="milestone-close" />
         </div>
       </Overlay>
     </>

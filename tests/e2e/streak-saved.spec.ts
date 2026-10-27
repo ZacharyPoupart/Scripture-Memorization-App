@@ -58,3 +58,24 @@ test('a missed day is saved once a month: the popup says so, the streak carries 
   await expect(page.getByTestId('streak')).toContainText('0');
   await expect(page.getByTestId('streak-saved')).toHaveCount(0);
 });
+
+test('the streak-saved pop-up closes with the corner × or a tap outside, and has no text button', async ({ page }) => {
+  await page.clock.install({ time: at('2026-11-02T08:00:00') });
+  await page.clock.resume();
+  await blockLookups(page);
+  await openApp(page);
+  await addVerse(page, JOHN316);
+  await travel(page, '2026-11-03T08:00:00');
+  await oneReview(page);
+  await travel(page, '2026-11-04T08:00:00');
+  await oneReview(page);
+  await travel(page, '2026-11-06T08:00:00');
+  await page.goto('/#/');
+  const popup = page.getByTestId('streak-saved');
+  await expect(popup).toBeVisible();
+  await expect(popup.getByRole('button')).toHaveCount(1); // only the ×
+  await expect(popup.getByRole('button', { name: 'Close' })).toBeVisible();
+  // a tap on the dim area outside the pop-up closes it
+  await page.mouse.click(5, 5);
+  await expect(popup).toHaveCount(0);
+});

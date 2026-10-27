@@ -5,6 +5,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.55.0] - 2026-10-27
+
+### Changed
+- The celebration pop-ups (level-up, streak milestone, streak saved, new item) no longer end with a "Thank you" / "Wonderful" / "Nice" button. They close with a small × in the corner, a tap outside, or Escape.
+
 ## [1.54.0] - 2026-10-27
 
 ### Added

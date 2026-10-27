@@ -90,6 +90,15 @@ export function CheckMark({ size = 56 }: { size?: number }) {
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
+/** The little × in the corner of a pop-up. Tapping outside the pop-up or pressing Escape closes it too. */
+export function CloseX({ onClick, testId, label = 'Close' }: { onClick: () => void; testId?: string; label?: string }) {
+  return (
+    <button class="icon-btn modal-x" onClick={onClick} aria-label={label} data-testid={testId}>
+      <Icon name="close" />
+    </button>
+  );
+}
+
 export function Overlay({ children, onClose, center, label }: { children: ComponentChildren; onClose?: () => void; center?: boolean; label?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   // Parents pass a fresh onClose on every render. The effect below must NOT re-run for that (its cleanup gives focus
