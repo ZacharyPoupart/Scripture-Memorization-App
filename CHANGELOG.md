@@ -5,6 +5,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.64.0] - 2026-10-27
+
+### Added
+- Names for people and groups are checked: rude or inappropriate names are turned down with a kind message, in the app and again on the server.
+
 ## [1.63.0] - 2026-10-27
 
 ### Added

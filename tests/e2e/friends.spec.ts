@@ -141,6 +141,28 @@ test('a friend can cheer you on, and you see it', async ({ browser }) => {
   await expect(zach.getByTestId('cheers')).toContainText('Sam L. cheered you!');
 });
 
+test('rude names are turned down kindly, for a person and for a group', async ({ page }) => {
+  await openApp(page, '/#/friends');
+  await page.getByTestId('friends-name').fill('f.u.c.k');
+  await page.getByTestId('friends-on').click();
+  await expect(page.getByTestId('friends-error')).toContainText('pick a different name');
+  await expect(page.getByTestId('my-name')).toHaveCount(0); // still off
+  await page.getByTestId('friends-name').fill('Sam L.');
+  await page.getByTestId('friends-on').click();
+  await expect(page.getByTestId('my-name')).toHaveText('Sam L.');
+  await page.getByTestId('guild-name-input').fill('Sh1t Club');
+  await page.getByTestId('guild-create').click();
+  await expect(page.getByTestId('friends-error')).toContainText('pick a different name');
+  await expect(page.getByTestId('guild-card')).toHaveCount(0);
+  await page.getByTestId('guild-name-input').fill('Youth Group');
+  await page.getByTestId('guild-create').click();
+  await expect(page.getByTestId('guild-name')).toHaveText('Youth Group');
+  await page.getByTestId('guild-rename').click();
+  await page.getByTestId('guild-rename-input').fill('N4zi Club');
+  await page.getByTestId('guild-rename-save').click();
+  await expect(page.getByTestId('friends-error')).toContainText('pick a different name');
+});
+
 test('groups: create, invite, join, see a shared weekly goal, leave', async ({ browser }) => {
   const zach = await person(browser, 'Zach P.');
   const sam = await person(browser, 'Sam L.');

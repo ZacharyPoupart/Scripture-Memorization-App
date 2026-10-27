@@ -10,8 +10,8 @@ import { LESSONS, START, doneLessons, nextPos, sampleTourData, type TourPos } fr
 import { navigate } from './router.ts';
 import type { AppData, LevelUp, Settings } from './core/types.ts';
 import { setFeedbackPrefs } from './services/feedback.ts';
-import { cleanName, guildWinsToClaim, MAX_GUILD_NAME, type Cheer, newIdentity, sameSnapshot, socialSnapshot, type FriendCard, type GuildView, type Snapshot } from './core/social.ts';
-import { api, socialMessage, SocialError, type Auth } from './services/social.ts';
+import { cleanName, guildWinsToClaim, nameAllowed, MAX_GUILD_NAME, type Cheer, newIdentity, sameSnapshot, socialSnapshot, type FriendCard, type GuildView, type Snapshot } from './core/social.ts';
+import { api, NAME_MESSAGE, socialMessage, SocialError, type Auth } from './services/social.ts';
 import { Storage, requestPersistence } from './services/storage.ts';
 import { runSync, stable, SyncError } from './services/sync.ts';
 import { generateSyncCode, normalizeSyncCode } from './services/syncCrypto.ts';
@@ -378,6 +378,7 @@ export async function refreshSocial(): Promise<void> {
 export async function enableSharing(rawName: string): Promise<boolean> {
   const name = cleanName(rawName);
   if (!name || state.sandbox) return false;
+  if (!nameAllowed(name)) return patchSocial({ error: NAME_MESSAGE }), false;
   act((d, now) => {
     d.social ??= newIdentity(now);
     d.sharing = { name, on: true, at: now };
@@ -400,6 +401,7 @@ export async function enableSharing(rawName: string): Promise<boolean> {
 export async function renameSharing(rawName: string): Promise<boolean> {
   const name = cleanName(rawName);
   if (!name || !state.data.sharing) return false;
+  if (!nameAllowed(name)) return patchSocial({ error: NAME_MESSAGE }), false;
   act((d, now) => {
     d.sharing = { name, on: d.sharing?.on ?? true, at: now };
   });
@@ -464,6 +466,7 @@ export async function createGuild(rawName: string): Promise<boolean> {
   const auth = authOf();
   const name = cleanName(rawName, MAX_GUILD_NAME);
   if (!auth || !name) return false;
+  if (!nameAllowed(name)) return patchSocial({ error: NAME_MESSAGE }), false;
   await pushProfile(true);
   const r = await guarded(() => api.guildCreate(auth, name));
   if (r) await refreshSocial();
@@ -494,6 +497,7 @@ export async function renameGuild(gid: string, rawName: string): Promise<boolean
   const auth = authOf();
   const name = cleanName(rawName, MAX_GUILD_NAME);
   if (!auth || !name) return false;
+  if (!nameAllowed(name)) return patchSocial({ error: NAME_MESSAGE }), false;
   const r = await guarded(() => api.guildRename(auth, gid, name));
   if (r) patchSocial({ guilds: (state.social.guilds ?? []).map((g) => (g.id === gid ? { ...g, name } : g)) });
   return !!r;

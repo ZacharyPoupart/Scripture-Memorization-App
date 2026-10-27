@@ -233,6 +233,20 @@ describe('cheers: a friendly 👏, once a day each, only between friends', () =>
   });
 });
 
+describe('kind names', () => {
+  it('the server turns down a rude name for a person and for a group, whatever the app does', async () => {
+    const r = await call('profile', { ...who(1), name: 'f.u.c.k', snap: snap() });
+    expect(r.status).toBe(422);
+    expect(r.body.error).toBe('name-not-allowed');
+    expect(kv.m.has(`u:${hex(1)}`)).toBe(false);
+    await join(1, 'Zach P.');
+    expect((await call('guild-create', { ...who(1), name: 'Sh1t Club' })).status).toBe(422);
+    const gid = (await call('guild-create', { ...who(1), name: 'Youth Group' })).body.gid as string;
+    expect((await call('guild-rename', { ...who(1), gid, name: 'N4zi Club' })).status).toBe(422);
+    expect((await call('guilds', who(1))).body.guilds[0].name).toBe('Youth Group');
+  });
+});
+
 describe('guilds: invite only', () => {
   async function guild() {
     await join(1, 'Zach P.', snap({ week: 10 }));
