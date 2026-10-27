@@ -377,3 +377,41 @@ test('Friends and Groups are two halves you switch between, and the screen can b
     expect(box.height, await b.innerText()).toBeGreaterThanOrEqual(40);
   }
 });
+
+test('the leader can choose a new leader, and leaving tells who takes over', async ({ browser }) => {
+  const zach = await person(browser, 'Zach P.');
+  const sam = await person(browser, 'Sam L.');
+  await groupsTab(zach);
+  await zach.getByTestId('guild-name-input').fill('Youth Group');
+  await zach.getByTestId('guild-create').click();
+  await expect(zach.getByTestId('guild-leader')).toHaveText('Led by you');
+  // with only one person there is nobody to choose
+  await openIf(zach, 'guild-more');
+  await expect(zach.getByTestId('guild-transfer')).toHaveCount(0);
+  await zach.getByTestId('guild-invite').click();
+  const code = (await zach.getByTestId('invite-code').innerText()).replace('-', '');
+  await zach.getByRole('button', { name: 'Done' }).click();
+  await sam.goto(`/#/guild/${code}`);
+  await sam.getByTestId('guild-join-yes').click();
+  await expect(sam.getByTestId('guild-leader')).toHaveText('Led by Zach P.');
+  // Zach picks Sam
+  await zach.goto('/#/stats');
+  await zach.goto('/#/friends');
+  await groupsTab(zach);
+  await openIf(zach, 'guild-more');
+  await zach.getByTestId('guild-transfer').click();
+  await expect(zach.getByTestId('leader-picker')).toBeVisible();
+  await expect(zach.getByTestId('leader-option')).toHaveCount(1); // everyone but you
+  await zach.getByTestId('leader-option').click();
+  await zach.getByRole('button', { name: 'Make leader' }).click();
+  await expect(zach.getByTestId('guild-leader')).toHaveText('Led by Sam L.');
+  await expect(zach.getByTestId('guild-rename')).toHaveCount(0); // no longer the leader
+  // Sam now leads, and leaving would pass it back to the person who has been there longest
+  await sam.goto('/#/stats');
+  await sam.goto('/#/friends');
+  await groupsTab(sam);
+  await expect(sam.getByTestId('guild-leader')).toHaveText('Led by you');
+  await openIf(sam, 'guild-more');
+  await sam.getByTestId('guild-leave').click();
+  await expect(sam.getByText('Zach P., who has been in the group longest, will lead it')).toBeVisible();
+});

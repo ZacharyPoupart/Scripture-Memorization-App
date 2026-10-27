@@ -514,6 +514,15 @@ export async function setGuildBanner(gid: string, banner: string): Promise<boole
   return !!r;
 }
 
+/** The leader hands the group to another member. */
+export async function transferGuild(gid: string, to: string): Promise<boolean> {
+  const auth = authOf();
+  if (!auth) return false;
+  const r = await guarded(() => api.guildTransfer(auth, gid, to));
+  if (r) await refreshSocial();
+  return !!r;
+}
+
 export async function leaveGuild(gid: string): Promise<boolean> {
   const auth = authOf();
   if (!auth) return false;

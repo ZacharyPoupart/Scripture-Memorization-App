@@ -286,6 +286,17 @@ export async function handleSocial(request, kv, action, now = Date.now()) {
       return json({ ok: true });
     }
 
+    case 'guild-transfer': {
+      // the leader hands the group to another member (who must already be in it)
+      if (!ID.test(body.to || '') || body.to === id) return fail('bad-request', 400);
+      const g = await memberGuild(kv, body.gid, id);
+      if (!g) return fail('not-found', 404);
+      if (g.owner !== id) return fail('forbidden', 403);
+      if (!g.members.includes(body.to)) return fail('not-found', 404);
+      await put(`g:${body.gid}`, { ...g, owner: body.to });
+      return json({ ok: true });
+    }
+
     case 'guild-banner': {
       if (typeof body.banner !== 'string' || !BANNER.test(body.banner)) return fail('bad-request', 400);
       const g = await memberGuild(kv, body.gid, id);
@@ -324,7 +335,7 @@ export async function handleSocial(request, kv, action, now = Date.now()) {
           goal = guildGoal(members.map((c) => dueOf(c.snap)));
           if (weekStart) await put(`g:${gid}`, { ...g, goalLock: { weekStart, goal } });
         }
-        views.push({ id: gid, name: g.name, owner: g.owner, ...(g.banner ? { banner: g.banner } : {}), members, weekStart, goal, progress });
+        views.push({ id: gid, name: g.name, owner: g.owner, ...(g.members.find((m) => m !== g.owner) ? { heir: g.members.find((m) => m !== g.owner) } : {}), ...(g.banner ? { banner: g.banner } : {}), members, weekStart, goal, progress });
       }
       return json({ guilds: views });
     }
