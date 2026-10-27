@@ -72,7 +72,7 @@ describe('full days: everything done all the way', () => {
   });
 
   it('pays a little extra for a full day, once, and nothing for extra practice or an ordinary day', () => {
-    expect(SEEDS_PER_FULL_DAY).toBe(3);
+    expect(SEEDS_PER_FULL_DAY).toBe(10);
     const { data, v } = setup();
     review(data, v, day(1), '09:00');
     settle(data, at(day(2), '08:00'));

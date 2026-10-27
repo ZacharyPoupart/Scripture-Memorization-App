@@ -21,14 +21,15 @@ import {
   type Slot,
 } from '../core/avatar.ts';
 import { bannerFromScene, bannerOf, bannerSceneId, bannerSpec } from '../core/banner.ts';
-import { streakMultiplier } from '../core/coins.ts';
+import { nextMultiplier, SEEDS_PER_DAY, SEEDS_PER_FULL_DAY, SEEDS_PER_LEVELUP, SEEDS_PER_REVIEW, STREAK_MULTIPLIERS, streakMultiplier } from '../core/coins.ts';
+import { GUILD_WIN_COINS } from '../core/avatar.ts';
 import { streakInfo } from '../core/schedule.ts';
 import { back } from '../router.ts';
 import { buyAndWear, refreshSocial, showToast, useApp, wearItem } from '../store.ts';
 import { armorUrl } from './ArmorArt.tsx';
 import { AvatarFigure } from './AvatarFigure.tsx';
 import { BannerFigure } from './Banner.tsx';
-import { Coin, Icon } from './common.tsx';
+import { CloseX, Coin, Icon } from './common.tsx';
 
 /** Your knight: everyone starts in the same basic armor, and any piece can be swapped for another with coins and streaks. */
 export function AvatarScreen() {
@@ -37,7 +38,9 @@ export function AvatarScreen() {
   const [pick, setPick] = useState<string | null>(null);
   const look = currentLook(data);
   const balance = seedsBalance(data);
-  const multiplier = streakMultiplier(streakInfo(data, Date.now()).count);
+  const streak = streakInfo(data, Date.now()).count;
+  const multiplier = streakMultiplier(streak);
+  const [guide, setGuide] = useState<'coins' | 'multiplier' | null>(null);
   const picked = pick ? itemById(pick) : undefined;
   const shown = picked ? { ...look, [picked.slot]: picked.id } : look;
   // the banners of the groups you are in can be worn as a background (the one you are wearing stays listed even after you leave)
@@ -82,14 +85,53 @@ export function AvatarScreen() {
               Your avatar
             </h1>
             {multiplier > 1 && (
-              <span class="chip" data-testid="streak-multiplier" title="Your streak makes every coin worth more" aria-label={`Streak multiplier ${multiplier}`}>
+              <button class="chip" aria-expanded={guide === 'multiplier'} onClick={() => setGuide(guide === 'multiplier' ? null : 'multiplier')} data-testid="streak-multiplier" aria-label={`Streak multiplier ${multiplier}. Tap to see why.`}>
                 ×{multiplier}
-              </span>
+              </button>
             )}
-            <span class="chip seeds-chip" data-testid="seeds-balance" aria-label={`${balance} coins`}>
+            <button class="chip seeds-chip" aria-expanded={guide === 'coins'} onClick={() => setGuide(guide === 'coins' ? null : 'coins')} data-testid="seeds-balance" aria-label={`${balance} coins. Tap to see how you earn them.`}>
               <Coin /> {balance}
-            </span>
+            </button>
           </div>
+          {guide && (
+            <div class="card stack coins-guide" data-testid="coins-guide" role="region" aria-label={guide === 'coins' ? 'How you earn coins' : 'Your streak multiplier'}>
+              <div class="row spread">
+                <strong>{guide === 'coins' ? 'How you earn coins' : `Why it is ×${multiplier}`}</strong>
+                <CloseX onClick={() => setGuide(null)} label="Close" />
+              </div>
+              {guide === 'coins' && (
+                <ul class="guide-list">
+                  <li>
+                    <Coin /> {SEEDS_PER_REVIEW} for every review that counts
+                  </li>
+                  <li>
+                    <Coin /> {SEEDS_PER_DAY} for every day you finish, and {SEEDS_PER_FULL_DAY} more when it is a full day (every verse all the way)
+                  </li>
+                  <li>
+                    <Coin /> {SEEDS_PER_LEVELUP} when a verse moves up a pile
+                  </li>
+                  <li>
+                    <Coin /> {GUILD_WIN_COINS} when your group reaches its weekly goal
+                  </li>
+                  <li>A bonus the first time your streak reaches 3, 7, 14, 30 days and beyond</li>
+                  <li class="muted">Extra practice is always welcome, but it does not earn coins.</li>
+                </ul>
+              )}
+              <p class="muted small" style={{ margin: 0 }} data-testid="multiplier-line">
+                {multiplier > 1 ? (
+                  <>
+                    Your streak is {streak} days, so coins from reviews, finished days and level-ups are worth <strong>×{multiplier}</strong>.
+                  </>
+                ) : (
+                  <>Your streak is {streak} day{streak === 1 ? '' : 's'}. From 3 days in a row, coins are worth more.</>
+                )}{' '}
+                {nextMultiplier(streak) ? `Next: ×${nextMultiplier(streak)!.x} at ${nextMultiplier(streak)!.days} days (${nextMultiplier(streak)!.days - streak} to go).` : 'That is the top step.'}
+              </p>
+              <p class="muted small" style={{ margin: 0 }}>
+                {STREAK_MULTIPLIERS.map((m) => `×${m.x} from ${m.days} days`).join(' · ')}
+              </p>
+            </div>
+          )}
 
           {testing.armorFree && (
             <div class="banner info" data-testid="armor-free-banner">

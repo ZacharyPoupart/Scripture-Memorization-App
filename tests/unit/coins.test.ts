@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { normalizeData } from '../../src/core/backup.ts';
 import { seedsEarned } from '../../src/core/avatar.ts';
-import { STREAK_MULTIPLIERS, streakMultiplier } from '../../src/core/coins.ts';
+import { nextMultiplier, STREAK_MULTIPLIERS, streakMultiplier } from '../../src/core/coins.ts';
 import { mergeData } from '../../src/core/merge.ts';
 import { recordReview, settle } from '../../src/core/schedule.ts';
 import { at, D0, day, DEVICE, john316, newData, reviewEverythingDue } from './helpers.ts';
@@ -16,6 +16,17 @@ describe('the streak multiplier', () => {
     expect([30, 99].map(at_)).toEqual([2.5, 2.5]);
     expect([100, 365, 5000].map(at_)).toEqual([3, 3, 3]);
     expect(STREAK_MULTIPLIERS.map((m) => m.days)).toEqual([...STREAK_MULTIPLIERS.map((m) => m.days)].sort((a, b) => a - b));
+  });
+});
+
+describe('the coins guide', () => {
+  it('says what the next step of the multiplier is, and when there are no more', () => {
+    expect(nextMultiplier(0)).toEqual({ days: 3, x: 1.2 });
+    expect(nextMultiplier(3)).toEqual({ days: 7, x: 1.5 });
+    expect(nextMultiplier(13)).toEqual({ days: 14, x: 2 });
+    expect(nextMultiplier(99)).toEqual({ days: 100, x: 3 });
+    expect(nextMultiplier(100)).toBeNull();
+    expect(nextMultiplier(900)).toBeNull();
   });
 });
 
