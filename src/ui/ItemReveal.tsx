@@ -1,8 +1,9 @@
-import { useEffect, useRef } from 'preact/hooks';
+import { useEffect } from 'preact/hooks';
 import { freshUnlocks, itemById, owns, sceneUrl, unlockedIds, currentLook } from '../core/avatar.ts';
 import { feedback } from '../services/feedback.ts';
 import { dismissReveal, queueReveal, updateSettings, useApp, wearItem } from '../store.ts';
 import { armorUrl } from './ArmorArt.tsx';
+import { CloseX } from './common.tsx';
 
 /** Twelve little sparkles round the item: where each one flies to and when it twinkles (fixed, so it looks the same every time). */
 const SPARKLES = Array.from({ length: 12 }, (_, i) => ({ angle: i * 30 + (i % 2 ? 8 : -6), dist: 118 + (i % 3) * 22, delay: (i * 0.17) % 1.6, size: 6 + (i % 4) * 2 }));
@@ -29,11 +30,9 @@ export function ItemReveal({ suppressed }: { suppressed: boolean }) {
 
   const id = reveals[0];
   const item = id && !suppressed && !celebrating ? itemById(id) : undefined;
-  const btn = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     if (!item) return;
     feedback.milestone();
-    btn.current?.focus({ preventScroll: true });
   }, [item?.id]);
   if (!item) {
     if (id && !suppressed && !itemById(id)) dismissReveal(); // something the app no longer knows
@@ -46,6 +45,9 @@ export function ItemReveal({ suppressed }: { suppressed: boolean }) {
 
   return (
     <div class="reveal-layer" role="dialog" aria-modal="true" aria-label={`New: ${item.name}`} onClick={close} data-testid="item-reveal" key={item.id}>
+      <div class="reveal-x" onClick={(e) => e.stopPropagation()}>
+        <CloseX onClick={close} testId="reveal-close" />
+      </div>
       <div class="reveal-stage" onClick={(e) => e.stopPropagation()}>
         <div class="reveal-glow" aria-hidden="true" />
         <div class="reveal-rays" aria-hidden="true" />
@@ -76,9 +78,6 @@ export function ItemReveal({ suppressed }: { suppressed: boolean }) {
               Wear it
             </button>
           )}
-          <button ref={btn} class="btn primary" onClick={close} data-testid="reveal-close">
-            {worn ? 'Nice' : 'Later'}
-          </button>
         </div>
       </div>
     </div>
