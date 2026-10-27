@@ -5,6 +5,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.50.0] - 2026-10-26
+
+### Added
+- Streak multipliers. The longer your streak, the more every coin is worth: x1.2 from 3 days, x1.5 from 7, x2 from 14, x2.5 from 30 and x3 from 100. It applies to the coins from a review, a finished day and a level-up, and your current multiplier shows beside your coins on the avatar screen. The one-time streak milestone coins are unchanged.
+
 ## [1.49.2] - 2026-10-26
 
 ### Removed

@@ -151,6 +151,11 @@ export function normalizeData(raw: unknown): AppData {
     out.social = { id: raw.social.id, secret: raw.social.secret, at: raw.social.at };
   if (isObj(raw.sharing) && isStr(raw.sharing.name) && typeof raw.sharing.on === 'boolean' && isNum(raw.sharing.at))
     out.sharing = { name: raw.sharing.name.replace(/\s+/g, ' ').trim().slice(0, 40), on: raw.sharing.on, at: raw.sharing.at };
+  if (isObj(raw.coinBonus)) {
+    const bonus: Record<string, number> = {};
+    for (const [k, n] of Object.entries(raw.coinBonus)) if (k !== '__proto__' && isNum(n) && n >= 0 && n <= 1e9) bonus[k] = n;
+    if (Object.keys(bonus).length) out.coinBonus = bonus;
+  }
   if (Array.isArray(raw.guildWins)) {
     const wins = [...new Set(raw.guildWins.filter((w): w is string => isStr(w) && /^[A-Za-z0-9_-]{1,64}:\d{4}-\d{2}-\d{2}$/.test(w)))].sort().slice(0, 1000);
     if (wins.length) out.guildWins = wins;

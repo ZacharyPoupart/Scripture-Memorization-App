@@ -19,6 +19,8 @@ import {
   type Item,
   type Slot,
 } from '../core/avatar.ts';
+import { streakMultiplier } from '../core/coins.ts';
+import { streakInfo } from '../core/schedule.ts';
 import { back } from '../router.ts';
 import { buyAndWear, showToast, useApp, wearItem } from '../store.ts';
 import { armorUrl } from './ArmorArt.tsx';
@@ -32,6 +34,7 @@ export function AvatarScreen() {
   const [pick, setPick] = useState<string | null>(null);
   const look = currentLook(data);
   const balance = seedsBalance(data);
+  const multiplier = streakMultiplier(streakInfo(data, Date.now()).count);
   const picked = pick ? itemById(pick) : undefined;
   const shown = picked ? { ...look, [picked.slot]: picked.id } : look;
   const items = itemsIn(slot);
@@ -68,6 +71,11 @@ export function AvatarScreen() {
             <h1 class="grow" style={{ margin: 0 }}>
               Your avatar
             </h1>
+            {multiplier > 1 && (
+              <span class="chip" data-testid="streak-multiplier" title="Your streak makes every coin worth more" aria-label={`Streak multiplier ${multiplier}`}>
+                ×{multiplier}
+              </span>
+            )}
             <span class="chip seeds-chip" data-testid="seeds-balance" aria-label={`${balance} coins`}>
               <Coin /> {balance}
             </span>
