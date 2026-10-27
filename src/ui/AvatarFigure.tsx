@@ -1,12 +1,10 @@
 import { armorWorn, sceneUrl, type Look } from '../core/avatar.ts';
-import { bannerFromScene } from '../core/banner.ts';
+import { bannerFromFlag } from '../core/banner.ts';
 import { ArmorLayers } from './ArmorArt.tsx';
-import { BannerBackground } from './Banner.tsx';
+import { FlagStand } from './Banner.tsx';
 
 /** The painted background behind the knight. */
 function Background({ scene }: { scene: string }) {
-  const banner = bannerFromScene(scene);
-  if (banner) return <BannerBackground banner={banner} />;
   const url = sceneUrl(scene);
   return url ? <image href={url} x="0" y="0" width="120" height="120" preserveAspectRatio="xMidYMid slice" /> : <rect width="120" height="120" fill="#cfe6ea" />;
 }
@@ -34,6 +32,7 @@ export function AvatarFigure({ look, size = 120, title, view = 'full' }: { look:
       </defs>
       <g clip-path={`url(#avc-${view}${size})`}>
         <Background scene={look.scene} />
+        {!face && bannerFromFlag(look.flag ?? '') && <FlagStand banner={bannerFromFlag(look.flag)!} />}
         <g transform={`translate(60 ${116 - 250 * K}) scale(${K})`}>
           <ArmorLayers look={look} />
         </g>

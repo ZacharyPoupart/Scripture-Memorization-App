@@ -126,6 +126,8 @@ export interface Settings {
   seenSaved: string;
   /** How the verse lists are sorted (Piles and each pile page). Remembered between visits and launches, so it is not chosen again every time. */
   listSort: 'longest' | 'reference' | 'added' | 'due';
+  /** The group whose banner is on this device's flag stand ('' = none), so the flag follows it when the leader redesigns it. */
+  flagGuild: string;
   /** The guided tour: lesson ids this device has finished (so the menu can tick them). */
   tour: { done: string[] };
 }

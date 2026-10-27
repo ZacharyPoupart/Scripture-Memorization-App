@@ -616,3 +616,10 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Side effect to know about:** a light page on a dark-mode phone can show white clock text on a cream strip, because the phone chooses the text colour from its own setting. Setting Theme to "Match device" avoids that.
 **Test changes:** new e2e test (phone in dark mode: Match device is dark, Light turns the bar light, switching back and the phone changing both follow).
 **Undo:** roll back to the previous stage tag.
+
+## v1.62.0 — Group banner is a flag on a stand, not the background (owner request)
+**What:** a new avatar slot, Group flag (`flag-<design>-<field>-<pattern>`, free, one per group you are in). It is drawn as a pole with the banner hanging from a crossbar at the knight's left, over the normal background. The old "banner as background" is gone.
+**Follows the group:** this device remembers which group the flag came from (`settings.flagGuild`, device only). Whenever your groups load, or the leader saves a new design, or you leave, `reconcileFlag` swaps the flag for the new design or takes it off. A second device that has no memory of the group finds it by matching the design. No data shape change (one more key in the look, `schema` stays 1).
+**Choices (tell me if you want them different):** the stand is on the left side; friends can see it in the full knight, not in the small face pictures. A flag from a group you are not in can never be worn.
+**Test changes:** banner unit tests moved from scene to flag, plus `reconcileFlag`; avatar catalog tests know the new slot; the e2e banner test now covers wearing the flag, a redesign and leaving.
+**Undo:** roll back to the previous stage tag.

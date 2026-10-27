@@ -2,7 +2,7 @@ import { useEffect, useState } from 'preact/hooks';
 import {
   ARMOR_NAMES,
   ARMOR_SLOTS,
-  bannerItem,
+  flagItem,
   sceneUrl,
   currentLook,
   describeUnlock,
@@ -20,11 +20,11 @@ import {
   type Item,
   type Slot,
 } from '../core/avatar.ts';
-import { bannerFromScene, bannerOf, bannerSceneId, bannerSpec } from '../core/banner.ts';
+import { bannerFromFlag, bannerOf, bannerSpec, flagId } from '../core/banner.ts';
 import { streakMultiplier } from '../core/coins.ts';
 import { streakInfo } from '../core/schedule.ts';
 import { back } from '../router.ts';
-import { buyAndWear, refreshSocial, showToast, useApp, wearItem } from '../store.ts';
+import { buyAndWear, refreshSocial, showToast, useApp, wearFlag, wearItem } from '../store.ts';
 import { armorUrl } from './ArmorArt.tsx';
 import { AvatarFigure } from './AvatarFigure.tsx';
 import { BannerFigure } from './Banner.tsx';
@@ -40,10 +40,12 @@ export function AvatarScreen() {
   const multiplier = streakMultiplier(streakInfo(data, Date.now()).count);
   const picked = pick ? itemById(pick) : undefined;
   const shown = picked ? { ...look, [picked.slot]: picked.id } : look;
-  // the banners of the groups you are in can be worn as a background (the one you are wearing stays listed even after you leave)
-  const banners = slot === 'scene' ? (social.guilds ?? []).map((g) => bannerItem(bannerSceneId(bannerSpec(bannerOf(g))), `${g.name} banner`)) : [];
-  if (slot === 'scene' && bannerFromScene(look.scene) && !banners.some((b) => b.id === look.scene)) banners.push(bannerItem(look.scene, 'Group banner'));
-  const items = [...itemsIn(slot), ...banners];
+  // the flags of the groups you are in (the one on the stand stays listed even if its group has not loaded yet)
+  const guilds = social.guilds ?? [];
+  const flags = slot === 'flag' ? guilds.map((g) => ({ g, item: flagItem(flagId(bannerSpec(bannerOf(g))), `${g.name} flag`) })) : [];
+  const flagList = flags.map((f) => f.item);
+  if (slot === 'flag' && bannerFromFlag(look.flag) && !flagList.some((b) => b.id === look.flag)) flagList.push(flagItem(look.flag, 'Group flag'));
+  const items = [...itemsIn(slot), ...flagList];
   const sharing = !!data.sharing?.on && !!data.social;
   useEffect(() => {
     if (sharing && social.guilds === null) void refreshSocial();
@@ -52,7 +54,8 @@ export function AvatarScreen() {
 
   const choose = (item: Item) => {
     if (owns(data, item) && look[item.slot] !== item.id) {
-      wearItem(item.id);
+      if (item.slot === 'flag') wearFlag(flags.find((f) => f.item.id === item.id)?.g.id ?? null, item.id);
+      else wearItem(item.id);
       setPick(null);
     } else setPick(item.id === pick ? null : item.id);
   };
@@ -128,6 +131,11 @@ export function AvatarScreen() {
             </p>
           )}
 
+          {slot === 'flag' && !flagList.length && (
+            <p class="muted small" style={{ margin: 0 }}>
+              Join a group on the Friends tab to hang its flag here.
+            </p>
+          )}
           <div class="item-grid" data-testid="item-grid">
             {items.map((item) => {
               const have = owns(data, item);
@@ -141,9 +149,9 @@ export function AvatarScreen() {
                   data-testid={`item-${item.id}`}
                   aria-pressed={isWorn || pick === item.id}
                 >
-                  {bannerFromScene(item.id) ? (
+                  {bannerFromFlag(item.id) ? (
                     <span class="piece-img banner-tile">
-                      <BannerFigure banner={bannerFromScene(item.id)!} size={50} title={item.name} />
+                      <BannerFigure banner={bannerFromFlag(item.id)!} size={50} title={item.name} />
                     </span>
                   ) : armorUrl(item.id) ? (
                     <img class="piece-img" src={armorUrl(item.id)!} alt="" width="72" height="72" loading="lazy" style={item.slot === 'weapon' ? { transform: 'rotate(180deg)' } : undefined} />
@@ -214,7 +222,7 @@ export function AvatarScreen() {
               )}
             </button>
           ) : (
-            <button class="btn primary block" onClick={() => (wearItem(picked.id), setPick(null))} data-testid="wear">
+            <button class="btn primary block" onClick={() => (picked.slot === 'flag' ? wearFlag(flags.find((f) => f.item.id === picked.id)?.g.id ?? null, picked.id) : wearItem(picked.id), setPick(null))} data-testid="wear">
               Wear {picked.name}
             </button>
           )}
