@@ -5,6 +5,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.65.1] - 2026-10-27
+
+### Changed
+- The group flag beside your knight now casts soft shadows: on the scene behind it, down its pole and on the ground, and the gold ball on top is shaded. The banner you see in a group card is unchanged.
+
 ## [1.65.0] - 2026-10-27
 
 ### Changed

@@ -651,4 +651,8 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Coins already earned stay:** the extra a device has earned so far (`data.coinBonus`) only ever grows, so nobody loses coins; only coins earned from now on use the new table.
 **Choices (tell me if you want them different):** the in-between steps (1.1, 1.25, 1.5, 1.75) are my pick to fit "2x at 100 days and 3x at a year"; say if you want other numbers.
 **Test changes:** the multiplier and guide unit tests use the new table; the 7-day coin test now expects a quarter extra instead of a half.
+
+## v1.65.1 — Shadows on the group flag stand (owner request)
+**What:** `FlagStand` (the flag on the avatar picture only) draws a soft shadow behind the cloth, a shaded top under the crossbar, a shadow beside the pole (to its left, a darker left edge on the pole) and a pool and longer shadow on the ground, and the gold ball on top is shaded round with its own shadow. The flag's small picture in a group card and the item tiles use `BannerFigure` and are untouched; the face-only picture does not draw the stand at all.
+**Choices (tell me if you want them different):** the light comes from the upper right, so every shadow falls to the left. Strength was raised once at your request and can go higher.
 **Undo:** roll back to the previous stage tag.

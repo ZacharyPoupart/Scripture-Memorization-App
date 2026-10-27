@@ -108,6 +108,10 @@ export function FlagStand({ banner }: { banner: Banner }) {
   const spec = bannerSpec(banner);
   const clip = `fsc-${spec}`;
   const shade = `fss-${spec}`;
+  const soft = `fsb-${spec}`;
+  const tight = `fst-${spec}`;
+  const fold = `fsf-${spec}`;
+  const ball = `fsg-${spec}`;
   return (
     <g data-testid="flag-stand" data-flag={spec}>
       <defs>
@@ -115,17 +119,45 @@ export function FlagStand({ banner }: { banner: Banner }) {
           <path d={SHIELD} />
         </clipPath>
         <Shade id={shade} />
+        <filter id={soft} x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur stdDeviation="1.6" />
+        </filter>
+        <filter id={tight} x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur stdDeviation="0.7" />
+        </filter>
+        <radialGradient id={ball} cx="0.65" cy="0.3" r="0.8">
+          <stop offset="0" stop-color="#f7e0a0" />
+          <stop offset="0.45" stop-color="#e3b23c" />
+          <stop offset="1" stop-color="#9a6a14" />
+        </radialGradient>
+        <linearGradient id={fold} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#000" stop-opacity="0.34" />
+          <stop offset="1" stop-color="#000" stop-opacity="0" />
+        </linearGradient>
       </defs>
-      <ellipse cx="102" cy="113" rx="10" ry="2.8" fill="#000" opacity="0.2" />
+      {/* on the ground: a soft pool under the pole and a longer shadow it throws to the left */}
+      <ellipse cx="102" cy="113.5" rx="11" ry="3" fill="#000" opacity="0.6" filter={`url(#${soft})`} />
+      <ellipse cx="92" cy="114.2" rx="17" ry="2.6" fill="#000" opacity="0.45" filter={`url(#${soft})`} />
+      {/* the pole's own shadow on the scene behind it */}
+      <rect x="96.4" y="20.5" width="3.6" height="93.5" rx="1.4" fill="#000" opacity="0.6" filter={`url(#${tight})`} />
       <rect x="100.6" y="18" width="2.8" height="95" rx="1.2" fill="#8a6a2a" stroke="#5a4416" stroke-width="0.6" />
-      <circle cx="102" cy="17" r="3" fill="#e3b23c" stroke="#7a4f12" stroke-width="0.8" />
+      {/* the pole's lit side is on the right, its left side is in shade */}
+      <rect x="100.6" y="18" width="1.2" height="95" rx="0.6" fill="#000" opacity="0.28" />
+      <circle cx="100" cy="19" r="3.2" fill="#000" opacity="0.6" filter={`url(#${tight})`} />
+      <circle cx="102" cy="17" r="3" fill={`url(#${ball})`} stroke="#7a4f12" stroke-width="0.8" />
+      <rect x="85" y="24" width="34" height="2.8" rx="1.2" fill="#000" opacity="0.3" filter={`url(#${tight})`} />
       <rect x="85" y="22" width="34" height="2.8" rx="1.2" fill="#8a6a2a" stroke="#5a4416" stroke-width="0.6" />
+      {/* the banner throws a soft shadow onto the scene behind it */}
+      <g transform="translate(83 29.8) scale(0.3)" opacity="0.75" filter={`url(#${soft})`}>
+        <path d={SHIELD} fill="#000" />
+      </g>
       <g transform="translate(87 24.8) scale(0.3)">
-        <path d={SHIELD} fill="#000" opacity="0.22" transform="translate(0 3)" />
         <g clip-path={`url(#${clip})`}>
           <rect x="0" y="0" width="100" height="130" fill={colorHex(banner.field)} />
           <Pattern design={banner.design} color={colorHex(banner.pattern)} />
           <rect x="0" y="0" width="100" height="130" fill={`url(#${shade})`} />
+          {/* the crossbar shades the top of the cloth */}
+          <rect x="0" y="0" width="100" height="26" fill={`url(#${fold})`} />
         </g>
         <path d={SHIELD} fill="none" stroke="#7a4f12" stroke-width="7" stroke-linejoin="round" />
         <path d={SHIELD} fill="none" stroke="#e3b23c" stroke-width="4.4" stroke-linejoin="round" />
