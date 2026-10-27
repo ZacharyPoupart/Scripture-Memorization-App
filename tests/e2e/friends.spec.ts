@@ -6,6 +6,17 @@ test.beforeEach(async ({ page }) => {
   await blockLookups(page);
 });
 
+/** The groups half of the Friends screen (the screen opens on friends). */
+async function groupsTab(page: Page) {
+  await page.getByTestId('friends-tab-groups').click();
+}
+
+/** Open a disclosure (a button with aria-expanded) if it is not open yet. */
+async function openIf(page: Page, testid: string) {
+  const b = page.getByTestId(testid);
+  if ((await b.getAttribute('aria-expanded')) !== 'true') await b.click();
+}
+
 // Each "person" is a separate browser context, so they have separate devices and data. They talk to the same test server.
 async function person(browser: Browser, name: string): Promise<Page> {
   const ctx = await browser.newContext();
@@ -32,6 +43,7 @@ test('turning on friends needs only a name, and it can be undone', async ({ page
   await page.reload();
   await expect(page.getByTestId('my-name')).toHaveText('Sam L.');
   // switch it off again
+  await openIf(page, 'friends-settings');
   await page.getByTestId('friends-stop').click();
   await page.getByTestId('friends-stop-erase').click();
   await expect(page.getByTestId('friends-on')).toBeVisible();
@@ -116,6 +128,7 @@ test('friends see your progress after you practice', async ({ browser }) => {
   // the profile is sent a moment later; opening the friends page sends anything new right away
   await zach.goto('/#/friends');
   await expect(zach.getByTestId('me-card')).toBeVisible();
+  await openIf(zach, 'friends-settings');
   await zach.getByTestId('friends-rename').click();
   await zach.getByTestId('friends-rename-input').fill('Zach P');
   await zach.getByTestId('friends-rename-save').click();
@@ -150,6 +163,7 @@ test('rude names are turned down kindly, for a person and for a group', async ({
   await page.getByTestId('friends-name').fill('Sam L.');
   await page.getByTestId('friends-on').click();
   await expect(page.getByTestId('my-name')).toHaveText('Sam L.');
+  await groupsTab(page);
   await page.getByTestId('guild-name-input').fill('Sh1t Club');
   await page.getByTestId('guild-create').click();
   await expect(page.getByTestId('friends-error')).toContainText('pick a different name');
@@ -157,6 +171,7 @@ test('rude names are turned down kindly, for a person and for a group', async ({
   await page.getByTestId('guild-name-input').fill('Youth Group');
   await page.getByTestId('guild-create').click();
   await expect(page.getByTestId('guild-name')).toHaveText('Youth Group');
+  await openIf(page, 'guild-more');
   await page.getByTestId('guild-rename').click();
   await page.getByTestId('guild-rename-input').fill('N4zi Club');
   await page.getByTestId('guild-rename-save').click();
@@ -166,6 +181,7 @@ test('rude names are turned down kindly, for a person and for a group', async ({
 test('groups: create, invite, join, see a shared weekly goal, leave', async ({ browser }) => {
   const zach = await person(browser, 'Zach P.');
   const sam = await person(browser, 'Sam L.');
+  await groupsTab(zach);
   await zach.getByTestId('guild-name-input').fill('Youth Group');
   await zach.getByTestId('guild-create').click();
   await expect(zach.getByTestId('guild-name')).toHaveText('Youth Group');
@@ -183,6 +199,7 @@ test('groups: create, invite, join, see a shared weekly goal, leave', async ({ b
   // who leads, and a members list you can open
   await expect(sam.getByTestId('guild-leader')).toHaveText('Led by Zach P.');
   await expect(zach.getByTestId('guild-leader')).toHaveText('Led by you');
+  await openIf(sam, 'guild-members-toggle');
   await expect(sam.getByTestId('guild-members')).toContainText('Leader');
   await sam.getByTestId('guild-member').first().click();
   await expect(sam.getByTestId('friend-sheet')).toBeVisible();
@@ -190,14 +207,18 @@ test('groups: create, invite, join, see a shared weekly goal, leave', async ({ b
   await expect(sam.getByTestId('friend-sheet-cheer')).toHaveCount(0); // they are in the group but not friends
   await sam.getByRole('button', { name: 'Done' }).click();
   // only the leader can rename
+  await openIf(sam, 'guild-more');
   await expect(sam.getByTestId('guild-rename')).toHaveCount(0);
+  await openIf(zach, 'guild-more');
   await zach.getByTestId('guild-rename').click();
   await zach.getByTestId('guild-rename-input').fill('Bible Crew');
   await zach.getByTestId('guild-rename-save').click();
   await expect(zach.getByTestId('guild-name')).toHaveText('Bible Crew');
   await sam.goto('/#/stats');
   await sam.goto('/#/friends');
+  await groupsTab(sam);
   await expect(sam.getByTestId('guild-name')).toHaveText('Bible Crew');
+  await openIf(sam, 'guild-more');
   await sam.getByTestId('guild-leave').click();
   await sam.getByRole('button', { name: 'Leave', exact: true }).last().click();
   await expect(sam.getByTestId('guild-card')).toHaveCount(0);
@@ -224,6 +245,7 @@ test('tapping a friend shows their whole knight, their numbers and the groups yo
   await sam.getByRole('button', { name: 'Done' }).click();
   await expect(sam.getByTestId('friend-sheet')).toHaveCount(0);
   // now a group together
+  await groupsTab(zach);
   await zach.getByTestId('guild-name-input').fill('Youth Group');
   await zach.getByTestId('guild-create').click();
   await zach.getByTestId('guild-invite').click();
@@ -232,6 +254,7 @@ test('tapping a friend shows their whole knight, their numbers and the groups yo
   await sam.goto(`/#/guild/${code}`);
   await sam.getByTestId('guild-join-yes').click();
   await expect(sam.getByTestId('guild-name')).toHaveText('Youth Group');
+  await sam.getByTestId('friends-tab-friends').click();
   await sam.getByTestId('friend-open').click();
   await expect(sam.getByTestId('friend-sheet-groups')).toContainText('Youth Group');
   await sam.getByTestId('friend-sheet-cheer').click();
@@ -241,11 +264,13 @@ test('tapping a friend shows their whole knight, their numbers and the groups yo
 test('a group has a banner next to its name: the leader designs it, members see it and can hang it on their flag stand, and it follows the group', async ({ browser }) => {
   const zach = await person(browser, 'Zach P.');
   const sam = await person(browser, 'Sam L.');
+  await groupsTab(zach);
   await zach.getByTestId('guild-name-input').fill('Youth Group');
   await zach.getByTestId('guild-create').click();
   await expect(zach.getByTestId('guild-name')).toHaveText('Youth Group');
   // every group already has a banner (a default); the leader changes it
   await expect(zach.getByTestId('guild-card').locator('[data-banner]')).toHaveCount(1);
+  await openIf(zach, 'guild-more');
   await zach.getByTestId('guild-banner-edit').click();
   await zach.getByTestId('banner-design-chevron').click();
   await zach.getByTestId('banner-field-crimson').click();
@@ -261,6 +286,7 @@ test('a group has a banner next to its name: the leader designs it, members see 
   await sam.goto(`/#/guild/${code}`);
   await sam.getByTestId('guild-join-yes').click();
   await expect(sam.getByTestId('guild-card').locator('[data-banner="chevron-crimson-gold"]')).toBeVisible();
+  await openIf(sam, 'guild-more');
   await expect(sam.getByTestId('guild-banner-edit')).toHaveCount(0);
   // and Sam can hang it on the flag stand next to the knight (not as the background)
   await sam.goto('/#/avatar');
@@ -269,6 +295,7 @@ test('a group has a banner next to its name: the leader designs it, members see 
   await expect(sam.getByTestId('item-flag-chevron-crimson-gold')).toContainText('Wearing');
   await expect(sam.locator('svg [data-flag="chevron-crimson-gold"]').first()).toBeVisible();
   // the leader redesigns it: Sam's flag changes the next time the groups load
+  await openIf(zach, 'guild-more');
   await zach.getByTestId('guild-banner-edit').click();
   await zach.getByTestId('banner-design-cross').click();
   await zach.getByTestId('banner-field-teal').click();
@@ -276,12 +303,15 @@ test('a group has a banner next to its name: the leader designs it, members see 
   await zach.getByTestId('banner-save').click();
   await expect(zach.getByTestId('banner-editor')).toHaveCount(0);
   await sam.goto('/#/friends');
+  await groupsTab(sam);
   await expect(sam.getByTestId('guild-card').locator('[data-banner="cross-teal-ivory"]')).toBeVisible();
   await sam.goto('/#/avatar');
   await expect(sam.locator('svg [data-flag="cross-teal-ivory"]').first()).toBeVisible();
   await expect(sam.locator('svg [data-flag="chevron-crimson-gold"]')).toHaveCount(0);
   // Sam leaves the group: the flag goes
   await sam.goto('/#/friends');
+  await groupsTab(sam);
+  await openIf(sam, 'guild-more');
   await sam.getByTestId('guild-leave').click();
   await sam.getByRole('button', { name: 'Leave', exact: true }).last().click();
   await expect(sam.getByTestId('guild-card')).toHaveCount(0);
@@ -305,4 +335,38 @@ test('Friends has its own tab, and invite links keep it highlighted', async ({ p
   await expect(page.getByTestId('tab-friends')).toHaveAttribute('aria-current', 'page');
   await page.goto('/#/join/ABCD-EFGH');
   await expect(page.getByTestId('tab-friends')).toHaveAttribute('aria-current', 'page');
+});
+
+test('Friends and Groups are two halves you switch between, and the screen can be used by keyboard and screen reader', async ({ browser }) => {
+  const zach = await person(browser, 'Zach P.');
+  // two tabs, the first one selected, linked to their panels
+  const tabs = zach.getByRole('tab');
+  await expect(tabs).toHaveCount(2);
+  await expect(zach.getByRole('tab', { name: /^Friends/ })).toHaveAttribute('aria-selected', 'true');
+  await expect(zach.getByRole('tabpanel')).toBeVisible();
+  await expect(zach.getByTestId('guild-name-input')).toHaveCount(0); // groups are not on this half
+  // arrow keys move between the tabs
+  await zach.getByRole('tab', { name: /^Friends/ }).focus();
+  await zach.keyboard.press('ArrowRight');
+  await expect(zach.getByRole('tab', { name: /^Groups/ })).toHaveAttribute('aria-selected', 'true');
+  await expect(zach.getByTestId('guild-name-input')).toBeVisible();
+  await zach.keyboard.press('ArrowLeft');
+  await expect(zach.getByRole('tab', { name: /^Friends/ })).toHaveAttribute('aria-selected', 'true');
+  // the things you rarely need are tucked away, and say so (aria-expanded)
+  const sharing = zach.getByTestId('friends-settings');
+  await expect(sharing).toHaveAttribute('aria-expanded', 'false');
+  await expect(zach.getByTestId('friends-stop')).toHaveCount(0);
+  await sharing.click();
+  await expect(sharing).toHaveAttribute('aria-expanded', 'true');
+  await expect(zach.getByTestId('friends-stop')).toBeVisible();
+  // every button and field on the screen is a comfortable size to touch
+  await groupsTab(zach);
+  await zach.getByTestId('guild-name-input').fill('Youth Group');
+  await zach.getByTestId('guild-create').click();
+  await expect(zach.getByTestId('guild-name')).toBeVisible();
+  for (const b of await zach.getByRole('main').getByRole('button').all()) {
+    if (!(await b.isVisible())) continue;
+    const box = (await b.boundingBox())!;
+    expect(box.height, await b.innerText()).toBeGreaterThanOrEqual(40);
+  }
 });

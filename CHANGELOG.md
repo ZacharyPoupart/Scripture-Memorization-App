@@ -5,6 +5,12 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.66.0] - 2026-10-28
+
+### Changed
+- The Friends tab is calmer. Friends and Groups are two halves you switch between, instead of one long page. Your name, the privacy note and "Stop sharing" are tucked under "Your sharing"; a group shows its goal and an Invite button, with the members list and the rename / banner / leave options a tap away; the code boxes only appear when you need them.
+- Easier to use with a screen reader or keyboard: the two halves are proper tabs (arrow keys move between them), every folding section says whether it is open, buttons and links are at least 44 px tall, and the goal bar reads out its numbers.
+
 ## [1.65.2] - 2026-10-27
 
 ### Changed
