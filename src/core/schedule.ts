@@ -100,6 +100,7 @@ export function mergeLedgerDay(a: LedgerDay | undefined, b: LedgerDay | undefine
   const out: LedgerDay = {};
   if (a?.r || b?.r) out.r = 1;
   if (a?.p || b?.p) out.p = 1;
+  if (a?.f || b?.f) out.f = 1;
   const oa = a?.o;
   const ob = b?.o;
   if (oa && ob) out.o = OUTCOME_RANK[oa] >= OUTCOME_RANK[ob] ? oa : ob;
@@ -434,9 +435,10 @@ export function streakInfo(data: AppData, now: number): StreakInfo {
 
 // ---------------------------------------------------------------- settling days & graduation
 
-function computeDay(data: AppData, day: DayKey): { outcome: DayOutcome; reviewed: boolean; paused: boolean } {
+function computeDay(data: AppData, day: DayKey): { outcome: DayOutcome; reviewed: boolean; paused: boolean; full: boolean } {
   let met = 0;
   let unmet = 0;
+  let short = 0; // verses that were not done all the way (a Daily verse under 3 reviews, a Weekly/Monthly/Yearly one not yet reviewed in its period)
   let reviewed = false;
   for (const v of liveVerses(data)) {
     const n = reviewsOn(v, day);
@@ -445,15 +447,17 @@ function computeDay(data: AppData, day: DayKey): { outcome: DayOutcome; reviewed
     if (v.pile === 'daily') {
       if (n >= 1) met++; // one counted review keeps the streak; three is the goal
       else unmet++;
+      if (n < DAILY_REVIEWS) short++;
     } else if (!inArrivalPeriod(v, day)) {
       if (n > 0) met++;
       else if (day === periodEnd(v.pile, day) && !reviewedInPeriod(v, day)) unmet++; // due on the period's last day
+      if (!reviewedInPeriod(v, day)) short++;
     }
   }
   const paused = isPaused(data, day);
   // On a break nothing can be missed: a day is either completed anyway ('c') or simply neutral ('n').
   const outcome: DayOutcome = unmet > 0 ? (paused ? 'n' : 'm') : met > 0 || reviewed ? 'c' : 'n';
-  return { outcome, reviewed, paused };
+  return { outcome, reviewed, paused, full: outcome === 'c' && met > 0 && short === 0 };
 }
 
 export interface SettleResult {
@@ -475,9 +479,10 @@ export function settle(data: AppData, now: number): SettleResult {
   let start = addDays(data.settledThrough, 1);
   if (start < data.createdDay) start = data.createdDay;
   for (let d = start; d <= yesterday; d = addDays(d, 1)) {
-    const { outcome, reviewed, paused } = computeDay(data, d);
+    const { outcome, reviewed, paused, full } = computeDay(data, d);
     const computed: LedgerDay = { o: outcome };
     if (reviewed) computed.r = 1;
+    if (full) computed.f = 1;
     if (paused) computed.p = 1;
     data.ledger[d] = mergeLedgerDay(data.ledger[d], computed);
     // each verse keeps the days it was up to date
@@ -691,6 +696,8 @@ export function recordReview(
   if (summary.outcome === 'c') {
     data.ledger[today] = mergeLedgerDay(data.ledger[today], { o: 'c' });
   }
+  // "All done for today": every Daily verse got its 3 reviews and the Weekly, Monthly and Yearly ones that were ready got theirs
+  if (summary.total > 0 && summary.remaining === 0) data.ledger[today] = mergeLedgerDay(data.ledger[today], { f: 1 });
   data.longestStreak = Math.max(data.longestStreak, streakInfo(data, now).count);
   if (counted && multiplier > 1) {
     // every coin this review earned (the review, a finished day, a level-up) is worth more on a streak; kept as a per-device total that only grows
