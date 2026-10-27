@@ -5,6 +5,15 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.63.0] - 2026-10-27
+
+### Added
+- In a group: "Led by <name>", a members list you can tap (their knight, streak and week), a Leader tag, and each member's streak.
+- The group shows its reward (25 coins each) and a countdown to the end of the week: whole days at first, then hours and minutes on the last day.
+
+### Changed
+- A group's weekly goal is now worked out once when the week starts and kept for that week. New verses and new members change next week's goal, not this one.
+
 ## [1.62.0] - 2026-10-27
 
 ### Changed

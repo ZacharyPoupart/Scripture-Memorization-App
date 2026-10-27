@@ -156,7 +156,17 @@ test('groups: create, invite, join, see a shared weekly goal, leave', async ({ b
   await sam.getByTestId('guild-join-yes').click();
   await expect(sam.getByTestId('guild-name')).toHaveText('Youth Group');
   await expect(sam.getByTestId('guild-progress')).toContainText('of 5 reviews');
-  await expect(sam.getByTestId('guild-progress')).toContainText('25 at the goal'); // the coin reward for a group of two or more
+  await expect(sam.getByTestId('guild-reward')).toContainText('25 each at the goal'); // the coin reward for a group of two or more
+  await expect(sam.getByTestId('guild-countdown')).toContainText(/(\d+ days|\d+ h|\d+ min) left/); // when the week (and the goal) ends
+  // who leads, and a members list you can open
+  await expect(sam.getByTestId('guild-leader')).toHaveText('Led by Zach P.');
+  await expect(zach.getByTestId('guild-leader')).toHaveText('Led by you');
+  await expect(sam.getByTestId('guild-members')).toContainText('Leader');
+  await sam.getByTestId('guild-member').first().click();
+  await expect(sam.getByTestId('friend-sheet')).toBeVisible();
+  await expect(sam.getByTestId('friend-sheet-name')).toBeVisible();
+  await expect(sam.getByTestId('friend-sheet-cheer')).toHaveCount(0); // they are in the group but not friends
+  await sam.getByRole('button', { name: 'Done' }).click();
   // only the leader can rename
   await expect(sam.getByTestId('guild-rename')).toHaveCount(0);
   await zach.getByTestId('guild-rename').click();

@@ -104,6 +104,26 @@ export function guildWinsToClaim(data: AppData, guilds: GuildView[], meId: strin
   return out;
 }
 
+/** The moment a group's week is over: local midnight after its Saturday (so the new goal starts at Saturday midnight). */
+export function weekEndsAt(weekStart: DayKey): number {
+  const [y, m, d] = weekStart.split('-').map(Number);
+  return new Date(y, m - 1, d + 7).getTime();
+}
+
+/** How long is left in the week: whole days until the last day, then hours and minutes, then minutes. */
+export function countdownText(ms: number): string {
+  if (ms <= 0) return 'A new week is starting';
+  const mins = Math.ceil(ms / 60000);
+  if (ms > 24 * 3600000) {
+    const days = Math.ceil(ms / (24 * 3600000));
+    return `${days} days left`; // always 2 or more here
+  }
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  if (h >= 1) return m ? `${h} h ${m} min left` : `${h} h left`;
+  return `${m} min left`;
+}
+
 /** What a friend can see about you right now. */
 export function socialSnapshot(data: AppData, now: number): Snapshot {
   const today = dayKeyOf(now);
