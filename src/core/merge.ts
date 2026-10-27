@@ -108,6 +108,7 @@ export function mergeData(a: AppData, b: AppData): AppData {
     for (const [k, n] of Object.entries(b.coinBonus ?? {})) bonus[k] = Math.max(bonus[k] ?? 0, n);
     merged.coinBonus = bonus;
   }
+  if (a.guildWins || b.guildWins) merged.guildWins = [...new Set([...(a.guildWins ?? []), ...(b.guildWins ?? [])])].sort();
   if (a.tourAt !== undefined || b.tourAt !== undefined) merged.tourAt = Math.max(a.tourAt ?? 0, b.tourAt ?? 0);
   if (a.avatar || b.avatar) {
     // items are only ever added (union); what is worn is the later decision

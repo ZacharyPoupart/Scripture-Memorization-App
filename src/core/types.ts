@@ -83,6 +83,8 @@ export interface AppData {
   sharing?: { name: string; on: boolean; at: number };
   /** Extra coins earned by the streak multiplier, per device (each only grows; merged by taking the larger). Whole coins are summed. */
   coinBonus?: Record<string, number>;
+  /** Weeks in which a guild this person is in reached its weekly goal (`<guild id>:<week start>`). Grow-only, merged by union; each is worth coins. */
+  guildWins?: string[];
 }
 
 export type ReviewMode = 'flashcard' | 'blanks' | 'type' | 'speak';

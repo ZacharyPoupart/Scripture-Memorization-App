@@ -5,8 +5,48 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.50.0] - 2026-10-26
+
 ### Added
 - Streak multipliers. The longer your streak, the more every coin is worth: x1.2 from 3 days, x1.5 from 7, x2 from 14, x2.5 from 30 and x3 from 100. It applies to the coins from a review, a finished day and a level-up, and your current multiplier shows beside your coins on the avatar screen. The one-time streak milestone coins are unchanged.
+
+## [1.49.2] - 2026-10-26
+
+### Removed
+- The "Armor of God: 2 of 6 upgraded" line and its dots under the knight on the avatar screen.
+
+## [1.49.1] - 2026-10-26
+
+### Fixed
+- The sword sits a little further right on the knight, so the grip is in the hand.
+
+## [1.49.0] - 2026-10-26
+
+### Changed
+- The first two armor sets you can buy are cheaper: Silver Vanguard is 400 coins for the whole set (was 800) and Forest Guardian 1,000 (was 1,600). The prices of the later sets are unchanged, so it is easy to get started and the finest armor takes real saving. Anything you already bought stays yours, and the coins you spent on it are worked out at the new prices, so your balance goes up by the difference.
+
+## [1.48.0] - 2026-10-26
+
+### Changed
+- A group's weekly goal is now the reviews its members have due that week added up (a Daily verse counts 3 a day, a Weekly verse once, and so on), rounded to the nearest 5, instead of a flat 25 each.
+
+### Added
+- 25 coins for every member of a group of two or more when the group reaches its weekly goal. You need at least one review of your own that week, and the coins arrive the next time you open Friends.
+
+## [1.47.0] - 2026-10-26
+
+### Changed
+- The Weekly, Monthly and Yearly pile pages now always have a one-tap "Review all" button, even when nothing is due. It counts as extra practice and does not change the schedule.
+
+## [1.46.0] - 2026-10-26
+
+### Changed
+- The four pile counts (Daily, Weekly, Monthly, Yearly) now sit at the top of Today, above the day's card.
+
+## [1.45.1] - 2026-10-26
+
+### Fixed
+- On iPhone the last choices in the book, chapter and verse pickers (Revelation, the last verses) were hidden behind the bottom tab bar. Pop-up sheets now stop above the tab bar, so everything can be reached.
 
 ## [1.45.0] - 2026-10-26
 

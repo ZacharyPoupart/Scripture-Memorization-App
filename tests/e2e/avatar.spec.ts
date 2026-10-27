@@ -31,7 +31,6 @@ test.describe('avatar and seeds', () => {
     const before = Number((await page.getByTestId('seeds-balance').innerText()).replace(/\D/g, ''));
     expect(before).toBeGreaterThan(100);
     // everyone starts in the same free basic steel armor
-    await expect(page.getByTestId('armor-meter')).toContainText('0 of 6');
     await expect(page.getByTestId('item-helmet-iron-bulwark')).toContainText('Wearing');
     // a paid piece previews first, then is bought and worn
     await page.getByTestId('item-helmet-silver-vanguard').click();
@@ -39,8 +38,7 @@ test.describe('avatar and seeds', () => {
     await page.getByTestId('buy').click();
     await expect(page.getByTestId('item-helmet-silver-vanguard')).toContainText('Wearing');
     const after = Number((await page.getByTestId('seeds-balance').innerText()).replace(/\D/g, ''));
-    expect(after).toBe(before - 160);
-    await expect(page.getByTestId('armor-meter')).toContainText('1 of 6');
+    expect(after).toBe(before - 80);
     // going back to the free helmet is one tap and costs nothing
     await page.getByTestId('item-helmet-iron-bulwark').click();
     await expect(page.getByTestId('item-helmet-iron-bulwark')).toContainText('Wearing');
@@ -79,7 +77,7 @@ test.describe('avatar and seeds', () => {
     await page.getByRole('button', { name: 'Reset', exact: true }).click();
     await page.goto('/#/avatar');
     await expect(page.getByTestId('item-helmet-iron-bulwark')).toContainText('Wearing');
-    await expect(page.getByTestId('item-helmet-silver-vanguard')).toContainText('160');
+    await expect(page.getByTestId('item-helmet-silver-vanguard')).toContainText('80');
     expect(Number((await page.getByTestId('seeds-balance').innerText()).replace(/\D/g, ''))).toBe(before);
   });
 
@@ -90,9 +88,8 @@ test.describe('avatar and seeds', () => {
     await page.evaluate(() => (window as any).__mfl.armorFree(false));
     await addVerse(page, JOHN316);
     await page.goto('/#/avatar');
-    await expect(page.getByTestId('armor-meter')).toContainText('0 of 6');
     await expect(page.getByTestId('item-helmet-iron-bulwark')).toContainText('Wearing');
-    await expect(page.getByTestId('item-helmet-silver-vanguard')).toContainText('160');
+    await expect(page.getByTestId('item-helmet-silver-vanguard')).toContainText('80');
     await page.getByTestId('slot-chest').click();
     await expect(page.getByTestId('item-chest-iron-bulwark')).toContainText('Wearing');
     await expect(page.getByTestId('item-chest-sulestial')).toContainText('🔒');
@@ -115,7 +112,6 @@ test.describe('avatar and seeds', () => {
     await expect(page.getByTestId('armor-free-banner')).toBeVisible();
     await page.getByTestId('item-helmet-sulestial').click(); // costs seeds and a 365-day streak when not testing; now one tap wears it
     await expect(page.getByTestId('item-helmet-sulestial')).toContainText('Wearing');
-    await expect(page.getByTestId('armor-meter')).toContainText('1 of 6');
     await expect(page.getByTestId('seeds-balance')).toContainText('0'); // nothing was spent
   });
 

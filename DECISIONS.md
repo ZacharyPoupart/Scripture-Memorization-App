@@ -485,11 +485,56 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **What:** the "Move to Daily" button offered after a hard review now credits 83 of Daily's 90 days, so the verse is back in Daily with a week to go. It earns the days as usual and moves up to Weekly again after seven more.
 **Choices (tell me if you want them different):** only the move to Daily changed, as you asked. A move from Monthly to Weekly (or Yearly to Monthly) from the same offer still starts that pile fresh; I can give those a "one period to go" credit too. Moving a verse by hand from its page is unchanged.
 **Test changes:** new unit test (`moveDownDaysIn`, and a verse moved back to Daily has seven days left); the move-down e2e test now checks the ring says Day 83 of 90.
-**Undo:** roll back to the previous stage tag.
 
 ## Housekeeping — a stray `node_modules` link removed from the repo (no version bump)
 **What:** while working in temporary copies of the repo I linked `node_modules` into them, and my `git add -A` committed that link (it was merged to `main` with v1.42.0 by mistake). It points at itself, so a fresh checkout has a broken `node_modules` until `npm ci` replaces it; CI was not affected. It is now removed and `.gitignore` ignores `node_modules` even when it is a link.
 **Nothing changes in the app.** No version bump, so no new release tag.
+
+## v1.45.1 — Pickers no longer hide their last choices behind the tab bar (owner report)
+**What:** pop-up sheets (the book, chapter and verse pickers, the move-to-pile sheet, the topic list) used to reach the bottom of the screen, under the tab bar. They now end just above it, so the last row can always be scrolled into view. The tab bar stays visible and tappable under them.
+**Not changed:** pop-ups on screens without the tab bar (a review) and the celebration cards still use the whole screen.
+**Test changes:** new `picker.spec` test checks the last book and the last chapter number sit fully above the tab bar on a phone-sized screen (it failed before the fix: 40 px hidden).
+**Undo:** roll back to the previous stage tag.
+
+## v1.46.0 — Pile counts at the top of Today (owner request)
+**What:** the quiet row of pile counts (Daily 14, Weekly 8, Monthly 0, Yearly 0) moved from below the day's card to the top of Today, just under the avatar and streak line.
+**Choices (tell me if you want them different):** "the top" is directly under the avatar and streak, not above them; the row itself is unchanged. The tour's "Four piles" step points at the row wherever it is, so it needed no change.
+**Test changes:** the Today layout test now checks the row is above the day's card.
+**Undo:** roll back to the previous stage tag.
+
+## v1.47.0 — Review a whole pile in one tap (owner request)
+**What:** on the Weekly, Monthly and Yearly pile pages, when nothing is due the button now says "Review all · N verses" and starts the whole pile, instead of being disabled. The Only due / All switch is hidden in that case because there is nothing to choose. It is extra practice, so nothing in the schedule changes.
+**Choices (tell me if you want them different):** Daily is unchanged (it still says "Nothing due" and needs the All switch), because you asked about the other three. I can make Daily work the same way.
+**Test changes:** new e2e test (a verse just moved to Weekly has nothing due; the pile page offers "Review all" and starts a review).
+**Undo:** roll back to the previous stage tag.
+
+## v1.48.0 — Guild goal from what is due, and coins for reaching it (owner request)
+**What:** a group's weekly goal is the sum of every member's reviews due that week, rounded to the nearest 5 (never below 5). Per member: a Daily verse counts 3 on each day of the week after the one it was added (so up to 21), a Weekly verse counts 1, a Monthly or Yearly verse counts 1 in the week its month or year ends (otherwise 0). Reaching the goal pays 25 coins to each member, once per group per week.
+**How I read your formula (tell me if you meant something else):** "3 for Daily, times 7" became 3 a day over the week's 7 days, which is 21 for a Daily verse; the other piles are not multiplied by 7 because that would make a Weekly verse worth 7 reviews a week. Rounding is applied to the group's total, not to each person.
+**Rules I added (so the coins cannot be collected for nothing):** the group needs at least two people; you need a counted review of your own that week; each group pays once a week; and the coins are only claimed for the current week, when Friends next loads. If you were away when the goal was reached and the week has ended, that week's coins are not paid.
+**Choices (tell me if you want them different):** 25 coins (set by you) is a small thank-you for a good week with friends that does not outweigh your own streak. A member whose app is older shares no number yet, so for them I count 21 per Daily verse and 1 per Weekly verse.
+**What is shared:** one more number per person, "reviews due this week". Still never verses, references or topics. Reviews counts are still reported by each phone, so a determined person could fake them; groups are for friendly encouragement.
+**Data:** additive `guildWins` (list of ids, merged by union), `schema` stays 1, fixture `backup-v1.48.0-guildwins.json`.
+**Test changes:** unit tests for the weekly number, the rounding, the older-member fallback, claiming (once, group of two, own review, current week), merge, backup and migration; the group e2e now expects a goal of 5 when nobody has verses yet and shows the coin line.
+**Undo:** roll back to the previous stage tag. Coins already paid stay.
+
+## v1.49.0 — Cheaper first two armor sets (owner request)
+**What:** whole-set prices are now 0 (Iron Bulwark, free), 400 (Silver Vanguard), 1,000 (Forest Guardian), then 2,400, 3,600, 4,800, 6,400, 8,800, 12,000, 16,000 and 22,000 as before. A single piece is still a fixed share of its set, so a Silver Vanguard helmet is 80 coins (was 160).
+**Choices (tell me if you want them different):** you asked for the first two sets only, so the third set (Knight's Oath, 2,400) is unchanged. That leaves a steeper step from 1,000 to 2,400 (2.4 times) and then gentler steps (1.5, 1.3, 1.3, 1.4, 1.4, 1.3, 1.4). If you want a smoother curve I would bring Knight's Oath to about 1,800 and Stormcaller to about 3,000.
+**What happens to people who already bought:** nothing is taken away. Coins are worked out from reviews minus the cost of what you own at today's prices, so anyone who bought Silver Vanguard or Forest Guardian pieces simply sees a higher balance.
+**Test changes:** the price table test expects the new numbers and checks that prices only go up and that the first two are at most 400 and 1,000; the avatar e2e expects an 80-coin helmet.
+**Undo:** roll back to the previous stage tag.
+
+## v1.49.1 — Sword nudged right into the hand (owner request)
+**What:** the sword moved 8 units to the right (placement `dx` 36 to 44; it had been moved in from 48 earlier). Checked with a close-up of the knight holding a sword: the grip now covers the fist.
+**Choices (tell me if you want them different):** one small step; if it still looks off on your phone, tell me which way and I will go again in smaller steps.
+**Test changes:** none (a picture position; checked by eye).
+**Undo:** roll back to the previous stage tag.
+
+## v1.49.2 — The armor count under the knight is gone (owner request)
+**What:** removed the line "Armor of God: N of 6 upgraded" with its six dots (and the "Silver Vanguard set..." wording when the pieces matched) from the avatar screen. It counted any piece that was not the free start, which did not mean much.
+**Test changes:** the avatar e2e tests no longer look for it; they still check which piece is being worn.
+**Undo:** roll back to the previous stage tag.
 
 ## v1.50.0 — Streak multipliers on coins (owner request)
 **What:** coins from counted reviews (1), finished days (5) and level-ups (25) are multiplied by the streak you had coming in: x1.2 from 3 days, x1.5 from 7, x2 from 14, x2.5 from 30, x3 from 100 (under 3 days: x1). The avatar screen shows the multiplier next to your balance.
