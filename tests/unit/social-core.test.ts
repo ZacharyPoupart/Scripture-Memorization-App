@@ -3,7 +3,7 @@ import { exportBackup, normalizeData, parseBackup } from '../../src/core/backup.
 import { seedsEarned } from '../../src/core/avatar.ts';
 import { mergeData } from '../../src/core/merge.ts';
 import { recordReview } from '../../src/core/schedule.ts';
-import { cheerLine, cleanName, codeFrom, formatCode, guildLink, initialOf, inviteLink, inviteMessage, newIdentity, sameSnapshot, socialSnapshot, weeklyDue, guildWinsToClaim, type GuildView } from '../../src/core/social.ts';
+import { cheerLine, cleanName, codeFrom, formatCode, guildLink, initialOf, inviteLink, inviteMessage, newIdentity, sameSnapshot, socialSnapshot, weeklyDue, weekEndsAt, countdownText, guildWinsToClaim, type GuildView } from '../../src/core/social.ts';
 import { cleanSnap, guildGoal } from '../../functions/_lib/social.js';
 import { at, D0, day, DEVICE, john316, newData } from './helpers.ts';
 
@@ -243,5 +243,21 @@ describe('claiming the coins for a guild goal', () => {
     expect(guildWinsToClaim(d, [guild({ weekStart: '2026-01-04' })], me, now)).toEqual([]);
     expect(guildWinsToClaim(d, [guild({ members: [member(me, 0), member('b'.repeat(32), 40)] })], me, now)).toEqual([]);
     expect(guildWinsToClaim(d, [guild({ members: [member(me, 20, '2026-01-04'), member('b'.repeat(32), 20)] })], me, now)).toEqual([]);
+  });
+});
+
+describe('the weekly countdown', () => {
+  const ends = weekEndsAt('2026-10-18'); // the week Sunday 18 Oct to Saturday 24 Oct ends at local midnight after the 24th
+  it('ends at local midnight after Saturday', () => {
+    expect(ends).toBe(new Date(2026, 9, 25).getTime());
+  });
+  it('counts whole days, then gets precise on the last day', () => {
+    const h = 3600000;
+    expect(countdownText(ends - new Date(2026, 9, 18).getTime())).toBe('7 days left');
+    expect(countdownText(ends - new Date(2026, 9, 23, 12).getTime())).toBe('2 days left'); // Friday noon: a day and a half to go
+    expect(countdownText(24 * h)).toBe('24 h left');
+    expect(countdownText(5 * h + 20 * 60000)).toBe('5 h 20 min left');
+    expect(countdownText(12 * 60000)).toBe('12 min left');
+    expect(countdownText(0)).toBe('A new week is starting');
   });
 });

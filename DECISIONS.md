@@ -628,3 +628,10 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Choices (tell me if you want them different):** the stand is on the left side; friends can see it in the full knight, not in the small face pictures. A flag from a group you are not in can never be worn.
 **Test changes:** banner unit tests moved from scene to flag, plus `reconcileFlag`; avatar catalog tests know the new slot; the e2e banner test now covers wearing the flag, a redesign and leaving.
 **Undo:** roll back to the previous stage tag.
+
+## v1.63.0 — Group goal locked for the week, reward + countdown, members list (owner request)
+**Goal lock:** the server remembers each group's goal for the week it was first worked out in (`goalLock` on the group, one small write per group per week) and shows that number for the rest of the week. The goal is still the members' reviews due added up and rounded to 5, worked out from everyone's latest numbers the first time anyone looks at the group in the new week.
+**Week end:** a week runs Sunday to Saturday on each person's own clock, so the new goal starts at Saturday midnight local time. The countdown uses the viewer's clock; a group spread over time zones may flip over a few hours apart. The server takes the newest week any member has reported.
+**Choices (tell me if you want them different):** (1) a member who joins mid-week does not change the goal but their reviews do count toward it. (2) The countdown says "N days left" until the last 24 hours, then "H h M min left", then "M min left". (3) Tapping a member who is not your friend shows their knight and numbers but no cheer button.
+**Test changes:** server tests for the lock; core tests for `weekEndsAt` and `countdownText`; the group e2e test checks the leader line, members list, reward and countdown (the reward text moved to its own line).
+**Undo:** roll back to the previous stage tag.

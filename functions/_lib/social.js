@@ -4,7 +4,7 @@
 //
 // Storage is the same Cloudflare KV namespace the sync feature uses (binding SYNC), with different key prefixes:
 //   u:<id>   a profile {sh (hash of the secret), name, snap, at}      f:<id>  a person's friend ids
-//   inv:<code> {from}  ui:<id> {code, exp}                             g:<gid> a guild {name, owner, members, at}
+//   inv:<code> {from}  ui:<id> {code, exp}                             g:<gid> a guild {name, owner, members, at, goalLock?}
 //   gi:<code> {gid}   gu:<gid> {code, exp}                             ug:<id> a person's guild ids
 //   ch:<id>  recent cheers received [{from, at}] (a fixed 👏, never text)
 // Each person only ever writes their own profile; a friendship is "both lists contain the other", so removing someone works at once.
@@ -312,7 +312,14 @@ export async function handleSocial(request, kv, action, now = Date.now()) {
         const thisWeek = (c) => (c.snap.weekStart === weekStart ? doneOf(c.snap) : 0); // numbers from an older week count as nothing yet
         members.sort((a, b) => thisWeek(b) - thisWeek(a) || a.name.localeCompare(b.name));
         const progress = members.filter((c) => c.snap.weekStart === weekStart).reduce((n, c) => n + doneOf(c.snap), 0);
-        views.push({ id: gid, name: g.name, owner: g.owner, ...(g.banner ? { banner: g.banner } : {}), members, weekStart, goal: guildGoal(members.map((c) => dueOf(c.snap))), progress });
+        // the goal is worked out once, the first time the group is looked at in a new week, and then kept for that week: later
+        // verses and new members change next week's goal, never this one
+        let goal = g.goalLock && g.goalLock.weekStart === weekStart ? g.goalLock.goal : 0;
+        if (!goal) {
+          goal = guildGoal(members.map((c) => dueOf(c.snap)));
+          if (weekStart) await put(`g:${gid}`, { ...g, goalLock: { weekStart, goal } });
+        }
+        views.push({ id: gid, name: g.name, owner: g.owner, ...(g.banner ? { banner: g.banner } : {}), members, weekStart, goal, progress });
       }
       return json({ guilds: views });
     }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'preact/hooks';
 import { currentLook, defaultLook, GUILD_WIN_COINS, matchedSet, type Look } from '../core/avatar.ts';
-import { cleanName, cheerLine, codeFrom, formatCode, guildLink, inviteLink, inviteMessage, MAX_GUILD_NAME, MAX_NAME, type FriendCard, type GuildView } from '../core/social.ts';
+import { cleanName, cheerLine, codeFrom, formatCode, guildLink, inviteLink, inviteMessage, MAX_GUILD_NAME, MAX_NAME, countdownText, weekEndsAt, type FriendCard, type GuildView } from '../core/social.ts';
 import { api, socialMessage } from '../services/social.ts';
 import { navigate } from '../router.ts';
 import {
@@ -93,7 +93,7 @@ function FriendRow({ card, cheered, onOpen, onCheer, onRemove }: { card: FriendC
 }
 
 /** One friend up close: the whole suit of armor, their streaks and numbers, and the groups you share. */
-function FriendSheet({ card, groups, cheered, onCheer, onClose }: { card: FriendCard; groups: GuildView[]; cheered: boolean; onCheer: () => void; onClose: () => void }) {
+function FriendSheet({ card, groups, cheered, onCheer, onClose }: { card: FriendCard; groups: GuildView[]; cheered: boolean; onCheer?: () => void; onClose: () => void }) {
   const look = faceLook(card.snap.look);
   const set = matchedSet(look);
   const week = card.snap.week + (card.snap.extra ?? 0);
@@ -147,9 +147,11 @@ function FriendSheet({ card, groups, cheered, onCheer, onClose }: { card: Friend
             <div class="muted small">No group together</div>
           )}
         </div>
-        <button class="btn block" disabled={cheered} onClick={onCheer} data-testid="friend-sheet-cheer">
-          {cheered ? 'Cheered today' : `👏 Cheer ${card.name}`}
-        </button>
+        {onCheer && (
+          <button class="btn block" disabled={cheered} onClick={onCheer} data-testid="friend-sheet-cheer">
+            {cheered ? 'Cheered today' : `👏 Cheer ${card.name}`}
+          </button>
+        )}
         <button class="btn ghost block" onClick={onClose}>
           Done
         </button>
@@ -191,12 +193,18 @@ function InviteSheet({ title, code, link, message, onClose }: { title: string; c
   );
 }
 
-function GuildCard({ g, me, onInvite, onLeave }: { g: GuildView; me: string; onInvite: () => void; onLeave: () => void }) {
+function GuildCard({ g, me, onInvite, onLeave, onOpenMember }: { g: GuildView; me: string; onInvite: () => void; onLeave: () => void; onOpenMember: (m: FriendCard) => void }) {
   const [renaming, setRenaming] = useState(false);
   const [designing, setDesigning] = useState(false);
   const [title, setTitle] = useState(g.name);
   const pct = Math.min(100, Math.round((g.progress / Math.max(1, g.goal)) * 100));
   const done = g.progress >= g.goal;
+  const leader = g.members.find((m) => m.id === g.owner);
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 30000);
+    return () => clearInterval(t);
+  }, []);
   return (
     <div class="card stack" data-testid="guild-card">
       {renaming ? (
@@ -224,6 +232,11 @@ function GuildCard({ g, me, onInvite, onLeave }: { g: GuildView; me: string; onI
           <span class="muted small">{g.members.length} member{g.members.length === 1 ? '' : 's'}</span>
         </div>
       )}
+      {leader && !renaming && (
+        <div class="muted small" style={{ marginTop: '-6px' }} data-testid="guild-leader">
+          Led by {leader.id === me ? 'you' : leader.name}
+        </div>
+      )}
       {g.owner === me && !renaming && (
         <div class="row" style={{ gap: '16px' }}>
           <button class="link-btn" onClick={() => (setTitle(g.name), setRenaming(true))} data-testid="guild-rename">
@@ -241,23 +254,34 @@ function GuildCard({ g, me, onInvite, onLeave }: { g: GuildView; me: string; onI
         </div>
         <div class="muted small" style={{ marginTop: '4px' }} data-testid="guild-progress">
           {done ? 'Goal reached this week!' : 'Together this week'}: {g.progress} of {g.goal} reviews
-          {!done && g.members.length > 1 && (
+        </div>
+        <div class="muted small guild-reward" data-testid="guild-reward">
+          {g.members.length > 1 && (
             <>
+              <Coin /> {GUILD_WIN_COINS} each at the goal
               {' · '}
-              <Coin /> {GUILD_WIN_COINS} at the goal
             </>
           )}
+          <span data-testid="guild-countdown">{countdownText(weekEndsAt(g.weekStart) - now)}</span>
         </div>
       </div>
-      <ul class="guild-members">
+      <ul class="guild-members" data-testid="guild-members">
         {g.members.map((m) => (
           <li key={m.id}>
-            <Face card={m} size={34} />
-            <span class="guild-member-name">
-              {m.name}
-              {m.id === me ? ' (you)' : ''}
-            </span>
-            <span class="muted small">{m.snap.weekStart === g.weekStart ? m.snap.week + (m.snap.extra ?? 0) : 0}</span>
+            <button class="guild-member-btn" onClick={() => onOpenMember(m)} aria-label={`${m.name}${m.id === g.owner ? ', leader' : ''}. See their knight.`} data-testid="guild-member">
+              <Face card={m} size={34} />
+              <span class="guild-member-name">
+                {m.name}
+                {m.id === me ? ' (you)' : ''}
+                {m.id === g.owner && <span class="leader-tag"> · Leader</span>}
+              </span>
+              <span class="muted small guild-member-streak">
+                <Icon name="flame" fill /> {m.snap.streak}
+              </span>
+              <span class="guild-member-week" title="Reviews this week">
+                {m.snap.weekStart === g.weekStart ? m.snap.week + (m.snap.extra ?? 0) : 0}
+              </span>
+            </button>
           </li>
         ))}
       </ul>
@@ -284,6 +308,7 @@ export function Friends({ joinCode = '', guildCode = '' }: { joinCode?: string; 
   const [guildTyped, setGuildTyped] = useState('');
   const [removing, setRemoving] = useState<FriendCard | null>(null);
   const [opened, setOpened] = useState<string | null>(null);
+  const [openedMember, setOpenedMember] = useState<FriendCard | null>(null);
   const [leaving, setLeaving] = useState<GuildView | null>(null);
   const [stopping, setStopping] = useState(false);
   const [localError, setLocalError] = useState('');
@@ -553,7 +578,7 @@ export function Friends({ joinCode = '', guildCode = '' }: { joinCode?: string; 
             A small team with a weekly goal.
           </p>
           {(guilds ?? []).map((g) => (
-            <GuildCard key={g.id} g={g} me={data.social!.id} onInvite={() => void showGuildInvite(g)} onLeave={() => setLeaving(g)} />
+            <GuildCard key={g.id} g={g} me={data.social!.id} onInvite={() => void showGuildInvite(g)} onLeave={() => setLeaving(g)} onOpenMember={(m) => setOpenedMember(m)} />
           ))}
           <div class="card stack">
             <label class="field">
@@ -618,6 +643,19 @@ export function Friends({ joinCode = '', guildCode = '' }: { joinCode?: string; 
           cheered={social.cheered.includes(opened)}
           onCheer={() => void cheerFriend(opened).then((ok) => ok && showToast(`You cheered ${friends.find((f) => f.id === opened)?.name}.`))}
           onClose={() => setOpened(null)}
+        />
+      )}
+      {openedMember && (
+        <FriendSheet
+          card={openedMember}
+          groups={(guilds ?? []).filter((g) => g.members.some((m) => m.id === openedMember.id))}
+          cheered={social.cheered.includes(openedMember.id)}
+          onCheer={
+            openedMember.id !== data.social!.id && friends?.some((f) => f.id === openedMember.id)
+              ? () => void cheerFriend(openedMember.id).then((ok) => ok && showToast(`You cheered ${openedMember.name}.`))
+              : undefined
+          }
+          onClose={() => setOpenedMember(null)}
         />
       )}
       {removing && (

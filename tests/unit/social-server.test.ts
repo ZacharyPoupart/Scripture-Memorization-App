@@ -257,6 +257,20 @@ describe('guilds: invite only', () => {
     expect(JSON.stringify(g)).not.toContain('"sh"');
   });
 
+  it('the weekly goal is locked for the week: new verses and new members change next week, not this one', async () => {
+    const { code } = await guild();
+    await call('guild-join', { ...who(2), code });
+    await call('guild-join', { ...who(3), code });
+    expect((await call('guilds', who(1))).body.guilds[0].goal).toBe(130);
+    await join(2, 'Sam L.', snap({ week: 5, due: 100 })); // Sam adds many verses mid-week
+    await join(4, 'Lee K.', snap({ due: 80 }));
+    await call('guild-join', { ...who(4), code }); // and someone new arrives
+    expect((await call('guilds', who(1))).body.guilds[0].goal).toBe(130);
+    // the next week works the goal out again from what everyone has then
+    for (const n of [1, 2, 3, 4]) await join(n, `Person ${n}`, snap({ weekStart: '2026-10-25', due: 10 }));
+    expect((await call('guilds', who(1))).body.guilds[0].goal).toBe(40);
+  });
+
   it('extra practice adds to the group\u2019s progress and to a member\u2019s total', async () => {
     const { code } = await guild();
     await call('guild-join', { ...who(2), code });
