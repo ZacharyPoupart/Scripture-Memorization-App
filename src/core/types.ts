@@ -42,6 +42,8 @@ export interface LedgerDay {
   o?: DayOutcome;
   /** 1 when the day fell inside a "break" (pause): nothing was due, nothing was missed, no progress was earned. */
   p?: 1;
+  /** 1 for a full day: everything due was done all the way (every Daily verse reviewed 3 times, and the Weekly, Monthly and Yearly ones that were ready). Only ever added, merged with OR. */
+  f?: 1;
 }
 
 export interface LevelUp {

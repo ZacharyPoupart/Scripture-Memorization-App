@@ -54,7 +54,7 @@ test.describe('stats screen', () => {
     await expect(page.getByTestId('stat-verses')).toContainText('4');
     await expect(page.getByTestId('heatmap').locator('.cell')).toHaveCount(26 * 7);
     expect(await page.getByTestId('heatmap').locator('.cell.k-complete').count()).toBeGreaterThan(50);
-    await expect(page.getByTestId('heat-summary')).toContainText(/days with everything done/); // screen-reader summary
+    await expect(page.getByTestId('heat-summary')).toContainText(/days with every verse reviewed/); // screen-reader summary
     await expect(page.getByTestId('pile-stat-daily')).toContainText('2');
     await expect(page.getByTestId('pile-stat-yearly')).toContainText('1');
     await expect(page.getByTestId('nearly').first()).toContainText(/(days?|weeks?|months?) to/);

@@ -58,13 +58,13 @@ describe('calendar heatmap', () => {
 
   it('shows complete and practiced days, and never marks a missed day differently from an empty one', () => {
     const data = dataWithHistory();
-    expect(dayKind(data, day(2))).toBe('complete');
+    expect(dayKind(data, day(2))).toBe('full'); // all three reviews were done
     expect(dayKind(data, day(6))).toBe('none'); // missed: no blame, same as nothing
     expect(dayKind(data, day(-30))).toBe('none');
     data.ledger[day(6)] = { r: 1, o: 'm' };
     expect(dayKind(data, day(6))).toBe('practiced');
     const cells = heatmap(data, at(day(10)), 4).flat();
-    expect(cells.find((c) => c.day === day(3))!.kind).toBe('complete');
+    expect(cells.find((c) => c.day === day(3))!.kind).toBe('full');
   });
 });
 

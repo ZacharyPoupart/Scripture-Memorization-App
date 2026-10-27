@@ -15,6 +15,7 @@ export function Stats() {
   const t = totals(data);
   const cols = heatmap(data, now, WEEKS);
   const cells = cols.flat().filter((c) => !c.future);
+  const full = cells.filter((c) => c.kind === 'full').length;
   const complete = cells.filter((c) => c.kind === 'complete').length;
   const practiced = cells.filter((c) => c.kind === 'practiced').length;
   const saved = cells.filter((c) => c.kind === 'saved').length;
@@ -65,7 +66,7 @@ export function Stats() {
         <div class="card stack">
           <h2>Your practice</h2>
           <p class="sr-only" data-testid="heat-summary">
-            In the last {WEEKS} weeks: {complete} days with everything done, {practiced} other days practiced{saved ? `, ${saved} streak ${saved === 1 ? 'save' : 'saves'} used` : ''}.
+            In the last {WEEKS} weeks: {full} full days, {complete} days with every verse reviewed, {practiced} other days practiced{saved ? `, ${saved} streak ${saved === 1 ? 'save' : 'saves'} used` : ''}.
           </p>
           <div class="heat-wrap" aria-hidden="true">
             <div class="heat-days">
@@ -75,7 +76,7 @@ export function Stats() {
             </div>
             <div class="heat" data-testid="heatmap" style={{ gridTemplateColumns: `repeat(${WEEKS}, minmax(0, 1fr))` }}>
               {cols.map((col, w) =>
-                col.map((c) => <i key={`${w}-${c.day}`} class={`cell k-${c.future ? 'future' : c.kind}`} title={`${fmt(c.day)}: ${c.future ? '' : c.kind === 'complete' ? 'all done' : c.kind === 'practiced' ? 'practiced' : c.kind === 'saved' ? 'streak saved' : 'no practice'}`} />),
+                col.map((c) => <i key={`${w}-${c.day}`} class={`cell k-${c.future ? 'future' : c.kind}`} title={`${fmt(c.day)}: ${c.future ? '' : c.kind === 'full' ? 'full day' : c.kind === 'complete' ? 'all done' : c.kind === 'practiced' ? 'practiced' : c.kind === 'saved' ? 'streak saved' : 'no practice'}`} />),
               )}
             </div>
           </div>
@@ -83,13 +84,14 @@ export function Stats() {
             <span><i class="cell k-none" /> Rest</span>
             <span><i class="cell k-practiced" /> Practiced</span>
             <span><i class="cell k-complete" /> All done</span>
+            <span><i class="cell k-full" /> Full day</span>
             {saved > 0 && (
               <span data-testid="heat-saved">
                 <i class="cell k-saved" /> Streak saved
               </span>
             )}
             <span class="grow" />
-            <span data-testid="heat-counts">{complete} all-done · {practiced} practiced</span>
+            <span data-testid="heat-counts">{full} full · {complete} all-done · {practiced} practiced</span>
           </div>
         </div>
 
