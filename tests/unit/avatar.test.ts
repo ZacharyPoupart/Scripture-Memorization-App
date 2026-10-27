@@ -298,12 +298,13 @@ describe('earning seeds', () => {
     const streakBonus = [1, 3].reduce((n, m) => n + (data.longestStreak >= m ? STREAK_SEED_BONUS[m] : 0), 0); // a 3-day streak was reached
     expect(data.longestStreak).toBe(3);
     expect(seedsEarned(data)).toBe(counted + doneDays * 5 + streakBonus);
-    // the first counted review of a new day pays 1 (+5 because it completes the day for the streak);
+    // the first counted review of a new day pays 1 (+5 because it completes the day for the streak), more on a streak (see coins.test.ts);
     // a second review inside the cooldown is extra practice and pays nothing
     const before = seedsEarned(data);
     recordReview(data, v.id, at(day(4), '09:00'), DEVICE);
     const afterFirst = seedsEarned(data);
-    expect(afterFirst).toBe(before + 1 + 5);
+    expect(afterFirst - before).toBeGreaterThanOrEqual(1 + 5);
+    expect(afterFirst - before).toBeLessThanOrEqual(1 + 5 + 2); // on a 3-day streak the day's coins are worth 1.2x
     recordReview(data, v.id, at(day(4), '09:05'), DEVICE);
     expect(seedsEarned(data)).toBe(afterFirst);
   });

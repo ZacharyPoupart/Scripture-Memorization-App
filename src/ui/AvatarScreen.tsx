@@ -3,14 +3,12 @@ import {
   ARMOR_NAMES,
   ARMOR_SLOTS,
   sceneUrl,
-  armorWorn,
   currentLook,
   describeUnlock,
   isGated,
   isUnlocked,
   itemById,
   itemsIn,
-  matchedSet,
   owns,
   seedsBalance,
   shortUnlock,
@@ -21,6 +19,8 @@ import {
   type Item,
   type Slot,
 } from '../core/avatar.ts';
+import { streakMultiplier } from '../core/coins.ts';
+import { streakInfo } from '../core/schedule.ts';
 import { back } from '../router.ts';
 import { buyAndWear, showToast, useApp, wearItem } from '../store.ts';
 import { armorUrl } from './ArmorArt.tsx';
@@ -34,11 +34,10 @@ export function AvatarScreen() {
   const [pick, setPick] = useState<string | null>(null);
   const look = currentLook(data);
   const balance = seedsBalance(data);
+  const multiplier = streakMultiplier(streakInfo(data, Date.now()).count);
   const picked = pick ? itemById(pick) : undefined;
   const shown = picked ? { ...look, [picked.slot]: picked.id } : look;
   const items = itemsIn(slot);
-  const worn = armorWorn(look);
-  const matched = matchedSet(look);
   const armorInfo = (ARMOR_SLOTS as readonly string[]).includes(slot) ? ARMOR_NAMES[slot as (typeof ARMOR_SLOTS)[number]] : null;
 
   const choose = (item: Item) => {
@@ -72,6 +71,11 @@ export function AvatarScreen() {
             <h1 class="grow" style={{ margin: 0 }}>
               Your avatar
             </h1>
+            {multiplier > 1 && (
+              <span class="chip" data-testid="streak-multiplier" title="Your streak makes every coin worth more" aria-label={`Streak multiplier ${multiplier}`}>
+                ×{multiplier}
+              </span>
+            )}
             <span class="chip seeds-chip" data-testid="seeds-balance" aria-label={`${balance} coins`}>
               <Coin /> {balance}
             </span>
@@ -85,16 +89,6 @@ export function AvatarScreen() {
 
           <div class="card center stack avatar-stage">
             <AvatarFigure look={shown} size={200} title="Your knight" />
-            <div class="armor-meter" data-testid="armor-meter">
-              <strong>
-                {matched ? `${matched.name} set — helmet, chest plate, belt and boots match` : worn === ARMOR_SLOTS.length ? 'Full armor of God' : `Armor of God: ${worn} of ${ARMOR_SLOTS.length} upgraded`}
-              </strong>
-              <span class="armor-pips" aria-hidden="true">
-                {ARMOR_SLOTS.map((s) => (
-                  <i key={s} class={look[s].endsWith('-none') ? '' : 'on'} />
-                ))}
-              </span>
-            </div>
           </div>
 
           {[

@@ -81,6 +81,8 @@ export interface AppData {
   social?: { id: string; secret: string; at: number };
   /** What is shared with friends: the name they see and whether sharing is on. The later decision wins. */
   sharing?: { name: string; on: boolean; at: number };
+  /** Extra coins earned by the streak multiplier, per device (each only grows; merged by taking the larger). Whole coins are summed. */
+  coinBonus?: Record<string, number>;
   /** Weeks in which a guild this person is in reached its weekly goal (`<guild id>:<week start>`). Grow-only, merged by union; each is worth coins. */
   guildWins?: string[];
   /** Extra-practice reviews (ones that did not count for the schedule) done this week, per device, so they can count toward a guild's goal. Only the current week matters: a newer week replaces an older one, the same week keeps the larger count. Never earns coins. */

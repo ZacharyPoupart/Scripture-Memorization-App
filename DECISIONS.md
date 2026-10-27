@@ -525,6 +525,25 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Test changes:** the price table test expects the new numbers and checks that prices only go up and that the first two are at most 400 and 1,000; the avatar e2e expects an 80-coin helmet.
 **Undo:** roll back to the previous stage tag.
 
+## v1.49.1 — Sword nudged right into the hand (owner request)
+**What:** the sword moved 8 units to the right (placement `dx` 36 to 44; it had been moved in from 48 earlier). Checked with a close-up of the knight holding a sword: the grip now covers the fist.
+**Choices (tell me if you want them different):** one small step; if it still looks off on your phone, tell me which way and I will go again in smaller steps.
+**Test changes:** none (a picture position; checked by eye).
+**Undo:** roll back to the previous stage tag.
+
+## v1.49.2 — The armor count under the knight is gone (owner request)
+**What:** removed the line "Armor of God: N of 6 upgraded" with its six dots (and the "Silver Vanguard set..." wording when the pieces matched) from the avatar screen. It counted any piece that was not the free start, which did not mean much.
+**Test changes:** the avatar e2e tests no longer look for it; they still check which piece is being worn.
+**Undo:** roll back to the previous stage tag.
+
+## v1.50.0 — Streak multipliers on coins (owner request)
+**What:** coins from counted reviews (1), finished days (5) and level-ups (25) are multiplied by the streak you had coming in: x1.2 from 3 days, x1.5 from 7, x2 from 14, x2.5 from 30, x3 from 100 (under 3 days: x1). The avatar screen shows the multiplier next to your balance.
+**Choices (tell me if you want them different):** (1) the multiplier steps are my guess; they live in one table (`STREAK_MULTIPLIERS` in `core/coins.ts`) so changing them is easy. (2) I kept the one-time milestone bonuses (2 coins for day 1 up to 500 for day 1,000) because taking them away would lower balances, and nothing is ever taken away; say so if you want them replaced by the multiplier going forward. (3) The multiplier uses the streak you came in with that day, so the first review after a break is x1 and the review that finishes day 7 already pays x1.5 only from day 8. (4) Coins from level-ups that happen at midnight rather than during a review are not multiplied. (5) Guild goal coins and milestone coins are not multiplied.
+**Effect on the economy:** a 100-day streak triples earnings, so a steady user reaches the 12,000 to 22,000 coin sets noticeably sooner. If that is too fast, lower the top steps.
+**Why a stored extra:** every other coin is worked out from history, but the multiplier depends on the streak on the day, which cannot be rebuilt later (old reviews are pruned), so each device keeps a running total of the extra it earned. Additive field `coinBonus`, merged by taking each device's largest total; `schema` stays 1.
+**Test changes:** new `coins.test.ts` (the table, a 7-day-streak review paying x1.5 on the review and the finished day, no streak paying nothing extra, whole coins, merge and backup); the "+1 per review, +5 per day" test allows for the 3-day multiplier; migration fixture `backup-v1.50.0-coinbonus.json`.
+**Undo:** roll back to the previous stage tag. Coins already earned stay.
+
 ## v1.51.0 — Extra practice counts for the guild goal (owner request)
 **What:** a review of a verse that is not due (extra practice) used to leave no trace, so it could not count for a group. Each device now keeps a small tally of extra practice for the current week (`data.extraWeek`, additive, schema stays 1; a newer week replaces an older one, the same week keeps the larger count; fixture `backup-v1.51.0-extraweek.json`). Friends see it as `extra`, and the server adds it to each member's reviews when it works out the group's progress. A person who only did extra practice this week can also claim the group's coins.
 **Coins (undecided, so unchanged):** extra practice still earns no coins of its own and moves nothing in the schedule or the streak. If you decide it should earn coins, it is a small change and the tally is already there to count.

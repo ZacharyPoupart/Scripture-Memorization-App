@@ -163,6 +163,15 @@ describe('friends (v1.37.0): the private identity and sharing choice travel with
     expect(mergeData(old, data).social).toEqual(data.social);
   });
 
+  it('opens a backup with streak-multiplier coins (v1.50.0) and older ones without', () => {
+    expect(parseBackup(BACKUP).coinBonus).toBeUndefined();
+    const data = parseBackup(read('backup-v1.50.0-coinbonus.json'));
+    expect(data.coinBonus).toEqual({ 'dev-A': 12.5, 'dev-B': 3 });
+    expect(parseBackup(exportBackup(data, '9.9.9', at('2026-03-15')))).toEqual(data);
+    expect(mergeData(data, data)).toEqual(data);
+    expect(mergeData(parseBackup(BACKUP), data).coinBonus).toEqual(data.coinBonus);
+  });
+
   it('opens a backup that records guild goals reached (v1.48.0) and older ones without them', () => {
     expect(parseBackup(BACKUP).guildWins).toBeUndefined();
     const data = parseBackup(read('backup-v1.48.0-guildwins.json'));
