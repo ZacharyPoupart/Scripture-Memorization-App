@@ -18,7 +18,7 @@ const WORDS: Record<SocialErrorCode, string> = {
   'not-configured': 'Friends are not switched on for this app yet.',
   forbidden: 'Something is out of date on this device. Try turning friends off and on again.',
   'not-found': 'That code did not work. It may have expired, so ask for a new one.',
-  full: 'That is full.',
+  full: 'That group is full, or you are already in 3 groups.',
   'own-code': 'That is your own code. Send it to a friend instead.',
   server: 'Something went wrong. Please try again in a moment.',
 };
@@ -79,5 +79,6 @@ export const api = {
   guildInvite: (a: Auth, gid: string) => socialCall<{ code: string; expiresAt: number }>('guild-invite', { ...a, gid }),
   guildInfo: (code: string) => socialCall<{ name: string; members: number }>('guild-info', { code }),
   guildJoin: (a: Auth, code: string) => socialCall<{ gid: string }>('guild-join', { ...a, code }),
+  guildRename: (a: Auth, gid: string, name: string) => socialCall<{ ok: true }>('guild-rename', { ...a, gid, name }),
   guildLeave: (a: Auth, gid: string) => socialCall<{ ok: true }>('guild-leave', { ...a, gid }),
 };

@@ -446,6 +446,15 @@ export async function joinGuild(code: string): Promise<boolean> {
   return !!r;
 }
 
+export async function renameGuild(gid: string, rawName: string): Promise<boolean> {
+  const auth = authOf();
+  const name = cleanName(rawName, MAX_GUILD_NAME);
+  if (!auth || !name) return false;
+  const r = await guarded(() => api.guildRename(auth, gid, name));
+  if (r) patchSocial({ guilds: (state.social.guilds ?? []).map((g) => (g.id === gid ? { ...g, name } : g)) });
+  return !!r;
+}
+
 export async function leaveGuild(gid: string): Promise<boolean> {
   const auth = authOf();
   if (!auth) return false;

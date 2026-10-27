@@ -17,7 +17,7 @@ const DAY = /^\d{4}-\d{2}-\d{2}$/;
 const MAX_BODY = 4096;
 const MAX_FRIENDS = 200;
 const MAX_GUILD_MEMBERS = 30;
-const MAX_GUILDS = 5;
+const MAX_GUILDS = 3;
 const FRIEND_INVITE_TTL = 7 * 86400;
 const GUILD_INVITE_TTL = 14 * 86400;
 const CHEER_KEEP = 7 * 86400_000; // how long a cheer stays on someone's page
@@ -267,6 +267,16 @@ export async function handleSocial(request, kv, action, now = Date.now()) {
       await put(`g:${gi.gid}`, { ...g, members: [...g.members, id] });
       await put(`ug:${id}`, [...mine, gi.gid]);
       return json({ ok: true, gid: gi.gid });
+    }
+
+    case 'guild-rename': {
+      const name = cleanName(body.name, 30);
+      if (!name) return fail('bad-request', 400);
+      const g = await memberGuild(kv, body.gid, id);
+      if (!g) return fail('not-found', 404);
+      if (g.owner !== id) return fail('forbidden', 403); // only the leader renames
+      if (g.name !== name) await put(`g:${body.gid}`, { ...g, name });
+      return json({ ok: true });
     }
 
     case 'guild-leave': {

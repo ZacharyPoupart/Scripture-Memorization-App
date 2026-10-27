@@ -6,11 +6,13 @@ function memoryKv() {
   const m = new Map<string, string>();
   return {
     m,
+    puts: 0,
     async get(key: string) {
       const v = m.get(key);
       return v ? JSON.parse(v) : null;
     },
     async put(key: string, value: string) {
+      this.puts++;
       m.set(key, value);
     },
     async delete(key: string) {
@@ -288,9 +290,9 @@ describe('guilds: invite only', () => {
     expect((await call('guild-info', { code })).status).toBe(404);
   });
 
-  it('a person can be in at most five guilds, and a guild holds at most thirty people', async () => {
+  it('a person can be in at most three guilds, and a guild holds at most thirty people', async () => {
     await join(1);
-    for (let i = 0; i < 5; i++) expect((await call('guild-create', { ...who(1), name: `G${i}` })).status).toBe(200);
+    for (let i = 0; i < 3; i++) expect((await call('guild-create', { ...who(1), name: `G${i}` })).status).toBe(200);
     expect((await call('guild-create', { ...who(1), name: 'one more' })).status).toBe(409);
     await join(2);
     const gid = (await call('guild-create', { ...who(2), name: 'Big' })).body.gid;
@@ -301,6 +303,20 @@ describe('guilds: invite only', () => {
     }
     await join(99);
     expect((await call('guild-join', { ...who(99), code })).status).toBe(409);
+  });
+
+  it('only the leader can rename a group, and everyone sees the new name', async () => {
+    const { gid, code } = await guild();
+    await call('guild-join', { ...who(2), code });
+    expect((await call('guild-rename', { ...who(2), gid, name: 'Hijack' })).status).toBe(403); // not the leader
+    expect((await call('guild-rename', { ...who(1), gid, name: '   ' })).status).toBe(400);
+    expect((await call('guild-rename', { ...who(3), gid, name: 'Outsider' })).status).toBe(404); // not a member
+    expect((await call('guild-rename', { ...who(1), gid, name: '  Bible \u200b Crew  ' })).status).toBe(200);
+    expect((await call('guilds', who(2))).body.guilds[0].name).toBe('Bible Crew');
+    expect((await call('guild-info', { code })).body.name).toBe('Bible Crew');
+    const writes = kv.puts;
+    await call('guild-rename', { ...who(1), gid, name: 'Bible Crew' }); // unchanged: nothing is written
+    expect(kv.puts).toBe(writes);
   });
 
   it('deleting a profile also leaves its guilds', async () => {
