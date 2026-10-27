@@ -112,6 +112,12 @@ export function FlagStand({ banner }: { banner: Banner }) {
   const tight = `fst-${spec}`;
   const fold = `fsf-${spec}`;
   const ball = `fsg-${spec}`;
+  const weave = `fsw-${spec}`;
+  const folds = `fsd-${spec}`;
+  const woodV = `fsv-${spec}`;
+  const woodH = `fsh-${spec}`;
+  const poleClip = `fsp-${spec}`;
+  const barClip = `fsr-${spec}`;
   return (
     <g data-testid="flag-stand" data-flag={spec}>
       <defs>
@@ -130,6 +136,35 @@ export function FlagStand({ banner }: { banner: Banner }) {
           <stop offset="0.45" stop-color="#e3b23c" />
           <stop offset="1" stop-color="#9a6a14" />
         </radialGradient>
+        {/* woven cloth: a fine criss-cross, and soft vertical folds that catch the light */}
+        <pattern id={weave} width="3" height="3" patternUnits="userSpaceOnUse">
+          <path d="M0 0.6 H3 M0.6 0 V3" stroke="#000" stroke-width="0.7" opacity="0.09" fill="none" />
+          <path d="M0 2.1 H3 M2.1 0 V3" stroke="#fff" stroke-width="0.5" opacity="0.07" fill="none" />
+        </pattern>
+        <linearGradient id={folds} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#000" stop-opacity="0.22" />
+          <stop offset="0.16" stop-color="#fff" stop-opacity="0.1" />
+          <stop offset="0.34" stop-color="#000" stop-opacity="0.18" />
+          <stop offset="0.52" stop-color="#fff" stop-opacity="0.12" />
+          <stop offset="0.7" stop-color="#000" stop-opacity="0.2" />
+          <stop offset="0.86" stop-color="#fff" stop-opacity="0.08" />
+          <stop offset="1" stop-color="#000" stop-opacity="0.26" />
+        </linearGradient>
+        {/* wood grain: stretched noise along the length of the pole and the crossbar */}
+        <filter id={woodV} x="99" y="16" width="6" height="99" filterUnits="userSpaceOnUse">
+          <feTurbulence type="fractalNoise" baseFrequency="1.3 0.05" numOctaves="2" seed="7" />
+          <feColorMatrix type="matrix" values="0 0 0 0 0.14  0 0 0 0 0.07  0 0 0 0 0.01  0 0 0 3.4 -1.3" />
+        </filter>
+        <filter id={woodH} x="84" y="21" width="36" height="6" filterUnits="userSpaceOnUse">
+          <feTurbulence type="fractalNoise" baseFrequency="0.05 1.3" numOctaves="2" seed="4" />
+          <feColorMatrix type="matrix" values="0 0 0 0 0.14  0 0 0 0 0.07  0 0 0 0 0.01  0 0 0 3.4 -1.3" />
+        </filter>
+        <clipPath id={poleClip}>
+          <rect x="100.6" y="18" width="2.8" height="95" rx="1.2" />
+        </clipPath>
+        <clipPath id={barClip}>
+          <rect x="85" y="22" width="34" height="2.8" rx="1.2" />
+        </clipPath>
         <linearGradient id={fold} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stop-color="#000" stop-opacity="0.34" />
           <stop offset="1" stop-color="#000" stop-opacity="0" />
@@ -141,12 +176,16 @@ export function FlagStand({ banner }: { banner: Banner }) {
       {/* the pole's own shadow on the scene behind it */}
       <rect x="96.4" y="20.5" width="3.6" height="93.5" rx="1.4" fill="#000" opacity="0.6" filter={`url(#${tight})`} />
       <rect x="100.6" y="18" width="2.8" height="95" rx="1.2" fill="#8a6a2a" stroke="#5a4416" stroke-width="0.6" />
+      <rect x="99" y="16" width="6" height="99" clip-path={`url(#${poleClip})`} filter={`url(#${woodV})`} />
       {/* the pole's lit side is on the right, its left side is in shade */}
       <rect x="100.6" y="18" width="1.2" height="95" rx="0.6" fill="#000" opacity="0.28" />
+      <rect x="102.6" y="18" width="0.5" height="95" rx="0.25" fill="#f7e0a0" opacity="0.28" />
       <circle cx="100" cy="19" r="3.2" fill="#000" opacity="0.6" filter={`url(#${tight})`} />
       <circle cx="102" cy="17" r="3" fill={`url(#${ball})`} stroke="#7a4f12" stroke-width="0.8" />
       <rect x="85" y="24" width="34" height="2.8" rx="1.2" fill="#000" opacity="0.3" filter={`url(#${tight})`} />
       <rect x="85" y="22" width="34" height="2.8" rx="1.2" fill="#8a6a2a" stroke="#5a4416" stroke-width="0.6" />
+      <rect x="84" y="21" width="36" height="6" clip-path={`url(#${barClip})`} filter={`url(#${woodH})`} />
+      <rect x="85.4" y="22.3" width="33.2" height="0.6" rx="0.3" fill="#f7e0a0" opacity="0.3" />
       {/* the banner throws a soft shadow onto the scene behind it */}
       <g transform="translate(83 29.8) scale(0.3)" opacity="0.75" filter={`url(#${soft})`}>
         <path d={SHIELD} fill="#000" />
@@ -155,13 +194,28 @@ export function FlagStand({ banner }: { banner: Banner }) {
         <g clip-path={`url(#${clip})`}>
           <rect x="0" y="0" width="100" height="130" fill={colorHex(banner.field)} />
           <Pattern design={banner.design} color={colorHex(banner.pattern)} />
+          <rect x="0" y="0" width="100" height="130" fill={`url(#${weave})`} />
+          <rect x="0" y="0" width="100" height="130" fill={`url(#${folds})`} />
           <rect x="0" y="0" width="100" height="130" fill={`url(#${shade})`} />
           {/* the crossbar shades the top of the cloth */}
           <rect x="0" y="0" width="100" height="26" fill={`url(#${fold})`} />
         </g>
         <path d={SHIELD} fill="none" stroke="#7a4f12" stroke-width="7" stroke-linejoin="round" />
         <path d={SHIELD} fill="none" stroke="#e3b23c" stroke-width="4.4" stroke-linejoin="round" />
+        {/* stitching just inside the gold edge */}
+        <path d="M17 17 H83 V70 C83 94 67 106 50 112.5 C33 106 17 94 17 70 Z" fill="none" stroke="#f7e0a0" stroke-width="1.6" stroke-dasharray="5 4" stroke-linecap="round" opacity="0.6" />
       </g>
+      {/* sewn loops carrying the cloth on the crossbar */}
+      {[93, 111].map((x) => (
+        <g key={x}>
+          <rect x={x - 1.8} y="22.2" width="3.6" height="7.4" rx="1.1" fill={colorHex(banner.field)} stroke="#3a2a0a" stroke-width="0.5" />
+          <rect x={x - 1.8} y="22.2" width="3.6" height="7.4" rx="1.1" fill={`url(#${weave})`} />
+          <rect x={x - 1.3} y="22.8" width="0.8" height="6" rx="0.4" fill="#fff" opacity="0.18" />
+        </g>
+      ))}
+      {/* a little gold tassel hanging from the point */}
+      <path d="M102 61.2 L99.9 63.6 H104.1 Z" fill="#e3b23c" stroke="#7a4f12" stroke-width="0.4" />
+      <path d="M100.2 63.6 V67.4 M101.4 63.6 V68 M102.6 63.6 V68 M103.8 63.6 V67.4" stroke="#e3b23c" stroke-width="0.7" stroke-linecap="round" />
     </g>
   );
 }
