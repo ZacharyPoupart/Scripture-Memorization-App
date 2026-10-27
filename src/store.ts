@@ -263,6 +263,29 @@ export function applyTheme() {
   const t = state.settings.theme;
   if (t === 'system') document.documentElement.removeAttribute('data-theme');
   else document.documentElement.setAttribute('data-theme', t);
+  syncBrowserColor();
+}
+
+/**
+ * The strip the phone draws behind the clock (the status bar) takes its colour from the page's `theme-color`. The tags in
+ * index.html follow the phone's light/dark setting, so someone whose app is on Light while the phone is on Dark got a black box
+ * above a light page. Keep one tag, always the colour the page itself is using.
+ */
+let watchingSystemTheme = false;
+function syncBrowserColor() {
+  if (typeof document === 'undefined') return;
+  const color = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+  if (color) {
+    document.querySelectorAll('meta[name="theme-color"]').forEach((m) => m.remove());
+    const meta = document.createElement('meta');
+    meta.name = 'theme-color';
+    meta.content = color;
+    document.head.appendChild(meta);
+  }
+  if (!watchingSystemTheme && typeof matchMedia === 'function') {
+    watchingSystemTheme = true;
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => syncBrowserColor());
+  }
 }
 
 // ---------------------------------------------------------------- friends and guilds
