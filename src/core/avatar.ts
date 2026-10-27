@@ -109,8 +109,8 @@ export interface ArmorSet {
 }
 export const SETS: ArmorSet[] = [
   { n: 1, id: 'iron-bulwark', name: 'Iron Bulwark', price: 0 },
-  { n: 2, id: 'silver-vanguard', name: 'Silver Vanguard', price: 800 },
-  { n: 3, id: 'forest-guardian', name: 'Forest Guardian', price: 1600 },
+  { n: 2, id: 'silver-vanguard', name: 'Silver Vanguard', price: 400 },
+  { n: 3, id: 'forest-guardian', name: 'Forest Guardian', price: 1000 },
   { n: 4, id: 'knights-oath', name: 'Knight’s Oath', price: 2400 },
   { n: 5, id: 'stormcaller', name: 'Stormcaller', price: 3600 },
   { n: 6, id: 'frostborn', name: 'Frostborn', price: 4800 },
@@ -233,6 +233,8 @@ export const STREAK_SEED_BONUS: Record<number, number> = {
 export const SEEDS_PER_REVIEW = 1;
 export const SEEDS_PER_DAY = 5;
 export const SEEDS_PER_LEVELUP = 25;
+/** Coins for each week a guild you are in reaches its weekly goal. */
+export const GUILD_WIN_COINS = 25;
 
 const totalCounted = (data: AppData) => Object.values(data.reviewsByDevice).reduce((a, b) => a + b, 0);
 
@@ -245,7 +247,7 @@ export function seedsEarned(data: AppData): number {
   const days = Object.values(data.ledger).filter((e) => e.o === 'c').length;
   let bonus = 0;
   for (const m of STREAK_MILESTONES) if (data.longestStreak >= m) bonus += STREAK_SEED_BONUS[m] ?? 0;
-  return totalCounted(data) * SEEDS_PER_REVIEW + days * SEEDS_PER_DAY + data.levelUps.length * SEEDS_PER_LEVELUP + bonus;
+  return totalCounted(data) * SEEDS_PER_REVIEW + days * SEEDS_PER_DAY + data.levelUps.length * SEEDS_PER_LEVELUP + (data.guildWins?.length ?? 0) * GUILD_WIN_COINS + bonus;
 }
 
 export function seedsSpent(data: AppData): number {

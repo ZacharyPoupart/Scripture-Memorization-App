@@ -38,7 +38,7 @@ test.describe('avatar and seeds', () => {
     await page.getByTestId('buy').click();
     await expect(page.getByTestId('item-helmet-silver-vanguard')).toContainText('Wearing');
     const after = Number((await page.getByTestId('seeds-balance').innerText()).replace(/\D/g, ''));
-    expect(after).toBe(before - 160);
+    expect(after).toBe(before - 80);
     // going back to the free helmet is one tap and costs nothing
     await page.getByTestId('item-helmet-iron-bulwark').click();
     await expect(page.getByTestId('item-helmet-iron-bulwark')).toContainText('Wearing');
@@ -77,7 +77,7 @@ test.describe('avatar and seeds', () => {
     await page.getByRole('button', { name: 'Reset', exact: true }).click();
     await page.goto('/#/avatar');
     await expect(page.getByTestId('item-helmet-iron-bulwark')).toContainText('Wearing');
-    await expect(page.getByTestId('item-helmet-silver-vanguard')).toContainText('160');
+    await expect(page.getByTestId('item-helmet-silver-vanguard')).toContainText('80');
     expect(Number((await page.getByTestId('seeds-balance').innerText()).replace(/\D/g, ''))).toBe(before);
   });
 
@@ -89,7 +89,7 @@ test.describe('avatar and seeds', () => {
     await addVerse(page, JOHN316);
     await page.goto('/#/avatar');
     await expect(page.getByTestId('item-helmet-iron-bulwark')).toContainText('Wearing');
-    await expect(page.getByTestId('item-helmet-silver-vanguard')).toContainText('160');
+    await expect(page.getByTestId('item-helmet-silver-vanguard')).toContainText('80');
     await page.getByTestId('slot-chest').click();
     await expect(page.getByTestId('item-chest-iron-bulwark')).toContainText('Wearing');
     await expect(page.getByTestId('item-chest-sulestial')).toContainText('🔒');

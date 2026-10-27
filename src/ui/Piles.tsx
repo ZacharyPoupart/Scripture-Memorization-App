@@ -67,7 +67,10 @@ export function PilePage({ pile }: { pile: Pile }) {
   const vs = sortVerses(filterVerses(all, list, data, now), list.sort, data, now);
   const statuses = new Map(all.map((v) => [v.id, verseStatus(data, v, now)]));
   const ready = all.filter((v) => statuses.get(v.id)!.state === 'ready').length;
-  const count = scope === 'due' ? ready : all.length;
+  // Weekly, Monthly and Yearly can always be reviewed whole in one tap, even with nothing due (it is extra practice).
+  const noneDue = ready === 0 && pile !== 'daily';
+  const effScope = noneDue ? 'all' : scope;
+  const count = effScope === 'due' ? ready : all.length;
   return (
     <>
       <div class="scroll">
@@ -85,15 +88,17 @@ export function PilePage({ pile }: { pile: Pile }) {
             <div class="card stack">
               <h2>Review this pile</h2>
               <ModePicker />
-              <Seg
-                label="Which verses"
-                value={scope}
-                options={[
-                  { value: 'due', label: `Only due (${ready})` },
-                  { value: 'all', label: `All (${all.length})` },
-                ]}
-                onChange={setScope}
-              />
+              {!noneDue && (
+                <Seg
+                  label="Which verses"
+                  value={scope}
+                  options={[
+                    { value: 'due', label: `Only due (${ready})` },
+                    { value: 'all', label: `All (${all.length})` },
+                  ]}
+                  onChange={setScope}
+                />
+              )}
             </div>
           )}
           {all.length > 1 && <ListControls state={list} update={update} topics={topicsOf(data)} />}
@@ -129,10 +134,10 @@ export function PilePage({ pile }: { pile: Pile }) {
           <button
             class="btn primary block"
             disabled={count === 0}
-            onClick={() => navigate(`/review?pile=${pile}&scope=${scope}&mode=${settings.defaultMode}`)}
+            onClick={() => navigate(`/review?pile=${pile}&scope=${effScope}&mode=${settings.defaultMode}`)}
             data-testid="start-pile"
           >
-            {count === 0 ? 'Nothing due in this pile' : `Start · ${count} verse${count === 1 ? '' : 's'}`}
+            {count === 0 ? 'Nothing due in this pile' : `${noneDue ? 'Review all' : 'Start'} · ${count} verse${count === 1 ? '' : 's'}`}
           </button>
         </div>
       )}

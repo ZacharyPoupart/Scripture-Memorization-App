@@ -103,6 +103,7 @@ export function mergeData(a: AppData, b: AppData): AppData {
   if (identities.length) merged.social = { ...identities[0] };
   const sharing = a.sharing && b.sharing ? pickLater(a.sharing.at, b.sharing.at, a.sharing, b.sharing, jsonTie) : (a.sharing ?? b.sharing);
   if (sharing) merged.sharing = { ...sharing };
+  if (a.guildWins || b.guildWins) merged.guildWins = [...new Set([...(a.guildWins ?? []), ...(b.guildWins ?? [])])].sort();
   if (a.tourAt !== undefined || b.tourAt !== undefined) merged.tourAt = Math.max(a.tourAt ?? 0, b.tourAt ?? 0);
   if (a.avatar || b.avatar) {
     // items are only ever added (union); what is worn is the later decision

@@ -26,6 +26,7 @@ const snap = (over: Record<string, unknown> = {}) => ({
   streak: 3,
   longest: 9,
   counts: { daily: 2, weekly: 1, monthly: 0, yearly: 0 },
+  due: 44,
   week: 12,
   weekStart: '2026-10-18',
   ...over,
@@ -250,7 +251,7 @@ describe('guilds: invite only', () => {
     expect(g.members.map((m: any) => m.name)).toEqual(['Zach P.', 'Sam L.', 'Ana B.']); // most reviews first
     expect(g.weekStart).toBe('2026-10-18');
     expect(g.progress).toBe(15); // Ana's numbers are from last week, so they are not counted
-    expect(g.goal).toBe(75);
+    expect(g.goal).toBe(130); // 44 + 44 + 44 = 132, rounded to the nearest 5
     expect(JSON.stringify(g)).not.toContain('"sh"');
   });
 
@@ -298,5 +299,19 @@ describe('guilds: invite only', () => {
     const g = (await call('guilds', who(2))).body.guilds[0];
     expect(g.id).toBe(gid);
     expect(g.members.map((m: any) => m.name)).toEqual(['Sam L.']);
+  });
+});
+
+describe('the guild goal for members who share an older snapshot', () => {
+  it('counts 21 for each Daily verse and 1 for each Weekly verse when a member has not shared what is due yet', async () => {
+    const { due, ...older } = snap();
+    void due;
+    await join(1, 'Zach P.', older as any);
+    await join(2, 'Sam L.', snap());
+    const gid = (await call('guild-create', { ...who(1), name: 'Group' })).body.gid as string;
+    const code = (await call('guild-invite', { ...who(1), gid })).body.code as string;
+    await call('guild-join', { ...who(2), code });
+    const g = (await call('guilds', who(1))).body.guilds[0];
+    expect(g.goal).toBe(85); // 43 + 44 = 87, rounded to the nearest 5
   });
 });

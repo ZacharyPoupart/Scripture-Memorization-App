@@ -26,6 +26,7 @@ import {
   sceneUrl,
   unlockedIds,
   freshUnlocks,
+  GUILD_WIN_COINS,
 } from '../../src/core/avatar.ts';
 import { mergeData } from '../../src/core/merge.ts';
 import { recordReview, settle } from '../../src/core/schedule.ts';
@@ -183,8 +184,8 @@ describe('the knight', () => {
   it('the prices are the owner-approved table: whole-set totals, with each piece a fixed share of its set', () => {
     expect(SETS.map((s) => [s.id, s.price])).toEqual([
       ['iron-bulwark', 0],
-      ['silver-vanguard', 800],
-      ['forest-guardian', 1600],
+      ['silver-vanguard', 400],
+      ['forest-guardian', 1000],
       ['knights-oath', 2400],
       ['stormcaller', 3600],
       ['frostborn', 4800],
@@ -195,9 +196,14 @@ describe('the knight', () => {
       ['sulestial', 22000],
     ]);
     const cost = (slot: string, id: string) => itemById(`${slot}-${id}`)!.cost;
-    expect(['helmet', 'chest', 'shield', 'weapon', 'boots', 'belt', 'cape'].map((s) => cost(s, 'silver-vanguard'))).toEqual([160, 200, 145, 145, 65, 50, 40]);
+    expect(['helmet', 'chest', 'shield', 'weapon', 'boots', 'belt', 'cape'].map((s) => cost(s, 'silver-vanguard'))).toEqual([80, 100, 70, 70, 30, 25, 20]);
     expect(['helmet', 'chest', 'shield', 'weapon', 'boots', 'belt', 'cape'].map((s) => cost(s, 'sulestial'))).toEqual([4400, 5500, 3960, 3960, 1760, 1320, 1100]);
     for (const slot of ['helmet', 'chest', 'belt', 'boots', 'cape', 'weapon', 'shield']) expect(cost(slot, 'iron-bulwark'), slot).toBe(0);
+    // an easy start that climbs: each set costs at least as much as the one before, and the first two are the cheap ones
+    const totals = SETS.map((x) => x.price);
+    expect(totals).toEqual([...totals].sort((a, b) => a - b));
+    expect(totals[1]).toBeLessThanOrEqual(400);
+    expect(totals[2]).toBeLessThanOrEqual(1000);
   });
 
   it('the free set\'s sword is a reward for adding a first verse and practising it, and its shield for finishing the tour (or a first streak)', () => {
@@ -481,5 +487,32 @@ describe('temporary "armor is free" testing switch', () => {
       testing.armorFree = false;
     }
     expect(currentLook(d).weapon).toBe(defaultLook().weapon);
+  });
+});
+
+describe('coins for a guild reaching its weekly goal', () => {
+  it('each goal reached is worth the same number of coins, once, and the coins are derived (never stored)', () => {
+    const d = newData();
+    const before = seedsEarned(d);
+    d.guildWins = ['abc:2026-01-11'];
+    expect(seedsEarned(d)).toBe(before + GUILD_WIN_COINS);
+    d.guildWins = ['abc:2026-01-11', 'abc:2026-01-18'];
+    expect(seedsEarned(d)).toBe(before + 2 * GUILD_WIN_COINS);
+    expect(GUILD_WIN_COINS).toBe(25);
+  });
+
+  it('is kept by merging (union) and by backups, which ignore anything that is not a goal id', () => {
+    const a = newData();
+    const b = newData();
+    a.guildWins = ['g1:2026-01-11'];
+    b.guildWins = ['g1:2026-01-11', 'g2:2026-01-18'];
+    expect(mergeData(a, b).guildWins).toEqual(['g1:2026-01-11', 'g2:2026-01-18']);
+    expect(mergeData(b, a)).toEqual(mergeData(a, b)); // order does not matter
+    expect(normalizeData(JSON.parse(JSON.stringify(a))).guildWins).toEqual(['g1:2026-01-11']);
+    const raw = JSON.parse(JSON.stringify(a));
+    raw.guildWins = ['g1:2026-01-11', 'nonsense', 5, '<script>:2026-01-11', 'g3:2026-01-18'];
+    expect(normalizeData(raw).guildWins).toEqual(['g1:2026-01-11', 'g3:2026-01-18']);
+    raw.guildWins = 'nope';
+    expect(normalizeData(raw).guildWins).toBeUndefined();
   });
 });

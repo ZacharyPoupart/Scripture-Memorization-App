@@ -2,8 +2,8 @@
 // What is shared is small on purpose: a name, how the knight looks, the streak, how many verses are in each pile and how many
 // reviews were done this week. Never the verses themselves. Presentation only: nothing here touches scheduling.
 import { currentLook } from './avatar.ts';
-import { dayKeyOf, type DayKey } from './dates.ts';
-import { liveVerses, periodStart, streakInfo } from './schedule.ts';
+import { addDays, dayKeyOf, type DayKey } from './dates.ts';
+import { liveVerses, periodEnd, periodStart, streakInfo } from './schedule.ts';
 import type { AppData, Pile } from './types.ts';
 
 export interface Snapshot {
@@ -14,6 +14,8 @@ export interface Snapshot {
   /** Counted reviews done this week (Sunday to Saturday). */
   week: number;
   weekStart: DayKey;
+  /** Reviews that are due of this person this week (what their share of a guild's goal is made of). Absent from older versions. */
+  due?: number;
 }
 
 export interface FriendCard {
@@ -61,6 +63,43 @@ export function newIdentity(now: number, random: (n: number) => Uint8Array = (n)
   return { id: hex(random(16)), secret: base64url(random(32)), at: now };
 }
 
+/**
+ * How many reviews are due of this person in the week of `now` (Sunday to Saturday): a Daily verse is due 3 times on each
+ * day after the one it arrived, a Weekly verse once (Saturday), a Monthly or Yearly verse once in the week its month or year
+ * ends. A guild's weekly goal is every member's number added up. Read-only: it never affects scheduling.
+ */
+export function weeklyDue(data: AppData, now: number): number {
+  const weekStart = periodStart('weekly', dayKeyOf(now));
+  const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
+  let n = 0;
+  for (const v of liveVerses(data)) {
+    for (const d of days) {
+      if (d <= v.pileSince) continue; // added or moved that day: nothing is due yet
+      if (v.pile === 'daily') n += 3;
+      else if (periodEnd(v.pile, d) === d) n += 1;
+    }
+  }
+  return n;
+}
+
+/**
+ * The guild goals that have been reached this week and not yet paid out to this person. A goal pays once per guild per week,
+ * only for a group of at least two, and only to someone who did a counted review of their own that week.
+ */
+export function guildWinsToClaim(data: AppData, guilds: GuildView[], meId: string, now: number): string[] {
+  const thisWeek = periodStart('weekly', dayKeyOf(now));
+  const have = new Set(data.guildWins ?? []);
+  const out: string[] = [];
+  for (const g of guilds) {
+    const id = `${g.id}:${g.weekStart}`;
+    if (g.weekStart !== thisWeek || g.members.length < 2 || g.goal <= 0 || g.progress < g.goal || have.has(id)) continue;
+    const mine = g.members.find((m) => m.id === meId);
+    if (!mine || mine.snap.weekStart !== g.weekStart || mine.snap.week < 1) continue;
+    out.push(id);
+  }
+  return out;
+}
+
 /** What a friend can see about you right now. */
 export function socialSnapshot(data: AppData, now: number): Snapshot {
   const today = dayKeyOf(now);
@@ -75,7 +114,7 @@ export function socialSnapshot(data: AppData, now: number): Snapshot {
     }
   }
   const streak = streakInfo(data, now);
-  return { look: { ...currentLook(data) }, streak: streak.count, longest: streak.longest, counts, week: Math.min(week, 99999), weekStart };
+  return { look: { ...currentLook(data) }, streak: streak.count, longest: streak.longest, counts, week: Math.min(week, 99999), weekStart, due: Math.min(weeklyDue(data, now), 99999) };
 }
 
 export const sameSnapshot = (a: Snapshot | null, b: Snapshot | null): boolean => !!a && !!b && JSON.stringify(a) === JSON.stringify(b);
