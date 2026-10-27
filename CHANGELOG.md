@@ -5,6 +5,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.60.0] - 2026-10-27
+
+### Fixed
+- The colour the iPhone draws behind the clock now always matches the page. Before, it followed the phone's light/dark setting, so a phone in dark mode could show a black box above a light page (when the app's theme was set to Light).
+
 ## [1.57.0] - 2026-10-27
 
 ### Added
