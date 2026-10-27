@@ -38,6 +38,8 @@ export interface GuildView {
   id: string;
   name: string;
   owner: string;
+  /** Who leads next if the leader leaves: the member who has been in the group longest. Absent from older servers, or for a group of one. */
+  heir?: string;
   /** The banner its leader designed (`design-field-pattern`); absent until they do, then the app shows a default. */
   banner?: string;
   members: FriendCard[];

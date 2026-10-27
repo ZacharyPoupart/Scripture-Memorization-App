@@ -318,6 +318,29 @@ describe('guilds: invite only', () => {
     expect((await call('guild-info', { code })).status).toBe(404);
   });
 
+  it('the leader can hand the group to a member; the heir is whoever has been in longest', async () => {
+    const { gid, code } = await guild();
+    await call('guild-join', { ...who(2), code });
+    await call('guild-join', { ...who(3), code });
+    let g = (await call('guilds', who(1))).body.guilds[0];
+    expect(g.owner).toBe(hex(1));
+    expect(g.heir).toBe(hex(2)); // joined before 3
+    // only the leader can hand it over, only to someone in the group, never to themselves
+    expect((await call('guild-transfer', { ...who(2), gid, to: hex(3) })).status).toBe(403);
+    expect((await call('guild-transfer', { ...who(1), gid, to: hex(9) })).status).toBe(404);
+    expect((await call('guild-transfer', { ...who(1), gid, to: hex(1) })).status).toBe(400);
+    expect((await call('guild-transfer', { ...who(1), gid, to: hex(3) })).status).toBe(200);
+    g = (await call('guilds', who(1))).body.guilds[0];
+    expect(g.owner).toBe(hex(3));
+    expect(g.heir).toBe(hex(1)); // the longest-standing member who is not the leader
+    // the old leader can no longer rename; the new one can
+    expect((await call('guild-rename', { ...who(1), gid, name: 'Nope' })).status).toBe(403);
+    expect((await call('guild-rename', { ...who(3), gid, name: 'Fine' })).status).toBe(200);
+    // and if the new leader leaves, it goes to the member who has been in the longest
+    await call('guild-leave', { ...who(3), gid });
+    expect((await call('guilds', who(1))).body.guilds[0].owner).toBe(hex(1));
+  });
+
   it('a person can be in at most three guilds, and a guild holds at most thirty people', async () => {
     await join(1);
     for (let i = 0; i < 3; i++) expect((await call('guild-create', { ...who(1), name: `G${i}` })).status).toBe(200);

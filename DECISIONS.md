@@ -668,3 +668,10 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Choices (tell me if you want them different):** the screen remembers which half you used last while the app is open, and an invite link to a group opens Groups. Nothing is hidden for good: everything that was there is still there, one tap away.
 **Test changes:** the friends e2e tests open the folds before using what is inside; one new test covers the tabs, keyboard and tap-target sizes.
 **Undo:** roll back to the previous stage tag.
+
+## v1.68.0 — Choosing a group's next leader (owner request)
+**What:** new server action `guild-transfer` (leader only, to a current member, never to yourself); the groups list now carries `heir` (the longest-standing member who is not the leader). In the app: ⋯ → "Choose a new leader" opens a list of the other members ("here longest" marks the heir) and asks to confirm. Leaving as the leader says who takes over.
+**Default succession:** this already worked (since v1.37.0) and is now covered by a test: when the leader leaves, the first remaining member in joining order leads, and the last person out closes the group.
+**Choices (tell me if you want them different):** "oldest" means whoever joined the group first, not who is oldest in age. The old leader stays as an ordinary member after handing over. Nothing else about the group changes.
+**Test changes:** server tests for the hand-over rules and the heir; new e2e test for the picker and the leave text.
+**Undo:** roll back to the previous stage tag.

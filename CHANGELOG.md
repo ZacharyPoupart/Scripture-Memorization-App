@@ -5,6 +5,12 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.68.0] - 2026-10-28
+
+### Added
+- A group's leader can hand the group to someone else: ⋯ → "Choose a new leader", pick a member, confirm. You stay in the group.
+- When a leader leaves, the group goes to the member who has been in it longest. The leave confirmation now says who that will be.
+
 ## [1.66.0] - 2026-10-28
 
 ### Changed

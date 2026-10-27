@@ -9,6 +9,7 @@ import {
   enableSharing,
   joinGuild,
   leaveGuild,
+  transferGuild,
   makeGuildInvite,
   makeInvite,
   refreshSocial,
@@ -195,7 +196,13 @@ function InviteSheet({ title, code, link, message, onClose }: { title: string; c
   );
 }
 
-function GuildCard({ g, me, onInvite, onLeave, onOpenMember }: { g: GuildView; me: string; onInvite: () => void; onLeave: () => void; onOpenMember: (m: FriendCard) => void }) {
+/** What leaving a group means: if you lead it, who takes over (the member who has been in it longest). */
+function leavingBody(g: GuildView, me: string): string {
+  const heir = g.owner === me ? g.members.find((m) => m.id === g.heir) : undefined;
+  return heir ? `${heir.name}, who has been in the group longest, will lead it. You can join again later with a new invite.` : 'You can join again later with a new invite.';
+}
+
+function GuildCard({ g, me, onInvite, onLeave, onTransfer, onOpenMember }: { g: GuildView; me: string; onInvite: () => void; onLeave: () => void; onTransfer: () => void; onOpenMember: (m: FriendCard) => void }) {
   const [renaming, setRenaming] = useState(false);
   const [designing, setDesigning] = useState(false);
   const [membersOpen, setMembersOpen] = useState(false);
@@ -302,6 +309,11 @@ function GuildCard({ g, me, onInvite, onLeave, onOpenMember }: { g: GuildView; m
               Edit banner
             </button>
           )}
+          {isLeader && g.members.length > 1 && (
+            <button class="menu-item" onClick={() => (setMoreOpen(false), onTransfer())} data-testid="guild-transfer">
+              Choose a new leader
+            </button>
+          )}
           <button class="menu-item danger" onClick={onLeave} data-testid="guild-leave">
             Leave group
           </button>
@@ -368,6 +380,8 @@ export function Friends({ joinCode = '', guildCode = '' }: { joinCode?: string; 
   const [addOpen, setAddOpen] = useState(false);
   const [openedMember, setOpenedMember] = useState<FriendCard | null>(null);
   const [leaving, setLeaving] = useState<GuildView | null>(null);
+  const [pickingLeader, setPickingLeader] = useState<GuildView | null>(null);
+  const [newLeader, setNewLeader] = useState<FriendCard | null>(null);
   const [stopping, setStopping] = useState(false);
   const [localError, setLocalError] = useState('');
   const friendCode = codeFrom(joinCode);
@@ -658,7 +672,7 @@ export function Friends({ joinCode = '', guildCode = '' }: { joinCode?: string; 
               </p>
             )}
             {(guilds ?? []).map((g) => (
-              <GuildCard key={g.id} g={g} me={data.social!.id} onInvite={() => void showGuildInvite(g)} onLeave={() => setLeaving(g)} onOpenMember={(m) => setOpenedMember(m)} />
+              <GuildCard key={g.id} g={g} me={data.social!.id} onInvite={() => void showGuildInvite(g)} onLeave={() => setLeaving(g)} onTransfer={() => setPickingLeader(g)} onOpenMember={(m) => setOpenedMember(m)} />
             ))}
             {(guilds ?? []).length > 0 && (
               <button class="link-btn" aria-expanded={addOpen} aria-controls="guild-add" onClick={() => setAddOpen(!addOpen)} data-testid="guild-add-toggle">
@@ -750,10 +764,53 @@ export function Friends({ joinCode = '', guildCode = '' }: { joinCode?: string; 
           }}
         />
       )}
+      {pickingLeader && !newLeader && (
+        <Overlay onClose={() => setPickingLeader(null)} label="Choose a new leader">
+          <div class="sheet stack scrolls" data-testid="leader-picker">
+            <h2>Choose a new leader</h2>
+            <p class="muted small" style={{ margin: 0 }}>
+              The leader can rename the group and design its banner. You stay in the group.
+            </p>
+            <ul class="guild-members" style={{ margin: 0 }}>
+              {pickingLeader.members
+                .filter((m) => m.id !== data.social!.id)
+                .map((m) => (
+                  <li key={m.id}>
+                    <button class="guild-member-btn" onClick={() => setNewLeader(m)} data-testid="leader-option">
+                      <Face card={m} size={34} />
+                      <span class="guild-member-name">
+                        {m.name}
+                        {m.id === pickingLeader.heir && <span class="leader-tag"> · here longest</span>}
+                      </span>
+                    </button>
+                  </li>
+                ))}
+            </ul>
+            <button class="btn ghost block" onClick={() => setPickingLeader(null)}>
+              Cancel
+            </button>
+          </div>
+        </Overlay>
+      )}
+      {pickingLeader && newLeader && (
+        <Confirm
+          title={`Make ${newLeader.name} the leader?`}
+          body="They will be able to rename the group and design its banner. You stay in the group."
+          confirmLabel="Make leader"
+          onCancel={() => setNewLeader(null)}
+          onConfirm={() => {
+            const g = pickingLeader;
+            const m = newLeader;
+            setNewLeader(null);
+            setPickingLeader(null);
+            void transferGuild(g.id, m.id).then((ok) => ok && showToast(`${m.name} leads ${g.name} now.`));
+          }}
+        />
+      )}
       {leaving && (
         <Confirm
           title={`Leave ${leaving.name}?`}
-          body="You can join again later with a new invite."
+          body={leavingBody(leaving, data.social!.id)}
           confirmLabel="Leave"
           danger
           onCancel={() => setLeaving(null)}
