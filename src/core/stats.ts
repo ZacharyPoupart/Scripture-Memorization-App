@@ -3,7 +3,7 @@ import { addDays, dayKeyOf, daysBetween, type DayKey } from './dates.ts';
 import { forgivenDays, graduationTarget, liveVerses, progressDays, totalReviews } from './schedule.ts';
 import { PILES, type AppData, type Pile, type Verse } from './types.ts';
 
-export type CellKind = 'none' | 'practiced' | 'complete' | 'saved';
+export type CellKind = 'none' | 'practiced' | 'complete' | 'full' | 'saved';
 
 export interface HeatCell {
   day: DayKey;
@@ -12,12 +12,12 @@ export interface HeatCell {
   future: boolean;
 }
 
-/** What happened on a day: complete = every due review done, practiced = some review, none = nothing recorded. */
+/** What happened on a day: full = everything done all the way, complete = every due verse reviewed at least once (the streak is safe), practiced = some review, none = nothing recorded. */
 export function dayKind(data: AppData, day: DayKey, saved?: ReadonlySet<DayKey>): CellKind {
   if (saved?.has(day)) return 'saved'; // a missed day the monthly streak save covered
   const e = data.ledger[day];
   if (!e) return 'none';
-  if (e.o === 'c') return 'complete';
+  if (e.o === 'c') return e.f ? 'full' : 'complete';
   if (e.r) return 'practiced';
   return 'none';
 }

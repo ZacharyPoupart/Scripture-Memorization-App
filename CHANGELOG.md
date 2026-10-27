@@ -10,6 +10,16 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 ### Changed
 - The "Longest in pile first" sort on your lists now stays on whatever you last picked, the next time you open a pile or the app, so you don't have to choose it again. Search and filters still start fresh.
 
+## [1.58.0] - 2026-10-27
+
+### Added
+- On Today, tap any verse in the list to practice just that one, in the review type you last used. It works for verses that are ready, still waiting for their next review, or already done (those count as extra practice).
+
+## [1.57.0] - 2026-10-27
+
+### Added
+- A day you finish all the way (every Daily verse reviewed 3 times, and the others reviewed too) is now a **full day**. The Stats page shows three shades: practiced, all done (every verse reviewed once, which keeps your streak) and full day (the deepest), and the line under the map counts each. A full day pays 3 coins on top of the usual 5. Days before this update stay as they were.
+
 ## [1.56.0] - 2026-10-27
 
 ### Added
