@@ -557,3 +557,9 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Choices (tell me if you want them different):** "guild" is shown as the names of the groups you share; I did not add a count of that group's goal progress. The sheet does not show their coins or which pieces they own (that is not shared).
 **Test changes:** new e2e test opens a friend, checks the numbers and the shared group, and cheers.
 **Undo:** roll back to the previous stage tag.
+
+## v1.53.0 — Rename your group, and up to 3 groups (owner request)
+**What:** the person who started a group (its leader) can rename it from the group's card; the server only accepts the rename from the leader, cleans the name like any other, and writes nothing when the name is unchanged (the free KV tier has a small daily write budget). A person can now be in at most 3 groups.
+**Choices (tell me if you want them different):** the limit used to be 5, so 3 is a cut, not an increase. I read your message as "3 is the number I want", so please tell me if you meant to raise it instead. Anyone already in more than 3 keeps every group; they just cannot join or start another until they are in fewer than 3. When a leader leaves, the group still passes to the next member, who then becomes the one who can rename it. The message for "full" now says it can mean either the group or your 3.
+**Test changes:** the "at most five guilds" server test now expects 3; new server tests for renaming (leader only, cleaned, no write when unchanged); the groups e2e test renames the group and checks a non-leader has no Rename button and the other member sees the new name.
+**Undo:** roll back to the previous stage tag.

@@ -14,6 +14,7 @@ import {
   refreshSocial,
   cheerFriend,
   removeFriend,
+  renameGuild,
   renameSharing,
   showToast,
   stopSharing,
@@ -187,16 +188,39 @@ function InviteSheet({ title, code, link, message, onClose }: { title: string; c
 }
 
 function GuildCard({ g, me, onInvite, onLeave }: { g: GuildView; me: string; onInvite: () => void; onLeave: () => void }) {
+  const [renaming, setRenaming] = useState(false);
+  const [title, setTitle] = useState(g.name);
   const pct = Math.min(100, Math.round((g.progress / Math.max(1, g.goal)) * 100));
   const done = g.progress >= g.goal;
   return (
     <div class="card stack" data-testid="guild-card">
-      <div class="row spread">
-        <h3 style={{ margin: 0 }} data-testid="guild-name">
-          {g.name}
-        </h3>
-        <span class="muted small">{g.members.length} member{g.members.length === 1 ? '' : 's'}</span>
-      </div>
+      {renaming ? (
+        <div class="row">
+          <input class="input grow" value={title} maxLength={MAX_GUILD_NAME} onInput={(e) => setTitle(e.currentTarget.value)} aria-label="Group name" data-testid="guild-rename-input" />
+          <button
+            class="btn primary"
+            disabled={!cleanName(title, MAX_GUILD_NAME)}
+            onClick={async () => {
+              if (await renameGuild(g.id, title)) setRenaming(false);
+            }}
+            data-testid="guild-rename-save"
+          >
+            Save
+          </button>
+        </div>
+      ) : (
+        <div class="row spread">
+          <h3 style={{ margin: 0 }} data-testid="guild-name">
+            {g.name}
+          </h3>
+          <span class="muted small">{g.members.length} member{g.members.length === 1 ? '' : 's'}</span>
+        </div>
+      )}
+      {g.owner === me && !renaming && (
+        <button class="link-btn" style={{ alignSelf: 'flex-start' }} onClick={() => (setTitle(g.name), setRenaming(true))} data-testid="guild-rename">
+          Rename group
+        </button>
+      )}
       <div>
         <div class="bar" role="progressbar" aria-valuemin={0} aria-valuemax={g.goal} aria-valuenow={Math.min(g.progress, g.goal)} aria-label="This week's goal">
           <i style={{ width: `${pct}%` }} />

@@ -5,6 +5,14 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.53.0] - 2026-10-27
+
+### Added
+- The leader of a group can rename it (Friends → the group → Rename group). Everyone in the group sees the new name.
+
+### Changed
+- You can be in up to 3 groups at once (it was 5). Anyone already in more keeps them; they just can't join or start another until they are in fewer than 3.
+
 ## [1.52.0] - 2026-10-27
 
 ### Added

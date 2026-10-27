@@ -157,6 +157,15 @@ test('groups: create, invite, join, see a shared weekly goal, leave', async ({ b
   await expect(sam.getByTestId('guild-name')).toHaveText('Youth Group');
   await expect(sam.getByTestId('guild-progress')).toContainText('of 5 reviews');
   await expect(sam.getByTestId('guild-progress')).toContainText('25 at the goal'); // the coin reward for a group of two or more
+  // only the leader can rename
+  await expect(sam.getByTestId('guild-rename')).toHaveCount(0);
+  await zach.getByTestId('guild-rename').click();
+  await zach.getByTestId('guild-rename-input').fill('Bible Crew');
+  await zach.getByTestId('guild-rename-save').click();
+  await expect(zach.getByTestId('guild-name')).toHaveText('Bible Crew');
+  await sam.goto('/#/stats');
+  await sam.goto('/#/friends');
+  await expect(sam.getByTestId('guild-name')).toHaveText('Bible Crew');
   await sam.getByTestId('guild-leave').click();
   await sam.getByRole('button', { name: 'Leave', exact: true }).last().click();
   await expect(sam.getByTestId('guild-card')).toHaveCount(0);
