@@ -79,6 +79,7 @@ export const api = {
   guildInvite: (a: Auth, gid: string) => socialCall<{ code: string; expiresAt: number }>('guild-invite', { ...a, gid }),
   guildInfo: (code: string) => socialCall<{ name: string; members: number }>('guild-info', { code }),
   guildJoin: (a: Auth, code: string) => socialCall<{ gid: string }>('guild-join', { ...a, code }),
+  guildBanner: (a: Auth, gid: string, banner: string) => socialCall<{ ok: true }>('guild-banner', { ...a, gid, banner }),
   guildRename: (a: Auth, gid: string, name: string) => socialCall<{ ok: true }>('guild-rename', { ...a, gid, name }),
   guildLeave: (a: Auth, gid: string) => socialCall<{ ok: true }>('guild-leave', { ...a, gid }),
 };
