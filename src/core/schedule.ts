@@ -376,6 +376,33 @@ export function todaySummary(data: AppData, now: number): TodaySummary {
   return { total, met, remaining, readyNow, outcome };
 }
 
+/** The first day streak forgiveness applies to: days before it keep the old rule, so nobody's past changes. */
+export const FORGIVENESS_START: DayKey = '2026-10-28';
+
+/**
+ * Streak forgiveness (v1.54.0, owner-requested): once a calendar month, a missed day that would have broken a live streak is
+ * saved. It is worked out from the ledger every time, never stored, so every device agrees whatever order they sync in.
+ * A saved day is neutral: it adds nothing to the streak, earns no progress day and is shown in gold on the stats page.
+ * There has to be a streak to save, and only days before today count (today can still be finished).
+ */
+export function forgivenDays(data: AppData, now: number): DayKey[] {
+  const today = dayKeyOf(now);
+  if (today <= FORGIVENESS_START) return [];
+  const saved: DayKey[] = [];
+  const usedMonths = new Set<string>();
+  let run = 0;
+  for (let d = data.createdDay; d < today; d = addDays(d, 1)) {
+    const o = data.ledger[d]?.o;
+    if (o === 'c') run++;
+    else if (o === 'n') continue;
+    else if (o === 'm' && d >= FORGIVENESS_START && run > 0 && !usedMonths.has(d.slice(0, 7))) {
+      usedMonths.add(d.slice(0, 7));
+      saved.push(d);
+    } else run = 0;
+  }
+  return saved;
+}
+
 export interface StreakInfo {
   count: number;
   todayDone: boolean;
@@ -387,10 +414,11 @@ export interface StreakInfo {
 export function streakInfo(data: AppData, now: number): StreakInfo {
   const today = dayKeyOf(now);
   let count = 0;
+  const saved = new Set(forgivenDays(data, now));
   for (let d = addDays(today, -1); d >= data.createdDay; d = addDays(d, -1)) {
     const o = data.ledger[d]?.o;
     if (o === 'c') count++;
-    else if (o === 'n') continue;
+    else if (o === 'n' || saved.has(d)) continue;
     else break;
   }
   const summary = todaySummary(data, now);

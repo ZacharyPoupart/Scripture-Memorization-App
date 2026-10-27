@@ -93,6 +93,7 @@ let state: AppState = {
     shuffle: false,
     tour: { done: [] },
     seenUnlocks: null,
+    seenSaved: '',
   },
   tick: 0,
   toast: null,

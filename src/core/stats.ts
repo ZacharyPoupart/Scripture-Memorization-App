@@ -1,9 +1,9 @@
 // Read-only statistics derived from the ledger and verses. Never changes data, never affects scheduling.
 import { addDays, dayKeyOf, daysBetween, type DayKey } from './dates.ts';
-import { graduationTarget, liveVerses, progressDays, totalReviews } from './schedule.ts';
+import { forgivenDays, graduationTarget, liveVerses, progressDays, totalReviews } from './schedule.ts';
 import { PILES, type AppData, type Pile, type Verse } from './types.ts';
 
-export type CellKind = 'none' | 'practiced' | 'complete';
+export type CellKind = 'none' | 'practiced' | 'complete' | 'saved';
 
 export interface HeatCell {
   day: DayKey;
@@ -13,7 +13,8 @@ export interface HeatCell {
 }
 
 /** What happened on a day: complete = every due review done, practiced = some review, none = nothing recorded. */
-export function dayKind(data: AppData, day: DayKey): CellKind {
+export function dayKind(data: AppData, day: DayKey, saved?: ReadonlySet<DayKey>): CellKind {
+  if (saved?.has(day)) return 'saved'; // a missed day the monthly streak save covered
   const e = data.ledger[day];
   if (!e) return 'none';
   if (e.o === 'c') return 'complete';
@@ -30,13 +31,14 @@ export function heatmap(data: AppData, now: number, weeks = 26): HeatCell[][] {
   const dow = new Date(`${today}T12:00:00Z`).getUTCDay(); // 0 = Sunday
   const lastSunday = addDays(today, -dow);
   const first = addDays(lastSunday, -(weeks - 1) * 7);
+  const saved = new Set(forgivenDays(data, now));
   const cols: HeatCell[][] = [];
   for (let w = 0; w < weeks; w++) {
     const col: HeatCell[] = [];
     for (let d = 0; d < 7; d++) {
       const day = addDays(first, w * 7 + d);
       const future = day > today;
-      col.push({ day, future, kind: future ? 'none' : dayKind(data, day) });
+      col.push({ day, future, kind: future ? 'none' : dayKind(data, day, saved) });
     }
     cols.push(col);
   }
@@ -56,12 +58,13 @@ export interface StreakRun {
 export function streakRuns(data: AppData, now: number): StreakRun[] {
   const today = dayKeyOf(now);
   const runs: StreakRun[] = [];
+  const saved = new Set(forgivenDays(data, now));
   let cur = null as StreakRun | null;
   for (let d = data.createdDay; d <= today; d = addDays(d, 1)) {
     const o = data.ledger[d]?.o;
     if (o === 'c') {
       cur = cur ? { ...cur, end: d, length: cur.length + 1 } : { start: d, end: d, length: 1 };
-    } else if (o === 'n') {
+    } else if (o === 'n' || saved.has(d)) {
       continue;
     } else if (d === today) {
       continue; // today is still open

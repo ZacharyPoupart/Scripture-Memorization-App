@@ -1,6 +1,6 @@
 {
   "name": "memorize-for-life",
-  "version": "1.53.0",
+  "version": "1.54.0",
   "private": true,
   "type": "module",
   "description": "Memorize For Life: spaced-repetition Bible verse memorization PWA",
