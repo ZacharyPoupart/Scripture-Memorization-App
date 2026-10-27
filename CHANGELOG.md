@@ -5,6 +5,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.64.1] - 2026-10-27
+
+### Changed
+- The group flag now stands on the knight's right and is a bit bigger.
+
 ## [1.64.0] - 2026-10-27
 
 ### Added
