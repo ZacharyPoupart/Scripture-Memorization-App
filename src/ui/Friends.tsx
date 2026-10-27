@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'preact/hooks';
-import { currentLook, defaultLook, GUILD_WIN_COINS, type Look } from '../core/avatar.ts';
+import { currentLook, defaultLook, GUILD_WIN_COINS, matchedSet, type Look } from '../core/avatar.ts';
 import { cleanName, cheerLine, codeFrom, formatCode, guildLink, inviteLink, inviteMessage, MAX_GUILD_NAME, MAX_NAME, type FriendCard, type GuildView } from '../core/social.ts';
 import { api, socialMessage } from '../services/social.ts';
 import { navigate } from '../router.ts';
@@ -60,9 +60,10 @@ function Counts({ card }: { card: FriendCard }) {
   );
 }
 
-function FriendRow({ card, cheered, onCheer, onRemove }: { card: FriendCard; cheered: boolean; onCheer: () => void; onRemove: () => void }) {
+function FriendRow({ card, cheered, onOpen, onCheer, onRemove }: { card: FriendCard; cheered: boolean; onOpen: () => void; onCheer: () => void; onRemove: () => void }) {
   return (
     <li class="friend-row" data-testid="friend-row">
+      <button class="friend-open" onClick={onOpen} aria-label={`See ${card.name}'s knight and stats`} data-testid="friend-open">
       <Face card={card} />
       <div class="friend-main">
         <div class="friend-name" data-testid="friend-name">
@@ -76,6 +77,7 @@ function FriendRow({ card, cheered, onCheer, onRemove }: { card: FriendCard; che
         </div>
         <Counts card={card} />
       </div>
+      </button>
       <button class={`icon-btn cheer-btn ${cheered ? 'done' : ''}`} aria-label={cheered ? `You cheered ${card.name} today` : `Cheer ${card.name}`} disabled={cheered} onClick={onCheer} data-testid="friend-cheer">
         <span aria-hidden="true">👏</span>
       </button>
@@ -83,6 +85,71 @@ function FriendRow({ card, cheered, onCheer, onRemove }: { card: FriendCard; che
         <Icon name="more" />
       </button>
     </li>
+  );
+}
+
+/** One friend up close: the whole suit of armor, their streaks and numbers, and the groups you share. */
+function FriendSheet({ card, groups, cheered, onCheer, onClose }: { card: FriendCard; groups: GuildView[]; cheered: boolean; onCheer: () => void; onClose: () => void }) {
+  const look = faceLook(card.snap.look);
+  const set = matchedSet(look);
+  const week = card.snap.week + (card.snap.extra ?? 0);
+  return (
+    <Overlay onClose={onClose} label={`${card.name}'s knight`}>
+      <div class="sheet stack scrolls center" data-testid="friend-sheet">
+        <div class="friend-figure">
+          <AvatarFigure look={look} size={220} title={`${card.name}'s knight`} />
+        </div>
+        <div>
+          <h2 style={{ margin: 0 }} data-testid="friend-sheet-name">
+            {card.name}
+          </h2>
+          {set && (
+            <div class="muted small" data-testid="friend-sheet-set">
+              {set.name} set
+            </div>
+          )}
+        </div>
+        <dl class="friend-stats">
+          <div>
+            <dt>Streak</dt>
+            <dd data-testid="friend-sheet-streak">
+              <Icon name="flame" fill /> {card.snap.streak}
+            </dd>
+          </div>
+          <div>
+            <dt>Longest</dt>
+            <dd data-testid="friend-sheet-longest">{card.snap.longest}</dd>
+          </div>
+          <div>
+            <dt>This week</dt>
+            <dd data-testid="friend-sheet-week">{week}</dd>
+          </div>
+        </dl>
+        <div class="friend-figure">
+          <Counts card={card} />
+        </div>
+        <div class="friend-groups" data-testid="friend-sheet-groups">
+          {groups.length ? (
+            <>
+              <div class="muted small">In a group together</div>
+              {groups.map((g) => (
+                <div key={g.id} class="friend-group-name">
+                  {g.name}
+                </div>
+              ))}
+            </>
+          ) : (
+            <div class="muted small">No group together</div>
+          )}
+        </div>
+        <button class="btn block" disabled={cheered} onClick={onCheer} data-testid="friend-sheet-cheer">
+          {cheered ? 'Cheered today' : `👏 Cheer ${card.name}`}
+        </button>
+        <button class="btn ghost block" onClick={onClose}>
+          Done
+        </button>
+      </div>
+    </Overlay>
   );
 }
 
@@ -178,6 +245,7 @@ export function Friends({ joinCode = '', guildCode = '' }: { joinCode?: string; 
   const [guildName, setGuildName] = useState('');
   const [guildTyped, setGuildTyped] = useState('');
   const [removing, setRemoving] = useState<FriendCard | null>(null);
+  const [opened, setOpened] = useState<string | null>(null);
   const [leaving, setLeaving] = useState<GuildView | null>(null);
   const [stopping, setStopping] = useState(false);
   const [localError, setLocalError] = useState('');
@@ -416,7 +484,7 @@ export function Friends({ joinCode = '', guildCode = '' }: { joinCode?: string; 
           ) : (
             <ul class="friend-list" data-testid="friend-list">
               {friends.map((f) => (
-                <FriendRow key={f.id} card={f} cheered={social.cheered.includes(f.id)} onCheer={() => void cheerFriend(f.id).then((ok) => ok && showToast(`You cheered ${f.name}.`))} onRemove={() => setRemoving(f)} />
+                <FriendRow key={f.id} card={f} cheered={social.cheered.includes(f.id)} onOpen={() => setOpened(f.id)} onCheer={() => void cheerFriend(f.id).then((ok) => ok && showToast(`You cheered ${f.name}.`))} onRemove={() => setRemoving(f)} />
               ))}
             </ul>
           )}
@@ -505,6 +573,15 @@ export function Friends({ joinCode = '', guildCode = '' }: { joinCode?: string; 
       </div>
 
       {invite && <InviteSheet {...invite} onClose={() => setInvite(null)} />}
+      {opened && friends?.find((f) => f.id === opened) && (
+        <FriendSheet
+          card={friends.find((f) => f.id === opened)!}
+          groups={(guilds ?? []).filter((g) => g.members.some((m) => m.id === opened))}
+          cheered={social.cheered.includes(opened)}
+          onCheer={() => void cheerFriend(opened).then((ok) => ok && showToast(`You cheered ${friends.find((f) => f.id === opened)?.name}.`))}
+          onClose={() => setOpened(null)}
+        />
+      )}
       {removing && (
         <Confirm
           title={`Remove ${removing.name}?`}

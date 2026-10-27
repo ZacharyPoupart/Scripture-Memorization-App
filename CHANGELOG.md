@@ -5,6 +5,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.52.0] - 2026-10-27
+
+### Added
+- Tap a friend on the Friends tab to see their whole knight in a larger picture, with their streak, longest streak, reviews this week, pile counts and any group you share. You can cheer them from there too.
+
 ## [1.51.0] - 2026-10-26
 
 ### Changed
