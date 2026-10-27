@@ -186,6 +186,8 @@ test('groups: create, invite, join, see a shared weekly goal, leave', async ({ b
   await zach.getByTestId('guild-create').click();
   await expect(zach.getByTestId('guild-name')).toHaveText('Youth Group');
   await expect(zach.getByTestId('guild-progress')).toContainText('0 of 5 reviews'); // nobody has verses yet: the goal is the smallest, 5
+  await expect(zach.getByTestId('guild-chest')).toHaveAttribute('data-state', 'locked'); // a group of one cannot open it
+  await expect(zach.getByTestId('guild-reward')).toContainText('Needs 2 people');
   await zach.getByTestId('guild-invite').click();
   const code = (await zach.getByTestId('invite-code').innerText()).replace('-', '');
   await zach.getByRole('button', { name: 'Done' }).click();
@@ -194,7 +196,12 @@ test('groups: create, invite, join, see a shared weekly goal, leave', async ({ b
   await sam.getByTestId('guild-join-yes').click();
   await expect(sam.getByTestId('guild-name')).toHaveText('Youth Group');
   await expect(sam.getByTestId('guild-progress')).toContainText('of 5 reviews');
-  await expect(sam.getByTestId('guild-reward')).toContainText('25 each at the goal'); // the coin reward for a group of two or more
+  await expect(sam.getByTestId('guild-reward')).toContainText('25 each'); // the coin reward for a group of two or more
+  await expect(sam.getByTestId('guild-chest')).toHaveAttribute('data-state', 'closed'); // the chest waits for the goal
+  await expect(sam.getByTestId('guild-progress')).toContainText('0 of 5');
+  await expect(sam.getByTestId('guild-countdown-line')).toContainText('5 to go');
+  await sam.getByTestId('guild-goal-help').click();
+  await expect(sam.getByText('It needs at least two people')).toBeVisible();
   await expect(sam.getByTestId('guild-countdown')).toContainText(/(\d+ days|\d+ h|\d+ min) left/); // when the week (and the goal) ends
   // who leads, and a members list you can open
   await expect(sam.getByTestId('guild-leader')).toHaveText('Led by Zach P.');

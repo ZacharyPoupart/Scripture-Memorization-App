@@ -2656,3 +2656,50 @@ button.chip {
 .guild-progress-line {
   margin-top: 4px;
 }
+
+/* A group's goal: the numbers in plain words, and the reward chest beside them */
+.goal {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.goal-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.goal-line {
+  font-size: 0.95rem;
+}
+.goal-chest {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex: none;
+}
+.goal-chest-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.goal-help {
+  line-height: 1.45;
+}
+.guild-member-nums {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+  white-space: nowrap;
+}
+.guild-member-streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}

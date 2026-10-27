@@ -5,6 +5,13 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.67.0] - 2026-10-28
+
+### Changed
+- A group's goal reads in plain words: "85 of 315 reviews this week · 27%", how many are left to go and how long is left, with a "How does the goal work?" explanation.
+- A little treasure chest shows the reward: shut with the coins it pays (25 each), padlocked with "Needs 2 people" for a group of one, and open and glowing once the goal is reached.
+- The members list says what each number is: reviews this week (of that person's share of the goal) and their streak in days.
+
 ## [1.66.0] - 2026-10-28
 
 ### Changed

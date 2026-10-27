@@ -668,3 +668,10 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Choices (tell me if you want them different):** the screen remembers which half you used last while the app is open, and an invite link to a group opens Groups. Nothing is hidden for good: everything that was there is still there, one tap away.
 **Test changes:** the friends e2e tests open the folds before using what is inside; one new test covers the tabs, keyboard and tap-target sizes.
 **Undo:** roll back to the previous stage tag.
+
+## v1.67.0 — Group goal in plain words, and a reward chest (owner request)
+**Why the numbers looked odd:** the goal adds up every member's reviews due that week (a daily verse is 3 a day, 21 a week), so one person with 15 daily verses has a goal of 315. That is correct but it was shown without any explanation, and the member row showed two bare numbers.
+**What:** the goal shows as "85 of 315 reviews this week · 27%" with "230 to go · 5 days left", plus an expandable "How does the goal work?" line. Each member row shows their reviews this week out of their own share ("85 of 315 this week") and their streak ("9-day streak"). A painted treasure chest sits beside the goal: padlocked (group of one, "Needs 2 people"), closed with the coin reward (25 each), or open with coins and sparkles once the goal is reached (`chestState` in `core/social.ts`, `ui/Chest.tsx`).
+**Choices (tell me if you want them different):** the chest is drawn, not a picture file, so it works offline and in both themes; the open chest says "+25 each" and does not itself pay anything (coins are still claimed when the Friends tab loads, as before).
+**Test changes:** unit test for `chestState`; the group e2e test checks the chest states, the "to go" line and the explanation.
+**Undo:** roll back to the previous stage tag.

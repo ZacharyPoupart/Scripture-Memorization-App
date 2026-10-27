@@ -108,6 +108,12 @@ export function guildWinsToClaim(data: AppData, guilds: GuildView[], meId: strin
 /** Is this name fit to show other people? The server checks the same rule and has the last word. */
 export const nameAllowed = (name: string): boolean => !isInappropriate(name);
 
+/** What the group's reward chest looks like: locked for a group of one (the reward is for two or more), open once the goal is reached. */
+export function chestState(g: { members: unknown[]; progress: number; goal: number }): 'locked' | 'closed' | 'open' {
+  if (g.members.length < 2) return 'locked';
+  return g.goal > 0 && g.progress >= g.goal ? 'open' : 'closed';
+}
+
 /** The moment a group's week is over: local midnight after its Saturday (so the new goal starts at Saturday midnight). */
 export function weekEndsAt(weekStart: DayKey): number {
   const [y, m, d] = weekStart.split('-').map(Number);
