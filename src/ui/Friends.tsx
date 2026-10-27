@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'preact/hooks';
 import { currentLook, defaultLook, GUILD_WIN_COINS, matchedSet, type Look } from '../core/avatar.ts';
-import { cleanName, cheerLine, codeFrom, formatCode, guildLink, inviteLink, inviteMessage, MAX_GUILD_NAME, MAX_NAME, countdownText, weekEndsAt, type FriendCard, type GuildView } from '../core/social.ts';
+import { cleanName, cheerLine, codeFrom, formatCode, guildLink, inviteLink, inviteMessage, MAX_GUILD_NAME, MAX_NAME, chestState, countdownText, weekEndsAt, type FriendCard, type GuildView } from '../core/social.ts';
 import { api, socialMessage } from '../services/social.ts';
 import { navigate } from '../router.ts';
 import {
@@ -25,6 +25,7 @@ import {
 import { bannerOf, bannerSpec } from '../core/banner.ts';
 import { AvatarFigure } from './AvatarFigure.tsx';
 import { BannerEditor, BannerFigure } from './Banner.tsx';
+import { TreasureChest } from './Chest.tsx';
 import { Coin, Confirm, Icon, Overlay, PILE_INFO } from './common.tsx';
 import { PILES } from '../core/types.ts';
 
@@ -207,9 +208,11 @@ function GuildCard({ g, me, onInvite, onLeave, onTransfer, onOpenMember }: { g: 
   const [designing, setDesigning] = useState(false);
   const [membersOpen, setMembersOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const [title, setTitle] = useState(g.name);
   const pct = Math.min(100, Math.round((g.progress / Math.max(1, g.goal)) * 100));
   const done = g.progress >= g.goal;
+  const chest = chestState(g);
   const leader = g.members.find((m) => m.id === g.owner);
   const isLeader = g.owner === me;
   const [now, setNow] = useState(Date.now());
@@ -247,23 +250,47 @@ function GuildCard({ g, me, onInvite, onLeave, onTransfer, onOpenMember }: { g: 
         </div>
       )}
       {designing && <BannerEditor initial={bannerOf(g)} onSave={(b) => setGuildBanner(g.id, bannerSpec(b))} onClose={() => setDesigning(false)} />}
-      <div>
-        <div class="bar" role="progressbar" aria-valuemin={0} aria-valuemax={g.goal} aria-valuenow={Math.min(g.progress, g.goal)} aria-valuetext={`${g.progress} of ${g.goal} reviews`} aria-label="This week's goal">
-          <i style={{ width: `${pct}%` }} />
+      <div class="goal">
+        <div class="goal-text">
+          <div class="bar" role="progressbar" aria-valuemin={0} aria-valuemax={g.goal} aria-valuenow={Math.min(g.progress, g.goal)} aria-valuetext={`${g.progress} of ${g.goal} reviews`} aria-label="This week's goal">
+            <i style={{ width: `${pct}%` }} />
+          </div>
+          <div class="goal-line" data-testid="guild-progress">
+            <strong>
+              {g.progress} of {g.goal}
+            </strong>{' '}
+            reviews this week{done ? ' · goal reached!' : ` · ${pct}%`}
+          </div>
+          <div class="muted small" data-testid="guild-countdown-line">
+            {!done && <>{Math.max(0, g.goal - g.progress)} to go · </>}
+            <span data-testid="guild-countdown">{countdownText(weekEndsAt(g.weekStart) - now)}</span>
+          </div>
         </div>
-        <div class="small guild-progress-line" data-testid="guild-progress">
-          {done ? 'Goal reached this week!' : 'Together this week'}: {g.progress} of {g.goal} reviews
-        </div>
-        <div class="muted small guild-reward" data-testid="guild-reward">
-          {g.members.length > 1 && (
-            <>
-              <Coin /> {GUILD_WIN_COINS} each at the goal
-              {' · '}
-            </>
-          )}
-          <span data-testid="guild-countdown">{countdownText(weekEndsAt(g.weekStart) - now)}</span>
+        <div class="goal-chest" data-testid="guild-reward">
+          <TreasureChest state={chest} />
+          <div class="goal-chest-label">
+            {chest === 'locked' ? (
+              <>Needs 2 people</>
+            ) : chest === 'open' ? (
+              <>
+                <Coin /> +{GUILD_WIN_COINS} each
+              </>
+            ) : (
+              <>
+                <Coin /> {GUILD_WIN_COINS} each
+              </>
+            )}
+          </div>
         </div>
       </div>
+      <button class="link-btn" aria-expanded={helpOpen} aria-controls={`goal-help-${g.id}`} onClick={() => setHelpOpen(!helpOpen)} data-testid="guild-goal-help">
+        How does the goal work?
+      </button>
+      {helpOpen && (
+        <p class="muted small goal-help" id={`goal-help-${g.id}`} style={{ margin: 0 }}>
+          The goal adds up every member's reviews due this week: 3 a day for each daily verse, and 1 a week for each weekly, monthly or yearly one. It is set when the week starts and does not change. When the group reaches it, the chest opens and everyone who practiced gets {GUILD_WIN_COINS} coins. It needs at least two people. A new goal starts each Sunday.
+        </p>
+      )}
       <div class="row">
         <button class="btn primary grow" onClick={onInvite} data-testid="guild-invite">
           Invite someone
@@ -277,7 +304,10 @@ function GuildCard({ g, me, onInvite, onLeave, onTransfer, onOpenMember }: { g: 
       </div>
       {membersOpen && (
         <ul class="guild-members" id={`members-${g.id}`} data-testid="guild-members">
-          {g.members.map((m) => (
+          {g.members.map((m) => {
+            const weekDone = m.snap.weekStart === g.weekStart ? m.snap.week + (m.snap.extra ?? 0) : 0;
+            const dueOf = m.snap.weekStart === g.weekStart ? m.snap.due ?? 0 : 0;
+            return (
             <li key={m.id}>
               <button class="guild-member-btn" onClick={() => onOpenMember(m)} aria-label={`${m.name}${m.id === g.owner ? ', leader' : ''}${m.id === me ? ', you' : ''}. See their knight.`} data-testid="guild-member">
                 <Face card={m} size={34} />
@@ -286,15 +316,20 @@ function GuildCard({ g, me, onInvite, onLeave, onTransfer, onOpenMember }: { g: 
                   {m.id === me ? ' (you)' : ''}
                   {m.id === g.owner && <span class="leader-tag"> · Leader</span>}
                 </span>
-                <span class="muted small guild-member-streak">
-                  <Icon name="flame" fill /> {m.snap.streak}
-                </span>
-                <span class="guild-member-week" title="Reviews this week">
-                  {m.snap.weekStart === g.weekStart ? m.snap.week + (m.snap.extra ?? 0) : 0}
+                <span class="guild-member-nums">
+                  <span class="guild-member-week" aria-label={`${weekDone} reviews this week${dueOf ? ` of ${dueOf}` : ''}`}>
+                    {weekDone}
+                    {dueOf ? <span class="muted"> of {dueOf}</span> : null}
+                    <span class="muted small"> this week</span>
+                  </span>
+                  <span class="muted small guild-member-streak" aria-label={`${m.snap.streak} day streak`}>
+                    <Icon name="flame" fill /> {m.snap.streak}-day streak
+                  </span>
                 </span>
               </button>
             </li>
-          ))}
+            );
+          })}
         </ul>
       )}
       {moreOpen && (

@@ -669,6 +669,12 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Test changes:** the friends e2e tests open the folds before using what is inside; one new test covers the tabs, keyboard and tap-target sizes.
 **Undo:** roll back to the previous stage tag.
 
+## v1.67.0 — Group goal in plain words, and a reward chest (owner request)
+**Why the numbers looked odd:** the goal adds up every member's reviews due that week (a daily verse is 3 a day, 21 a week), so one person with 15 daily verses has a goal of 315. That is correct but it was shown without any explanation, and the member row showed two bare numbers.
+**What:** the goal shows as "85 of 315 reviews this week · 27%" with "230 to go · 5 days left", plus an expandable "How does the goal work?" line. Each member row shows their reviews this week out of their own share ("85 of 315 this week") and their streak ("9-day streak"). A painted treasure chest sits beside the goal: padlocked (group of one, "Needs 2 people"), closed with the coin reward (25 each), or open with coins and sparkles once the goal is reached (`chestState` in `core/social.ts`, `ui/Chest.tsx`).
+**Choices (tell me if you want them different):** the chest is drawn, not a picture file, so it works offline and in both themes; the open chest says "+25 each" and does not itself pay anything (coins are still claimed when the Friends tab loads, as before).
+**Test changes:** unit test for `chestState`; the group e2e test checks the chest states, the "to go" line and the explanation.
+
 ## v1.68.0 — Choosing a group's next leader (owner request)
 **What:** new server action `guild-transfer` (leader only, to a current member, never to yourself); the groups list now carries `heir` (the longest-standing member who is not the leader). In the app: ⋯ → "Choose a new leader" opens a list of the other members ("here longest" marks the heir) and asks to confirm. Leaving as the leader says who takes over.
 **Default succession:** this already worked (since v1.37.0) and is now covered by a test: when the leader leaves, the first remaining member in joining order leads, and the last person out closes the group.
