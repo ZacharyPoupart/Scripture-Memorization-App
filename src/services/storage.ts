@@ -91,6 +91,7 @@ export function defaultSettings(): Settings {
     tour: { done: [] },
     seenUnlocks: null,
     seenSaved: '',
+    listSort: 'longest',
   };
 }
 

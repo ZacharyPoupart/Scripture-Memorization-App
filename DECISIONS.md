@@ -601,4 +601,10 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **What counts:** the usual rules apply, nothing new: a verse that is ready counts when you finish it; one that is still waiting for its next review, or already done for the day, becomes extra practice (never counted, no coins, but it does count for your group's weekly goal and marks the day as practiced). The big "Start today's reviews" button still goes through everything that is ready.
 **Choices (tell me if you want them different):** the whole row is the tap target (taller than before, 44 px, for thumbs). I did not add a confirmation for waiting or done verses, since practicing more is always fine.
 **Test changes:** new e2e test taps a ready verse (one-verse review), finishes it, then taps it again while waiting.
+
+## v1.59.0 — The list sort stays where you left it (owner request)
+**What:** the sort menu on the Piles screen and on each pile page ("Longest in pile first", "Bible order", "Newest added", "Due soonest") used to forget your choice when you closed the app (it only lasted while the app stayed open). It is now saved on the device (`settings.listSort`, a device-only setting like the review type) and shared by every list, so choosing "Bible order" once keeps it everywhere until you change it.
+**What did not change:** the default for a new install is still "Longest in pile first", and the order a review visits verses in never looks at this menu. Search words, the "ready" filter and the topic filter are still fresh each time you open the app (they are quick to retype, and a forgotten filter can make a pile look empty).
+**Choices (tell me if you want them different):** one sort for all lists, not one per pile. If you would rather keep a separate sort per pile, say so.
+**Test changes:** new e2e test: pick a sort, go to the Piles screen, reload, and it is still picked; search is empty again after a reload.
 **Undo:** roll back to the previous stage tag.

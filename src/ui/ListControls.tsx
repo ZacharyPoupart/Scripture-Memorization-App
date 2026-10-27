@@ -1,6 +1,6 @@
 import { useState } from 'preact/hooks';
 import { matchTopics, renameTopic, restoreTopics, SORT_LABELS, topicCounts, TOPIC_CHIPS_MAX, type SortKey } from '../core/organize.ts';
-import { act, showToast, useApp } from '../store.ts';
+import { act, showToast, updateSettings, useApp } from '../store.ts';
 import { Field, Overlay } from './common.tsx';
 
 export interface ListState {
@@ -10,14 +10,18 @@ export interface ListState {
   topic: string;
 }
 
-/** Remembered while the app is open, so coming back from a verse keeps your search and sort. */
+/** Search and filters are remembered while the app is open, so coming back from a verse keeps them. The sort is a device setting: it stays as you left it. */
 let remembered: ListState = { query: '', sort: 'longest', ready: false, topic: '' };
 export const useListState = (): [ListState, (p: Partial<ListState>) => void] => {
+  const { settings } = useApp();
   const [state, setState] = useState<ListState>(remembered);
+  const sort = (settings.listSort in SORT_LABELS ? settings.listSort : 'longest') as SortKey;
   return [
-    state,
+    { ...state, sort },
     (p) => {
-      remembered = { ...remembered, ...p };
+      const { sort: chosen, ...rest } = p;
+      if (chosen) updateSettings({ listSort: chosen });
+      remembered = { ...remembered, ...rest };
       setState(remembered);
     },
   ];

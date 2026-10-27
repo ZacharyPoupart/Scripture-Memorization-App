@@ -46,6 +46,26 @@ test.describe('search, sort and filter', () => {
     expect(await refs()).toEqual(['John 3:16', 'Psalms 23:1', 'Romans 8:28']);
   });
 
+  test('the sort you pick stays picked: across pages, reloads and the next time you open the app', async ({ page }) => {
+    await library(page);
+    await page.goto('/#/pile/daily');
+    await expect(page.getByTestId('sort')).toHaveValue('longest');
+    await page.getByTestId('sort').selectOption('reference');
+    // the Piles screen uses the same choice
+    await page.goto('/#/piles');
+    await expect(page.getByTestId('sort')).toHaveValue('reference');
+    // a full reload (the app being opened again): still there
+    await page.reload();
+    await expect(page.getByTestId('sort')).toHaveValue('reference');
+    await page.goto('/#/pile/daily');
+    const refs = async () => (await page.getByTestId('verse-card').locator('.verse-ref').allTextContents()).map((t) => t.trim());
+    expect(await refs()).toEqual(['Psalms 23:1', 'John 3:16', 'Romans 8:28']);
+    // but search and filters are fresh each launch
+    await page.getByTestId('search').fill('john');
+    await page.reload();
+    await expect(page.getByTestId('search')).toHaveValue('');
+  });
+
   test('searching never changes what a pile review contains', async ({ page }) => {
     await library(page);
     await page.goto('/#/pile/daily');
