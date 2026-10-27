@@ -60,11 +60,12 @@ export function parseBanner(spec: unknown): Banner | null {
 
 export const bannerSpec = (b: Banner): string => `${b.design}-${b.field}-${b.pattern}`;
 
-/** A banner worn as the avatar's background is the item `scene-banner-<spec>`. */
-export const BANNER_SCENE_PREFIX = 'scene-banner-';
-export const bannerSceneId = (spec: string): string => `${BANNER_SCENE_PREFIX}${spec}`;
-export function bannerFromScene(id: string): Banner | null {
-  return id.startsWith(BANNER_SCENE_PREFIX) ? parseBanner(id.slice(BANNER_SCENE_PREFIX.length)) : null;
+/** A banner worn on the avatar's flag stand is the item `flag-<spec>` (the design is in the id, so friends see the same flag). */
+export const FLAG_PREFIX = 'flag-';
+export const NO_FLAG = 'flag-none';
+export const flagId = (spec: string): string => `${FLAG_PREFIX}${spec}`;
+export function bannerFromFlag(id: string): Banner | null {
+  return id.startsWith(FLAG_PREFIX) ? parseBanner(id.slice(FLAG_PREFIX.length)) : null;
 }
 
 /** A group nobody has designed a banner for yet still gets one: always the same for the same group, chosen from its id. */
@@ -80,3 +81,14 @@ export function defaultBanner(seed: string): Banner {
 
 /** The banner to show for a group: the one its leader chose, else the default for its id. */
 export const bannerOf = (g: { id: string; banner?: string }): Banner => parseBanner(g.banner) ?? defaultBanner(g.id);
+
+/**
+ * Keeps the flag on the stand true to your groups. `worn` is the flag id you wear, `flagGuild` the group you chose it from (kept on
+ * this device); `guilds` is the list just loaded. A group that redesigned its banner changes the flag, and one you left clears it.
+ */
+export function reconcileFlag(worn: string, flagGuild: string, guilds: { id: string; banner?: string }[]): { flag: string; guild: string } {
+  const spec = bannerFromFlag(worn);
+  if (!spec) return { flag: NO_FLAG, guild: '' };
+  const guild = flagGuild ? guilds.find((g) => g.id === flagGuild) : guilds.find((g) => bannerSpec(bannerOf(g)) === bannerSpec(spec));
+  return guild ? { flag: flagId(bannerSpec(bannerOf(guild))), guild: guild.id } : { flag: NO_FLAG, guild: '' };
+}

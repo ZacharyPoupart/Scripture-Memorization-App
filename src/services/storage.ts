@@ -92,6 +92,7 @@ export function defaultSettings(): Settings {
     seenUnlocks: null,
     seenSaved: '',
     listSort: 'longest',
+    flagGuild: '',
   };
 }
 

@@ -5,17 +5,17 @@
 // The avatar is a knight who puts on the full armor of God (Ephesians 6:10-18). Everyone starts in the same basic
 // steel armor (free); every piece can be swapped for another, because all the painted pieces are drawn to the same size.
 // Some pieces cost seeds, some need a long streak first, and the finest take the most of both.
-import { bannerFromScene } from './banner.ts';
+import { bannerFromFlag } from './banner.ts';
 import { baseCoins, coinBonusTotal } from './coins.ts';
 import { STREAK_MILESTONES } from './milestones.ts';
 import type { AppData } from './types.ts';
 
-export type Slot = 'helmet' | 'chest' | 'belt' | 'boots' | 'cape' | 'shield' | 'weapon' | 'scene';
+export type Slot = 'helmet' | 'chest' | 'belt' | 'boots' | 'cape' | 'shield' | 'weapon' | 'scene' | 'flag';
 
 /** Everything you can change, in the order the avatar screen lists it: the six armor pieces, then the extras (cape and background). */
-export const SLOTS: Slot[] = ['helmet', 'chest', 'belt', 'boots', 'shield', 'weapon', 'cape', 'scene'];
+export const SLOTS: Slot[] = ['helmet', 'chest', 'belt', 'boots', 'shield', 'weapon', 'cape', 'scene', 'flag'];
 /** The avatar screen keeps these two under "Extras", apart from the armor. */
-export const EXTRA_SLOTS: Slot[] = ['cape', 'scene'];
+export const EXTRA_SLOTS: Slot[] = ['cape', 'scene', 'flag'];
 export const SLOT_LABELS: Record<Slot, string> = {
   helmet: 'Helmet',
   chest: 'Chest plate',
@@ -25,6 +25,7 @@ export const SLOT_LABELS: Record<Slot, string> = {
   shield: 'Shield',
   weapon: 'Sword',
   scene: 'Background',
+  flag: 'Group flag',
 };
 
 /** The painted backgrounds (v1.35.0, from the owner's sheet; pictures in `public/scenes/<id>.webp`). All free; the first one is what everyone starts with (the old drawn morning sky is gone). */
@@ -154,12 +155,14 @@ export const ITEMS: Item[] = [
   ...piecesOf('weapon'),
   // ---- backgrounds (all free)
   ...SCENES.map((s) => I('scene', `scene-${s.id}`, s.name)),
+  // ---- the flag stand (a group's banner is added by `itemById` / `flagItem`)
+  I('flag', 'flag-none', 'No flag'),
 ];
 
 const BY_ID = new Map(ITEMS.map((i) => [i.id, i]));
-export const itemById = (id: string): Item | undefined => BY_ID.get(id) ?? (bannerFromScene(id) ? I('scene', id, 'Group banner') : undefined);
-/** A group's banner as a background you can wear (free, and it is the same wherever it is seen: the design is in the id). */
-export const bannerItem = (id: string, name: string): Item => I('scene', id, name);
+export const itemById = (id: string): Item | undefined => BY_ID.get(id) ?? (bannerFromFlag(id) ? I('flag', id, 'Group flag') : undefined);
+/** A group's banner as a flag on the stand beside the knight (free, and it is the same wherever it is seen: the design is in the id). */
+export const flagItem = (id: string, name: string): Item => I('flag', id, name);
 export const itemsIn = (slot: Slot): Item[] => ITEMS.filter((i) => i.slot === slot);
 
 export type Look = Record<Slot, string>;
@@ -174,6 +177,7 @@ export function defaultLook(): Look {
     shield: 'shield-none',
     weapon: 'weapon-none',
     scene: 'scene-sunlit-castle',
+    flag: 'flag-none',
   };
 }
 

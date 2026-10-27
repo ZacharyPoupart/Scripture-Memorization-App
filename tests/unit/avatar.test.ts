@@ -96,7 +96,7 @@ describe('catalog', () => {
     expect(new Set(ITEMS.map((i) => i.id)).size).toBe(ITEMS.length);
     for (const slot of SLOTS) {
       const inSlot = ITEMS.filter((i) => i.slot === slot);
-      expect(inSlot.length, slot).toBeGreaterThanOrEqual(2);
+      expect(inSlot.length, slot).toBeGreaterThanOrEqual(slot === 'flag' ? 1 : 2); // group flags are added per group
       expect(inSlot.some((i) => i.cost === 0 && !i.unlock), `free default in ${slot}`).toBe(true);
     }
     for (const i of ITEMS) {
@@ -123,8 +123,8 @@ describe('the knight', () => {
     expect(armorWorn(look)).toBe(0);
   });
 
-  it('the avatar screen lists the six armor pieces, then the cape and the background, and nothing else (no extras)', () => {
-    expect(SLOTS).toEqual(['helmet', 'chest', 'belt', 'boots', 'shield', 'weapon', 'cape', 'scene']);
+  it('the avatar screen lists the six armor pieces, then the cape, the background and the group flag, and nothing else (no extras)', () => {
+    expect(SLOTS).toEqual(['helmet', 'chest', 'belt', 'boots', 'shield', 'weapon', 'cape', 'scene', 'flag']);
     expect([...new Set(ITEMS.map((i) => i.slot))].sort()).toEqual([...SLOTS].sort());
   });
 

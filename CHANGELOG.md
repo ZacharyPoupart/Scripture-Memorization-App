@@ -5,6 +5,13 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.62.0] - 2026-10-27
+
+### Changed
+- A group's banner is now a **flag on a little stand** next to your knight (Avatar → Extras → Group flag), not the whole background. Friends see it too.
+- The flag follows the group: when the leader redesigns the banner your flag changes, and if you leave the group it comes off.
+- Anyone who had worn a banner as their background goes back to the normal background.
+
 ## [1.61.0] - 2026-10-27
 
 ### Added

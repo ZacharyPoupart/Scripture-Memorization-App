@@ -1,7 +1,8 @@
 // App-wide state: the data document, device settings, and the glue to storage and sync.
 import { useEffect, useState } from 'preact/hooks';
 import { BackupError, exportBackup, parseBackup } from './core/backup.ts';
-import { buyItem, equipItem, GUILD_WIN_COINS, resetAvatar, seedsEarned, testing, type BuyResult } from './core/avatar.ts';
+import { buyItem, currentLook, equipItem, GUILD_WIN_COINS, resetAvatar, seedsEarned, testing, type BuyResult } from './core/avatar.ts';
+import { reconcileFlag } from './core/banner.ts';
 import { addDays, dayKeyOf } from './core/dates.ts';
 import { mergeData } from './core/merge.ts';
 import { createData, endPause, recordReview, setPause, settle } from './core/schedule.ts';
@@ -95,6 +96,7 @@ let state: AppState = {
     seenUnlocks: null,
     seenSaved: '',
     listSort: 'longest',
+    flagGuild: '',
   },
   tick: 0,
   toast: null,
@@ -208,6 +210,22 @@ export function resetArmor() {
 /** Wear an item you already have (or one an achievement has unlocked). */
 export function wearItem(id: string): boolean {
   return act((d, now) => equipItem(d, id, now));
+}
+
+/** Put a group's flag on the stand (or take it off with `guild` null); the flag then follows that group's banner. */
+export function wearFlag(guildId: string | null, id: string): boolean {
+  const ok = wearItem(id);
+  if (ok) updateSettings({ flagGuild: guildId ?? '' });
+  return ok;
+}
+
+/** After the groups load: a redesigned banner changes the flag you wear, and leaving the group takes it off. */
+function reconcileFlagNow(guilds: { id: string; banner?: string }[]) {
+  if (state.sandbox) return;
+  const worn = currentLook(state.data).flag;
+  const r = reconcileFlag(worn, state.settings.flagGuild, guilds);
+  if (r.flag !== worn) wearItem(r.flag);
+  if (r.guild !== state.settings.flagGuild) updateSettings({ flagGuild: r.guild });
 }
 
 export function updateSettings(patch: Partial<Settings>) {
@@ -345,6 +363,7 @@ export async function refreshSocial(): Promise<void> {
   await guarded(async () => {
     const [f, g] = await Promise.all([api.friends(auth), api.guilds(auth)]);
     patchSocial({ friends: f.friends, cheers: f.cheers ?? [], guilds: g.guilds, loadedAt: Date.now() });
+    reconcileFlagNow(g.guilds);
     // a group that reached its weekly goal pays coins, once
     const me = state.data.social?.id;
     const wins = me && !state.sandbox ? guildWinsToClaim(state.data, g.guilds, me, Date.now()) : [];
@@ -484,7 +503,10 @@ export async function setGuildBanner(gid: string, banner: string): Promise<boole
   const auth = authOf();
   if (!auth) return false;
   const r = await guarded(() => api.guildBanner(auth, gid, banner));
-  if (r) patchSocial({ guilds: (state.social.guilds ?? []).map((g) => (g.id === gid ? { ...g, banner } : g)) });
+  if (r) {
+    patchSocial({ guilds: (state.social.guilds ?? []).map((g) => (g.id === gid ? { ...g, banner } : g)) });
+    reconcileFlagNow(state.social.guilds ?? []);
+  }
   return !!r;
 }
 
@@ -492,7 +514,10 @@ export async function leaveGuild(gid: string): Promise<boolean> {
   const auth = authOf();
   if (!auth) return false;
   const r = await guarded(() => api.guildLeave(auth, gid));
-  if (r) patchSocial({ guilds: (state.social.guilds ?? []).filter((g) => g.id !== gid) });
+  if (r) {
+    patchSocial({ guilds: (state.social.guilds ?? []).filter((g) => g.id !== gid) });
+    reconcileFlagNow(state.social.guilds ?? []);
+  }
   return !!r;
 }
 

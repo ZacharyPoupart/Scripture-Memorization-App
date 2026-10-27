@@ -206,7 +206,7 @@ test('tapping a friend shows their whole knight, their numbers and the groups yo
   await expect(sam.getByTestId('friend-sheet-cheer')).toContainText('Cheered today');
 });
 
-test('a group has a banner next to its name: the leader designs it, members see it and can wear it as their background', async ({ browser }) => {
+test('a group has a banner next to its name: the leader designs it, members see it and can hang it on their flag stand, and it follows the group', async ({ browser }) => {
   const zach = await person(browser, 'Zach P.');
   const sam = await person(browser, 'Sam L.');
   await zach.getByTestId('guild-name-input').fill('Youth Group');
@@ -230,12 +230,31 @@ test('a group has a banner next to its name: the leader designs it, members see 
   await sam.getByTestId('guild-join-yes').click();
   await expect(sam.getByTestId('guild-card').locator('[data-banner="chevron-crimson-gold"]')).toBeVisible();
   await expect(sam.getByTestId('guild-banner-edit')).toHaveCount(0);
-  // and Sam can wear it behind the knight
+  // and Sam can hang it on the flag stand next to the knight (not as the background)
   await sam.goto('/#/avatar');
-  await sam.getByTestId('slot-scene').click();
-  await sam.getByTestId('item-scene-banner-chevron-crimson-gold').click();
-  await expect(sam.getByTestId('item-scene-banner-chevron-crimson-gold')).toContainText('Wearing');
-  await expect(sam.locator('svg[data-look*="scene-banner-chevron-crimson-gold"]').first()).toBeVisible();
+  await sam.getByTestId('slot-flag').click();
+  await sam.getByTestId('item-flag-chevron-crimson-gold').click();
+  await expect(sam.getByTestId('item-flag-chevron-crimson-gold')).toContainText('Wearing');
+  await expect(sam.locator('svg [data-flag="chevron-crimson-gold"]').first()).toBeVisible();
+  // the leader redesigns it: Sam's flag changes the next time the groups load
+  await zach.getByTestId('guild-banner-edit').click();
+  await zach.getByTestId('banner-design-cross').click();
+  await zach.getByTestId('banner-field-teal').click();
+  await zach.getByTestId('banner-pattern-ivory').click();
+  await zach.getByTestId('banner-save').click();
+  await expect(zach.getByTestId('banner-editor')).toHaveCount(0);
+  await sam.goto('/#/friends');
+  await expect(sam.getByTestId('guild-card').locator('[data-banner="cross-teal-ivory"]')).toBeVisible();
+  await sam.goto('/#/avatar');
+  await expect(sam.locator('svg [data-flag="cross-teal-ivory"]').first()).toBeVisible();
+  await expect(sam.locator('svg [data-flag="chevron-crimson-gold"]')).toHaveCount(0);
+  // Sam leaves the group: the flag goes
+  await sam.goto('/#/friends');
+  await sam.getByTestId('guild-leave').click();
+  await sam.getByRole('button', { name: 'Leave', exact: true }).last().click();
+  await expect(sam.getByTestId('guild-card')).toHaveCount(0);
+  await sam.goto('/#/avatar');
+  await expect(sam.locator('svg [data-flag]')).toHaveCount(0);
 });
 
 test('the friends page fits a phone and has no horizontal scrolling', async ({ browser }) => {

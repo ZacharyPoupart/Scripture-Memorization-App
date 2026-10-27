@@ -103,25 +103,33 @@ export function BannerFigure({ banner, size = 34, title }: { banner: Banner; siz
   );
 }
 
-/** The banner filling the avatar's background picture (a 120 x 120 square), with the corners darkened a little so the knight stands out. */
-export function BannerBackground({ banner }: { banner: Banner }) {
+/** A little flag stand for the avatar picture (120 x 120): a pole on the ground with the banner hanging from a crossbar. */
+export function FlagStand({ banner }: { banner: Banner }) {
   const spec = bannerSpec(banner);
-  const shade = `bnb-${spec}`;
+  const clip = `fsc-${spec}`;
+  const shade = `fss-${spec}`;
   return (
-    <g>
+    <g data-testid="flag-stand" data-flag={spec}>
       <defs>
+        <clipPath id={clip}>
+          <path d={SHIELD} />
+        </clipPath>
         <Shade id={shade} />
-        <radialGradient id={`bnv-${spec}`} cx="0.5" cy="0.45" r="0.75">
-          <stop offset="0.55" stop-color="#000" stop-opacity="0" />
-          <stop offset="1" stop-color="#000" stop-opacity="0.42" />
-        </radialGradient>
       </defs>
-      <rect width="120" height="120" fill={colorHex(banner.field)} />
-      <g transform="translate(60 60) scale(1.5) translate(-50 -64)">
-        <Pattern design={banner.design} color={colorHex(banner.pattern)} />
+      <ellipse cx="17" cy="113" rx="9" ry="2.6" fill="#000" opacity="0.2" />
+      <rect x="15.6" y="22" width="2.8" height="91" rx="1.2" fill="#8a6a2a" stroke="#5a4416" stroke-width="0.6" />
+      <circle cx="17" cy="21" r="2.8" fill="#e3b23c" stroke="#7a4f12" stroke-width="0.8" />
+      <rect x="4" y="26" width="26" height="2.6" rx="1.2" fill="#8a6a2a" stroke="#5a4416" stroke-width="0.6" />
+      <g transform="translate(5.5 28.5) scale(0.23)">
+        <path d={SHIELD} fill="#000" opacity="0.22" transform="translate(0 3)" />
+        <g clip-path={`url(#${clip})`}>
+          <rect x="0" y="0" width="100" height="130" fill={colorHex(banner.field)} />
+          <Pattern design={banner.design} color={colorHex(banner.pattern)} />
+          <rect x="0" y="0" width="100" height="130" fill={`url(#${shade})`} />
+        </g>
+        <path d={SHIELD} fill="none" stroke="#7a4f12" stroke-width="7" stroke-linejoin="round" />
+        <path d={SHIELD} fill="none" stroke="#e3b23c" stroke-width="4.4" stroke-linejoin="round" />
       </g>
-      <rect width="120" height="120" fill={`url(#${shade})`} />
-      <rect width="120" height="120" fill={`url(#bnv-${spec})`} />
     </g>
   );
 }
