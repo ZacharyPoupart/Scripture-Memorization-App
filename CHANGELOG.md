@@ -8,6 +8,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 ### Added
 - The coins you earn now count up on the result card and the session summary. On a streak the multiplier pops in (for example ×1.75) and the number climbs to the new total. With "reduce motion" on, the final number just appears.
 
+## [1.70.0] - 2026-10-28
+
+### Changed
+- Review all (a pile with "All" chosen, or when nothing is due) now starts with the verses you have not reviewed yet today and ends with the ones you already have. Shuffle still works inside each of the two groups.
+
 ## [1.69.0] - 2026-10-28
 
 ### Changed

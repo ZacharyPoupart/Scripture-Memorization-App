@@ -3,7 +3,7 @@
 // a view of progressDays / graduationTarget.
 import { addDays, dayKeyOf, daysBetween } from './dates.ts';
 import type { DayKey } from './dates.ts';
-import { PROGRESS_UNIT, graduationTarget, pileVerses, progressDays, verseStatus } from './schedule.ts';
+import { PROGRESS_UNIT, graduationTarget, pileVerses, progressDays, reviewsOn, verseStatus } from './schedule.ts';
 import { PILES } from './types.ts';
 import type { AppData, Verse } from './types.ts';
 
@@ -23,6 +23,19 @@ export function shuffled<T>(items: readonly T[], random: () => number = Math.ran
     [out[i], out[j]] = [out[j], out[i]];
   }
   return out;
+}
+
+/**
+ * "Review all" visits the verses with no counted review yet today first, then the ones that already have one. Pass `random` to shuffle
+ * (inside each of the two groups, so the unreviewed ones still come first); without it each group keeps the order it came in.
+ * Only the order a session visits them in: what is due and what counts never looks at it.
+ */
+export function reviewAllOrder(data: AppData, ids: readonly string[], now: number, random?: () => number): string[] {
+  const today = dayKeyOf(now);
+  const fresh: string[] = [];
+  const again: string[] = [];
+  for (const id of ids) (data.verses[id] && reviewsOn(data.verses[id], today) > 0 ? again : fresh).push(id);
+  return random ? [...shuffled(fresh, random), ...shuffled(again, random)] : [...fresh, ...again];
 }
 
 export type NextReview =
