@@ -267,7 +267,7 @@ describe('guilds: invite only', () => {
     expect(g.members.map((m: any) => m.name)).toEqual(['Zach P.', 'Sam L.', 'Ana B.']); // most reviews first
     expect(g.weekStart).toBe('2026-10-18');
     expect(g.progress).toBe(15); // Ana's numbers are from last week, so they are not counted
-    expect(g.goal).toBe(130); // 44 + 44 + 44 = 132, rounded to the nearest 5
+    expect(g.goal).toBe(120); // 44 + 44 + 44 = 132, 90% is 118.8, rounded to the nearest 5
     expect(JSON.stringify(g)).not.toContain('"sh"');
   });
 
@@ -275,14 +275,14 @@ describe('guilds: invite only', () => {
     const { code } = await guild();
     await call('guild-join', { ...who(2), code });
     await call('guild-join', { ...who(3), code });
-    expect((await call('guilds', who(1))).body.guilds[0].goal).toBe(130);
+    expect((await call('guilds', who(1))).body.guilds[0].goal).toBe(120);
     await join(2, 'Sam L.', snap({ week: 5, due: 100 })); // Sam adds many verses mid-week
     await join(4, 'Lee K.', snap({ due: 80 }));
     await call('guild-join', { ...who(4), code }); // and someone new arrives
-    expect((await call('guilds', who(1))).body.guilds[0].goal).toBe(130);
+    expect((await call('guilds', who(1))).body.guilds[0].goal).toBe(120);
     // the next week works the goal out again from what everyone has then
     for (const n of [1, 2, 3, 4]) await join(n, `Person ${n}`, snap({ weekStart: '2026-10-25', due: 10 }));
-    expect((await call('guilds', who(1))).body.guilds[0].goal).toBe(40);
+    expect((await call('guilds', who(1))).body.guilds[0].goal).toBe(35);
   });
 
   it('extra practice adds to the group\u2019s progress and to a member\u2019s total', async () => {
@@ -406,6 +406,6 @@ describe('the guild goal for members who share an older snapshot', () => {
     const code = (await call('guild-invite', { ...who(1), gid })).body.code as string;
     await call('guild-join', { ...who(2), code });
     const g = (await call('guilds', who(1))).body.guilds[0];
-    expect(g.goal).toBe(85); // 43 + 44 = 87, rounded to the nearest 5
+    expect(g.goal).toBe(80); // 43 + 44 = 87, 90% is 78.3, rounded to the nearest 5
   });
 });

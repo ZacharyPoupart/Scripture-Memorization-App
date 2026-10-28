@@ -5,6 +5,9 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Changed
+- A group's weekly goal is now 90% of every member's reviews due that week added up (still to the nearest 5, at least 5). A goal already set for this week stays as it is; the new rule applies from the next group goal that is set.
+
 ## [1.68.3] - 2026-10-28
 
 ### Fixed

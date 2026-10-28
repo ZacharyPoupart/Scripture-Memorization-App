@@ -26,7 +26,9 @@ const FRIEND_INVITE_TTL = 7 * 86400;
 const GUILD_INVITE_TTL = 14 * 86400;
 const CHEER_KEEP = 7 * 86400_000; // how long a cheer stays on someone's page
 /** A guild's weekly goal: every member's reviews due that week added up, rounded to the nearest 5 (never below 5). */
-export const guildGoal = (dues) => Math.max(5, Math.round(dues.reduce((n, d) => n + d, 0) / 5) * 5);
+/** 90% of what every member has due this week, to the nearest 5 (never below 5): a little room for a missed review. */
+export const GOAL_SHARE = 0.9;
+export const guildGoal = (dues) => Math.max(5, Math.round((dues.reduce((n, d) => n + d, 0) * GOAL_SHARE) / 5) * 5);
 /** One member's share. Members on an older version share no number yet: count 21 for each Daily verse and 1 for each Weekly one. */
 const doneOf = (snap) => snap.week + (Number.isInteger(snap.extra) ? snap.extra : 0);
 const dueOf = (snap) => (Number.isInteger(snap.due) ? snap.due : snap.counts.daily * 21 + snap.counts.weekly);

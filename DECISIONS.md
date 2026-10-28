@@ -695,3 +695,9 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **What:** `Speak.tsx` made a new speech recogniser for every verse and every "Try again". A phone allows one at a time and frees the old one late, so the next start was refused ("Could not start the microphone") until a page refresh. Now one recogniser is kept for the app, the old screen detaches its handlers and aborts it when it closes, and a start that is refused is retried a few times a quarter of a second apart. "No speech heard" now shows a message.
 **Test changes:** the pretend microphone in `tests/e2e/helpers.ts` now behaves like a phone (one at a time, released 150 ms late); with it the old code fails the new `speak-reuse.spec.ts` (three Speak rounds in a row) and the new code passes. Not testable here: the real iPhone microphone, so please try two verses in a row.
 **Undo:** roll back to the previous stage tag.
+
+## v1.69.0 — Group goal is 90% of what is due (owner request)
+**What:** `guildGoal` now takes 90% of the members' due total before rounding to the nearest 5 (minimum 5), so a group does not need every single review. A person is already limited to 3 groups at once (since v1.53.0, enforced on the server when creating or joining), so nothing changed there.
+**Not changed:** a goal already locked for the current week keeps its number (it would otherwise move under people's feet); the 90% applies to goals locked from now on. The reward stays 25 coins.
+**Test changes:** goal expectations in `social-core.test.ts` and `social-server.test.ts` moved to the 90% numbers (e.g. 132 due is now 120, 87 is 80), plus an exact case (100 due is 90).
+**Undo:** roll back to the previous stage tag.
