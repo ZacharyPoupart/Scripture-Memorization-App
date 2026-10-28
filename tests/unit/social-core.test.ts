@@ -152,10 +152,11 @@ describe('the guild goal', () => {
     expect(cleanSnap({ ...socialSnapshot(d, week) })).toMatchObject({ due: 21 });
   });
 
-  it('is the members\' totals added up and rounded to the nearest 5 (never below 5)', () => {
-    expect(guildGoal([21, 21])).toBe(40); // 42
-    expect(guildGoal([21, 22])).toBe(45); // 43
-    expect(guildGoal([44, 44, 44])).toBe(130); // 132
+  it('is 90% of the members\' totals added up, rounded to the nearest 5 (never below 5)', () => {
+    expect(guildGoal([21, 21])).toBe(40); // 42 -> 37.8
+    expect(guildGoal([21, 22])).toBe(40); // 43 -> 38.7
+    expect(guildGoal([44, 44, 44])).toBe(120); // 132 -> 118.8
+    expect(guildGoal([50, 50])).toBe(90); // 100 -> 90 exactly
     expect(guildGoal([2])).toBe(5);
     expect(guildGoal([0, 0])).toBe(5);
     expect(guildGoal([])).toBe(5);

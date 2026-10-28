@@ -288,7 +288,7 @@ function GuildCard({ g, me, onInvite, onLeave, onTransfer, onOpenMember }: { g: 
       </button>
       {helpOpen && (
         <p class="muted small goal-help" id={`goal-help-${g.id}`} style={{ margin: 0 }}>
-          The goal adds up every member's reviews due this week: 3 a day for each daily verse, and 1 a week for each weekly, monthly or yearly one. It is set when the week starts and does not change. When the group reaches it, the chest opens and everyone who practiced gets {GUILD_WIN_COINS} coins. It needs at least two people. A new goal starts each Sunday.
+          The goal is 90% of every member's reviews due this week added up: 3 a day for each daily verse, and 1 a week for each weekly, monthly or yearly one. It is set when the week starts and does not change. When the group reaches it, the chest opens and everyone who practiced gets {GUILD_WIN_COINS} coins. It needs at least two people. A new goal starts each Sunday.
         </p>
       )}
       <div class="row">
