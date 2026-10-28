@@ -687,3 +687,7 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Not verifiable here:** Chromium has no iOS tap rule, so the new e2e test (`type-keyboard.spec.ts`) checks that the real field is focused at the start and on the next verse; please try it on the iPhone.
 **Choices:** if you dismiss the keyboard yourself it is not forced back until the next verse or a tap on the text.
 **Undo:** roll back to `v1.68.0-guild-leader`.
+
+## v1.68.2 — Clearer heatmap shades (owner request)
+**What:** the three busy-day squares on Stats were mixes of one colour with the card colour, so the steps looked alike. They are now separate colours (`--heat-1/2/3` in both themes): pale, mid and deep in light mode, dim, mid and pale in dark mode. Rest and the gold saved day are unchanged. CSS only; no data change.
+**Undo:** roll back to the previous stage tag.
