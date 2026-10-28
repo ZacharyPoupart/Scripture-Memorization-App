@@ -9,9 +9,10 @@ import { tooManyMistakes } from '../core/quiz.ts';
 import { PILES, type AppData, type LevelUp, type Pile, type ReviewMode, type Verse } from '../core/types.ts';
 import { back, navigate, type Route } from '../router.ts';
 import { act, completeReview, showToast, updateSettings, useApp } from '../store.ts';
-import { CheckMark, Coin, Confetti, Icon, PileBadge, PILE_INFO, pileProgress, progressUnitPlural } from './common.tsx';
+import { CheckMark, Confetti, Icon, PileBadge, PILE_INFO, pileProgress, progressUnitPlural } from './common.tsx';
 import { MODES } from './ModePicker.tsx';
 import { Overlay } from './common.tsx';
+import { CoinCount } from './CoinCount.tsx';
 import { Blanks } from './modes/Blanks.tsx';
 import { Flashcard } from './modes/Flashcard.tsx';
 import { RefRecall } from './modes/RefRecall.tsx';
@@ -138,8 +139,8 @@ export function Review({ route }: { route: Route }) {
   const [attempt, setAttempt] = useState(0);
   const [restarts, setRestarts] = useState(0); // wrong answers in this verse's review so far
   const [easier, setEasier] = useState<Pile | null>(null); // a lower pile to offer after a hard time
-  const [result, setResult] = useState<{ counted: boolean; levelUps: LevelUp[]; todayComplete: boolean; seeds: number } | null>(null);
-  const [tally, setTally] = useState({ counted: 0, practice: 0, ups: 0, seeds: 0 });
+  const [result, setResult] = useState<{ counted: boolean; levelUps: LevelUp[]; todayComplete: boolean; seeds: number; base: number; multiplier: number } | null>(null);
+  const [tally, setTally] = useState({ counted: 0, practice: 0, ups: 0, seeds: 0, base: 0, multiplier: 1 });
   const advanceTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   if (!queue.length) {
@@ -176,9 +177,9 @@ export function Review({ route }: { route: Route }) {
   const onFinished = () => {
     if (!verse) return;
     const r = completeReview(verse.id);
-    setResult({ counted: r.counted, levelUps: r.levelUps, todayComplete: r.todayComplete, seeds: r.seeds });
+    setResult({ counted: r.counted, levelUps: r.levelUps, todayComplete: r.todayComplete, seeds: r.seeds, base: r.base, multiplier: r.multiplier });
     feedback.complete();
-    setTally((t) => ({ counted: t.counted + (r.counted ? 1 : 0), practice: t.practice + (r.counted ? 0 : 1), ups: t.ups + r.levelUps.length, seeds: t.seeds + r.seeds }));
+    setTally((t) => ({ counted: t.counted + (r.counted ? 1 : 0), practice: t.practice + (r.counted ? 0 : 1), ups: t.ups + r.levelUps.length, seeds: t.seeds + r.seeds, base: t.base + r.base, multiplier: Math.max(t.multiplier, r.multiplier) }));
     // a verse that took many tries in a pile that allows no slips is offered more frequent practice; wait for the answer
     const offer = r.counted && r.levelUps.length === 0 ? easierPile(verse.pile, restarts) : null;
     setEasier(offer);
@@ -245,9 +246,7 @@ export function Review({ route }: { route: Route }) {
             {tally.practice > 0 ? ` · ${tally.practice} extra practice` : ''}
           </p>
           {tally.seeds > 0 && settings.avatarOn && (
-            <p class="seeds-gain" data-testid="session-seeds">
-              +{tally.seeds} coin{tally.seeds === 1 ? '' : 's'} <Coin />
-            </p>
+            <CoinCount base={tally.base} total={tally.seeds} multiplier={tally.multiplier} testid="session-seeds" />
           )}
           {!fullyDone && sum.remaining > 0 && (
             <p class="muted small" data-testid="more-later">
@@ -295,9 +294,7 @@ export function Review({ route }: { route: Route }) {
             <ResultProgress verse={verse} data={data} />
             {result.levelUps.length > 0 && <p>Level up! Now in {PILE_INFO[result.levelUps[result.levelUps.length - 1].to].label}.</p>}
             {result.seeds > 0 && settings.avatarOn && queue.length === 1 && (
-              <p class="seeds-gain" data-testid="seeds-gain">
-                +{result.seeds} coin{result.seeds === 1 ? '' : 's'} <Coin />
-              </p>
+              <CoinCount key={`${idx}-${attempt}`} base={result.base} total={result.seeds} multiplier={result.multiplier} testid="seeds-gain" />
             )}
             {result.todayComplete && <p class="status-ready">That’s everything for today.</p>}
             {easier && (

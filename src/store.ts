@@ -168,7 +168,7 @@ export function act<T>(fn: (data: AppData, now: number, deviceId: string) => T):
   return result;
 }
 
-export function completeReview(verseId: string): { counted: boolean; levelUps: LevelUp[]; todayComplete: boolean; seeds: number } {
+export function completeReview(verseId: string): { counted: boolean; levelUps: LevelUp[]; todayComplete: boolean; seeds: number; base: number; multiplier: number } {
   const r = act((d, now, device) => {
     const before = seedsEarned(d);
     const r = recordReview(d, verseId, now, device);

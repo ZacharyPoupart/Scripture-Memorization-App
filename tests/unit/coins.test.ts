@@ -49,6 +49,22 @@ describe('coins earned with a streak', () => {
     expect(bonus).toBeCloseTo(1.5, 5); // 1 coin for the review + 5 for the finished day, a quarter more on each
   });
 
+  it('tells the screen what the review earned before the multiplier and what the multiplier was', () => {
+    const d = withStreak(7);
+    settle(d, at(day(8), '08:00'));
+    const r = recordReview(d, Object.keys(d.verses)[0], at(day(8), '08:00'), DEVICE);
+    expect(r.base).toBe(6); // 1 for the review + 5 for the finished day
+    expect(r.multiplier).toBe(1.25);
+    const none = newData();
+    const v = john316(none, at(D0, '07:00'));
+    const first = recordReview(none, v.id, at(day(1), '08:00'), DEVICE);
+    expect(first.multiplier).toBe(1);
+    const extra = recordReview(none, v.id, at(day(1), '08:01'), DEVICE); // too soon: extra practice
+    expect(extra.counted).toBe(false);
+    expect(extra.base).toBe(0);
+    expect(extra.multiplier).toBe(1);
+  });
+
   it('earns nothing extra with no streak yet', () => {
     const d = newData();
     const v = john316(d, at(D0, '07:00'));
