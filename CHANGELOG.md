@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.68.2] - 2026-10-28
+
 ### Changed
 - Stats: the practice squares are easier to tell apart: practiced, all done and full day are now three clearly different steps from pale to deep (the other way round in dark mode).
 
