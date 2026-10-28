@@ -29,6 +29,18 @@ export function nextMultiplier(streak: number): { days: number; x: number } | nu
   return STREAK_MULTIPLIERS.find((t) => streak < t.days) ?? null;
 }
 
+/**
+ * The extra coins a multiplier earned on one review (`extra` may be 1.5, 0.3, ...): the whole coins always, and the part left over as
+ * that chance of one more (0.3 left over is a 30% chance of a coin, otherwise nothing), so over many reviews it pays out the same
+ * as the fraction would. `random` returns a number in [0, 1).
+ */
+export function rollBonus(extra: number, random: () => number = Math.random): number {
+  const e = Math.round(Math.max(0, extra) * 1e6) / 1e6; // 0.30000000000000004 is 0.3
+  const whole = Math.floor(e);
+  const left = e - whole;
+  return whole + (left > 0 && random() < left ? 1 : 0);
+}
+
 /** Coins from counted reviews, finished days and level-ups, before any multiplier. */
 export function baseCoins(data: AppData): number {
   const reviews = Object.values(data.reviewsByDevice).reduce((a, b) => a + b, 0);

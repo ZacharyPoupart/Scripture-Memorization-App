@@ -30,7 +30,7 @@ import {
   startOfLocalDay,
   type DayKey,
 } from './dates.ts';
-import { baseCoins, streakMultiplier } from './coins.ts';
+import { baseCoins, rollBonus, streakMultiplier } from './coins.ts';
 import { uid } from './ids.ts';
 import {
   DEFAULT_PREFS,
@@ -665,7 +665,8 @@ export function recordReview(
   verseId: string,
   now: number,
   deviceId: string,
-): { counted: boolean; levelUps: LevelUp[]; todayComplete: boolean; base: number; multiplier: number } {
+  random: () => number = Math.random, // rolls the left-over part of a multiplied coin (see `rollBonus`)
+): { counted: boolean; levelUps: LevelUp[]; todayComplete: boolean; base: number; multiplier: number; bonus: number } {
   const settled = settle(data, now);
   const v = data.verses[verseId];
   if (!v || v.deletedAt) throw new Error('Verse not found');
@@ -699,13 +700,15 @@ export function recordReview(
   // "All done for today": every Daily verse got its 3 reviews and the Weekly, Monthly and Yearly ones that were ready got theirs
   if (summary.total > 0 && summary.remaining === 0) data.ledger[today] = mergeLedgerDay(data.ledger[today], { f: 1 });
   data.longestStreak = Math.max(data.longestStreak, streakInfo(data, now).count);
+  let bonus = 0;
   if (counted && multiplier > 1) {
-    // every coin this review earned (the review, a finished day, a level-up) is worth more on a streak; kept as a per-device total that only grows
-    const extra = (baseCoins(data) - coinsBefore) * (multiplier - 1);
-    data.coinBonus = { ...(data.coinBonus ?? {}), [deviceId]: Math.round(((data.coinBonus?.[deviceId] ?? 0) + extra) * 100) / 100 };
+    // every coin this review earned (the review, a finished day, a level-up) is worth more on a streak: the whole extra coins always, and the part
+    // left over (a third of a coin) as a chance of one more; kept as a per-device total of whole coins that only grows
+    bonus = rollBonus((baseCoins(data) - coinsBefore) * (multiplier - 1), random);
+    if (bonus > 0) data.coinBonus = { ...(data.coinBonus ?? {}), [deviceId]: (data.coinBonus?.[deviceId] ?? 0) + bonus };
   }
   // what the review earned before the multiplier, and the multiplier, so the screen can show the coins counting up and then multiplying
-  return { counted, levelUps, todayComplete: summary.total > 0 && summary.remaining === 0, base: counted ? baseCoins(data) - coinsBefore : 0, multiplier: counted ? multiplier : 1 };
+  return { counted, levelUps, todayComplete: summary.total > 0 && summary.remaining === 0, base: counted ? baseCoins(data) - coinsBefore : 0, multiplier: counted ? multiplier : 1, bonus };
 }
 
 export function totalReviews(data: AppData): number {

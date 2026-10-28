@@ -123,7 +123,7 @@ export function AvatarScreen() {
               <p class="muted small" style={{ margin: 0 }} data-testid="multiplier-line">
                 {multiplier > 1 ? (
                   <>
-                    Your streak is {streak} days, so coins from reviews, finished days and level-ups are worth <strong>×{multiplier}</strong>.
+                    Your streak is {streak} days, so coins from reviews, finished days and level-ups are worth <strong>×{multiplier}</strong>. A part of a coin is a chance: 0.3 of a coin is a 30% chance of one more.
                   </>
                 ) : (
                   <>Your streak is {streak} day{streak === 1 ? '' : 's'}. From 3 days in a row, coins are worth more.</>

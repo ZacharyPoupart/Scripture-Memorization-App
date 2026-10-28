@@ -2714,37 +2714,78 @@ button.chip {
   gap: 2px;
 }
 
-/* coins counting up, then multiplied by the streak */
+/* coins in the style of a slot machine: the number spins, a multiplier reel spins and lands, the number spins again */
 .coin-count {
   display: inline-block;
-  min-height: 1.6em;
   font-variant-numeric: tabular-nums;
+  font-size: 1.2em;
 }
-.coin-count .counting {
-  animation: coin-pulse 0.7s ease-in-out;
+.slot {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15em;
 }
-.mult-chip {
+.slot-number {
+  display: inline-flex;
+  padding: 0 0.15em;
+  border-radius: 0.3em;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  box-shadow: inset 0 0.08em 0.25em color-mix(in srgb, var(--text) 18%, transparent);
+}
+.reel {
   display: inline-block;
+  overflow: hidden;
+  line-height: 1.35;
+  text-align: center;
+  min-width: 0.62em;
+  -webkit-mask-image: linear-gradient(transparent, #000 22%, #000 78%, transparent);
+  mask-image: linear-gradient(transparent, #000 22%, #000 78%, transparent);
+}
+.reel.unlit {
+  opacity: 0;
+}
+.reel-strip {
+  display: flex;
+  flex-direction: column;
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.12, 0.8, 0.25, 1.06);
+}
+.reel-strip > span {
+  display: block;
+}
+.reel.lit {
+  animation: reel-win 0.9s ease-in-out;
+}
+.mult-slot {
+  display: inline-flex;
+  align-items: center;
   margin-left: 0.5em;
-  padding: 0.05em 0.6em;
+  padding: 0 0.5em;
   border-radius: 999px;
   background: var(--warn-bg);
   color: var(--warn);
   font-size: 0.9em;
-  animation: chip-pop 0.5s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+  box-shadow: inset 0 0.08em 0.25em color-mix(in srgb, var(--text) 22%, transparent);
+  transition: opacity 0.3s, transform 0.3s;
 }
-@keyframes chip-pop {
-  from {
-    transform: scale(0.3);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
+.mult-slot .reel {
+  min-width: 2.4em;
+}
+.mult-slot.waiting {
+  opacity: 0;
+  transform: scale(0.6);
+}
+.mult-slot.landed {
+  animation: reel-win 0.9s ease-in-out;
+}
+@keyframes reel-win {
+  40% {
+    transform: scale(1.18);
+    filter: brightness(1.25);
   }
 }
-@keyframes coin-pulse {
-  50% {
-    transform: scale(1.12);
+@media (prefers-reduced-motion: reduce) {
+  .reel-strip {
+    transition: none;
   }
 }
