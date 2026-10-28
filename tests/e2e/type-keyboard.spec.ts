@@ -18,7 +18,7 @@ test.describe('Type it out keeps the keyboard up', () => {
     await page.getByRole('group', { name: 'Review mode' }).getByRole('button', { name: /Type/ }).click();
     await page.getByTestId('start-today').click();
     await expect(page.getByTestId('type-input')).toBeVisible();
-    expect(await focusedIsTypeInput(page)).toBe(true);
+    await expect.poll(() => focusedIsTypeInput(page)).toBe(true);
     // the field has the keyboard before anything is tapped; finish the first verse, then check the second
     const first = (await page.getByTestId('review').textContent()) ?? '';
     const isJohn = first.includes('John');
@@ -26,7 +26,7 @@ test.describe('Type it out keeps the keyboard up', () => {
     await typeReference(page, isJohn ? JOHN316 : PSALM23_1);
     await expect(page.getByTestId('verse-result')).toBeVisible({ timeout: 6000 });
     await expect(page.getByTestId('type-input')).toBeVisible({ timeout: 6000 });
-    expect(await focusedIsTypeInput(page)).toBe(true);
+    await expect.poll(() => focusedIsTypeInput(page)).toBe(true);
   });
 
   test('swapping to Type mid review focuses the field, and leaving the review leaves no hidden field behind', async ({ page }) => {
@@ -36,7 +36,7 @@ test.describe('Type it out keeps the keyboard up', () => {
     await page.getByTestId('switch-mode').click();
     await page.getByTestId('switch-to-type').click();
     await expect(page.getByTestId('type-input')).toBeVisible();
-    expect(await focusedIsTypeInput(page)).toBe(true);
+    await expect.poll(() => focusedIsTypeInput(page)).toBe(true);
     await page.getByTestId('close-review').click();
     await expect.poll(() => page.evaluate(() => document.querySelectorAll('body > input').length)).toBe(0);
   });
