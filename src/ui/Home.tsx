@@ -1,4 +1,5 @@
 import { dayKeyOf, formatDuration } from '../core/dates.ts';
+import { primeKeyboard } from './keyboard.ts';
 import { formatRef } from '../core/reference.ts';
 import { nextReviewInfo } from '../core/today.ts';
 import { isPaused, liveVerses, pileVerses, streakInfo, todaySummary, verseStatus } from '../core/schedule.ts';
@@ -137,7 +138,7 @@ export function Home() {
               <ul class="today-list" aria-label="Verses for today" data-testid="today-list">
                 {todayList.map(({ v, s }) => (
                   <li key={v.id} class={`pile-${v.pile} ${s.state}`}>
-                    <button class="today-item" onClick={() => navigate(`/review?verse=${v.id}&mode=${settings.defaultMode}`)} aria-label={`Practice ${formatRef(v)}`} data-testid="today-verse">
+                    <button class="today-item" onClick={() => { if (settings.defaultMode === 'type') primeKeyboard(); navigate(`/review?verse=${v.id}&mode=${settings.defaultMode}`); }} aria-label={`Practice ${formatRef(v)}`} data-testid="today-verse">
                       <i aria-hidden="true" />
                       <span>{formatRef(v)}</span>
                       <small class="muted">{s.state === 'ready' ? (s.countedToday ? `${s.countedToday}/3` : '') : s.state === 'waiting' ? `in ${formatDuration(s.waitMs ?? 0)}` : 'done'}</small>
@@ -179,7 +180,7 @@ export function Home() {
       {readyAll > 0 && <div class="action-bar">
         <button
           class="btn primary block"
-          onClick={() => navigate(`/review?today=1&mode=${settings.defaultMode}`)}
+          onClick={() => { if (settings.defaultMode === 'type') primeKeyboard(); navigate(`/review?today=1&mode=${settings.defaultMode}`); }}
           data-testid="start-today"
         >
           {onBreak ? 'Review anyway' : "Start today's reviews"} · {readyAll}

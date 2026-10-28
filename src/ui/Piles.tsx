@@ -1,4 +1,5 @@
 import { useState } from 'preact/hooks';
+import { primeKeyboard } from './keyboard.ts';
 import { filterVerses, sortVerses, topicsOf } from '../core/organize.ts';
 import { pileVerses, verseStatus } from '../core/schedule.ts';
 import { PILES, type Pile } from '../core/types.ts';
@@ -134,7 +135,7 @@ export function PilePage({ pile }: { pile: Pile }) {
           <button
             class="btn primary block"
             disabled={count === 0}
-            onClick={() => navigate(`/review?pile=${pile}&scope=${effScope}&mode=${settings.defaultMode}`)}
+            onClick={() => { if (settings.defaultMode === 'type') primeKeyboard(); navigate(`/review?pile=${pile}&scope=${effScope}&mode=${settings.defaultMode}`); }}
             data-testid="start-pile"
           >
             {count === 0 ? 'Nothing due in this pile' : `${noneDue ? 'Review all' : 'Start'} · ${count} verse${count === 1 ? '' : 's'}`}
