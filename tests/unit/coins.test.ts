@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { normalizeData } from '../../src/core/backup.ts';
 import { seedsEarned } from '../../src/core/avatar.ts';
-import { nextMultiplier, STREAK_MULTIPLIERS, streakMultiplier } from '../../src/core/coins.ts';
+import { nextMultiplier, rollBonus, STREAK_MULTIPLIERS, streakMultiplier } from '../../src/core/coins.ts';
 import { mergeData } from '../../src/core/merge.ts';
 import { recordReview, settle } from '../../src/core/schedule.ts';
 import { at, D0, day, DEVICE, john316, newData, reviewEverythingDue } from './helpers.ts';
@@ -32,6 +32,28 @@ describe('the coins guide', () => {
   });
 });
 
+describe('the left-over part of a coin is a chance, not a fraction', () => {
+  it('always gives the whole coins, and the leftover as that chance of one more', () => {
+    expect(rollBonus(0.3, () => 0.29)).toBe(1);
+    expect(rollBonus(0.3, () => 0.3)).toBe(0);
+    expect(rollBonus(1.5, () => 0)).toBe(2);
+    expect(rollBonus(1.5, () => 0.999)).toBe(1);
+    expect(rollBonus(2, () => 0.999)).toBe(2); // nothing left over, nothing to roll
+    expect(rollBonus(0, () => 0)).toBe(0);
+    expect(rollBonus(0.1 * 3, () => 0.2999)).toBe(1); // 0.30000000000000004 behaves as 0.3
+    expect(rollBonus(0.1 * 3, () => 0.3)).toBe(0);
+  });
+
+  it('pays out the fraction on average (30% chance, 20000 tries: about 6000 coins)', () => {
+    let seed = 12345;
+    const rng = () => ((seed = (seed * 1664525 + 1013904223) % 4294967296) / 4294967296);
+    let total = 0;
+    for (let i = 0; i < 20000; i++) total += rollBonus(0.3, rng);
+    expect(total).toBeGreaterThan(5700);
+    expect(total).toBeLessThan(6300);
+  });
+});
+
 describe('coins earned with a streak', () => {
   function withStreak(days: number) {
     const d = newData();
@@ -40,13 +62,18 @@ describe('coins earned with a streak', () => {
     return d;
   }
 
-  it('a review on a 7-day streak earns the extra quarter on its coin and on the finished day', () => {
-    const d = withStreak(7);
-    const bonusBefore = Object.values(d.coinBonus ?? {}).reduce((a, b) => a + b, 0);
-    settle(d, at(day(8), '08:00'));
-    recordReview(d, Object.keys(d.verses)[0], at(day(8), '08:00'), DEVICE);
-    const bonus = Object.values(d.coinBonus ?? {}).reduce((a, b) => a + b, 0) - bonusBefore;
-    expect(bonus).toBeCloseTo(1.5, 5); // 1 coin for the review + 5 for the finished day, a quarter more on each
+  const bonusOf = (d: ReturnType<typeof newData>) => Object.values(d.coinBonus ?? {}).reduce((a, b) => a + b, 0);
+
+  it('a review on a 7-day streak earns the whole coins of its quarter extra, and a chance at the part left over', () => {
+    // 1 coin for the review + 5 for the finished day = 6, a quarter more is 1.5: one coin for sure, the other half a coin is a 50% chance
+    for (const [roll, expected] of [[0, 2], [0.49, 2], [0.5, 1], [0.99, 1]] as const) {
+      const d = withStreak(7);
+      const before = bonusOf(d);
+      settle(d, at(day(8), '08:00'));
+      const r = recordReview(d, Object.keys(d.verses)[0], at(day(8), '08:00'), DEVICE, () => roll);
+      expect(bonusOf(d) - before).toBe(expected);
+      expect(r.bonus).toBe(expected);
+    }
   });
 
   it('tells the screen what the review earned before the multiplier and what the multiplier was', () => {

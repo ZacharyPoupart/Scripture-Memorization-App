@@ -5,6 +5,10 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Changed
+- The streak multiplier now pays whole coins: the whole coins of the extra always, and the part of a coin left over as a chance (0.3 of a coin is a 30% chance of one more coin, otherwise nothing), so it pays out the same on average. Coins you already have are kept.
+- The coin count is now a slot machine: the number spins and lands on what you earned, a reel spins through the multipliers and lands on yours, and then the number spins up to the new total (it stays put when the chance did not come up). Reduce motion shows the final number at once.
+
 ## [1.71.0] - 2026-10-28
 
 ### Added

@@ -179,8 +179,21 @@ test('coins count up after a session and, on a streak, the multiplier arrives an
   }
   const seeds = page.getByTestId('session-seeds');
   await expect(seeds).toBeVisible();
-  await expect(seeds.locator('.mult-chip')).toHaveText(/×\d/); // the streak multiplier pops in...
-  await expect(seeds).toContainText(/\+\d+ coins/); // ...and the screen reader gets the final number straight away
+  await expect(seeds).toContainText(/\+\d+ coins/); // the screen reader gets the final number straight away
   const final = Number((await seeds.locator('.sr-only').innerText()).match(/\+(\d+) coin/)![1]);
-  await expect(seeds.locator('[aria-hidden]').first()).toContainText(`+${final} coin`); // the visible number lands on the same total
+  // the multiplier reel spins and lands on the streak's multiplier, then the number lands on the total
+  await expect(seeds.getByTestId('mult-reel')).toHaveAttribute('data-landed', 'true', { timeout: 9000 });
+  expect(Number(await seeds.getByTestId('mult-reel').getAttribute('data-value'))).toBeGreaterThan(1);
+  const slot = seeds.locator('.slot');
+  await expect(slot).toHaveAttribute('data-done', 'true', { timeout: 9000 });
+  await expect(slot).toHaveAttribute('data-total', String(final));
+  // each reel stopped on a row showing the final digit
+  const shown = await seeds.locator('.slot-number .reel').evaluateAll((reels) =>
+    reels.map((r) => {
+      const strip = r.firstElementChild as HTMLElement;
+      const y = Math.round(-parseFloat(strip.style.transform.replace(/[^-.\d]/g, '').replace(/^-?/, '-')) / 1.35);
+      return strip.children[Math.abs(y)]?.textContent;
+    }),
+  );
+  expect(shown.join('')).toBe(String(final));
 });
