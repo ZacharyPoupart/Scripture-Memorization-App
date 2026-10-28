@@ -5,6 +5,9 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Fixed
+- Speak it: it now works again after the first time (Try again, the next verse) without refreshing the page. The phone only lets one listener run and lets go of the last one a moment late, so a new one for every verse was refused; the app now reuses one and waits for it. If nothing is heard it says so instead of staying silent.
+
 ## [1.68.0] - 2026-10-28
 
 ### Added

@@ -681,3 +681,8 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Choices (tell me if you want them different):** "oldest" means whoever joined the group first, not who is oldest in age. The old leader stays as an ordinary member after handing over. Nothing else about the group changes.
 **Test changes:** server tests for the hand-over rules and the heir; new e2e test for the picker and the leave text.
 **Undo:** roll back to the previous stage tag.
+
+## v1.68.3 — Speak it works more than once (owner report)
+**What:** `Speak.tsx` made a new speech recogniser for every verse and every "Try again". A phone allows one at a time and frees the old one late, so the next start was refused ("Could not start the microphone") until a page refresh. Now one recogniser is kept for the app, the old screen detaches its handlers and aborts it when it closes, and a start that is refused is retried a few times a quarter of a second apart. "No speech heard" now shows a message.
+**Test changes:** the pretend microphone in `tests/e2e/helpers.ts` now behaves like a phone (one at a time, released 150 ms late); with it the old code fails the new `speak-reuse.spec.ts` (three Speak rounds in a row) and the new code passes. Not testable here: the real iPhone microphone, so please try two verses in a row.
+**Undo:** roll back to the previous stage tag.
