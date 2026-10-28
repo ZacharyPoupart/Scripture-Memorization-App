@@ -682,6 +682,15 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Test changes:** server tests for the hand-over rules and the heir; new e2e test for the picker and the leave text.
 **Undo:** roll back to the previous stage tag.
 
+## v1.68.1 — Keyboard stays up in Type it out (owner request)
+**What:** `src/ui/keyboard.ts` holds a hidden field. Tapping Start, a verse on Today, a pile's Start, a verse page's Type button or the swap to Type focuses it inside the tap (the only time iOS allows it); `TypeIt` then moves focus to its own field, and when a verse ends with the keyboard open it hands focus back to the hidden field so the next verse's field takes over with the keyboard still up. The hidden field is removed when the review closes or the type is swapped away.
+**Not verifiable here:** Chromium has no iOS tap rule, so the new e2e test (`type-keyboard.spec.ts`) checks that the real field is focused at the start and on the next verse; please try it on the iPhone.
+**Choices:** if you dismiss the keyboard yourself it is not forced back until the next verse or a tap on the text.
+**Undo:** roll back to `v1.68.0-guild-leader`.
+
+## v1.68.2 — Clearer heatmap shades (owner request)
+**What:** the three busy-day squares on Stats were mixes of one colour with the card colour, so the steps looked alike. They are now separate colours (`--heat-1/2/3` in both themes): pale, mid and deep in light mode, dim, mid and pale in dark mode. Rest and the gold saved day are unchanged. CSS only; no data change.
+
 ## v1.68.3 — Speak it works more than once (owner report)
 **What:** `Speak.tsx` made a new speech recogniser for every verse and every "Try again". A phone allows one at a time and frees the old one late, so the next start was refused ("Could not start the microphone") until a page refresh. Now one recogniser is kept for the app, the old screen detaches its handlers and aborts it when it closes, and a start that is refused is retried a few times a quarter of a second apart. "No speech heard" now shows a message.
 **Test changes:** the pretend microphone in `tests/e2e/helpers.ts` now behaves like a phone (one at a time, released 150 ms late); with it the old code fails the new `speak-reuse.spec.ts` (three Speak rounds in a row) and the new code passes. Not testable here: the real iPhone microphone, so please try two verses in a row.
