@@ -690,4 +690,8 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 
 ## v1.68.2 — Clearer heatmap shades (owner request)
 **What:** the three busy-day squares on Stats were mixes of one colour with the card colour, so the steps looked alike. They are now separate colours (`--heat-1/2/3` in both themes): pale, mid and deep in light mode, dim, mid and pale in dark mode. Rest and the gold saved day are unchanged. CSS only; no data change.
+
+## v1.68.3 — Speak it works more than once (owner report)
+**What:** `Speak.tsx` made a new speech recogniser for every verse and every "Try again". A phone allows one at a time and frees the old one late, so the next start was refused ("Could not start the microphone") until a page refresh. Now one recogniser is kept for the app, the old screen detaches its handlers and aborts it when it closes, and a start that is refused is retried a few times a quarter of a second apart. "No speech heard" now shows a message.
+**Test changes:** the pretend microphone in `tests/e2e/helpers.ts` now behaves like a phone (one at a time, released 150 ms late); with it the old code fails the new `speak-reuse.spec.ts` (three Speak rounds in a row) and the new code passes. Not testable here: the real iPhone microphone, so please try two verses in a row.
 **Undo:** roll back to the previous stage tag.

@@ -20,6 +20,36 @@ interface RecognitionLike {
   onend: (() => void) | null;
 }
 
+/**
+ * One recognizer for the whole app. A phone allows only one at a time and lets go of the last one a moment late, so
+ * making a fresh one for every verse (or "Try again") left the next start refused, and speaking only worked again
+ * after a refresh.
+ */
+let shared: RecognitionLike | null = null;
+function recognizer(): RecognitionLike {
+  if (!shared) {
+    const w = window as any;
+    const Ctor = w.SpeechRecognition || w.webkitSpeechRecognition;
+    shared = new Ctor() as RecognitionLike;
+  }
+  return shared;
+}
+
+/** Start it, trying again a few times while the last session is still closing. */
+function begin(r: RecognitionLike, onFail: () => void, tries = 6) {
+  try {
+    r.start();
+  } catch {
+    if (tries <= 0) return onFail();
+    try {
+      r.abort();
+    } catch {
+      /* nothing running */
+    }
+    setTimeout(() => begin(r, onFail, tries - 1), 250);
+  }
+}
+
 export function speechSupported(): boolean {
   const w = window as any;
   return !!(w.SpeechRecognition || w.webkitSpeechRecognition);
@@ -46,7 +76,11 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
   }, [align.progress, finished]);
   useEffect(() => () => {
     wantListening.current = false;
-    rec.current?.abort();
+    const r = rec.current;
+    if (r) {
+      r.onresult = r.onerror = r.onend = null; // the next screen reuses the recognizer; nothing here may answer for it
+      r.abort();
+    }
   }, []);
 
   if (!speechSupported()) {
@@ -68,9 +102,7 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
 
   const start = () => {
     setError(null);
-    const w = window as any;
-    const Ctor = w.SpeechRecognition || w.webkitSpeechRecognition;
-    const r: RecognitionLike = new Ctor();
+    const r = recognizer();
     r.continuous = true;
     r.interimResults = true;
     r.lang = 'en-US';
@@ -90,7 +122,9 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
         wantListening.current = false;
         setListening(false);
         setError('Microphone access was blocked. Allow it in your browser settings, or use another mode.');
-      } else if (e.error !== 'no-speech' && e.error !== 'aborted') setError(`Speech recognition problem: ${e.error}`);
+      } else if (e.error === 'no-speech') {
+        if (!wantListening.current && !finals.current) setError("Didn't hear anything. Tap Start speaking to try again.");
+      } else if (e.error !== 'aborted') setError(`Speech recognition problem: ${e.error}`);
     };
     r.onend = () => {
       if (wantListening.current) {
@@ -103,12 +137,12 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
     };
     rec.current = r;
     wantListening.current = true;
-    try {
-      r.start();
-      setListening(true);
-    } catch {
-      setError('Could not start the microphone.');
-    }
+    setListening(true);
+    begin(r, () => {
+      wantListening.current = false;
+      setListening(false);
+      setError('Could not start the microphone. Tap Start speaking to try again.');
+    });
   };
 
   const stop = () => {

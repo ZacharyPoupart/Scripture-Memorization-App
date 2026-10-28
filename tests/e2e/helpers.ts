@@ -144,6 +144,10 @@ export async function installFakeSpeech(page: Page, transcript: string) {
       onerror: ((e: unknown) => void) | null = null;
       onend: (() => void) | null = null;
       start() {
+        // like a phone: one at a time, and a stopped or aborted one is let go of a moment late
+        const w = window as any;
+        if (w.__speechBusy) throw new DOMException('recognition has already started', 'InvalidStateError');
+        w.__speechBusy = true;
         setTimeout(() => {
           const words = t.split(' ');
           const mid = Math.ceil(words.length / 2);
@@ -153,9 +157,16 @@ export async function installFakeSpeech(page: Page, transcript: string) {
         }, 50);
       }
       stop() {
-        setTimeout(() => this.onend?.(), 0);
+        setTimeout(() => {
+          (window as any).__speechBusy = false;
+          this.onend?.();
+        }, 150);
       }
-      abort() {}
+      abort() {
+        setTimeout(() => {
+          (window as any).__speechBusy = false;
+        }, 150);
+      }
     }
     (window as any).SpeechRecognition = FakeRecognition;
   }, transcript);
