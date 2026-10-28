@@ -1,4 +1,5 @@
 import { useState } from 'preact/hooks';
+import { primeKeyboard } from './keyboard.ts';
 import { bibleGatewayUrl, formatRef } from '../core/reference.ts';
 import { GRADUATION_DAYS, deleteVerse, maxDaysIn, movePile, nextPile, restorePile, restoreVerse, verseStatus } from '../core/schedule.ts';
 import { PILES, type Pile } from '../core/types.ts';
@@ -99,7 +100,7 @@ export function VerseDetail({ id }: { id: string }) {
           <h2>Review this verse</h2>
           <div class="grid2">
             {MODES.map((m) => (
-              <button key={m.value} class="btn" onClick={() => navigate(`/review?verse=${v.id}&mode=${m.value}`)} data-testid={`review-${m.value}`}>
+              <button key={m.value} class="btn" onClick={() => { if (m.value === 'type') primeKeyboard(); navigate(`/review?verse=${v.id}&mode=${m.value}`); }} data-testid={`review-${m.value}`}>
                 {m.long}
               </button>
             ))}

@@ -681,3 +681,9 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Choices (tell me if you want them different):** "oldest" means whoever joined the group first, not who is oldest in age. The old leader stays as an ordinary member after handing over. Nothing else about the group changes.
 **Test changes:** server tests for the hand-over rules and the heir; new e2e test for the picker and the leave text.
 **Undo:** roll back to the previous stage tag.
+
+## v1.68.1 — Keyboard stays up in Type it out (owner request)
+**What:** `src/ui/keyboard.ts` holds a hidden field. Tapping Start, a verse on Today, a pile's Start, a verse page's Type button or the swap to Type focuses it inside the tap (the only time iOS allows it); `TypeIt` then moves focus to its own field, and when a verse ends with the keyboard open it hands focus back to the hidden field so the next verse's field takes over with the keyboard still up. The hidden field is removed when the review closes or the type is swapped away.
+**Not verifiable here:** Chromium has no iOS tap rule, so the new e2e test (`type-keyboard.spec.ts`) checks that the real field is focused at the start and on the next verse; please try it on the iPhone.
+**Choices:** if you dismiss the keyboard yourself it is not forced back until the next verse or a tap on the text.
+**Undo:** roll back to `v1.68.0-guild-leader`.

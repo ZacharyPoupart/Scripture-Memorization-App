@@ -5,6 +5,9 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Fixed
+- Type it out on iPhone: the keyboard now comes up by itself when a review starts or you swap to Type, and stays up from one verse to the next. (iPhone only raises it during a tap, so a hidden field takes it then and hands it to the real one.) Tap the text still brings it back.
+
 ## [1.68.0] - 2026-10-28
 
 ### Added
