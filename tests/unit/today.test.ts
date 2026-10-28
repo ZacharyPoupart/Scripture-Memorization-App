@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildTodayQueue, nextReviewInfo, progressRing, shuffled } from '../../src/core/today.ts';
+import { buildTodayQueue, nextReviewInfo, progressRing, reviewAllOrder, shuffled } from '../../src/core/today.ts';
 import { recordReview, settle, todaySummary, streakInfo } from '../../src/core/schedule.ts';
 import { at, D0, day, DEVICE, john316, newData } from './helpers.ts';
 
@@ -137,5 +137,42 @@ describe('shuffled (the order a session visits the verses in)', () => {
   it('copes with nothing and with one verse', () => {
     expect(shuffled([])).toEqual([]);
     expect(shuffled(['only'])).toEqual(['only']);
+  });
+});
+
+describe('reviewAllOrder (Review all starts with what has not been reviewed today)', () => {
+  const setup = () => {
+    const data = newData();
+    const a = john316(data, at(D0, '07:00'));
+    const b = john316(data, at(D0, '07:01'));
+    const c = john316(data, at(D0, '07:02'));
+    const d = john316(data, at(D0, '07:03'));
+    recordReview(data, a.id, at(day(1), '08:00'), DEVICE); // a and c were reviewed today
+    recordReview(data, c.id, at(day(1), '08:01'), DEVICE);
+    return { data, a, b, c, d, now: at(day(1), '09:00') };
+  };
+
+  it('puts the verses not yet reviewed today first, then the ones that were, each keeping the pile order', () => {
+    const { data, a, b, c, d, now } = setup();
+    expect(reviewAllOrder(data, [a.id, b.id, c.id, d.id], now)).toEqual([b.id, d.id, a.id, c.id]);
+  });
+
+  it('shuffles inside each group only, so the unreviewed ones still come first', () => {
+    const { data, a, b, c, d, now } = setup();
+    const out = reviewAllOrder(data, [a.id, b.id, c.id, d.id], now, () => 0); // a fixed shuffle
+    expect(new Set(out.slice(0, 2))).toEqual(new Set([b.id, d.id]));
+    expect(new Set(out.slice(2))).toEqual(new Set([a.id, c.id]));
+  });
+
+  it('is the same order when nothing, or everything, has been reviewed today', () => {
+    const { data, a, b, now } = setup();
+    expect(reviewAllOrder(data, [b.id], now)).toEqual([b.id]);
+    expect(reviewAllOrder(data, [a.id], now)).toEqual([a.id]);
+    expect(reviewAllOrder(data, [], now)).toEqual([]);
+  });
+
+  it('counts only today: a review from yesterday does not push a verse back', () => {
+    const { data, a, b } = setup();
+    expect(reviewAllOrder(data, [a.id, b.id], at(day(2), '09:00'))).toEqual([a.id, b.id]);
   });
 });

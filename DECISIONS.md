@@ -701,3 +701,9 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Not changed:** a goal already locked for the current week keeps its number (it would otherwise move under people's feet); the 90% applies to goals locked from now on. The reward stays 25 coins.
 **Test changes:** goal expectations in `social-core.test.ts` and `social-server.test.ts` moved to the 90% numbers (e.g. 132 due is now 120, 87 is 80), plus an exact case (100 due is 90).
 **Undo:** roll back to the previous stage tag.
+
+## v1.70.0 — Review all starts with what is not done today (owner request)
+**What:** a pile session over every verse (Review all / "All") now visits the verses with no counted review today first, then the ones that have one; `reviewAllOrder` in `core/today.ts`. Shuffle still works, inside each group, so the unreviewed ones still come first. Only the visiting order changes: what is due and what counts do not look at it.
+**Choices (tell me if you want them different):** "reviewed today" means a counted review today, the same notion the schedule uses (extra practice is not stored, so it does not move a verse to the back); for Weekly, Monthly and Yearly it is also about today, not the week, month or year. Today's own list and "Only due" sessions are not reordered.
+**Test changes:** new unit tests (`reviewAllOrder`) and two e2e tests in `shuffle.spec.ts`; existing tests unchanged.
+**Undo:** roll back to the previous stage tag.
