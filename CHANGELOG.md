@@ -8,6 +8,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 ### Changed
 - Stats: the practice squares are easier to tell apart: practiced, all done and full day are now three clearly different steps from pale to deep (the other way round in dark mode).
 
+## [1.68.1] - 2026-10-28
+
+### Fixed
+- Type it out on iPhone: the keyboard now comes up by itself when a review starts or you swap to Type, and stays up from one verse to the next. (iPhone only raises it during a tap, so a hidden field takes it then and hands it to the real one.) Tap the text still brings it back.
+
 ## [1.68.0] - 2026-10-28
 
 ### Added

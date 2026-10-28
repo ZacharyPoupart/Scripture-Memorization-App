@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import { primeKeyboard } from '../keyboard.ts';
 import { topicsOf } from '../../core/organize.ts';
 import { formatRef } from '../../core/reference.ts';
 import { advanceRef, difficultyFor, makeRng, makeTopicStep, referenceTokens, skipRef } from '../../core/quiz.ts';
@@ -33,6 +34,9 @@ export function TypeIt({ verse, onMistake, onDone, mistakes, after }: ModeProps)
 
   useEffect(() => {
     input.current?.focus({ preventScroll: true });
+    return () => {
+      if (document.activeElement === input.current) primeKeyboard(); // the next verse's field takes over without the keyboard closing
+    };
   }, []);
   useEffect(() => {
     keepInView(area.current, area.current?.querySelector('.cur') as HTMLElement | null);

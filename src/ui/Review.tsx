@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import { primeKeyboard, releaseKeyboard } from './keyboard.ts';
 import { formatRef } from '../core/reference.ts';
 import { easierPile, movePile, moveDownDaysIn, nextPile, pileVerses, restorePile, streakInfo, todaySummary, verseStatus } from '../core/schedule.ts';
 import { doneLine } from '../core/milestones.ts';
@@ -122,6 +123,10 @@ export function Review({ route }: { route: Route }) {
   }, []);
   const [switching, setSwitching] = useState(false);
   const mode = chosen ?? startMode;
+  useEffect(() => {
+    if (mode !== 'type') releaseKeyboard();
+  }, [mode]);
+  useEffect(() => releaseKeyboard, []);
   const queue = useMemo(() => {
     const q = buildQueue(data, route.query, Date.now());
     return settings.shuffle && !route.query.get('verse') ? shuffled(q) : q; // one chosen verse stays one verse
@@ -189,6 +194,7 @@ export function Review({ route }: { route: Route }) {
   const switchTo = (m: ReviewMode) => {
     setSwitching(false);
     if (m === mode) return;
+    if (m === 'type') primeKeyboard();
     setChosen(m);
     updateSettings({ defaultMode: m });
     if (!result) setAttempt((a) => a + 1);
