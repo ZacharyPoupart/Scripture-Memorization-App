@@ -18,7 +18,7 @@ import { RefRecall } from './modes/RefRecall.tsx';
 import { Speak } from './modes/Speak.tsx';
 import { TypeIt } from './modes/TypeIt.tsx';
 
-import { buildTodayQueue, shuffled } from '../core/today.ts';
+import { buildTodayQueue, reviewAllOrder, shuffled } from '../core/today.ts';
 
 function buildQueue(data: AppData, q: URLSearchParams, now: number): string[] {
   const one = q.get('verse');
@@ -128,8 +128,11 @@ export function Review({ route }: { route: Route }) {
   }, [mode]);
   useEffect(() => releaseKeyboard, []);
   const queue = useMemo(() => {
-    const q = buildQueue(data, route.query, Date.now());
-    return settings.shuffle && !route.query.get('verse') ? shuffled(q) : q; // one chosen verse stays one verse
+    const now = Date.now();
+    const q = buildQueue(data, route.query, now);
+    if (route.query.get('verse')) return q; // one chosen verse stays one verse
+    if (route.query.get('pile') && route.query.get('scope') === 'all') return reviewAllOrder(data, q, now, settings.shuffle ? Math.random : undefined); // what is not done today first
+    return settings.shuffle ? shuffled(q) : q;
   }, []);
   const [idx, setIdx] = useState(0);
   const [attempt, setAttempt] = useState(0);

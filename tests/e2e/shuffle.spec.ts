@@ -72,4 +72,35 @@ test.describe('shuffle', () => {
     await page.getByTestId('review-flashcard').click();
     await expect(page.getByTestId('review')).toContainText('Verse 1 of 1');
   });
+
+  const url = '/#/review?pile=daily&scope=all&mode=flashcard';
+  /** One counted review of John 3:16 (the first in the usual order), then back out. */
+  async function reviewJohnOnce(page: Page) {
+    await page.goto(url);
+    await expect(page.getByTestId('card-front')).toBeVisible();
+    await expect(page.locator('[data-testid=card-front] .prompt-ref')).toHaveText('John 3:16');
+    await finishFlashcard(page);
+    await page.getByTestId('verse-result').click();
+    await page.getByTestId('close-review').click();
+  }
+
+  test('Review all starts with the verses not reviewed today, then the ones that were', async ({ page }) => {
+    await reviewJohnOnce(page);
+    await page.goto(url);
+    expect(await visitAll(page)).toEqual(['Psalms 23:1', 'Romans 8:28', 'John 3:16']);
+  });
+
+  test('with shuffle on, Review all still ends with the ones already reviewed today', async ({ page }) => {
+    await reviewJohnOnce(page);
+    await page.goto('/#/');
+    await page.getByTestId('shuffle-toggle').click();
+    await page.evaluate(() => {
+      (window as any).__realRandom = Math.random;
+      Math.random = () => 0; // a known shuffle: [a, b] becomes [b, a]
+    });
+    await page.goto(url);
+    const order = await visitAll(page);
+    await page.evaluate(() => (Math.random = (window as any).__realRandom));
+    expect(order).toEqual(['Romans 8:28', 'Psalms 23:1', 'John 3:16']);
+  });
 });

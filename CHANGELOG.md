@@ -5,6 +5,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.70.0] - 2026-10-28
+
+### Changed
+- Review all (a pile with "All" chosen, or when nothing is due) now starts with the verses you have not reviewed yet today and ends with the ones you already have. Shuffle still works inside each of the two groups.
+
 ## [1.69.0] - 2026-10-28
 
 ### Changed
