@@ -160,3 +160,27 @@ test('tapping the coins or the multiplier explains where they come from', async 
   await page.getByRole('button', { name: 'Close' }).click();
   await expect(page.getByTestId('coins-guide')).toHaveCount(0);
 });
+
+test('coins count up after a session and, on a streak, the multiplier arrives and the total climbs', async ({ page }) => {
+  await page.clock.install({ time: new Date(2026, 2, 13, 9, 0) });
+  await page.clock.resume();
+  await autoDismissMilestones(page);
+  await blockLookups(page);
+  await openApp(page);
+  await replaceDataWith(page, fixture);
+  await page.goto('/#/');
+  if (await page.getByTestId('celebration').isVisible()) await page.getByTestId('celebration-close').click();
+  await page.goto('/#/review?today=1&mode=flashcard');
+  for (let i = 0; i < 20 && !(await page.getByTestId('session-summary').isVisible()); i++) {
+    if (await page.getByTestId('card-front').isVisible()) {
+      await finishFlashcard(page);
+      await page.getByTestId('verse-result').click();
+    } else await page.waitForTimeout(100);
+  }
+  const seeds = page.getByTestId('session-seeds');
+  await expect(seeds).toBeVisible();
+  await expect(seeds.locator('.mult-chip')).toHaveText(/×\d/); // the streak multiplier pops in...
+  await expect(seeds).toContainText(/\+\d+ coins/); // ...and the screen reader gets the final number straight away
+  const final = Number((await seeds.locator('.sr-only').innerText()).match(/\+(\d+) coin/)![1]);
+  await expect(seeds.locator('[aria-hidden]').first()).toContainText(`+${final} coin`); // the visible number lands on the same total
+});

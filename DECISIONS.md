@@ -701,3 +701,9 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Not changed:** a goal already locked for the current week keeps its number (it would otherwise move under people's feet); the 90% applies to goals locked from now on. The reward stays 25 coins.
 **Test changes:** goal expectations in `social-core.test.ts` and `social-server.test.ts` moved to the 90% numbers (e.g. 132 due is now 120, 87 is 80), plus an exact case (100 due is 90).
 **Undo:** roll back to the previous stage tag.
+
+## v1.71.0 — Coins count up and the multiplier multiplies (owner request)
+**What:** `ui/CoinCount.tsx` shows the coins a review (or a whole session) earned counting up from 0 to what they were before the multiplier, then, if your streak earned one, a ×N chip pops in and the number climbs to the total. `recordReview` now also returns `base` (what was earned before the multiplier) and `multiplier`; nothing stored or scheduled changes. The final total is always in the page for screen readers, and with reduced motion on the final number shows at once.
+**Choices (tell me if you want them different):** about 2 seconds in all; one chip for a whole session (the highest multiplier used); no sound.
+**Test changes:** a unit test for `base`/`multiplier`, a new e2e test in `avatar.spec.ts` (chip appears, visible number lands on the final total); existing tests unchanged.
+**Undo:** roll back to the previous stage tag.

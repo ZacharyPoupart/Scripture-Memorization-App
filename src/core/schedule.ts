@@ -665,7 +665,7 @@ export function recordReview(
   verseId: string,
   now: number,
   deviceId: string,
-): { counted: boolean; levelUps: LevelUp[]; todayComplete: boolean } {
+): { counted: boolean; levelUps: LevelUp[]; todayComplete: boolean; base: number; multiplier: number } {
   const settled = settle(data, now);
   const v = data.verses[verseId];
   if (!v || v.deletedAt) throw new Error('Verse not found');
@@ -704,7 +704,8 @@ export function recordReview(
     const extra = (baseCoins(data) - coinsBefore) * (multiplier - 1);
     data.coinBonus = { ...(data.coinBonus ?? {}), [deviceId]: Math.round(((data.coinBonus?.[deviceId] ?? 0) + extra) * 100) / 100 };
   }
-  return { counted, levelUps, todayComplete: summary.total > 0 && summary.remaining === 0 };
+  // what the review earned before the multiplier, and the multiplier, so the screen can show the coins counting up and then multiplying
+  return { counted, levelUps, todayComplete: summary.total > 0 && summary.remaining === 0, base: counted ? baseCoins(data) - coinsBefore : 0, multiplier: counted ? multiplier : 1 };
 }
 
 export function totalReviews(data: AppData): number {

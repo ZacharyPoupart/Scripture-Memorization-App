@@ -2713,3 +2713,38 @@ button.chip {
   align-items: center;
   gap: 2px;
 }
+
+/* coins counting up, then multiplied by the streak */
+.coin-count {
+  display: inline-block;
+  min-height: 1.6em;
+  font-variant-numeric: tabular-nums;
+}
+.coin-count .counting {
+  animation: coin-pulse 0.7s ease-in-out;
+}
+.mult-chip {
+  display: inline-block;
+  margin-left: 0.5em;
+  padding: 0.05em 0.6em;
+  border-radius: 999px;
+  background: var(--warn-bg);
+  color: var(--warn);
+  font-size: 0.9em;
+  animation: chip-pop 0.5s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+@keyframes chip-pop {
+  from {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes coin-pulse {
+  50% {
+    transform: scale(1.12);
+  }
+}
