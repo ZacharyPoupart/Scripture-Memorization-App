@@ -1,7 +1,7 @@
 import { dayKeyOf, formatDuration } from '../core/dates.ts';
 import { primeKeyboard } from './keyboard.ts';
 import { formatRef } from '../core/reference.ts';
-import { nextReviewInfo } from '../core/today.ts';
+import { buildTodayQueue, nextReviewInfo } from '../core/today.ts';
 import { isPaused, liveVerses, pileVerses, streakInfo, todaySummary, verseStatus } from '../core/schedule.ts';
 import { PILES } from '../core/types.ts';
 import { navigate } from '../router.ts';
@@ -20,9 +20,11 @@ export function Home() {
   const streak = streakInfo(data, now);
   const onBreak = isPaused(data, dayKeyOf(now));
   const readyAll = verses.filter((v) => verseStatus(data, v, now).state === 'ready').length;
+  const queueOrder = buildTodayQueue(data, now); // the ready ones in the order today's review visits them (fewest reviews so far first)
   const todayList = verses
     .map((v) => ({ v, s: verseStatus(data, v, now) }))
-    .filter(({ v, s }) => s.state === 'ready' || s.state === 'waiting' || (s.state === 'done' && v.pile === 'daily') || (s.countedToday > 0 && v.pile !== 'daily'));
+    .filter(({ v, s }) => s.state === 'ready' || s.state === 'waiting' || (s.state === 'done' && v.pile === 'daily') || (s.countedToday > 0 && v.pile !== 'daily'))
+    .sort((a, b) => (queueOrder.includes(a.v.id) ? queueOrder.indexOf(a.v.id) : queueOrder.length) - (queueOrder.includes(b.v.id) ? queueOrder.indexOf(b.v.id) : queueOrder.length));
   const next = nextReviewInfo(data, now);
   const nextText =
     next.kind === 'soon'

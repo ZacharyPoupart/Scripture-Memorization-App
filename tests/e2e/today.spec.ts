@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { addVerse, blockLookups, JOHN316, openApp, finishFlashcard, autoDismissMilestones } from './helpers';
+import { addVerse, blockLookups, JOHN316, openApp, finishFlashcard, autoDismissMilestones, PSALM23_1, ROMANS8_28 } from './helpers';
 
 test.beforeEach(async ({ page }) => {
   await autoDismissMilestones(page);
@@ -121,4 +121,28 @@ test('Today: tap a verse in the list to practice just that one, whether it is re
   await expect(page.getByTestId('today-list')).toContainText('in ');
   await page.getByTestId('today-verse').first().click();
   await expect(page.getByTestId('review')).toContainText('Verse 1 of 1');
+});
+
+test('Today: the verses reviewed the fewest times so far come first, in the list and in the review', async ({ page }) => {
+  await page.clock.install({ time: new Date(2026, 2, 13, 9, 0) });
+  await page.clock.resume();
+  await blockLookups(page);
+  await openApp(page);
+  for (const v of [JOHN316, PSALM23_1, ROMANS8_28]) await addVerse(page, v);
+  const review = async (name: string) => {
+    await page.goto('/#/');
+    await page.getByTestId('today-verse').filter({ hasText: name }).click();
+    await finishFlashcard(page);
+    await page.getByTestId('verse-result').click();
+  };
+  await review('John 3:16');
+  await page.clock.fastForward('02:05:00'); // the spacing between Daily reviews
+  await review('John 3:16'); // John twice, Psalm once, Romans not yet
+  await review('Psalms 23:1');
+  await page.clock.fastForward('02:05:00');
+  await page.goto('/#/');
+  const names = async () => (await page.getByTestId('today-verse').allInnerTexts()).map((t) => t.split('\n')[0].trim());
+  await expect.poll(names).toEqual(['Romans 8:28', 'Psalms 23:1', 'John 3:16']);
+  await page.getByTestId('start-today').click();
+  await expect(page.getByTestId('card-front')).toContainText('Romans 8:28'); // the session starts with the one not reviewed yet
 });

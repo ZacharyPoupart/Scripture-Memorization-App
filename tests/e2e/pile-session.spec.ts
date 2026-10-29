@@ -65,3 +65,28 @@ test('a Weekly, Monthly or Yearly pile can be reviewed whole in one tap, even wh
   await expect(page.getByTestId('review')).toBeVisible();
   await expect(page.getByTestId('card-front')).toBeVisible();
 });
+
+test('closing a pile review part way still shows what you earned; closing before any review just closes', async ({ page }) => {
+  await blockLookups(page);
+  await openApp(page);
+  for (const v of [JOHN316, PSALM23_1, ROMANS8_28]) await addVerse(page, v);
+
+  // nothing reviewed yet: the X just goes back
+  await page.goto('/#/pile/daily');
+  await page.getByTestId('start-pile').click();
+  await expect(page.getByTestId('card-front')).toBeVisible();
+  await page.getByTestId('close-review').click();
+  await expect(page.getByTestId('session-summary')).toHaveCount(0);
+  await expect(page).toHaveURL(/#\/pile\/daily|#\/$/);
+
+  // one verse reviewed of three, then the X: the summary says so, with the coins
+  await page.goto('/#/pile/daily');
+  await page.getByTestId('start-pile').click();
+  await finishFlashcard(page);
+  await expect(page.getByTestId('verse-result')).toBeVisible();
+  await page.getByTestId('close-review').click();
+  await expect(page.getByTestId('session-summary')).toContainText('1 verse reviewed · 1 counted');
+  await expect(page.getByTestId('session-seeds')).toContainText(/\+\d+ coin/);
+  await page.getByTestId('session-done').click();
+  await expect(page.getByTestId('session-summary')).toHaveCount(0);
+});

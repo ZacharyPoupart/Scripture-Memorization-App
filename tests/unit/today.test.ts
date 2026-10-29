@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildTodayQueue, nextReviewInfo, progressRing, reviewAllOrder, shuffled } from '../../src/core/today.ts';
+import { buildTodayQueue, fewestFirst, nextReviewInfo, progressRing, reviewAllOrder, shuffled } from '../../src/core/today.ts';
 import { recordReview, settle, todaySummary, streakInfo } from '../../src/core/schedule.ts';
 import { at, D0, day, DEVICE, john316, newData } from './helpers.ts';
 
@@ -174,5 +174,45 @@ describe('reviewAllOrder (Review all starts with what has not been reviewed toda
   it('counts only today: a review from yesterday does not push a verse back', () => {
     const { data, a, b } = setup();
     expect(reviewAllOrder(data, [a.id, b.id], at(day(2), '09:00'))).toEqual([a.id, b.id]);
+  });
+});
+
+describe('Today starts with the verses reviewed the fewest times today', () => {
+  const setup = () => {
+    const data = newData();
+    const a = john316(data, at(D0, '07:00')); // reviewed twice today
+    const b = john316(data, at(D0, '07:01')); // once
+    const c = john316(data, at(D0, '07:02')); // not yet
+    const w = john316(data, at(D0, '07:03'), { pile: 'weekly', pileSince: D0 });
+    const d1 = day(40);
+    settle(data, at(d1, '07:00'));
+    recordReview(data, a.id, at(d1, '08:00'), DEVICE);
+    recordReview(data, b.id, at(d1, '08:00'), DEVICE);
+    recordReview(data, a.id, at(d1, '10:00'), DEVICE);
+    return { data, a, b, c, w, now: at(d1, '13:00') };
+  };
+
+  it('puts the verses with fewer reviews today first, keeping the pile order and, among equals, longest in the pile first', () => {
+    const { data, a, b, c, w, now } = setup();
+    expect(buildTodayQueue(data, now)).toEqual([c.id, b.id, a.id, w.id]); // Daily by reviews so far, then the Weekly one as before
+  });
+
+  it('is the usual order when everything has the same number of reviews', () => {
+    const data = newData();
+    const x = john316(data, at(D0, '07:00'));
+    const y = john316(data, at(D0, '07:01'));
+    expect(buildTodayQueue(data, at(day(1), '09:00'))).toEqual([x.id, y.id]);
+  });
+
+  it('shuffles inside each group of equal counts, so the fewest-reviewed still come first', () => {
+    const { data, a, b, c, now } = setup();
+    const ids = [a.id, b.id, c.id];
+    const out = fewestFirst(data, ids, now, () => 0);
+    expect(out).toEqual([c.id, b.id, a.id]); // groups of one cannot be reordered
+    const same = newData();
+    const p = john316(same, at(D0, '07:00'));
+    const q = john316(same, at(D0, '07:01'));
+    const r = john316(same, at(D0, '07:02'));
+    expect(fewestFirst(same, [p.id, q.id, r.id], at(day(1), '09:00'), () => 0)).toEqual([q.id, r.id, p.id]); // one group, shuffled
   });
 });

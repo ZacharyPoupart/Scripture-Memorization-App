@@ -7,9 +7,33 @@ import { PROGRESS_UNIT, graduationTarget, pileVerses, progressDays, reviewsOn, v
 import { PILES } from './types.ts';
 import type { AppData, Verse } from './types.ts';
 
-/** Everything that can earn a counted review right now: Daily, then Weekly, Monthly, Yearly, longest-in-pile first. */
+/**
+ * Everything that can earn a counted review right now: Daily, then Weekly, Monthly, Yearly; inside a pile the verses reviewed the fewest
+ * times today first (a Daily verse at 1 of 3 before one at 2 of 3), and among equals longest-in-pile first.
+ */
 export function buildTodayQueue(data: AppData, now: number): string[] {
-  return PILES.flatMap((p) => pileVerses(data, p).filter((v) => verseStatus(data, v, now).state === 'ready')).map((v) => v.id);
+  return PILES.flatMap((p) =>
+    fewestFirst(
+      data,
+      pileVerses(data, p).filter((v) => verseStatus(data, v, now).state === 'ready').map((v) => v.id),
+      now,
+    ),
+  );
+}
+
+/**
+ * The verses reviewed the fewest times today first (0, then 1, then 2 ...), each group keeping the order it came in. Pass `random` to
+ * shuffle inside each group, so the least-reviewed still come first. Only the order a session visits them in: what is due and what
+ * counts never looks at it.
+ */
+export function fewestFirst(data: AppData, ids: readonly string[], now: number, random?: () => number): string[] {
+  const today = dayKeyOf(now);
+  const groups = new Map<number, string[]>();
+  for (const id of ids) {
+    const n = data.verses[id] ? reviewsOn(data.verses[id], today) : 0;
+    groups.set(n, [...(groups.get(n) ?? []), id]);
+  }
+  return [...groups.keys()].sort((a, b) => a - b).flatMap((n) => (random ? shuffled(groups.get(n)!, random) : groups.get(n)!));
 }
 
 /**
