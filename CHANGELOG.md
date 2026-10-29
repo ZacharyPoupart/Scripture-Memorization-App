@@ -5,6 +5,12 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.73.0] - 2026-10-29
+
+### Changed
+- Today's review starts with the verses reviewed the fewest times so far today (a Daily verse at 1 of 3 before one at 2 of 3). The list on Today is in the same order. Shuffle still works, inside each group.
+- Closing a review of several verses part way (the × in the corner) now shows the summary with your coins and progress, instead of just going home. Closing before anything is reviewed, or a single-verse review, closes straight away as before.
+
 ## [1.72.0] - 2026-10-28
 
 ### Changed

@@ -19,7 +19,7 @@ import { RefRecall } from './modes/RefRecall.tsx';
 import { Speak } from './modes/Speak.tsx';
 import { TypeIt } from './modes/TypeIt.tsx';
 
-import { buildTodayQueue, reviewAllOrder, shuffled } from '../core/today.ts';
+import { buildTodayQueue, fewestFirst, reviewAllOrder, shuffled } from '../core/today.ts';
 
 function buildQueue(data: AppData, q: URLSearchParams, now: number): string[] {
   const one = q.get('verse');
@@ -133,6 +133,7 @@ export function Review({ route }: { route: Route }) {
     const q = buildQueue(data, route.query, now);
     if (route.query.get('verse')) return q; // one chosen verse stays one verse
     if (route.query.get('pile') && route.query.get('scope') === 'all') return reviewAllOrder(data, q, now, settings.shuffle ? Math.random : undefined); // what is not done today first
+    if (route.query.get('today')) return settings.shuffle ? fewestFirst(data, q, now, Math.random) : q; // the least-reviewed today first, shuffled inside each group
     return settings.shuffle ? shuffled(q) : q;
   }, []);
   const [idx, setIdx] = useState(0);
@@ -140,6 +141,7 @@ export function Review({ route }: { route: Route }) {
   const [restarts, setRestarts] = useState(0); // wrong answers in this verse's review so far
   const [easier, setEasier] = useState<Pile | null>(null); // a lower pile to offer after a hard time
   const [result, setResult] = useState<{ counted: boolean; levelUps: LevelUp[]; todayComplete: boolean; seeds: number; base: number; multiplier: number } | null>(null);
+  const [ended, setEnded] = useState(false); // closed part way through a session of several verses: the summary still shows what was earned
   const [tally, setTally] = useState({ counted: 0, practice: 0, ups: 0, seeds: 0, base: 0, multiplier: 1 });
   const advanceTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
@@ -162,8 +164,14 @@ export function Review({ route }: { route: Route }) {
     );
   }
 
-  const finished = idx >= queue.length;
+  const finished = ended || idx >= queue.length;
   const verse = !finished ? data.verses[queue[idx]] : undefined;
+  const close = () => {
+    if (queue.length > 1 && tally.counted + tally.practice > 0) {
+      clearTimeout(advanceTimer.current);
+      setEnded(true);
+    } else back('/');
+  };
 
   const next = () => {
     clearTimeout(advanceTimer.current);
@@ -242,7 +250,7 @@ export function Review({ route }: { route: Route }) {
             </>
           )}
           <p class="muted">
-            {queue.length} verse{queue.length === 1 ? '' : 's'} reviewed · {tally.counted} counted
+            {ended ? tally.counted + tally.practice : queue.length} verse{(ended ? tally.counted + tally.practice : queue.length) === 1 ? '' : 's'} reviewed · {tally.counted} counted
             {tally.practice > 0 ? ` · ${tally.practice} extra practice` : ''}
           </p>
           {tally.seeds > 0 && settings.avatarOn && (
@@ -269,7 +277,7 @@ export function Review({ route }: { route: Route }) {
   return (
     <div class="review" data-testid="review" data-mode={mode}>
       <div class="review-head">
-        <button class="icon-btn" aria-label="Close review" onClick={() => back('/')} data-testid="close-review">
+        <button class="icon-btn" aria-label="Close review" onClick={close} data-testid="close-review">
           <Icon name="close" />
         </button>
         <div class="title">
