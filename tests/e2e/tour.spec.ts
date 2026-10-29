@@ -34,6 +34,7 @@ async function walk(page: Page, until?: string): Promise<string[]> {
       flip: 'card-front',
       grade: 'grade-good',
       close: 'close-review',
+      summary: 'session-done',
       sandwich: 'practice-preset-sandwich',
     };
     if (act[id]) {

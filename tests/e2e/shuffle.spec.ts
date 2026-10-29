@@ -82,6 +82,7 @@ test.describe('shuffle', () => {
     await finishFlashcard(page);
     await page.getByTestId('verse-result').click();
     await page.getByTestId('close-review').click();
+    await page.getByTestId('session-done').click(); // closing a session part way shows how it went first
   }
 
   test('Review all starts with the verses not reviewed today, then the ones that were', async ({ page }) => {
