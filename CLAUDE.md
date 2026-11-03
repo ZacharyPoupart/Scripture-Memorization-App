@@ -68,6 +68,6 @@ None are needed to build, test or run. Never commit keys; use environment variab
 
 ## Known limitations / things to verify on a real iPhone
 - Verse lookup uses free public APIs (bible-api.com for KJV/WEB, bolls.life for the rest); NIV goes through our `/api/verse` function (API.Bible, needs the owner's key and NIV access, with bolls.life as backup). API.Bible's terms may require copyright display and usage (FUMS) reporting — copyright text is returned by the function but not yet stored or shown, and FUMS reporting is not implemented; the owner should read their terms. They were coded to the documented response shapes but **not exercised against the live services from the build sandbox**; typing the text always works. Copyright of NIV/ESV/etc. text belongs to the publishers — fine for personal study, check terms before making the app public.
-- "Speak it" uses the Web Speech API: experimental, behaviour on iOS home-screen apps varies.
+- "Speak it" uses the Web Speech API: experimental, behaviour on iOS home-screen apps varies. Each start makes a fresh recogniser after aborting the previous one (a start is retried a few times; v1.73.1 replaced the reuse of one shared recogniser from v1.68.3, which could hear nothing on iPhone); the screen says when the microphone never starts, when nothing was heard, and shows what was heard when far off.
 - On iOS the on-screen keyboard may need a tap on the text to re-open between verses in "Type it out" mode.
 - Playwright runs Chromium only (no WebKit): iOS Safari quirks need a real-device check on every preview.

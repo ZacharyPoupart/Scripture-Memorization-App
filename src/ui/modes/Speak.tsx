@@ -15,38 +15,26 @@ interface RecognitionLike {
   start(): void;
   stop(): void;
   abort(): void;
+  onstart: (() => void) | null;
   onresult: ((e: any) => void) | null;
   onerror: ((e: any) => void) | null;
   onend: (() => void) | null;
 }
 
 /**
- * One recognizer for the whole app. A phone allows only one at a time and lets go of the last one a moment late, so
- * making a fresh one for every verse (or "Try again") left the next start refused, and speaking only worked again
- * after a refresh.
+ * A phone allows one listener at a time and lets go of the last one a moment late. So each start makes a fresh recogniser (a finished
+ * one is not reliable to reuse on iPhone), after letting go of the previous one, and a start that is refused is tried again a few
+ * times. Nothing is ever aborted by the retry itself.
  */
-let shared: RecognitionLike | null = null;
-function recognizer(): RecognitionLike {
-  if (!shared) {
-    const w = window as any;
-    const Ctor = w.SpeechRecognition || w.webkitSpeechRecognition;
-    shared = new Ctor() as RecognitionLike;
-  }
-  return shared;
-}
+let lastOne: RecognitionLike | null = null; // the one that may still be listening or closing
 
-/** Start it, trying again a few times while the last session is still closing. */
-function begin(r: RecognitionLike, onFail: () => void, tries = 6) {
+function letGo(r: RecognitionLike | null) {
+  if (!r) return;
+  r.onstart = r.onresult = r.onerror = r.onend = null; // nothing it says from now on may reach a screen
   try {
-    r.start();
+    r.abort();
   } catch {
-    if (tries <= 0) return onFail();
-    try {
-      r.abort();
-    } catch {
-      /* nothing running */
-    }
-    setTimeout(() => begin(r, onFail, tries - 1), 250);
+    /* nothing running */
   }
 }
 
@@ -67,6 +55,8 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
   const rec = useRef<RecognitionLike | null>(null);
   const wantListening = useRef(false);
   const finals = useRef('');
+  const watchdog = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const heardSomething = useRef(false);
   const area = useRef<HTMLDivElement>(null);
 
   const align = alignSpeech(expected, tokenizeSpeech(transcript), finished);
@@ -76,11 +66,8 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
   }, [align.progress, finished]);
   useEffect(() => () => {
     wantListening.current = false;
-    const r = rec.current;
-    if (r) {
-      r.onresult = r.onerror = r.onend = null; // the next screen reuses the recognizer; nothing here may answer for it
-      r.abort();
-    }
+    clearTimeout(watchdog.current);
+    letGo(rec.current);
   }, []);
 
   if (!speechSupported()) {
@@ -102,51 +89,77 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
 
   const start = () => {
     setError(null);
-    const r = recognizer();
-    r.continuous = true;
-    r.interimResults = true;
-    r.lang = 'en-US';
     finals.current = '';
+    heardSomething.current = false;
     setTranscript('');
-    r.onresult = (e) => {
-      let interim = '';
-      for (let i = e.resultIndex; i < e.results.length; i++) {
-        const res = e.results[i];
-        if (res.isFinal) finals.current += ' ' + res[0].transcript;
-        else interim += ' ' + res[0].transcript;
-      }
-      setTranscript((finals.current + ' ' + interim).trim());
-    };
-    r.onerror = (e) => {
-      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
-        wantListening.current = false;
-        setListening(false);
-        setError('Microphone access was blocked. Allow it in your browser settings, or use another mode.');
-      } else if (e.error === 'no-speech') {
-        if (!wantListening.current && !finals.current) setError("Didn't hear anything. Tap Start speaking to try again.");
-      } else if (e.error !== 'aborted') setError(`Speech recognition problem: ${e.error}`);
-    };
-    r.onend = () => {
-      if (wantListening.current) {
-        try {
-          r.start(); // some browsers stop after a pause; keep listening until "Done"
-        } catch {
-          /* already started */
-        }
-      } else setListening(false);
-    };
-    rec.current = r;
     wantListening.current = true;
     setListening(true);
-    begin(r, () => {
+    const fail = (message: string) => {
       wantListening.current = false;
+      clearTimeout(watchdog.current);
+      letGo(rec.current);
       setListening(false);
-      setError('Could not start the microphone. Tap Start speaking to try again.');
-    });
+      setError(message);
+    };
+    const open = (tries: number) => {
+      if (!wantListening.current) return;
+      const w = window as any;
+      const r: RecognitionLike = new (w.SpeechRecognition || w.webkitSpeechRecognition)();
+      r.continuous = true;
+      r.interimResults = true;
+      r.lang = 'en-US';
+      r.onstart = () => clearTimeout(watchdog.current);
+      r.onresult = (e) => {
+        heardSomething.current = true;
+        clearTimeout(watchdog.current);
+        let interim = '';
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          const res = e.results[i];
+          if (res.isFinal) finals.current += ' ' + res[0].transcript;
+          else interim += ' ' + res[0].transcript;
+        }
+        setTranscript((finals.current + ' ' + interim).trim());
+      };
+      r.onerror = (e) => {
+        if (e.error === 'not-allowed' || e.error === 'service-not-allowed') fail('Microphone access was blocked. Allow it in your browser settings, or use another mode.');
+        else if (e.error === 'audio-capture') fail('The microphone is not available right now. Close anything else using it and try again.');
+        else if (e.error !== 'no-speech' && e.error !== 'aborted') setError(`Speech recognition problem: ${e.error}`);
+      };
+      r.onend = () => {
+        if (wantListening.current) {
+          try {
+            r.start(); // some browsers stop after a pause; keep listening until "Done"
+          } catch {
+            /* already started */
+          }
+        } else setListening(false);
+      };
+      rec.current = r;
+      lastOne = r;
+      try {
+        r.start();
+      } catch {
+        // the last one is probably still closing: try again with a fresh one in a moment
+        letGo(r);
+        if (tries <= 0) return fail('Could not start the microphone. Tap Start speaking to try again.');
+        setTimeout(() => open(tries - 1), 300);
+      }
+    };
+    // let go of the previous listener first and give the phone a moment to free the microphone
+    const previous = lastOne;
+    lastOne = null;
+    if (previous) {
+      letGo(previous);
+      setTimeout(() => open(6), 350);
+    } else open(6);
+    // if the microphone never starts, say so instead of waiting in silence
+    clearTimeout(watchdog.current);
+    watchdog.current = setTimeout(() => !heardSomething.current && fail('The microphone did not start. Check that it is allowed for this app, then tap Start speaking to try again.'), 8000);
   };
 
   const stop = () => {
     wantListening.current = false;
+    clearTimeout(watchdog.current);
     rec.current?.stop();
     setListening(false);
     setFinished(true);
@@ -195,6 +208,11 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
             {listening ? 'Listening… the words will appear when you finish.' : 'The words stay hidden until you finish.'}
           </div>
         )}
+        {finished && !transcript.trim() && (
+          <div class="banner info" data-testid="speak-nothing-heard">
+            Nothing was heard. Check that the microphone is allowed for this app and that nothing else is using it, then try again.
+          </div>
+        )}
         {finished && (
           <div class={`banner ${speechPassed(align) ? 'good' : 'info'}`} data-testid="speak-result">
             {align.mistakes === 0
@@ -202,6 +220,11 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
               : speechPassed(align)
                 ? `Close enough — ${Math.round(speechAccuracy(align) * 100)}% of the words. That counts.`
                 : `${align.mistakes} word${align.mistakes === 1 ? '' : 's'} missed or different (${Math.round(speechAccuracy(align) * 100)}%; ${Math.round(SPEECH_PASS * 100)}% passes).`}
+          </div>
+        )}
+        {finished && transcript.trim() && !speechPassed(align) && (
+          <div class="muted small center" data-testid="speak-heard">
+            Heard: {transcript}
           </div>
         )}
         {error && <div class="banner bad" role="alert">{error}</div>}
