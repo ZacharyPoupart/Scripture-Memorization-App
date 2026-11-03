@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.73.1] - 2026-11-03
+
 ### Fixed
 - Speak it hearing nothing (0 of 30 words): each start now makes a fresh listener after letting go of the last one, instead of reusing one (a finished one is not reliable on iPhone), and a refused start is tried again. If the microphone never starts it now says so after a few seconds, a result with nothing heard says "Nothing was heard" with what to check, and a result that was far off shows what it did hear.
 
