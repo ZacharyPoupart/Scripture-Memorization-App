@@ -16,6 +16,8 @@ interface RecognitionLike {
   stop(): void;
   abort(): void;
   onstart: (() => void) | null;
+  onaudiostart: (() => void) | null;
+  addEventListener?(type: string, fn: () => void): void;
   onresult: ((e: any) => void) | null;
   onerror: ((e: any) => void) | null;
   onend: (() => void) | null;
@@ -27,10 +29,26 @@ interface RecognitionLike {
  * times. Nothing is ever aborted by the retry itself.
  */
 let lastOne: RecognitionLike | null = null; // the one that may still be listening or closing
+let closing: Promise<void> = Promise.resolve(); // resolves when everything let go of has really ended (or after a short wait)
+
+/** Watch for a recogniser's real end, so the next one is only started once the phone has let go of the microphone. */
+function track(r: RecognitionLike) {
+  r.addEventListener?.('end', () => ((r as any).__ended = true));
+}
 
 function letGo(r: RecognitionLike | null) {
   if (!r) return;
-  r.onstart = r.onresult = r.onerror = r.onend = null; // nothing it says from now on may reach a screen
+  r.onstart = r.onaudiostart = r.onresult = r.onerror = r.onend = null; // nothing it says from now on may reach a screen
+  if (!(r as any).__ended) {
+    const gone = new Promise<void>((resolve) => {
+      const t = setTimeout(resolve, 1500);
+      r.addEventListener?.('end', () => {
+        clearTimeout(t);
+        resolve();
+      });
+    });
+    closing = Promise.all([closing, gone]).then(() => undefined);
+  }
   try {
     r.abort();
   } catch {
@@ -101,15 +119,24 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
       setListening(false);
       setError(message);
     };
-    const open = (tries: number) => {
+    const open = (tries: number, silentTries = 2) => {
       if (!wantListening.current) return;
       const w = window as any;
       const r: RecognitionLike = new (w.SpeechRecognition || w.webkitSpeechRecognition)();
+      track(r);
+      let alive = false; // the phone has really started listening (or we heard something)
+      let silent: ReturnType<typeof setTimeout> | undefined;
       r.continuous = true;
       r.interimResults = true;
       r.lang = 'en-US';
       r.onstart = () => clearTimeout(watchdog.current);
+      r.onaudiostart = () => {
+        alive = true;
+        clearTimeout(silent);
+      };
       r.onresult = (e) => {
+        alive = true;
+        clearTimeout(silent);
         heardSomething.current = true;
         clearTimeout(watchdog.current);
         let interim = '';
@@ -141,20 +168,28 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
       } catch {
         // the last one is probably still closing: try again with a fresh one in a moment
         letGo(r);
+        lastOne = null;
         if (tries <= 0) return fail('Could not start the microphone. Tap Start speaking to try again.');
-        setTimeout(() => open(tries - 1), 300);
+        setTimeout(() => open(tries - 1, silentTries), 300);
+        return;
       }
+      // a phone sometimes starts a second listener without ever giving it the microphone: no audio and no words, and no error either.
+      // Start over with a fresh one instead of leaving it deaf.
+      silent = setTimeout(() => {
+        if (alive || heardSomething.current || !wantListening.current || silentTries <= 0) return;
+        letGo(r);
+        lastOne = null;
+        closing.then(() => setTimeout(() => open(tries, silentTries - 1), 200));
+      }, 3500);
     };
-    // let go of the previous listener first and give the phone a moment to free the microphone
+    // let go of the previous listener first, and wait until the phone really has before starting the next
     const previous = lastOne;
     lastOne = null;
-    if (previous) {
-      letGo(previous);
-      setTimeout(() => open(6), 350);
-    } else open(6);
+    letGo(previous);
+    closing.then(() => setTimeout(() => open(6), previous ? 250 : 0));
     // if the microphone never starts, say so instead of waiting in silence
     clearTimeout(watchdog.current);
-    watchdog.current = setTimeout(() => !heardSomething.current && fail('The microphone did not start. Check that it is allowed for this app, then tap Start speaking to try again.'), 8000);
+    watchdog.current = setTimeout(() => !heardSomething.current && fail('The microphone did not start. Check that it is allowed for this app, then tap Start speaking to try again.'), 12000);
   };
 
   const stop = () => {

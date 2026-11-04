@@ -141,36 +141,56 @@ export async function installFakeSpeech(page: Page, transcript: string) {
       interimResults = false;
       lang = '';
       onstart: (() => void) | null = null;
+      onaudiostart: (() => void) | null = null;
       onresult: ((e: unknown) => void) | null = null;
       onerror: ((e: unknown) => void) | null = null;
       onend: (() => void) | null = null;
+      private running = false;
+      private listeners: Record<string, Array<() => void>> = {};
+      addEventListener(type: string, fn: () => void) {
+        (this.listeners[type] ??= []).push(fn);
+      }
+      private emit(type: 'start' | 'audiostart' | 'end') {
+        (this as any)[`on${type}`]?.();
+        for (const fn of this.listeners[type] ?? []) fn();
+      }
       start() {
         // like a phone: one at a time, and a stopped or aborted one is let go of a moment late
         const w = window as any;
+        if (this.running) throw new DOMException('recognition has already started', 'InvalidStateError');
         if (w.__speechBusy) throw new DOMException('recognition has already started', 'InvalidStateError');
         w.__speechBusy = true;
-        setTimeout(() => this.onstart?.(), 10);
+        this.running = true;
+        if (w.__speechDeafStarts > 0) {
+          w.__speechDeafStarts--; // a deaf start: no start event, no audio, no words, no error
+          return;
+        }
+        setTimeout(() => this.running && this.emit('start'), 10);
+        setTimeout(() => this.running && this.emit('audiostart'), 20);
         setTimeout(() => {
+          if (!this.running) return;
           const words = t.split(' ');
           const mid = Math.ceil(words.length / 2);
           const mk = (text: string, isFinal: boolean) => ({ 0: { transcript: text }, isFinal, length: 1 });
           this.onresult?.({ resultIndex: 0, results: [mk(words.slice(0, mid).join(' '), true)] });
-          setTimeout(() => this.onresult?.({ resultIndex: 1, results: [mk(words.slice(0, mid).join(' '), true), mk(words.slice(mid).join(' '), true)] }), 50);
+          setTimeout(() => this.running && this.onresult?.({ resultIndex: 1, results: [mk(words.slice(0, mid).join(' '), true), mk(words.slice(mid).join(' '), true)] }), 50);
         }, 50);
       }
-      stop() {
+      private finish(aborted: boolean) {
+        if (!this.running) return;
         setTimeout(() => {
+          this.running = false;
           (window as any).__speechBusy = false;
-          this.onend?.();
+          if (aborted) this.onerror?.({ error: 'aborted' });
+          this.emit('end');
         }, 150);
+      }
+      stop() {
+        this.finish(false);
       }
       abort() {
         // like a phone: an aborted session reports 'aborted' and then ends, a moment later
-        setTimeout(() => {
-          (window as any).__speechBusy = false;
-          this.onerror?.({ error: 'aborted' });
-          this.onend?.();
-        }, 150);
+        this.finish(true);
       }
     }
     (window as any).SpeechRecognition = FakeRecognition;
