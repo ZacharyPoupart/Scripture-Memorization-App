@@ -731,3 +731,10 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Test changes:** the pretend microphone in the e2e helpers now also reports a start event and, like a phone, an aborted session reports 'aborted' and then ends; new e2e test for the nothing-heard and heard-text messages. The earlier speak-reuse test (three rounds in a row) still passes.
 **Please try it on the phone** and tell me what you see: if it still hears nothing, the new messages will say whether the microphone never started, was blocked, or started and heard nothing; if it shows "Heard: ...", send me that text.
 **Undo:** roll back to `v1.73.0-fewest-first`.
+
+## v1.73.2 — Speak it heard nothing on the second verse (owner report)
+**What I know:** after v1.73.1 the first verse worked and the second heard nothing. With a fresh listener per start, the second one is started 350 ms after the first was aborted; on iPhone the first listener can still be holding the microphone then, and the second listener "starts" without being given any audio: no sound, no words and no error, so the screen just waits and ends with 0 words. I cannot reproduce this without a real iPhone, so this is my best reading, not a confirmed cause.
+**What changed:** (1) the next start waits for the previous listener's real `end` event (up to 1.5 s, then 250 ms more) instead of a fixed 350 ms; (2) if a listener gives no audio start, no words and no error within 3.5 s, it is let go of and a fresh one is started, up to twice, with no message; (3) the "microphone did not start" wait is 12 s to leave room for those restarts. Nothing else about Speak it changes.
+**Test changes:** the pretend microphone is more like a phone (each listener knows whether it is running, reports start, audio start and end events, and can be told to start deaf); new e2e test where a later listener starts deaf and the screen recovers by itself.
+**Please try it on the phone**: two or three verses in a row. If the second still hears nothing, tell me what it says (a message, or a "Heard: ..." line).
+**Undo:** roll back to `v1.73.1-speak-fresh-listener`.

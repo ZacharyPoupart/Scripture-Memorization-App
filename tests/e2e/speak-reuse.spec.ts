@@ -52,3 +52,29 @@ test('Speak it says so when nothing was heard, and shows what it did hear when i
   await expect(page.getByTestId('speak-heard')).toContainText('banana bread is tasty');
   await expect(page.getByTestId('speak-nothing-heard')).toHaveCount(0);
 });
+
+test('Speak it recovers by itself when the phone starts a later listener without giving it the microphone', async ({ page }) => {
+  await autoDismissMilestones(page);
+  await blockLookups(page);
+  await installFakeSpeech(page, JOHN_TEXT.replace(/[,.;]/g, '').toLowerCase());
+  await openApp(page);
+  await addVerse(page, JOHN316);
+  await page.goto('/#/pile/daily');
+  await page.getByTestId('verse-card').first().click();
+  await page.getByTestId('review-speak').click();
+  // first verse: works
+  await page.getByTestId('speak-start').click();
+  await expect(page.getByTestId('speak-text').locator('.w.ok').first()).toBeVisible();
+  await page.waitForTimeout(400);
+  await page.getByTestId('speak-done').click();
+  await expect(page.getByTestId('speak-result')).toContainText('Perfect');
+  // the next listener is deaf (no start, no audio, no words, no error), the one after it works
+  await page.evaluate(() => ((window as any).__speechDeafStarts = 1));
+  await page.getByRole('button', { name: 'Try again' }).click();
+  await page.getByTestId('speak-start').click();
+  await expect(page.getByTestId('speak-text').locator('.w.ok').first()).toBeVisible({ timeout: 10000 });
+  await page.waitForTimeout(400);
+  await page.getByTestId('speak-done').click();
+  await expect(page.getByTestId('speak-result')).toContainText('Perfect');
+  await expect(page.getByTestId('speak-nothing-heard')).toHaveCount(0);
+});
