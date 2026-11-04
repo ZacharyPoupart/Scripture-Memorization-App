@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.73.2] - 2026-11-04
+
 ### Fixed
 - Speak it hearing nothing on the second verse: the next listener now waits until the phone has really let go of the microphone before it starts, and if a listener starts but never gets the microphone (no sound, no words, no error) it starts over with a fresh one by itself, up to twice, instead of staying deaf.
 
