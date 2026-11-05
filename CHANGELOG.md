@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.74.0] - 2026-11-05
+
 ### Changed
 - A new look, set like a printed page instead of a template: flat paper and ink with the same teal, hairline rules instead of boxed cards, square corners, no gradients, shadows or glows. Libre Franklin and Fraunces replace Nunito. Section headings are small capitals, titles and figures are serif.
 - No emojis in the app any more: line drawings replace them (welcome slides, empty states, level-up, friends, the avatar lock).
