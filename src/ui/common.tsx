@@ -28,6 +28,7 @@ const ICONS: Record<string, string> = {
   chart: 'M5 20V11M12 20V4M19 20v-6',
   friends: 'M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM3 20a6 6 0 0 1 12 0M16 5.2a3 3 0 0 1 0 5.6M18 14.4A6 6 0 0 1 21 20',
   shuffle: 'M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5',
+  arrow: 'M4 12h16M14 6l6 6-6 6',
 };
 
 /** A gold coin with a square hole in the middle (the currency). Sized to the text around it. */
@@ -166,7 +167,8 @@ export function Confirm({ title, body, confirmLabel, danger, onConfirm, onCancel
   );
 }
 
-const CONFETTI_COLORS = ['#e9b44c', '#2f8a8f', '#e07a5f', '#81b29a', '#6c63ff', '#f2cc8f'];
+/** Narrow strips in the app's own few colours, not a rainbow. */
+const CONFETTI_COLORS = ['var(--accent)', 'var(--daily)', 'var(--text)', 'var(--accent-strong)', 'var(--muted)'];
 export function Confetti({ count = 46 }: { count?: number }) {
   const pieces = Array.from({ length: count }, (_, i) => ({
     left: (i * 37) % 100,
@@ -264,11 +266,11 @@ export function VerseCard({ data, verse, now, status }: { data: AppData; verse: 
           <PileBadge pile={verse.pile} />
         </span>
       </div>
-      <div class="verse-snippet" style={{ margin: '6px 0 8px' }}>
+      <div class="verse-snippet">
         {verse.text}
       </div>
       {verse.topic && (
-        <div style={{ marginBottom: '8px' }}>
+        <div class="mb-2">
           <span class="chip">#{verse.topic}</span>
         </div>
       )}

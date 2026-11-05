@@ -92,12 +92,12 @@ test.describe('avatar and seeds', () => {
     await expect(page.getByTestId('item-helmet-silver-vanguard')).toContainText('80');
     await page.getByTestId('slot-chest').click();
     await expect(page.getByTestId('item-chest-iron-bulwark')).toContainText('Wearing');
-    await expect(page.getByTestId('item-chest-sulestial')).toContainText('🔒');
+    await expect(page.getByTestId('item-chest-sulestial').locator('.item-need')).not.toHaveCount(0); // marked as locked
     // the free set's sword waits for a first practice (adding the verse is not enough); its shield waits for the tour or a first streak
     await page.getByTestId('slot-weapon').click();
-    await expect(page.getByTestId('item-weapon-iron-bulwark')).toContainText('🔒 first practice');
+    await expect(page.getByTestId('item-weapon-iron-bulwark')).toContainText('first practice');
     await page.getByTestId('slot-shield').click();
-    await expect(page.getByTestId('item-shield-iron-bulwark')).toContainText('🔒 finish the tour');
+    await expect(page.getByTestId('item-shield-iron-bulwark')).toContainText('finish the tour');
     await page.getByTestId('item-shield-iron-bulwark').click();
     await expect(page.getByTestId('unlock-hint')).toContainText('Finish the tour');
   });

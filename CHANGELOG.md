@@ -5,6 +5,14 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.74.0] - 2026-11-05
+
+### Changed
+- A new look, set like a printed page instead of a template: flat paper and ink with the same teal, hairline rules instead of boxed cards, square corners, no gradients, shadows or glows. Libre Franklin and Fraunces replace Nunito. Section headings are small capitals, titles and figures are serif.
+- No emojis in the app any more: line drawings replace them (welcome slides, empty states, level-up, friends, the avatar lock).
+- Today's four piles are one ruled strip, Progress leads with the streak as one large figure, a verse's review types are four ruled rows, choices of one are underlined words, switches have a square thumb, and the new-item pop-up is a plain plate with no glow or sparkles.
+- Every button, row, tab and chip now answers a press (and a hover on a computer) in its own way, with a clear focus ring.
+
 ## [1.73.2] - 2026-11-04
 
 ### Fixed

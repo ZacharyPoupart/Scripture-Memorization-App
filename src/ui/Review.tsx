@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import { Mark } from './marks.tsx';
 import { primeKeyboard, releaseKeyboard } from './keyboard.ts';
 import { formatRef } from '../core/reference.ts';
 import { easierPile, movePile, moveDownDaysIn, nextPile, pileVerses, restorePile, streakInfo, todaySummary, verseStatus } from '../core/schedule.ts';
@@ -88,13 +89,13 @@ function ResultProgress({ verse, data }: { verse: Verse; data: AppData }) {
   const next = nextPile(verse.pile);
   const sum = todaySummary(data, now);
   return (
-    <div class={`stack pile-${verse.pile}`} style={{ maxWidth: '320px', margin: '14px auto 0' }} data-testid="result-progress">
+    <div class={`stack measure-sm mt-4 pile-${verse.pile}`} data-testid="result-progress">
       {p.target && next ? (
         <div>
           <div class="bar">
             <i style={{ width: `${p.pct}%` }} />
           </div>
-          <div class="muted small" style={{ marginTop: '4px' }}>
+          <div class="muted small mt-1">
             {p.earned} of {p.target} {progressUnitPlural(verse.pile)} toward {PILE_INFO[next].label}
           </div>
         </div>
@@ -154,8 +155,8 @@ export function Review({ route }: { route: Route }) {
           </button>
         </div>
         <div class="verse-area center stack">
-          <div class="hero">🌿</div>
-          <h2>Nothing to review right now</h2>
+          <Mark name="leaf" />
+          <h2 class="headline">Nothing to review right now</h2>
           <button class="btn primary" onClick={() => navigate('/', true)}>
             Back home
           </button>
@@ -225,7 +226,7 @@ export function Review({ route }: { route: Route }) {
     const fullyDone = sum.total > 0 && sum.remaining === 0; // every review of today finished (not just enough for the streak)
     return (
       <div class="review" data-testid="session-summary">
-        <div class="verse-area center stack" style={{ paddingTop: '48px' }}>
+        <div class="verse-area center stack pt-6">
           {fullyDone ? (
             <div class="alldone" data-testid="all-done">
               <Confetti count={36} />
@@ -245,7 +246,7 @@ export function Review({ route }: { route: Route }) {
             </div>
           ) : (
             <>
-              <div class="hero">🌿</div>
+              <Mark name="leaf" />
               <h1>Session complete</h1>
             </>
           )}
@@ -297,7 +298,7 @@ export function Review({ route }: { route: Route }) {
         <div class="verse-area" onClick={next} data-testid="verse-result">
           <div class="result-card">
             <div class="result-check">{result.counted ? <CheckMark size={64} /> : <div class="big">＋</div>}</div>
-            <h2 style={{ marginTop: '10px' }}>{formatRef(verse)}</h2>
+            <h2 class="headline">{formatRef(verse)}</h2>
             <p class="muted">{result.counted ? `Review counted. ${doneLine(tally.counted)}` : 'Extra practice.'}</p>
             <ResultProgress verse={verse} data={data} />
             {result.levelUps.length > 0 && <p>Level up! Now in {PILE_INFO[result.levelUps[result.levelUps.length - 1].to].label}.</p>}
@@ -306,7 +307,7 @@ export function Review({ route }: { route: Route }) {
             )}
             {result.todayComplete && <p class="status-ready">That’s everything for today.</p>}
             {easier && (
-              <div class="stack" style={{ marginTop: '14px' }} data-testid="easier-suggestion" onClick={(e) => e.stopPropagation()}>
+              <div class="stack mt-4" data-testid="easier-suggestion" onClick={(e) => e.stopPropagation()}>
                 <p class="muted small" style={{ margin: 0 }}>
                   That one took a few tries.
                 </p>

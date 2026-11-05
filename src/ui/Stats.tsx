@@ -1,4 +1,5 @@
 import { formatRef } from '../core/reference.ts';
+import { EmptyState, Section, Stat } from './primitives.tsx';
 import { streakInfo } from '../core/schedule.ts';
 import { bestRuns, heatmap, nextGraduations, pileCounts, totals } from '../core/stats.ts';
 import { navigate } from '../router.ts';
@@ -29,11 +30,9 @@ export function Stats() {
       <div class="scroll">
         <div class="narrow stack">
           <h1>Progress</h1>
-          <div class="card center stack" data-testid="stats-empty">
-            <div class="hero">🌱</div>
-            <h2>Your progress will grow here</h2>
+          <EmptyState mark="sprout" title="Your progress will grow here" testid="stats-empty">
             <button class="btn primary" onClick={() => navigate('/add')}>Add a verse</button>
-          </div>
+          </EmptyState>
         </div>
       </div>
     );
@@ -42,29 +41,18 @@ export function Stats() {
   return (
     <div class="scroll">
       <div class="narrow stack" data-testid="stats">
-        <h1 style={{ margin: 0 }}>Progress</h1>
+        <h1>Progress</h1>
 
-        <div class="grid2">
-          <div class="card stat" data-testid="stat-streak">
-            <div class="stat-num">{streak.count}</div>
-            <div class="muted small">Current streak{streak.count === 1 ? '' : ''} (days)</div>
-          </div>
-          <div class="card stat" data-testid="stat-longest">
-            <div class="stat-num">{streak.longest}</div>
-            <div class="muted small">Longest streak (days)</div>
-          </div>
-          <div class="card stat" data-testid="stat-reviews">
-            <div class="stat-num">{t.reviews}</div>
-            <div class="muted small">Reviews completed</div>
-          </div>
-          <div class="card stat" data-testid="stat-verses">
-            <div class="stat-num">{t.verses}</div>
-            <div class="muted small">Verses ({t.memorizedYearly} kept for life)</div>
+        <div class="stat-hero">
+          <Stat big value={streak.count} label={streak.count === 1 ? 'day streak' : 'day streak'} testid="stat-streak" />
+          <div class="stat-aside">
+            <Stat value={streak.longest} label="longest streak" testid="stat-longest" />
+            <Stat value={t.reviews} label="reviews completed" testid="stat-reviews" />
+            <Stat value={t.verses} label={`verses, ${t.memorizedYearly} kept for life`} testid="stat-verses" />
           </div>
         </div>
 
-        <div class="card stack">
-          <h2>Your practice</h2>
+        <Section title="Your practice">
           <p class="sr-only" data-testid="heat-summary">
             In the last {WEEKS} weeks: {full} full days, {complete} days with every verse reviewed, {practiced} other days practiced{saved ? `, ${saved} streak ${saved === 1 ? 'save' : 'saves'} used` : ''}.
           </p>
@@ -93,11 +81,10 @@ export function Stats() {
             <span class="grow" />
             <span data-testid="heat-counts">{full} full · {complete} all-done · {practiced} practiced</span>
           </div>
-        </div>
+        </Section>
 
         {near.length > 0 && (
-          <div class="card stack">
-            <h2>Nearly there</h2>
+          <Section title="Nearly there">
             {near.map((n) => (
               <button key={n.verse.id} class={`row nearly pile-${n.verse.pile}`} onClick={() => navigate(`/verse/${n.verse.id}`)} data-testid="nearly">
                 <span class="grow" style={{ textAlign: 'left' }}>
@@ -105,32 +92,30 @@ export function Stats() {
                   <span class="muted small" style={{ display: 'block' }}>
                     {n.remaining === 0 ? `Ready to move to ${PILE_INFO[n.to].label}` : `${n.remaining} ${n.remaining === 1 ? progressUnitPlural(n.verse.pile).slice(0, -1) : progressUnitPlural(n.verse.pile)} to ${PILE_INFO[n.to].label}`}
                   </span>
-                  <span class="bar" style={{ display: 'block', marginTop: '6px' }}>
+                  <span class="bar block mt-2">
                     <i style={{ width: `${Math.round((n.earned / n.target) * 100)}%` }} />
                   </span>
                 </span>
               </button>
             ))}
-          </div>
+          </Section>
         )}
 
-        <div class="card stack">
-          <h2>Verses in each pile</h2>
+        <Section title="Verses in each pile">
           {piles.map((p) => (
             <div key={p.pile} class={`pile-${p.pile}`} data-testid={`pile-stat-${p.pile}`}>
               <div class="row spread small">
                 <span>{PILE_INFO[p.pile].label}</span>
                 <strong>{p.count}</strong>
               </div>
-              <div class="bar" style={{ marginTop: '4px' }}>
+              <div class="bar mt-1">
                 <i style={{ width: `${(p.count / maxPile) * 100}%` }} />
               </div>
             </div>
           ))}
-        </div>
+        </Section>
 
-        <div class="card stack">
-          <h2>Streak history</h2>
+        <Section title="Streak history">
           {runs.map((r) => (
             <div key={r.start} class="row spread" data-testid="run">
               <span>
@@ -142,7 +127,7 @@ export function Stats() {
           <p class="muted small" style={{ margin: 0 }}>
             {t.completeDays} day{t.completeDays === 1 ? '' : 's'} with everything done · {t.daysPracticed} day{t.daysPracticed === 1 ? '' : 's'} practiced.
           </p>
-        </div>
+        </Section>
       </div>
     </div>
   );

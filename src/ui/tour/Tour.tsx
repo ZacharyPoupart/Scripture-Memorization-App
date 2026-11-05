@@ -147,7 +147,7 @@ function Coach({ pos }: { pos: TourPos }) {
           <span class="muted small">
             Lesson {pos.lesson + 1} of {LESSONS.length} · {lesson.title}
           </span>
-          <span class="row" style={{ gap: '2px' }}>
+          <span class="row gap-1">
             {step.free && (
               <button class="icon-btn small" aria-label="Hide the tour for now" onClick={() => setMini(true)} data-testid="tour-hide">
                 <Icon name="close" />

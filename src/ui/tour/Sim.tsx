@@ -15,7 +15,7 @@ export function TourSim() {
       <div class="muted small" data-testid="sim-status">
         {v.date} · {v.status}
       </div>
-      <div class="row wrap" style={{ gap: '6px' }}>
+      <div class="row wrap gap-2">
         <button class="btn small primary" disabled={!v.canReview} onClick={() => setSim(simReview(sim))} data-testid="sim-review">
           Review it
         </button>

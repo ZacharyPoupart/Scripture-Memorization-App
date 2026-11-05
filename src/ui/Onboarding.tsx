@@ -1,12 +1,13 @@
 import { useState } from 'preact/hooks';
 import { Overlay } from './common.tsx';
+import { Mark, type MarkName } from './marks.tsx';
 
-const SLIDES = [
-  { icon: '📖', title: 'Keep Scripture for life', body: 'A calm daily habit that makes verses stick.' },
-  { icon: '➕', title: 'Add verses', body: 'Pick a book, chapter and verses. The text is looked up for you, or paste your own.' },
-  { icon: '🗂️', title: 'Four piles', body: 'New verses start in Daily. As they settle they move up to Weekly, Monthly and Yearly.' },
-  { icon: '🧠', title: 'Four ways to practice', body: 'Flashcards, blanks, typing or speaking.' },
-  { icon: '🔥', title: 'Build your streak', body: 'A short tour shows you around and earns your first shield.' },
+const SLIDES: { mark: MarkName; title: string; body: string }[] = [
+  { mark: 'book', title: 'Keep Scripture for life', body: 'A calm daily habit that makes verses stick.' },
+  { mark: 'plus', title: 'Add verses', body: 'Pick a book, chapter and verses. The text is looked up for you, or paste your own.' },
+  { mark: 'piles', title: 'Four piles', body: 'New verses start in Daily. As they settle they move up to Weekly, Monthly and Yearly.' },
+  { mark: 'cards', title: 'Four ways to practice', body: 'Flashcards, blanks, typing or speaking.' },
+  { mark: 'flame', title: 'Build your streak', body: 'A short tour shows you around and earns your first shield.' },
 ];
 
 export function Onboarding({ onClose, onTour }: { onClose: () => void; onTour: () => void }) {
@@ -16,8 +17,8 @@ export function Onboarding({ onClose, onTour }: { onClose: () => void; onTour: (
   return (
     <Overlay center label="Welcome">
       <div class="modal stack center" data-testid="onboarding">
-        <div class="hero">{s.icon}</div>
-        <h2>{s.title}</h2>
+        <Mark name={s.mark} size={52} />
+        <h2 class="headline">{s.title}</h2>
         <p class="muted" style={{ margin: 0 }}>
           {s.body}
         </p>
