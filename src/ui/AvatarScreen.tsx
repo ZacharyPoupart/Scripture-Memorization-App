@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'preact/hooks';
+import { Mark } from './marks.tsx';
 import {
   ARMOR_NAMES,
   ARMOR_SLOTS,
@@ -80,13 +81,11 @@ export function AvatarScreen() {
     <>
       <div class="scroll">
         <div class="narrow stack">
-          <div class="row spread">
+          <div class="page-head">
             <button class="icon-btn" aria-label="Back" onClick={() => back('/')}>
               <Icon name="back" />
             </button>
-            <h1 class="grow" style={{ margin: 0 }}>
-              Your avatar
-            </h1>
+            <h1>Your avatar</h1>
             {multiplier > 1 && (
               <button class="chip" aria-expanded={guide === 'multiplier'} onClick={() => setGuide(guide === 'multiplier' ? null : 'multiplier')} data-testid="streak-multiplier" aria-label={`Streak multiplier ${multiplier}. Tap to see why.`}>
                 ×{multiplier}
@@ -217,7 +216,7 @@ export function AvatarScreen() {
                         {lockedItem &&
                           (item.unlock ? [item.unlock] : item.requires!).map((u, n) => (
                             <span class="item-need" key={n}>
-                              {n === 0 ? '🔒 ' : ''}
+                              {n === 0 && <Mark name="lock" size={13} />}
                               {shortUnlock(u)}
                             </span>
                           ))}

@@ -16,7 +16,7 @@ test('fifteen free backgrounds: pick one, see it behind the knight, keep it afte
   await page.getByTestId('slot-scene').click();
   await expect(page.getByTestId('item-grid').locator('.item-tile')).toHaveCount(15);
   await expect(page.getByTestId('item-scene-sunlit-castle')).toContainText('Wearing'); // everyone starts with the first
-  await expect(page.getByTestId('item-scene-frost-keep')).not.toContainText('🔒'); // nothing to earn or buy
+  await expect(page.getByTestId('item-scene-frost-keep').locator('.item-need')).toHaveCount(0); // nothing to earn or buy
   await expect(page.getByTestId('item-scene-frost-keep')).not.toContainText('Buy');
   await page.getByTestId('item-scene-frost-keep').click();
   await expect(page.getByTestId('item-scene-frost-keep')).toContainText('Wearing');

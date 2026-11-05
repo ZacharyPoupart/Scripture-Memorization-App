@@ -5,11 +5,8 @@ import { dismissReveal, queueReveal, updateSettings, useApp, wearItem } from '..
 import { armorUrl } from './ArmorArt.tsx';
 import { CloseX } from './common.tsx';
 
-/** Twelve little sparkles round the item: where each one flies to and when it twinkles (fixed, so it looks the same every time). */
-const SPARKLES = Array.from({ length: 12 }, (_, i) => ({ angle: i * 30 + (i % 2 ? 8 : -6), dist: 118 + (i % 3) * 22, delay: (i * 0.17) % 1.6, size: 6 + (i % 4) * 2 }));
-
 /**
- * "You got something new": the item grows in the middle of the screen with a soft glow and a few sparkles. Shows after buying an
+ * "You got something new": the item is set in the middle of the screen on a flat plate, with its name under a rule. Shows after buying an
  * item and when an achievement item (the sword, the shield) is earned. Never during the tour or a review.
  */
 export function ItemReveal({ suppressed }: { suppressed: boolean }) {
@@ -49,11 +46,6 @@ export function ItemReveal({ suppressed }: { suppressed: boolean }) {
         <CloseX onClick={close} testId="reveal-close" />
       </div>
       <div class="reveal-stage" onClick={(e) => e.stopPropagation()}>
-        <div class="reveal-glow" aria-hidden="true" />
-        <div class="reveal-rays" aria-hidden="true" />
-        {SPARKLES.map((s, i) => (
-            <i key={i} class="reveal-sparkle" aria-hidden="true" style={{ '--a': `${s.angle}deg`, '--d': `${s.dist}px`, '--delay': `${s.delay}s`, '--s': `${s.size}px` } as never} />
-          ))}
         {src && (
           <div class="reveal-imgwrap" style={item.slot === 'weapon' ? { transform: 'rotate(180deg)' } : undefined}>
             <img class={`reveal-img ${item.slot === 'scene' ? 'scene' : ''}`} src={src} alt="" />
@@ -65,7 +57,7 @@ export function ItemReveal({ suppressed }: { suppressed: boolean }) {
         <h2 class="reveal-name" data-testid="reveal-name">
           {item.name}
         </h2>
-        <div class="row" style={{ justifyContent: 'center', gap: '10px' }}>
+        <div class="row reveal-actions">
           {!worn && owns(data, item) && (
             <button
               class="btn"

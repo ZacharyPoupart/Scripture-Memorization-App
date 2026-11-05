@@ -1,4 +1,5 @@
 import { dayKeyOf, formatDuration } from '../core/dates.ts';
+import { EmptyState } from './primitives.tsx';
 import { primeKeyboard } from './keyboard.ts';
 import { formatRef } from '../core/reference.ts';
 import { buildTodayQueue, nextReviewInfo } from '../core/today.ts';
@@ -57,9 +58,7 @@ export function Home() {
       <div class="scroll">
         <div class="narrow stack">
           <h1>Memorize For Life</h1>
-          <div class="card center stack" data-testid="empty-home">
-            <div class="hero">📖</div>
-            <h2>Add your first verse</h2>
+          <EmptyState mark="book" title="Add your first verse" testid="empty-home">
             <button class="btn primary block" onClick={() => navigate('/add')}>
               Add a verse
             </button>
@@ -68,7 +67,7 @@ export function Home() {
                 New here? Take the five-minute tour
               </button>
             )}
-          </div>
+          </EmptyState>
         </div>
       </div>
     );
@@ -86,7 +85,7 @@ export function Home() {
                 </div>
               )}
             </div>
-            <div class="row" style={{ gap: '8px' }}>
+            <div class="row gap-2">
               {settings.avatarOn && (
                 <button class="avatar-bubble" onClick={() => navigate('/avatar')} aria-label={`Your avatar. ${seedsBalance(data)} coins.`} data-testid="avatar-bubble">
                   <AvatarFigure look={currentLook(data)} size={44} view="face" />
@@ -164,7 +163,7 @@ export function Home() {
             now,
           }) && (
             <div class="banner info" data-testid="backup-nudge">
-              <div style={{ marginBottom: '8px' }}>
+              <div class="mb-2">
                 Keep your verses safe with a backup or sync.
               </div>
               <div class="row wrap">

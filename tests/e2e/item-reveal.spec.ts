@@ -21,7 +21,7 @@ test.beforeEach(async ({ page }) => {
   await blockLookups(page);
 });
 
-test('buying an item shows it in the middle of the screen with a glow, and it can be closed', async ({ page }) => {
+test('buying an item shows it in the middle of the screen on a plain plate, and it can be closed', async ({ page }) => {
   await openApp(page);
   await page.evaluate(() => (window as any).__mfl.armorFree(false));
   await replaceDataWith(page, fixture);
@@ -32,7 +32,8 @@ test('buying an item shows it in the middle of the screen with a glow, and it ca
   const reveal = page.getByTestId('item-reveal');
   await expect(reveal).toBeVisible();
   await expect(page.getByTestId('reveal-name')).toContainText('Silver Vanguard helm');
-  await expect(reveal.locator('.reveal-glow')).toBeVisible();
+  await expect(reveal.locator('.reveal-stage')).toBeVisible(); // a flat plate: no glow, rays or sparkles
+  await expect(reveal.locator('.reveal-glow, .reveal-rays, .reveal-sparkle')).toHaveCount(0);
   await expect(reveal.locator('img.reveal-img')).toBeVisible();
   // the item sits in the middle of the screen
   const vp = page.viewportSize()!;

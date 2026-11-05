@@ -109,12 +109,12 @@ export function RefRecall({ verse, onMistake, onDone, onRestart, mistakes, parts
             {cue === 'citation' ? formatRef(verse) : cue === 'topic' ? verse.topic : firstWords(verse.text)}
           </div>
         ) : (
-          <p class="verse-text" style={{ marginTop: '12px' }} data-testid="ref-verse-text">
+          <p class="verse-text mt-3" data-testid="ref-verse-text">
             {verse.text}
           </p>
         )}
         {revealed && (
-          <div class="banner info center" data-testid="ref-answer" style={{ marginTop: '12px' }}>
+          <div class="banner info center mt-3" data-testid="ref-answer">
             It's <strong>{formatRef(verse)}</strong>. Let's go through it once more.
           </div>
         )}
@@ -186,7 +186,7 @@ export function RefRecall({ verse, onMistake, onDone, onRestart, mistakes, parts
       {picking && (
         <Overlay onClose={() => setPicking(false)} label="Choose a book">
           <div class="sheet full" data-testid="book-picker">
-            <div class="row" style={{ marginBottom: '10px' }}>
+            <div class="row mb-3">
               <input class="input grow" autofocus placeholder="Search books…" value={query} onInput={(e) => setQuery(e.currentTarget.value)} data-testid="book-search" autocapitalize="off" autocomplete="off" />
               <button class="btn" onClick={() => setPicking(false)}>
                 Cancel
