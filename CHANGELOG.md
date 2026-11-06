@@ -5,6 +5,10 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Fixed
+- Today now shows how many of the 3 Daily reviews each verse has (0/3, 1/3, 2/3), also while it is waiting for the next one, and the result card after a review says "1 of 3 today".
+- The coin count animation is back after every review, also in a run of several verses; the card stays a little longer so the coins can finish counting (tap to move on at once). The run's total still shows at the end.
+
 ## [1.74.1] - 2026-11-06
 
 ### Changed

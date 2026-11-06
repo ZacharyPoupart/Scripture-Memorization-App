@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { Mark } from './marks.tsx';
 import { primeKeyboard, releaseKeyboard } from './keyboard.ts';
 import { formatRef } from '../core/reference.ts';
-import { easierPile, movePile, moveDownDaysIn, nextPile, pileVerses, restorePile, streakInfo, todaySummary, verseStatus } from '../core/schedule.ts';
+import { easierPile, movePile, moveDownDaysIn, nextPile, pileVerses, restorePile, streakInfo, todaySummary, verseStatus, DAILY_REVIEWS } from '../core/schedule.ts';
 import { doneLine } from '../core/milestones.ts';
 import { feedback } from '../services/feedback.ts';
 import { cueFor, planFor } from '../core/practice.ts';
@@ -192,7 +192,9 @@ export function Review({ route }: { route: Route }) {
     // a verse that took many tries in a pile that allows no slips is offered more frequent practice; wait for the answer
     const offer = r.counted && r.levelUps.length === 0 ? easierPile(verse.pile, restarts) : null;
     setEasier(offer);
-    if (!offer) advanceTimer.current = setTimeout(next, 1100);
+    // long enough for the coins to finish counting (a tap moves on at once)
+    const hold = r.seeds > 0 && settings.avatarOn ? (r.multiplier > 1 ? 5200 : 2400) : 1100;
+    if (!offer) advanceTimer.current = setTimeout(next, hold);
   };
 
   const moveDown = (to: Pile) => {
@@ -300,9 +302,14 @@ export function Review({ route }: { route: Route }) {
             <div class="result-check">{result.counted ? <CheckMark size={64} /> : <div class="big">＋</div>}</div>
             <h2 class="headline">{formatRef(verse)}</h2>
             <p class="muted">{result.counted ? `Review counted. ${doneLine(tally.counted)}` : 'Extra practice.'}</p>
+            {verse.pile === 'daily' && (
+              <p class="muted small" data-testid="daily-count">
+                {Math.min(verseStatus(data, verse, Date.now()).countedToday, DAILY_REVIEWS)} of {DAILY_REVIEWS} today
+              </p>
+            )}
             <ResultProgress verse={verse} data={data} />
             {result.levelUps.length > 0 && <p>Level up! Now in {PILE_INFO[result.levelUps[result.levelUps.length - 1].to].label}.</p>}
-            {result.seeds > 0 && settings.avatarOn && queue.length === 1 && (
+            {result.seeds > 0 && settings.avatarOn && (
               <CoinCount key={`${idx}-${attempt}`} base={result.base} total={result.seeds} multiplier={result.multiplier} testid="seeds-gain" />
             )}
             {result.todayComplete && <p class="status-ready">That’s everything for today.</p>}
