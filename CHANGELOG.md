@@ -14,6 +14,7 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 - The progress ring on a verse is smaller, thinner and softer.
 
 ### Fixed
+- Speak it, second verse hearing nothing on iPhone: the microphone is now started inside your tap whenever the previous listener has already finished, instead of a moment later (the phone can refuse a late start).
 - Friends' progress now stays up to date: a change that was waiting out the send delay is sent when the delay ends (every 10 minutes at most, was 30) and when you leave the app, and the Friends page refreshes itself every minute and when you come back to it.
 
 ## [1.74.0] - 2026-11-05
