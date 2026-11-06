@@ -790,9 +790,9 @@ textarea.input {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-areas:
-    'head ring'
-    'snippet ring'
-    'foot foot';
+    'head head'
+    'snippet snippet'
+    'foot ring';
   align-items: center;
   column-gap: var(--sp-4);
   row-gap: var(--sp-1);
@@ -810,7 +810,7 @@ textarea.input {
 .verse-card-ring {
   grid-area: ring;
   display: grid;
-  place-items: center;
+  place-items: end;
 }
 .verse-card-foot {
   grid-area: foot;
@@ -818,7 +818,7 @@ textarea.input {
   flex-wrap: wrap;
   align-items: baseline;
   gap: var(--sp-1) var(--sp-3);
-  margin-top: var(--sp-2);
+  margin-top: var(--sp-1);
   font-size: 0.86rem;
 }
 .verse-version,
