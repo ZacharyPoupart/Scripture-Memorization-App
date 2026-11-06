@@ -748,3 +748,8 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Test changes (please review):** the avatar lock is a drawn mark, so avatar and backgrounds tests check for the "needs" label instead of the lock emoji; `comfort.spec` expects the new paper and ink colours; `item-reveal.spec` expects the flat plate (no glow, rays or sparkles). Nothing else changed; all other tests pass untouched.
 **Not done / for you to judge:** Settings, Friends and the avatar shop still use the long single-column forms they had, only restyled; the painted avatar art and the banner/flag drawings are untouched; I could not check it on a real iPhone.
 **Undo:** roll back to `v1.73.2-speak-second-verse`.
+
+## v1.74.1 — Clearer fields and calmer verse cards (owner feedback on the restyle)
+**What:** after the restyle the owner said the typing boxes were not clear and the verse cards felt like a lot of text. Fields (`.input`, the book/chapter/verse boxes, the sort menu) now have a full 1.5px ink border on paper; the Ready-now and topic filter buttons are boxed buttons in sentence case. `VerseCard` shows the reference with the translation in small muted type, one line of the verse, one status line with the topic as plain muted text, and the progress ring at the right; the Daily/Weekly tag and the boxed tags are removed because the heading above each group already names the pile.
+**Test change (please review):** `verses.spec` expected the card to contain "Daily"; it now checks the page heading "Daily" instead.
+**Undo:** roll back to `v1.74.0-editorial-restyle`.

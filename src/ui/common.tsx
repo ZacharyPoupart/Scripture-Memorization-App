@@ -258,26 +258,19 @@ export function VerseCard({ data, verse, now, status }: { data: AppData; verse: 
   const label = statusLabel(status);
   const open = () => navigate(`/verse/${verse.id}`);
   return (
-    <button class={`card tap pile-${verse.pile}`} onClick={open} data-testid="verse-card" data-verse-id={verse.id}>
-      <div class="row spread">
+    <button class={`card tap verse-card pile-${verse.pile}`} onClick={open} data-testid="verse-card" data-verse-id={verse.id}>
+      <span class="verse-card-head">
         <span class="verse-ref">{formatRef(verse)}</span>
-        <span class="row">
-          <span class="chip">{verse.translation}</span>
-          <PileBadge pile={verse.pile} />
-        </span>
-      </div>
-      <div class="verse-snippet">
-        {verse.text}
-      </div>
-      {verse.topic && (
-        <div class="mb-2">
-          <span class="chip">#{verse.topic}</span>
-        </div>
-      )}
-      <div class="row spread small">
+        <span class="verse-version">{verse.translation}</span>
+      </span>
+      <span class="verse-snippet">{verse.text}</span>
+      <span class="verse-card-foot">
         <span class={label.cls} data-testid="status">{label.text}</span>
+        {verse.topic && <span class="verse-topic">#{verse.topic}</span>}
+      </span>
+      <span class="verse-card-ring">
         <ProgressRing ring={ring} />
-      </div>
+      </span>
     </button>
   );
 }
