@@ -11,6 +11,10 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 - Fields you type in or choose from (search, sort, translation, the book, chapter and verse boxes, topic) are now clear boxes with a dark edge, and the filter buttons (Ready now, topics) are boxed buttons you can see.
 - Today's Daily, Weekly, Monthly and Yearly counts sit in one crisp box: a solid 2px dark outline and dividers, the current pile marked by a bar along the bottom, and no second rule under it.
 - A verse in a list is quieter: its reference with the translation in small type, one line of its text, one line of status with its topic, and the progress ring in the bottom right corner. The pile tag and the boxed translation and topic tags are gone from the cards (the pile is already named by its heading).
+- The progress ring on a verse is smaller, thinner and softer.
+
+### Fixed
+- Friends' progress now stays up to date: a change that was waiting out the send delay is sent when the delay ends (every 10 minutes at most, was 30) and when you leave the app, and the Friends page refreshes itself every minute and when you come back to it.
 
 ## [1.74.0] - 2026-11-05
 

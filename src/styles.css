@@ -1935,30 +1935,31 @@ button.streak:active {
   position: relative;
   display: inline-grid;
   place-items: center;
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   flex: none;
   color: var(--pile, var(--accent));
+  opacity: 0.7;
 }
 .pring svg {
   grid-area: 1 / 1;
 }
 .pring b {
   grid-area: 1 / 1;
-  font-size: 0.66rem;
-  font-weight: 700;
-  color: var(--text);
+  font-size: 0.58rem;
+  font-weight: 500;
+  color: var(--muted, var(--text));
   font-variant-numeric: tabular-nums;
 }
 .pring-track {
   fill: none;
-  stroke: var(--surface-2);
-  stroke-width: 4;
+  stroke: var(--rule, var(--surface-2));
+  stroke-width: 2.5;
 }
 .pring-arc {
   fill: none;
   stroke: currentColor;
-  stroke-width: 4;
+  stroke-width: 2.5;
   stroke-linecap: round;
   transition: stroke-dasharray 0.4s ease;
 }
