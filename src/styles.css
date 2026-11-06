@@ -2246,8 +2246,8 @@ button.streak:active {
 /* the four piles are one ruled strip: a count over its name, the ones with something ready in the accent */
 .pile-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  border-block: var(--rule);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 2px solid var(--text); /* whole-pixel ink lines: crisp at every screen density */
 }
 .pile-link {
   position: relative;
@@ -2255,10 +2255,10 @@ button.streak:active {
   justify-items: start;
   align-content: center;
   gap: 0;
-  min-height: 64px;
-  padding: var(--sp-3) var(--sp-3);
+  min-height: 72px;
+  padding: var(--sp-3);
   border: 0;
-  border-left: var(--rule);
+  border-left: 2px solid var(--text);
   background: none;
   color: var(--muted);
   font-size: 0.7rem;
@@ -2270,22 +2270,17 @@ button.streak:active {
 }
 .pile-link:first-child {
   border-left: 0;
-  padding-left: 0;
 }
 .pile-link i {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: -1px;
-  height: 3px;
+  bottom: 0;
+  height: 4px;
   background: var(--pile);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform var(--t-med) var(--ease);
-}
-.pile-link:first-child i {
-  right: auto;
-  width: 100%;
 }
 .pile-link:active {
   background: var(--surface-2);
@@ -2308,7 +2303,6 @@ button.streak:active {
 }
 .today-card {
   padding: var(--sp-5) 0 0;
-  border-top: var(--rule-strong);
 }
 .today-card.stack > * + * {
   margin-top: var(--sp-5);
