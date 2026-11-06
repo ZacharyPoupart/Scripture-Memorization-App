@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.74.1] - 2026-11-06
+
 ### Changed
 - Back to the previous look (the editorial restyle of 1.74.0 was too cluttered): the soft teal-and-paper colours, Nunito and Fraunces, rounded cards and the emoji pictures are all back. Nothing about how the app works changed.
 
