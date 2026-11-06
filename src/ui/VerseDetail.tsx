@@ -1,5 +1,4 @@
 import { useState } from 'preact/hooks';
-import { ListRow, Section } from './primitives.tsx';
 import { primeKeyboard } from './keyboard.ts';
 import { bibleGatewayUrl, formatRef } from '../core/reference.ts';
 import { GRADUATION_DAYS, deleteVerse, maxDaysIn, movePile, nextPile, restorePile, restoreVerse, verseStatus } from '../core/schedule.ts';
@@ -97,29 +96,30 @@ export function VerseDetail({ id }: { id: string }) {
           )}
         </div>
 
-        <Section title="Review this verse">
-          <ul class="rows">
+        <div class="card stack">
+          <h2>Review this verse</h2>
+          <div class="grid2">
             {MODES.map((m) => (
-              <li key={m.value}>
-                <ListRow onClick={() => { if (m.value === 'type') primeKeyboard(); navigate(`/review?verse=${v.id}&mode=${m.value}`); }} testid={`review-${m.value}`}>
-                  {m.long}
-                </ListRow>
-              </li>
+              <button key={m.value} class="btn" onClick={() => { if (m.value === 'type') primeKeyboard(); navigate(`/review?verse=${v.id}&mode=${m.value}`); }} data-testid={`review-${m.value}`}>
+                {m.long}
+              </button>
             ))}
-          </ul>
-        </Section>
+          </div>
+        </div>
 
-        <div class="action-links">
-          <button class="btn ghost" onClick={() => navigate(`/edit/${v.id}`)}>
+        <div class="row wrap">
+          <button class="btn grow" onClick={() => navigate(`/edit/${v.id}`)}>
             Edit
           </button>
-          <a class="btn ghost" href={bibleGatewayUrl(v, v.translation)} target="_blank" rel="noopener noreferrer">
+          <a class="btn grow" href={bibleGatewayUrl(v, v.translation)} target="_blank" rel="noopener noreferrer">
             Open in Bible <Icon name="external" />
           </a>
-          <button class="btn ghost" onClick={() => setMoving(true)} data-testid="move">
+        </div>
+        <div class="row wrap">
+          <button class="btn grow" onClick={() => setMoving(true)} data-testid="move">
             Move to another pile
           </button>
-          <button class="btn ghost danger-text" onClick={() => setDeleting(true)}>
+          <button class="btn grow danger" onClick={() => setDeleting(true)}>
             Delete
           </button>
         </div>

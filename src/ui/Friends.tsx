@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'preact/hooks';
-import { Mark } from './marks.tsx';
 import { currentLook, defaultLook, GUILD_WIN_COINS, matchedSet, type Look } from '../core/avatar.ts';
 import { cleanName, cheerLine, codeFrom, formatCode, guildLink, inviteLink, inviteMessage, MAX_GUILD_NAME, MAX_NAME, chestState, countdownText, weekEndsAt, type FriendCard, type GuildView } from '../core/social.ts';
 import { api, socialMessage } from '../services/social.ts';
@@ -88,7 +87,7 @@ function FriendRow({ card, cheered, onOpen, onCheer, onRemove }: { card: FriendC
       </div>
       </button>
       <button class={`icon-btn cheer-btn ${cheered ? 'done' : ''}`} aria-label={cheered ? `You cheered ${card.name} today` : `Cheer ${card.name}`} disabled={cheered} onClick={onCheer} data-testid="friend-cheer">
-        <Mark name="burst" size={22} />
+        <span aria-hidden="true">👏</span>
       </button>
       <button class="icon-btn" aria-label={`Options for ${card.name}`} onClick={onRemove} data-testid="friend-menu">
         <Icon name="more" />
@@ -142,7 +141,7 @@ function FriendSheet({ card, groups, cheered, onCheer, onClose }: { card: Friend
             <>
               <div class="muted small">In a group together</div>
               {groups.map((g) => (
-                <div key={g.id} class="friend-group-name row gap-2 justify-center">
+                <div key={g.id} class="friend-group-name row" style={{ gap: '8px', justifyContent: 'center' }}>
                   <BannerFigure banner={bannerOf(g)} size={20} title={`${g.name} banner`} />
                   {g.name}
                 </div>
@@ -154,7 +153,7 @@ function FriendSheet({ card, groups, cheered, onCheer, onClose }: { card: Friend
         </div>
         {onCheer && (
           <button class="btn block" disabled={cheered} onClick={onCheer} data-testid="friend-sheet-cheer">
-            {cheered ? 'Cheered today' : `Cheer ${card.name}`}
+            {cheered ? 'Cheered today' : `👏 Cheer ${card.name}`}
           </button>
         )}
         <button class="btn ghost block" onClick={onClose}>
@@ -238,7 +237,7 @@ function GuildCard({ g, me, onInvite, onLeave, onTransfer, onOpenMember }: { g: 
           </button>
         </div>
       ) : (
-        <div class="row gap-3 min-w-0">
+        <div class="row" style={{ gap: '10px', minWidth: 0 }}>
           <BannerFigure banner={bannerOf(g)} size={34} title={`${g.name} banner`} />
           <div class="grow" style={{ minWidth: 0 }}>
             <h3 style={{ margin: 0 }} data-testid="guild-name">
@@ -521,8 +520,8 @@ export function Friends({ joinCode = '', guildCode = '' }: { joinCode?: string; 
             </div>
           )}
           <div class="card stack">
-            <Mark name="pair" />
-            <h2 class="headline">Learn together</h2>
+            <div class="hero center">🤝</div>
+            <h2 style={{ textAlign: 'center' }}>Learn together</h2>
             <p class="muted" style={{ margin: 0 }}>
               See how your friends’ knights and streaks are growing. Only people you invite can see your name, knight, streak and pile counts. Never your verses.
             </p>
@@ -603,7 +602,7 @@ export function Friends({ joinCode = '', guildCode = '' }: { joinCode?: string; 
 
         {social.cheers.length > 0 && (
           <div class="banner good" data-testid="cheers">
-            {cheerLine(social.cheers.map((c) => c.name))}
+            👏 {cheerLine(social.cheers.map((c) => c.name))}
           </div>
         )}
 
@@ -659,7 +658,9 @@ export function Friends({ joinCode = '', guildCode = '' }: { joinCode?: string; 
               </div>
             ) : friends.length === 0 ? (
               <div class="card center stack" data-testid="friends-empty">
-                <Mark name="sprout" />
+                <div class="hero" aria-hidden="true">
+                  🌱
+                </div>
                 <div class="muted">No friends yet. Invite someone, or add a code below.</div>
               </div>
             ) : (

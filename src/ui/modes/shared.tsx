@@ -22,7 +22,7 @@ export function MistakeDots({ verse, mistakes }: { verse: Verse; mistakes: numbe
       {Array.from({ length: allowed }, (_, i) => (
         <span key={i} class={`dot ${i < mistakes ? 'used' : ''}`} />
       ))}
-      <span class="ml-2">{allowed} slips allowed</span>
+      <span style={{ marginLeft: '6px' }}>{allowed} slips allowed</span>
     </div>
   );
 }

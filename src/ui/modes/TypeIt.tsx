@@ -213,7 +213,7 @@ export function TypeIt({ verse, onMistake, onDone, mistakes, after }: ModeProps)
             Reveal
           </button>
         </div>
-        <div class="hint-text center mt-2">
+        <div class="hint-text center" style={{ marginTop: '6px' }}>
           {inTopic
             ? `Typing ${typedShown ? `"${typedShown}"` : 'the first letters'} narrows the choices. Tap the text to bring the keyboard back.`
             : inRef

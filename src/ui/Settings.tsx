@@ -117,7 +117,7 @@ function SyncCard() {
         <div class="hint-text">The server needs a KV namespace named SYNC (see the README's “Turn on sync” section).</div>
       )}
       <div>
-        <div class="muted small mb-1">
+        <div class="muted small" style={{ marginBottom: '4px' }}>
           Link code
         </div>
         <div class="row">
@@ -430,7 +430,7 @@ function SpacingField({ hours, onChange }: { hours: number; onChange: (hours: nu
         <option value="custom">Custom…</option>
       </select>
       {custom && (
-        <label class="row gap-2 mt-2">
+        <label class="row" style={{ marginTop: 'var(--s-2, 8px)', gap: '8px', alignItems: 'center' }}>
           <input
             class="input"
             type="number"

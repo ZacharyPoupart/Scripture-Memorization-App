@@ -1,5 +1,4 @@
 import { useEffect } from 'preact/hooks';
-import { Mark } from './marks.tsx';
 import { addDays, dayKeyOf } from '../core/dates.ts';
 import { isStreakMilestone, streakMilestoneId, streakMilestoneSize, streakMilestoneText } from '../core/milestones.ts';
 import { formatRef } from '../core/reference.ts';
@@ -44,8 +43,8 @@ export function Celebrations({ suppressed }: { suppressed: boolean }) {
         <Confetti count={toYearly ? 90 : 40} />
         <Overlay center label="Level up" onClose={close}>
           <div class="modal stack center" data-testid="celebration">
-            <Mark name={toYearly ? 'tree' : 'burst'} size={52} />
-            <h2 class="headline">{ups.length === 1 ? 'A verse levelled up!' : `${ups.length} verses levelled up!`}</h2>
+            <div class="hero">{toYearly ? '🌳' : '🎉'}</div>
+            <h2>{ups.length === 1 ? 'A verse levelled up!' : `${ups.length} verses levelled up!`}</h2>
             <div class="stack">
               {ups.map((u) => (
                 <div key={u.id}>

@@ -86,7 +86,7 @@ function Shell({ title, onBack, onClose, children, testid, footer }: { title: st
               ‹ Back
             </button>
           ) : (
-            <span class="w-spacer" />
+            <span style={{ width: '64px' }} />
           )}
           <h2 class="grow center">{title}</h2>
           <button class="btn small ghost" onClick={onClose} aria-label="Close">

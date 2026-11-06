@@ -38,7 +38,7 @@ export function PilesOverview() {
         )}
         {shown.map(({ pile: p, vs }) => (
           <section key={p} class={`pile-${p}`}>
-            <div class="row spread mb-2">
+            <div class="row spread" style={{ marginBottom: '8px' }}>
               <h2>
                 {PILE_INFO[p].label} <span class="muted">({vs.length})</span>
               </h2>
@@ -82,7 +82,7 @@ export function PilePage({ pile }: { pile: Pile }) {
             </button>
             <h1>{PILE_INFO[pile].label}</h1>
           </div>
-          <p class="muted">
+          <p class="muted" style={{ marginTop: '-8px' }}>
             {PILE_INFO[pile].blurb}
           </p>
           {all.length > 0 && (
@@ -119,7 +119,7 @@ export function PilePage({ pile }: { pile: Pile }) {
               <div class="card center muted">
                 No verses in {PILE_INFO[pile].label} yet.
                 {pile === 'daily' && (
-                  <div class="mt-3">
+                  <div style={{ marginTop: '10px' }}>
                     <button class="btn primary" onClick={() => navigate('/add')}>
                       Add a verse
                     </button>

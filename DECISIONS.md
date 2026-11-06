@@ -748,3 +748,8 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Test changes (please review):** the avatar lock is a drawn mark, so avatar and backgrounds tests check for the "needs" label instead of the lock emoji; `comfort.spec` expects the new paper and ink colours; `item-reveal.spec` expects the flat plate (no glow, rays or sparkles). Nothing else changed; all other tests pass untouched.
 **Not done / for you to judge:** Settings, Friends and the avatar shop still use the long single-column forms they had, only restyled; the painted avatar art and the banner/flag drawings are untouched; I could not check it on a real iPhone.
 **Undo:** roll back to `v1.73.2-speak-second-verse`.
+
+## v1.74.1 — Back to the look of 1.73.2 (owner request)
+**What:** the owner tried the editorial restyle (1.74.0) and found it too cluttered, so it is reverted: the whole of pull request 105 is undone with a revert, which restores the old stylesheet, fonts (Nunito), screens, tests and the design notes in CLAUDE.md. The version number moves forward to 1.74.1 so nothing is reused. Nothing else was touched, and your data was never affected (the restyle changed no saved data).
+**For next time:** the screenshots of every screen before and after are in the earlier conversation; if you want pieces of the restyle back (for example only no emojis, or only the new fonts) say which and I will do them one at a time, so each is easy to judge and undo.
+**Undo of this undo:** `v1.74.0-editorial-restyle` is the restyled version.

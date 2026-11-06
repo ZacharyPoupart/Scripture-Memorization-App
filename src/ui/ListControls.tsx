@@ -34,6 +34,8 @@ export function ListControls({ state, update, topics }: { state: ListState; upda
   const [picking, setPicking] = useState(false);
   const [find, setFind] = useState('');
   const [name, setName] = useState('');
+  const chip = (active: boolean) => ({ border: 0, background: active ? 'var(--accent)' : undefined, color: active ? 'var(--on-accent)' : undefined });
+
   const save = () => {
     const from = state.topic;
     const to = name.trim();
@@ -70,6 +72,7 @@ export function ListControls({ state, update, topics }: { state: ListState; upda
           value={state.sort}
           onChange={(e) => update({ sort: e.currentTarget.value as SortKey })}
           data-testid="sort"
+          style={{ minHeight: '44px' }}
         >
           {(Object.keys(SORT_LABELS) as SortKey[]).map((k) => (
             <option key={k} value={k}>
@@ -78,7 +81,8 @@ export function ListControls({ state, update, topics }: { state: ListState; upda
           ))}
         </select>
         <button
-          class="chip chip-lg"
+          class="chip"
+          style={{ ...chip(state.ready), minHeight: '44px', padding: '0 14px' }}
           aria-pressed={state.ready}
           onClick={() => update({ ready: !state.ready })}
           data-testid="ready-only"
@@ -88,16 +92,17 @@ export function ListControls({ state, update, topics }: { state: ListState; upda
       </div>
       {topics.length > TOPIC_CHIPS_MAX && (
         <div class="row wrap" role="group" aria-label="Filter by topic">
-          <button class="chip chip-md" aria-pressed={!!state.topic} onClick={() => (setFind(''), setPicking(true))} aria-haspopup="dialog" data-testid="topic-open">
+          <button class={`chip ${state.topic ? 'on' : ''}`} style={{ ...chip(!!state.topic), minHeight: '40px', padding: '0 14px' }} onClick={() => (setFind(''), setPicking(true))} aria-haspopup="dialog" data-testid="topic-open">
             {state.topic ? `#${state.topic}` : `Topic: all (${topics.length})`} ▾
           </button>
           {state.topic && (
             <>
-              <button class="chip chip-md" onClick={() => update({ topic: '' })} aria-label="Show all topics" data-testid="topic-clear">
+              <button class="chip" style={{ minHeight: '40px' }} onClick={() => update({ topic: '' })} aria-label="Show all topics" data-testid="topic-clear">
                 ✕ Clear
               </button>
               <button
-                class="chip chip-md"
+                class="chip"
+                style={{ minHeight: '40px' }}
                 onClick={() => {
                   setName(state.topic);
                   setRenaming(true);
@@ -113,7 +118,8 @@ export function ListControls({ state, update, topics }: { state: ListState; upda
       {topics.length > 0 && topics.length <= TOPIC_CHIPS_MAX && (
         <div class="row wrap" role="group" aria-label="Filter by topic">
           <button
-            class="chip chip-md"
+            class="chip"
+            style={{ ...chip(state.topic === ''), minHeight: '36px' }}
             aria-pressed={state.topic === ''}
             onClick={() => update({ topic: '' })}
           >
@@ -122,7 +128,8 @@ export function ListControls({ state, update, topics }: { state: ListState; upda
           {topics.map((t) => (
             <button
               key={t}
-              class="chip chip-md"
+              class="chip"
+              style={{ ...chip(state.topic === t), minHeight: '36px' }}
               aria-pressed={state.topic === t}
               onClick={() => update({ topic: t })}
             >
@@ -131,7 +138,8 @@ export function ListControls({ state, update, topics }: { state: ListState; upda
           ))}
           {state.topic && (
             <button
-              class="chip chip-md"
+              class="chip"
+              style={{ minHeight: '36px' }}
               onClick={() => {
                 setName(state.topic);
                 setRenaming(true);

@@ -130,7 +130,7 @@ export function Blanks({ verse, onMistake, onDone, mistakes, after }: ModeProps)
             </button>
           ))}
           {allDone && (
-            <div class="center muted col-span-all pt-5">
+            <div class="center muted" style={{ gridColumn: '1 / -1', paddingTop: '30px' }}>
               Complete!
             </div>
           )}

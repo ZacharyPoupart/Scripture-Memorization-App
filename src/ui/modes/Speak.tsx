@@ -213,7 +213,7 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
         <div class="muted small center">{showWords ? 'Say the verse aloud' : 'Say the verse from memory'}</div>
         <div class="prompt-ref" style={{ fontSize: '1.3rem' }}>{formatRef(verse)}</div>
         {!listening && !finished && (
-          <div class="measure-sm my-2">
+          <div style={{ maxWidth: '320px', margin: '8px auto' }}>
             <Seg<'show' | 'hide'>
               label="Show the words?"
               value={showWords ? 'show' : 'hide'}
@@ -239,7 +239,7 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
           </p>
         )}
         {!showWords && !finished && (
-          <div class="muted center my-4" data-testid="speak-hidden">
+          <div class="muted center" style={{ margin: '14px 0' }} data-testid="speak-hidden">
             {listening ? 'Listening… the words will appear when you finish.' : 'The words stay hidden until you finish.'}
           </div>
         )}
@@ -263,7 +263,7 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
           </div>
         )}
         {error && <div class="banner bad" role="alert">{error}</div>}
-        <div class="hint-text center mt-3">Experimental — recognition may mishear words.</div>
+        <div class="hint-text center" style={{ marginTop: '10px' }}>Experimental — recognition may mishear words.</div>
       </div>
       <Dock>
         <MistakeDots verse={verse} mistakes={mistakes} />
