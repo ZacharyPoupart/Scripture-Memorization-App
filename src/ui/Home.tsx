@@ -142,7 +142,7 @@ export function Home() {
                     <button class="today-item" onClick={() => { if (settings.defaultMode === 'type') primeKeyboard(); navigate(`/review?verse=${v.id}&mode=${settings.defaultMode}`); }} aria-label={`Practice ${formatRef(v)}`} data-testid="today-verse">
                       <i aria-hidden="true" />
                       <span>{formatRef(v)}</span>
-                      <small class="muted">{s.state === 'ready' ? (s.countedToday ? `${s.countedToday}/3` : '') : s.state === 'waiting' ? `in ${formatDuration(s.waitMs ?? 0)}` : 'done'}</small>
+                      <small class="muted">{v.pile === 'daily' ? `${Math.min(s.countedToday, 3)}/3${s.state === 'waiting' ? ` · in ${formatDuration(s.waitMs ?? 0)}` : ''}` : s.state === 'ready' ? (s.countedToday ? `${s.countedToday}/3` : '') : s.state === 'waiting' ? `in ${formatDuration(s.waitMs ?? 0)}` : 'done'}</small>
                     </button>
                   </li>
                 ))}

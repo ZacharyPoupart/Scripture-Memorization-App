@@ -754,3 +754,7 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 **Test change (please review):** `verses.spec` expected the card to contain "Daily"; it now checks the page heading "Daily" instead.
 **Undo:** roll back to `v1.74.0-editorial-restyle`.
 **Added to 1.74.1 (owner feedback):** the four pile counts on Today were drawn with hairlines that looked uneven; they are now a solid 2px ink outline with 2px dividers (whole-pixel lines, which stay crisp at every screen density) and the extra rule under them is gone. CSS only; no test change.
+
+## Daily count and per-review coins (owner-requested)
+- Today's list shows n/3 for every Daily verse (also while waiting), and the result card says "n of 3 today".
+- Coins count after every review again (the multi-verse run had been summary-only). The card holds 2.4 s (5.2 s with a multiplier) so the reels finish; a tap moves on. Test change: motivation.spec summary timeout 5 s to 9 s; pile-session.spec now expects the per-review coins.
