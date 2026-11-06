@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.74.1] - 2026-11-06
+
 ### Changed
 - Fields you type in or choose from (search, sort, translation, the book, chapter and verse boxes, topic) are now clear boxes with a dark edge, and the filter buttons (Ready now, topics) are boxed buttons you can see.
 - A verse in a list is quieter: its reference with the translation in small type, one line of its text, one line of status with its topic, and the progress ring beside them. The pile tag and the boxed translation and topic tags are gone from the cards (the pile is already named by its heading).
