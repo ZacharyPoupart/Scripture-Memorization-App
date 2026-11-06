@@ -581,13 +581,22 @@ button.chip[aria-pressed='true'] {
   border-color: var(--text);
   color: var(--bg);
 }
+button.chip.chip-md,
+button.chip.chip-lg {
+  padding: 0 var(--sp-4);
+  border: 1.5px solid var(--text);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
 .chip-md {
-  min-height: 40px;
-  padding: 0 var(--sp-3);
+  min-height: 44px;
 }
 .chip-lg {
-  min-height: 44px;
-  padding: 0 var(--sp-3);
+  min-height: 48px;
 }
 .pile-daily {
   --pile: var(--daily);
@@ -641,21 +650,16 @@ textarea.input {
   width: 100%;
   min-height: 48px;
   padding: var(--sp-3) var(--sp-3);
-  border-radius: 0;
-  border: 0;
-  border-bottom: 1.5px solid var(--text);
-  background: color-mix(in srgb, var(--surface) 60%, transparent);
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--text);
+  background: var(--surface);
   font-size: 1rem; /* 16px+ stops iOS zooming into fields */
   transition: background-color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
 }
-.input:hover {
-  background: var(--surface);
-}
 .input:focus {
   outline: none;
-  background: var(--surface);
-  border-bottom-color: var(--accent-strong);
-  box-shadow: 0 2px 0 var(--accent-strong);
+  border-color: var(--accent-strong);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-strong) 35%, transparent);
 }
 .input::placeholder {
   color: var(--muted);
@@ -777,9 +781,50 @@ textarea.input {
   color: var(--muted);
   font-size: 0.95rem;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+/* a verse in a list: the reference, a quiet line of its text, one line of status, and the progress ring beside them */
+.card.tap.verse-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'head head'
+    'snippet snippet'
+    'foot ring';
+  align-items: center;
+  column-gap: var(--sp-4);
+  row-gap: var(--sp-1);
+}
+.verse-card-head {
+  grid-area: head;
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+.verse-card .verse-snippet {
+  grid-area: snippet;
+}
+.verse-card-ring {
+  grid-area: ring;
+  display: grid;
+  place-items: end;
+}
+.verse-card-foot {
+  grid-area: foot;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--sp-1) var(--sp-3);
+  margin-top: var(--sp-1);
+  font-size: 0.86rem;
+}
+.verse-version,
+.verse-topic {
+  color: var(--muted);
+  font-size: 0.8rem;
 }
 .status-ready {
   color: var(--good);
@@ -1649,7 +1694,7 @@ button.streak:active {
   padding: 8px 14px;
   text-align: left;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
+  border: 1.5px solid var(--text);
   background: var(--surface);
   position: relative;
 }
@@ -1890,30 +1935,31 @@ button.streak:active {
   position: relative;
   display: inline-grid;
   place-items: center;
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   flex: none;
   color: var(--pile, var(--accent));
+  opacity: 0.7;
 }
 .pring svg {
   grid-area: 1 / 1;
 }
 .pring b {
   grid-area: 1 / 1;
-  font-size: 0.66rem;
-  font-weight: 700;
-  color: var(--text);
+  font-size: 0.58rem;
+  font-weight: 500;
+  color: var(--muted, var(--text));
   font-variant-numeric: tabular-nums;
 }
 .pring-track {
   fill: none;
-  stroke: var(--surface-2);
-  stroke-width: 4;
+  stroke: var(--rule, var(--surface-2));
+  stroke-width: 2.5;
 }
 .pring-arc {
   fill: none;
   stroke: currentColor;
-  stroke-width: 4;
+  stroke-width: 2.5;
   stroke-linecap: round;
   transition: stroke-dasharray 0.4s ease;
 }
@@ -2201,8 +2247,8 @@ button.streak:active {
 /* the four piles are one ruled strip: a count over its name, the ones with something ready in the accent */
 .pile-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  border-block: var(--rule);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 2px solid var(--text); /* whole-pixel ink lines: crisp at every screen density */
 }
 .pile-link {
   position: relative;
@@ -2210,10 +2256,10 @@ button.streak:active {
   justify-items: start;
   align-content: center;
   gap: 0;
-  min-height: 64px;
-  padding: var(--sp-3) var(--sp-3);
+  min-height: 72px;
+  padding: var(--sp-3);
   border: 0;
-  border-left: var(--rule);
+  border-left: 2px solid var(--text);
   background: none;
   color: var(--muted);
   font-size: 0.7rem;
@@ -2225,22 +2271,17 @@ button.streak:active {
 }
 .pile-link:first-child {
   border-left: 0;
-  padding-left: 0;
 }
 .pile-link i {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: -1px;
-  height: 3px;
+  bottom: 0;
+  height: 4px;
   background: var(--pile);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform var(--t-med) var(--ease);
-}
-.pile-link:first-child i {
-  right: auto;
-  width: 100%;
 }
 .pile-link:active {
   background: var(--surface-2);
@@ -2263,7 +2304,6 @@ button.streak:active {
 }
 .today-card {
   padding: var(--sp-5) 0 0;
-  border-top: var(--rule-strong);
 }
 .today-card.stack > * + * {
   margin-top: var(--sp-5);

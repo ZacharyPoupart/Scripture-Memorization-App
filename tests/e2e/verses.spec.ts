@@ -26,7 +26,7 @@ test.describe('adding, editing and organizing verses', () => {
     await expect(page).toHaveURL(/#\/pile\/daily/);
     const card = page.getByTestId('verse-card');
     await expect(card).toContainText('John 3:16');
-    await expect(card).toContainText('Daily');
+    await expect(page.getByRole('heading', { name: 'Daily' })).toBeVisible(); // the pile is named once, by the page; the card no longer repeats it
     await expect(card).toContainText('#Gospel');
     await expect(card.getByTestId('status')).toContainText('Ready');
   });

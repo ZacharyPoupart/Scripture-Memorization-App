@@ -308,7 +308,7 @@ function syncBrowserColor() {
 
 // ---------------------------------------------------------------- friends and guilds
 
-const PUSH_EVERY = 30 * 60_000; // an unchanged-or-changed profile is sent at most this often (the server's free storage allows few writes)
+const PUSH_EVERY = 10 * 60_000; // an unchanged-or-changed profile is sent at most this often (the server's free storage allows few writes)
 let lastPush = { at: 0, snap: null as Snapshot | null, name: '' };
 let pushTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -340,7 +340,14 @@ export async function pushProfile(force = false): Promise<void> {
   const now = Date.now();
   const snap = socialSnapshot(state.data, now);
   const unchanged = sameSnapshot(lastPush.snap, snap) && lastPush.name === name;
-  if (!force && (unchanged || now - lastPush.at < PUSH_EVERY)) return;
+  if (!force && unchanged) return;
+  const wait = PUSH_EVERY - (now - lastPush.at);
+  if (!force && wait > 0) {
+    // changed but sent recently: send it when the wait is over, so friends never see stale numbers for long
+    clearTimeout(pushTimer);
+    pushTimer = setTimeout(() => void pushProfile(), wait + 1000);
+    return;
+  }
   try {
     await api.profile(auth, name, snap);
     lastPush = { at: now, snap, name };
@@ -781,6 +788,9 @@ export async function init(): Promise<void> {
       refresh();
       void syncNow();
       void pushProfile();
+    } else {
+      // leaving the app: timers stop on a phone, so send any new numbers now (at most once a minute)
+      if (Date.now() - lastPush.at > 60_000) void pushProfile(true);
     }
   });
   setInterval(refresh, 30_000);

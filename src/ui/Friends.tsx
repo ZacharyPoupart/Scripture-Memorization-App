@@ -444,7 +444,16 @@ export function Friends({ joinCode = '', guildCode = '' }: { joinCode?: string; 
 
   // load friends and guilds when the page opens
   useEffect(() => {
-    if (on) void refreshSocial();
+    if (!on) return;
+    void refreshSocial();
+    // keep friends' numbers fresh while this page is open and when coming back to it
+    const timer = setInterval(() => document.visibilityState === 'visible' && void refreshSocial(), 60_000);
+    const onVisible = () => document.visibilityState === 'visible' && void refreshSocial();
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
   }, [on]);
 
   const clearLink = () => navigate('/friends', true);

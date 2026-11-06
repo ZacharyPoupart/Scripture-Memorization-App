@@ -186,7 +186,11 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
     const previous = lastOne;
     lastOne = null;
     letGo(previous);
-    closing.then(() => setTimeout(() => open(6), previous ? 250 : 0));
+    if (!previous || (previous as any).__ended) {
+      // the phone only gives the microphone to a start made inside the tap itself; starting a moment later (after a promise or
+      // a timer) can open the microphone indicator and then hear nothing. When nothing is still closing, start right now.
+      open(6);
+    } else closing.then(() => setTimeout(() => open(6), 250));
     // if the microphone never starts, say so instead of waiting in silence
     clearTimeout(watchdog.current);
     watchdog.current = setTimeout(() => !heardSomething.current && fail('The microphone did not start. Check that it is allowed for this app, then tap Start speaking to try again.'), 12000);
