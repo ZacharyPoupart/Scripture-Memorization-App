@@ -5,6 +5,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.74.3] - 2026-11-13
+
+### Changed
+- Every button, link, chip and switch is now at least 44 by 44 px to tap: the small buttons (Look up text, Reset my armor), the practice-order and armor-slot chips, the on/off switches, the coin balance and the Open link on Piles. They look the same, only taller where they were short.
+
 ## [1.74.2] - 2026-11-06
 
 ### Fixed

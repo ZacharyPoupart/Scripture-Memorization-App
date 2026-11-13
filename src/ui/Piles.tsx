@@ -42,7 +42,7 @@ export function PilesOverview() {
               <h2>
                 {PILE_INFO[p].label} <span class="muted">({vs.length})</span>
               </h2>
-              <a class="small" href={`#/pile/${p}`}>
+              <a class="small tap-link" href={`#/pile/${p}`}>
                 Open
               </a>
             </div>

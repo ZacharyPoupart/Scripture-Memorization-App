@@ -758,3 +758,6 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 ## Daily count and per-review coins (owner-requested)
 - Today's list shows n/3 for every Daily verse (also while waiting), and the result card says "n of 3 today".
 - Coins count after every review again (the multi-verse run had been summary-only). The card holds 2.4 s (5.2 s with a multiplier) so the reels finish; a tap moves on. Test change: motivation.spec summary timeout 5 s to 9 s; pile-session.spec now expects the per-review coins.
+
+## Tap targets (owner-requested, UI rules)
+- Every control is at least 44x44 (measured at iPhone width on Today, Piles, Add, Progress, Friends, Settings, Avatar). `.btn.small` 38 to 44, `.chip-btn` and `.seeds-chip` min 44, the switch button is 52x44 with its track drawn by `::before`, and the Piles "Open" link is `.tap-link`. No test change.

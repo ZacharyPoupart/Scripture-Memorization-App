@@ -524,7 +524,7 @@ button,
   width: 100%;
 }
 .btn.small {
-  min-height: 38px;
+  min-height: 44px;
   padding: 0 var(--sp-3);
   font-size: 0.88rem;
 }
@@ -1638,15 +1638,25 @@ button.streak:active {
 .switch {
   flex: none;
   width: 52px;
-  height: 28px;
-  border-radius: 0;
+  height: 44px; /* the whole touch target; the track itself is drawn smaller by ::before */
+  border: 0;
+  background: transparent;
+  padding: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.switch::before {
+  content: '';
+  position: absolute;
+  inset: 8px 0;
   border: 1.5px solid var(--text);
   background: transparent;
-  padding: 2px;
-  position: relative;
-  transition: background-color var(--t-fast) var(--ease);
+  transition: background-color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
 }
 .switch > i {
+  position: relative;
+  margin-left: 3.5px;
   display: block;
   width: 18px;
   height: 20px;
@@ -1657,7 +1667,7 @@ button.streak:active {
 .switch:active > i {
   width: 24px;
 }
-.switch[aria-checked='true'] {
+.switch[aria-checked='true']::before {
   background: var(--accent);
   border-color: var(--accent);
 }
@@ -2112,6 +2122,9 @@ button.streak:active {
   border-radius: 0;
 }
 .seeds-chip {
+  min-height: 44px;
+  min-width: 44px;
+  justify-content: center;
   font-weight: 700;
   white-space: nowrap;
 }
@@ -2146,6 +2159,9 @@ button.streak:active {
 }
 .chip-btn {
   flex: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   border: var(--rule);
   background: transparent;
   color: var(--text);
@@ -3283,4 +3299,13 @@ button.chip {
 .w-spacer {
   display: block;
   width: 4rem;
+}
+
+/* a plain text link that is still a full-size touch target */
+.tap-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 44px;
+  min-height: 44px;
 }
