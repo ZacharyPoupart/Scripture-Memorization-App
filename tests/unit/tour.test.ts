@@ -61,7 +61,7 @@ describe('the step engine', () => {
     expect(lessonStart(-3)).toEqual(START);
     expect(needsAction({ id: 'x', title: 'x', body: 'x', advance: { kind: 'click' }, target: 't' })).toBe(true);
     expect(needsAction({ id: 'x', title: 'x', body: 'x' })).toBe(false);
-    expect(doneLessons(['review', 'nope', 'basics'])).toEqual(['basics', 'review']);
+    expect(doneLessons(['practice', 'nope', 'review', 'basics'])).toEqual(['basics', 'practice']); // 'review' was a lesson before v1.76.0: ignored
   });
 });
 

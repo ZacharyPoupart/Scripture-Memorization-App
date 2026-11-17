@@ -64,7 +64,7 @@ export function Home() {
             </button>
             {!data.tourAt && !settings.tour.done.length && (
               <button class="btn ghost block" onClick={() => openTourMenu(true)} data-testid="empty-tour">
-                New here? Take the five-minute tour
+                New here? Take the two-minute tour
               </button>
             )}
           </EmptyState>
