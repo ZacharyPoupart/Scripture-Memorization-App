@@ -3309,3 +3309,204 @@ button.chip {
   min-width: 44px;
   min-height: 44px;
 }
+
+/* ================= cozy pass (v1.75.0, owner-requested): the knight companion and small rewarding motion ================= */
+:root {
+  --radius: 12px;
+  --radius-sm: 8px;
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* a little overshoot: things land, they do not just stop */
+}
+
+/* ---- the knight says ---- */
+.knight-says {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--sp-3);
+  text-align: left;
+}
+.knight-tap {
+  background: none;
+  border: 0;
+  padding: 0;
+  border-radius: var(--radius);
+  min-width: 44px;
+  min-height: 44px;
+}
+.knight-portrait {
+  display: block;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 2px solid var(--text);
+  transform-origin: 50% 100%;
+  animation: knight-breathe 3.6s ease-in-out infinite;
+}
+.knight-portrait.cheer {
+  animation: knight-hop 0.9s var(--spring) 0.15s 2 both, knight-breathe 3.6s ease-in-out 2s infinite;
+}
+.knight-bubble {
+  position: relative;
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--surface);
+  border: 1.5px solid var(--text);
+  border-radius: var(--radius);
+  font-family: var(--serif, 'Fraunces', serif);
+  font-size: 1.02rem;
+  line-height: 1.4;
+  transform-origin: 0 60%;
+  animation: bubble-in 0.42s var(--spring) both;
+}
+.knight-bubble::before {
+  /* the little tail pointing at the knight */
+  content: '';
+  position: absolute;
+  left: -7px;
+  top: 50%;
+  width: 11px;
+  height: 11px;
+  margin-top: -6px;
+  background: var(--surface);
+  border-left: 1.5px solid var(--text);
+  border-bottom: 1.5px solid var(--text);
+  transform: rotate(45deg);
+}
+.result-card .knight-says,
+.alldone ~ .knight-says,
+.verse-area.center > .knight-says {
+  max-width: 340px;
+  margin: var(--sp-4) auto 0;
+}
+@keyframes knight-breathe {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(1.035); }
+}
+@keyframes knight-hop {
+  0% { transform: translateY(0) scale(1, 1); }
+  20% { transform: translateY(0) scale(1.08, 0.9); }
+  50% { transform: translateY(-12px) scale(0.96, 1.06); }
+  80% { transform: translateY(0) scale(1.06, 0.94); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+@keyframes bubble-in {
+  from { opacity: 0; transform: scale(0.82) translateX(-6px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ---- a counted review lands ---- */
+.result-card {
+  animation: card-land 0.4s var(--spring) both;
+}
+.result-check {
+  position: relative;
+}
+.result-check .checkmark {
+  animation: check-pop 0.5s var(--spring) both;
+}
+.sparkles {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+}
+.sparkles i {
+  position: absolute;
+  width: 6px;
+  height: 6px; /* square, like the knight's pixels */
+  margin: -3px;
+  opacity: 0;
+  animation: sparkle 0.7s ease-out 0.12s both;
+}
+@keyframes card-land {
+  from { opacity: 0; transform: translateY(10px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes check-pop {
+  0% { transform: scale(0.4); }
+  100% { transform: scale(1); }
+}
+@keyframes sparkle {
+  0% { opacity: 0; transform: rotate(var(--a)) translateY(-14px) scale(0.4); }
+  25% { opacity: 1; }
+  100% { opacity: 0; transform: rotate(var(--a)) translateY(calc(var(--d) * -1)) scale(1.15); }
+}
+
+/* ---- small touches everywhere ---- */
+.btn:active {
+  transform: scale(0.97);
+}
+.today-list li {
+  animation: row-in 0.36s var(--ease) both;
+}
+.today-list li:nth-child(2) { animation-delay: 0.04s; }
+.today-list li:nth-child(3) { animation-delay: 0.08s; }
+.today-list li:nth-child(4) { animation-delay: 0.12s; }
+.today-list li:nth-child(5) { animation-delay: 0.16s; }
+.today-list li:nth-child(n + 6) { animation-delay: 0.2s; }
+@keyframes row-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+.today-count.done {
+  animation: check-pop 0.5s var(--spring) both;
+}
+.streak svg {
+  transform-origin: 50% 90%;
+  animation: flame 2.4s ease-in-out infinite;
+}
+@keyframes flame {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  30% { transform: scale(1.08, 1.12) rotate(-3deg); }
+  60% { transform: scale(0.97, 1.04) rotate(2deg); }
+}
+.result-card .bar > i {
+  transform-origin: 0 50%;
+  animation: bar-grow 0.9s var(--ease) 0.25s both;
+}
+@keyframes bar-grow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+.alldone h1 {
+  animation: card-land 0.5s var(--spring) 0.15s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .knight-portrait,
+  .knight-portrait.cheer,
+  .knight-bubble,
+  .result-card,
+  .result-check .checkmark,
+  .today-list li,
+  .today-count.done,
+  .streak svg,
+  .result-card .bar > i,
+  .alldone h1 {
+    animation: none;
+  }
+  .sparkles {
+    display: none;
+  }
+}
+
+/* soft corners on the big surfaces too, so the whole app feels of a piece */
+.modal,
+.sheet {
+  border-radius: var(--radius);
+  animation: card-land 0.34s var(--spring) both;
+}
+.pile-row {
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.milestone-flame {
+  animation: check-pop 0.6s var(--spring) 0.1s both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .modal,
+  .sheet,
+  .milestone-flame {
+    animation: none;
+  }
+}

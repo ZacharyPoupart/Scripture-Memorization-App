@@ -185,6 +185,17 @@ export function Confetti({ count = 46 }: { count?: number }) {
   );
 }
 
+/** A ring of small square sparkles that bursts outward once (behind the check mark after a counted review). */
+export function Sparkles({ count = 10 }: { count?: number }) {
+  return (
+    <span class="sparkles" aria-hidden="true">
+      {Array.from({ length: count }, (_, i) => (
+        <i key={i} style={{ '--a': `${(360 / count) * i}deg`, '--d': `${38 + (i % 3) * 10}px`, background: CONFETTI_COLORS[i % CONFETTI_COLORS.length], animationDelay: `${(i % 4) * 0.03}s` }} />
+      ))}
+    </span>
+  );
+}
+
 // ---------------------------------------------------------------- verse status wording
 
 export function statusLabel(s: VerseStatus): { text: string; cls: string } {

@@ -1,12 +1,12 @@
 import { armorWorn, sceneUrl, type Look } from '../core/avatar.ts';
 import { bannerFromFlag } from '../core/banner.ts';
-import { ArmorLayers } from './ArmorArt.tsx';
+import { ArmorLayers, PIXEL } from './ArmorArt.tsx';
 import { FlagStand } from './Banner.tsx';
 
 /** The painted background behind the knight. */
 function Background({ scene }: { scene: string }) {
   const url = sceneUrl(scene);
-  return url ? <image href={url} x="0" y="0" width="120" height="120" preserveAspectRatio="xMidYMid slice" /> : <rect width="120" height="120" fill="#cfe6ea" />;
+  return url ? <image href={url} x="0" y="0" width="120" height="120" preserveAspectRatio="xMidYMid slice" style={PIXEL} /> : <rect width="120" height="120" fill="#cfe6ea" />;
 }
 
 /**

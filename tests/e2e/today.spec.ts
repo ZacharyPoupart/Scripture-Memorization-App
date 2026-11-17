@@ -89,7 +89,7 @@ test('with no connection, Today says so calmly and everything keeps working', as
   await expect(page.getByTestId('offline-note')).toHaveCount(0);
 });
 
-test('Today is just the verses: no date, greeting, ring or pile cards; the four piles are one quiet row', async ({ page }) => {
+test('Today is the verses and the knight’s one line: no date, ring or pile cards; the four piles are one quiet row', async ({ page }) => {
   await blockLookups(page);
   await openApp(page);
   await addVerse(page, JOHN316);
@@ -98,8 +98,8 @@ test('Today is just the verses: no date, greeting, ring or pile cards; the four 
   const row = (await page.getByTestId('pile-row').boundingBox())!;
   const card = (await page.getByTestId('today-title').boundingBox())!;
   expect(row.y + row.height).toBeLessThan(card.y); // the pile counts sit at the top, above the day's card
-  await expect(page.getByRole('heading', { level: 1 })).toHaveCount(0); // no greeting
-  await expect(page.locator('main')).not.toContainText(/Good (morning|afternoon|evening)|Still up/);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveCount(0); // no big greeting heading
+  await expect(page.getByTestId('knight-says-line')).toHaveText(/\w{3,}/); // the knight says one warm line (v1.75.0)
   await expect(page.locator('main')).not.toContainText(new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' }));
   await expect(page.locator('.ring')).toHaveCount(0);
   for (const p of ['daily', 'weekly', 'monthly', 'yearly']) await expect(page.getByTestId(`pile-${p}`)).toBeVisible();

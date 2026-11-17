@@ -4,13 +4,16 @@ import { primeKeyboard, releaseKeyboard } from './keyboard.ts';
 import { formatRef } from '../core/reference.ts';
 import { easierPile, movePile, moveDownDaysIn, nextPile, pileVerses, restorePile, streakInfo, todaySummary, verseStatus, DAILY_REVIEWS } from '../core/schedule.ts';
 import { doneLine } from '../core/milestones.ts';
+import { reviewLine, summaryLine } from '../core/voice.ts';
+import { currentLook } from '../core/avatar.ts';
+import { KnightSays } from './KnightSays.tsx';
 import { feedback } from '../services/feedback.ts';
 import { cueFor, planFor } from '../core/practice.ts';
 import { tooManyMistakes } from '../core/quiz.ts';
 import { PILES, type AppData, type LevelUp, type Pile, type ReviewMode, type Verse } from '../core/types.ts';
 import { back, navigate, type Route } from '../router.ts';
 import { act, completeReview, showToast, updateSettings, useApp } from '../store.ts';
-import { CheckMark, Confetti, Icon, PileBadge, PILE_INFO, pileProgress, progressUnitPlural } from './common.tsx';
+import { CheckMark, Confetti, Icon, PileBadge, PILE_INFO, pileProgress, progressUnitPlural, Sparkles } from './common.tsx';
 import { MODES } from './ModePicker.tsx';
 import { Overlay } from './common.tsx';
 import { CoinCount } from './CoinCount.tsx';
@@ -256,6 +259,9 @@ export function Review({ route }: { route: Route }) {
             {ended ? tally.counted + tally.practice : queue.length} verse{(ended ? tally.counted + tally.practice : queue.length) === 1 ? '' : 's'} reviewed · {tally.counted} counted
             {tally.practice > 0 ? ` · ${tally.practice} extra practice` : ''}
           </p>
+          {settings.avatarOn && (
+            <KnightSays look={currentLook(data)} line={summaryLine({ reviewed: tally.counted + tally.practice, fullyDone, streak: streak.count })} mood="cheer" testid="knight-summary" />
+          )}
           {tally.seeds > 0 && settings.avatarOn && (
             <CoinCount base={tally.base} total={tally.seeds} multiplier={tally.multiplier} testid="session-seeds" />
           )}
@@ -299,13 +305,18 @@ export function Review({ route }: { route: Route }) {
       {result ? (
         <div class="verse-area" onClick={next} data-testid="verse-result">
           <div class="result-card">
-            <div class="result-check">{result.counted ? <CheckMark size={64} /> : <div class="big">＋</div>}</div>
+            <div class="result-check">{result.counted ? <><Sparkles /><CheckMark size={64} /></> : <div class="big">＋</div>}</div>
             <h2 class="headline">{formatRef(verse)}</h2>
-            <p class="muted">{result.counted ? `Review counted. ${doneLine(tally.counted)}` : 'Extra practice.'}</p>
+            <p class="muted">{result.counted ? 'Review counted.' : 'Extra practice.'}</p>
             {verse.pile === 'daily' && (
               <p class="muted small" data-testid="daily-count">
                 {Math.min(verseStatus(data, verse, Date.now()).countedToday, DAILY_REVIEWS)} of {DAILY_REVIEWS} today
               </p>
+            )}
+            {settings.avatarOn ? (
+              <KnightSays look={currentLook(data)} size={48} line={reviewLine({ counted: result.counted, levelUp: result.levelUps.length > 0, todayComplete: result.todayComplete, n: tally.counted + tally.practice })} mood="cheer" testid="knight-result" />
+            ) : (
+              result.counted && <p class="muted">{doneLine(tally.counted)}</p>
             )}
             <ResultProgress verse={verse} data={data} />
             {result.levelUps.length > 0 && <p>Level up! Now in {PILE_INFO[result.levelUps[result.levelUps.length - 1].to].label}.</p>}

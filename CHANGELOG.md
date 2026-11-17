@@ -5,6 +5,15 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Added
+- Your knight is now pixel art: every piece of armor and all fifteen backgrounds were redrawn as crisp pixel art (four times the detail of a first try), and everything you own or wear stays exactly as it was.
+- Your knight talks to you. On Today he greets you with one warm line that fits the moment (the time of day, how much is ready, your streak, a break), after each review he says a word of encouragement, and at the end of a session he sums it up. Tap him to open your avatar. Never guilt, never hurry.
+- Small rewarding motion: the check mark pops with a burst of sparkles when a review counts, the result card lands with a little bounce, the progress bar fills, the knight hops when you finish, Today's verses slide in, the streak flame flickers, and buttons press in. Reduced motion keeps everything still.
+
+### Changed
+- Softer, cozier shapes: rounded corners on buttons, cards, pop-ups and the pile row.
+- Today's top corner shows your coins and streak; the knight's picture moved into his speech bubble row.
+
 ## [1.74.3] - 2026-11-13
 
 ### Changed

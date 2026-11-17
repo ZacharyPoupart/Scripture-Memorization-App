@@ -761,3 +761,9 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 
 ## Tap targets (owner-requested, UI rules)
 - Every control is at least 44x44 (measured at iPhone width on Today, Piles, Add, Progress, Friends, Settings, Avatar). `.btn.small` 38 to 44, `.chip-btn` and `.seeds-chip` min 44, the switch button is 52x44 with its track drawn by `::before`, and the Piles "Open" link is `.tap-link`. No test change.
+
+## Pixel knight and the cozy pass (v1.75.0, owner-requested: "cozy, motivational, human dialogue, dopamine animations, knights in pixel art, take full control")
+- Pixel art is made from the painted originals by `design/pixel/pixelate.py` (originals kept in `design/pixel/painted/`); armor files are written at twice the size with 1.5-painted-pixel blocks on one shared grid, 22 colours a piece, dark outline; scenes use 2 px blocks and 44 colours. Placement json is untouched, so nothing about the look data changes. To go back to the painted knight: copy `design/pixel/painted/*` over `public/` and drop `image-rendering: pixelated`.
+- The knight's lines live in `core/voice.ts` (pure, deterministic, unit-tested against the guilt list). This reverses "Today has no greeting" (v1.46.0) at the owner's request; the heading-free layout stays.
+- Corners went from 4/2 px to 12/8 px and motion uses a small overshoot (`--spring`). This reverses "square corners" from the editorial restyle; colours, type and the no-gradient/no-shadow rules are unchanged.
+- Test change: today.spec "no greeting" now expects the knight's line; the top-right bubble no longer holds a portrait.

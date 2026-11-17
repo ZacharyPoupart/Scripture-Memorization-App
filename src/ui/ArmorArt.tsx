@@ -10,6 +10,8 @@ const SIZE = sizes as unknown as Record<string, [number, number]>;
 type SlotLayout = { prefix: string; dir: string; w: number; h: number; x: number; y: number; rotate?: number; tilt?: number; pivot?: [number, number] };
 const SLOT_LAYOUT = layout.slots as unknown as Record<string, SlotLayout>;
 const BY_PREFIX = Object.fromEntries(Object.values(SLOT_LAYOUT).map((s) => [s.prefix, s]));
+/** The armor is pixel art (design/pixel): keep its blocks crisp at any size. */
+export const PIXEL = { imageRendering: 'pixelated' } as const;
 const U = 250 / layout.frame.height;
 const TOP = layout.frame.top; // the top of the helmet is y = 0, the soles of the boots are y = 250
 
@@ -33,7 +35,7 @@ function Slot({ slot, id }: { slot: keyof typeof SLOT_LAYOUT; id: string }) {
   const h = at.h * U;
   const turn = at.rotate ? `rotate(${at.rotate} ${x + w / 2} ${y + h / 2})` : '';
   const tilt = at.tilt && at.pivot ? `rotate(${at.tilt} ${at.pivot[0] * U} ${(at.pivot[1] - TOP) * U}) ` : ''; // around the hand
-  return <image href={url} x={x} y={y} width={w} height={h} transform={`${tilt}${turn}` || undefined} />;
+  return <image href={url} x={x} y={y} width={w} height={h} transform={`${tilt}${turn}` || undefined} style={PIXEL} />;
 }
 
 /** All the painted layers, back to front. */
