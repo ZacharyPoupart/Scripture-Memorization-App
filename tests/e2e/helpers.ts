@@ -167,6 +167,10 @@ export async function installFakeSpeech(page: Page, transcript: string) {
         }
         setTimeout(() => this.running && this.emit('start'), 10);
         setTimeout(() => this.running && this.emit('audiostart'), 20);
+        if (w.__speechMuteStarts > 0) {
+          w.__speechMuteStarts--; // what an iPhone did on a second verse: the microphone opens and then nothing is ever heard
+          return;
+        }
         setTimeout(() => {
           if (!this.running) return;
           const words = t.split(' ');

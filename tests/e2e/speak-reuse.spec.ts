@@ -78,3 +78,30 @@ test('Speak it recovers by itself when the phone starts a later listener without
   await expect(page.getByTestId('speak-result')).toContainText('Perfect');
   await expect(page.getByTestId('speak-nothing-heard')).toHaveCount(0);
 });
+
+test('Speak it recovers when the microphone opens but hears nothing, and offers a restart by tap while it waits', async ({ page }) => {
+  await autoDismissMilestones(page);
+  await blockLookups(page);
+  await installFakeSpeech(page, JOHN_TEXT.replace(/[,.;]/g, '').toLowerCase());
+  await openApp(page);
+  await addVerse(page, JOHN316);
+  await page.goto('/#/pile/daily');
+  await page.getByTestId('verse-card').first().click();
+  await page.getByTestId('review-speak').click();
+  // the microphone opens (start and audio events) and then nothing is heard, once: a fresh listener takes over by itself
+  await page.evaluate(() => ((window as any).__speechMuteStarts = 1));
+  await page.getByTestId('speak-start').click();
+  await expect(page.getByTestId('speak-text').locator('.w.ok').first()).toBeVisible({ timeout: 10000 });
+  await page.waitForTimeout(300);
+  await page.getByTestId('speak-done').click();
+  await expect(page.getByTestId('speak-result')).toContainText('Perfect');
+  // every listener is mute: after a while the screen offers a restart made by a tap, and that one works
+  await page.evaluate(() => ((window as any).__speechMuteStarts = 3));
+  await page.getByRole('button', { name: 'Try again' }).click();
+  await page.getByTestId('speak-start').click();
+  await expect(page.getByTestId('speak-quiet')).toBeVisible({ timeout: 12000 });
+  await page.evaluate(() => ((window as any).__speechMuteStarts = 0));
+  await page.getByTestId('speak-restart').click();
+  await expect(page.getByTestId('speak-text').locator('.w.ok').first()).toBeVisible({ timeout: 8000 });
+  await expect(page.getByTestId('speak-quiet')).toHaveCount(0);
+});

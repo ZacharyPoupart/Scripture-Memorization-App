@@ -17,6 +17,8 @@ interface RecognitionLike {
   abort(): void;
   onstart: (() => void) | null;
   onaudiostart: (() => void) | null;
+  onsoundstart?: (() => void) | null;
+  onspeechstart?: (() => void) | null;
   addEventListener?(type: string, fn: () => void): void;
   onresult: ((e: any) => void) | null;
   onerror: ((e: any) => void) | null;
@@ -38,7 +40,7 @@ function track(r: RecognitionLike) {
 
 function letGo(r: RecognitionLike | null) {
   if (!r) return;
-  r.onstart = r.onaudiostart = r.onresult = r.onerror = r.onend = null; // nothing it says from now on may reach a screen
+  r.onstart = r.onaudiostart = r.onsoundstart = r.onspeechstart = r.onresult = r.onerror = r.onend = null; // nothing it says from now on may reach a screen
   if (!(r as any).__ended) {
     const gone = new Promise<void>((resolve) => {
       const t = setTimeout(resolve, 1500);
@@ -70,6 +72,9 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
   const [finished, setFinished] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [quiet, setQuiet] = useState(false); // listening for a while with nothing heard: offer a restart made by a tap
+  const quietTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const reopen = useRef<() => void>(() => {});
   const rec = useRef<RecognitionLike | null>(null);
   const wantListening = useRef(false);
   const finals = useRef('');
@@ -85,6 +90,7 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
   useEffect(() => () => {
     wantListening.current = false;
     clearTimeout(watchdog.current);
+    clearTimeout(quietTimer.current);
     letGo(rec.current);
   }, []);
 
@@ -124,13 +130,15 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
       const w = window as any;
       const r: RecognitionLike = new (w.SpeechRecognition || w.webkitSpeechRecognition)();
       track(r);
-      let alive = false; // the phone has really started listening (or we heard something)
+      let alive = false; // this listener has really heard a sound or words
       let silent: ReturnType<typeof setTimeout> | undefined;
       r.continuous = true;
       r.interimResults = true;
       r.lang = 'en-US';
       r.onstart = () => clearTimeout(watchdog.current);
-      r.onaudiostart = () => {
+      // The microphone opening is not proof of hearing: an iPhone can show its microphone and still deliver nothing (the owner saw
+      // exactly that on a second verse). Only a sound, speech or words count as alive (v1.75.0).
+      r.onsoundstart = r.onspeechstart = () => {
         alive = true;
         clearTimeout(silent);
       };
@@ -139,6 +147,8 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
         clearTimeout(silent);
         heardSomething.current = true;
         clearTimeout(watchdog.current);
+        clearTimeout(quietTimer.current);
+        setQuiet(false);
         let interim = '';
         for (let i = e.resultIndex; i < e.results.length; i++) {
           const res = e.results[i];
@@ -180,7 +190,7 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
         letGo(r);
         lastOne = null;
         closing.then(() => setTimeout(() => open(tries, silentTries - 1), 200));
-      }, 3500);
+      }, 4000);
     };
     // let go of the previous listener first, and wait until the phone really has before starting the next
     const previous = lastOne;
@@ -191,6 +201,19 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
       // a timer) can open the microphone indicator and then hear nothing. When nothing is still closing, start right now.
       open(6);
     } else closing.then(() => setTimeout(() => open(6), 250));
+    // a restart made inside a tap, which a phone always honours: offered when nothing has been heard for a while
+    reopen.current = () => {
+      setQuiet(false);
+      clearTimeout(quietTimer.current);
+      quietTimer.current = setTimeout(() => wantListening.current && !heardSomething.current && setQuiet(true), 7000);
+      const cur = rec.current;
+      lastOne = null;
+      letGo(cur);
+      open(6);
+    };
+    setQuiet(false);
+    clearTimeout(quietTimer.current);
+    quietTimer.current = setTimeout(() => wantListening.current && !heardSomething.current && setQuiet(true), 7000);
     // if the microphone never starts, say so instead of waiting in silence
     clearTimeout(watchdog.current);
     watchdog.current = setTimeout(() => !heardSomething.current && fail('The microphone did not start. Check that it is allowed for this app, then tap Start speaking to try again.'), 12000);
@@ -199,7 +222,19 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
   const stop = () => {
     wantListening.current = false;
     clearTimeout(watchdog.current);
-    rec.current?.stop();
+    clearTimeout(quietTimer.current);
+    setQuiet(false);
+    const r = rec.current;
+    r?.stop();
+    // a phone can hang on to a stopped listener for seconds, and the next verse then hears nothing: make it let go for certain
+    setTimeout(() => {
+      if (r && !(r as any).__ended)
+        try {
+          r.abort();
+        } catch {
+          /* already gone */
+        }
+    }, 700);
     setListening(false);
     setFinished(true);
   };
@@ -264,6 +299,14 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
         {finished && transcript.trim() && !speechPassed(align) && (
           <div class="muted small center" data-testid="speak-heard">
             Heard: {transcript}
+          </div>
+        )}
+        {listening && quiet && !finished && (
+          <div class="banner info stack" data-testid="speak-quiet">
+            <span>I can’t hear you yet.</span>
+            <button class="btn small" onClick={() => reopen.current()} data-testid="speak-restart">
+              Restart the microphone
+            </button>
           </div>
         )}
         {error && <div class="banner bad" role="alert">{error}</div>}
