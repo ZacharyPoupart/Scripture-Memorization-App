@@ -9,7 +9,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ### Added
 - Your knight is now pixel art: every piece of armor and all fifteen backgrounds were redrawn as fine pixel art, and everything you own or wear stays exactly as it was.
-- Two games to play with your knight, from any verse's page. **Dragon Duel:** pick the next word of the verse to land each blow; a wrong word costs a heart. **Bridge of the Word:** lay the verse's phrases in order to walk your knight across. Both are little pixel scenes set in your knight's own background: he lunges and a slash lands, right words in a row build a combo, the dragon rears and breathes fire back, hearts break, planks drop into place or tumble into the gap, and the last blow plays out before the result. Both give up to three stars for a clean run. They are for practice and fun: no review is counted and no coins are paid.
+- **Play.** Real-time games are now a main part of the app: a Play tab, a Play panel at the top of Today, and "Play this verse" on every verse's page. Win a game and it counts as that verse's review, with the usual coins (Weekly, Monthly and Yearly verses need a clean run, as in every review type; a lost game saves nothing). After a win, "Next verse" takes you straight to the next one that is ready.
+  - **Arrow Volley:** goblin archers loose arrows that carry words across the screen. Tap the one with the next word of the verse to cut it down before it reaches your knight. Any other word, or letting the right one land, costs a heart. It speeds up as the verse goes on.
+  - **Dragon Duel:** strike with the next word before the dragon finishes drawing breath. Its fire bar fills as you think; too slow, or a wrong word, and it breathes fire.
+  - **Bridge Run:** your knight keeps walking. Lay each phrase of the verse in order before he reaches the edge, or he tumbles into the river.
+- Your knight moves: his sword swings, his shield and cape and legs move by themselves, so he walks, strikes, staggers, tips over an edge and raises his sword when he wins. The dragon flaps and rears, and the goblins bob and recoil as they shoot.
 - Small rewarding motion: the check mark pops with a burst of sparkles when a review counts, the result card lands with a little bounce, the progress bar fills, Today's verses slide in, the streak flame flickers, and buttons press in. Reduced motion keeps everything still.
 
 ### Changed

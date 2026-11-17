@@ -6,6 +6,7 @@ import { Icon } from './common.tsx';
 const TABS = [
   { path: '/', label: 'Today', icon: 'home' },
   { path: '/piles', label: 'Piles', icon: 'piles' },
+  { path: '/play', label: 'Play', icon: 'play' },
   { path: '/add', label: 'Add', icon: 'plus' },
   { path: '/friends', label: 'Friends', icon: 'friends' },
   { path: '/stats', label: 'Stats', icon: 'chart' },

@@ -110,7 +110,7 @@ export function VerseDetail({ id }: { id: string }) {
           </ul>
         </Section>
 
-        <Section title="Play with your knight">
+        <Section title="Play this verse">
           <ul class="rows">
             {GAMES.map((g) => (
               <li key={g.id}>

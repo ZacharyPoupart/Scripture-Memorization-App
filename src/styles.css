@@ -3436,8 +3436,7 @@ button.chip {
 .game .review-head .title {
   display: grid;
 }
-.duel-stage,
-.bridge-stage {
+.game-stage {
   position: relative;
   overflow: hidden;
   border: 2px solid var(--text);
@@ -3451,7 +3450,7 @@ button.chip {
 .duel-stage.hurt {
   animation: stage-shake 0.42s var(--ease) 0.34s;
 }
-.duel-ground {
+.game-ground {
   position: absolute;
   inset: auto 0 0 0;
   height: 26px;
@@ -3459,7 +3458,7 @@ button.chip {
   border-top: 2px solid var(--text);
   opacity: 0.86;
 }
-.duel-hud {
+.game-hud {
   position: absolute;
   inset: var(--sp-2) var(--sp-2) auto var(--sp-2);
   display: flex;
@@ -3468,7 +3467,7 @@ button.chip {
   gap: var(--sp-3);
   z-index: 3;
 }
-.duel-hearts {
+.game-hearts {
   display: flex;
   gap: 3px;
   padding: 3px 5px;
@@ -3476,11 +3475,39 @@ button.chip {
   border: 1.5px solid var(--text);
   border-radius: var(--radius-sm);
 }
-.duel-hearts .gone {
+.game-hearts .gone {
   animation: heart-break 0.5s var(--spring) 0.4s both;
 }
-.duel-hp {
+.duel-bars {
   width: 46%;
+  display: grid;
+  gap: 3px;
+}
+.duel-charge {
+  height: 8px;
+  border: 1.5px solid var(--text);
+  background: var(--surface);
+  border-radius: 4px;
+}
+.duel-charge > i {
+  background: #e2792f;
+  transition: none;
+}
+.duel-charge.hot {
+  animation: charge-hot 0.3s steps(2) infinite;
+}
+.duel-dragon.rearing {
+  animation: dragon-rear 0.3s ease-in-out infinite alternate;
+}
+@keyframes charge-hot {
+  50% { transform: scaleY(1.5); }
+}
+@keyframes dragon-rear {
+  from { transform: translateX(4px) rotate(3deg); }
+  to { transform: translateX(8px) rotate(7deg) scale(1.04); }
+}
+.duel-hp {
+  width: 100%;
   height: 12px;
   border: 1.5px solid var(--text);
   background: var(--surface);
@@ -3679,7 +3706,7 @@ button.chip {
 
 /* ---- the bridge ---- */
 .bridge-stage {
-  height: 176px;
+  height: 214px;
 }
 .bridge-cliff {
   position: absolute;
@@ -3736,10 +3763,45 @@ button.chip {
 .bridge-walker {
   position: absolute;
   bottom: 50px;
-  width: 96px;
-  margin-left: -36px;
-  transition: left 0.55s var(--ease);
+  width: 100px;
+  margin-left: -50px;
   z-index: 2;
+}
+.bridge-walker.danger {
+  animation: teeter 0.3s ease-in-out infinite alternate;
+  transform-origin: 50% 100%;
+}
+.bridge-walker.fell {
+  animation: tumble 0.85s ease-in both;
+}
+.bridge-stage.lost .bridge-walker {
+  animation: tumble-away 1s ease-in forwards;
+}
+.bridge-river {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 22px;
+  background: #2f5f7a;
+  border-top: 2px solid var(--text);
+  opacity: 0.9;
+}
+.bridge-planks i.wanted {
+  border-style: solid;
+  border-color: var(--bad);
+  animation: charge-hot 0.3s steps(2) infinite;
+}
+@keyframes teeter {
+  from { transform: rotate(-4deg); }
+  to { transform: rotate(9deg); }
+}
+@keyframes tumble {
+  0% { transform: translate(34px, 0) rotate(40deg); }
+  45% { transform: translate(44px, 70px) rotate(150deg); opacity: 0.6; }
+  46% { transform: translate(0, -60px) rotate(0deg); opacity: 0; }
+  100% { transform: none; opacity: 1; }
+}
+@keyframes tumble-away {
+  to { transform: translate(40px, 110px) rotate(170deg); opacity: 0; }
 }
 .bridge-walker.wobble {
   animation: wobble 0.5s var(--ease);
@@ -3794,14 +3856,291 @@ button.chip {
   animation: check-pop 0.5s var(--spring) both;
 }
 @media (prefers-reduced-motion: reduce) {
+  /* the games still run (things have to move to be played), but nothing shakes, flashes or bounces for decoration */
   .game *,
-  .game *::before {
+  .game *::before,
+  .hub-stage *,
+  .play-card * {
     animation: none !important;
-    transition: none !important;
   }
   .duel-fx,
   .duel-flame,
-  .bridge-drop {
+  .bridge-drop,
+  .volley-fx {
     display: none;
   }
+}
+
+/* ================= the knight's rig (v1.75.0): each painted piece moves by itself in the games ================= */
+.knight-rig .rig {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+.knight-rig .rig-cape { transform-origin: 50% 0%; }
+.knight-rig .rig-legs { transform-origin: 50% 0%; }
+.knight-rig .rig-sword { transform-origin: 50% 78%; }
+.knight-rig .rig-shield { transform-origin: 80% 40%; }
+.knight-rig .rig-helmet { transform-origin: 50% 100%; }
+
+/* idle: he breathes, the cape drifts, the sword tip wavers */
+.pose-idle .rig-chest, .pose-idle .rig-belt, .pose-idle .rig-shield { animation: rig-breathe 2.4s ease-in-out infinite; }
+.pose-idle .rig-helmet { animation: rig-nod 2.4s ease-in-out infinite; }
+.pose-idle .rig-cape { animation: rig-cape 3.2s ease-in-out infinite; }
+.pose-idle .rig-sword { animation: rig-sword-idle 2.4s ease-in-out infinite; }
+
+/* walk: legs step, the body bobs, the cape streams */
+.pose-walk .rig-legs { animation: rig-step 0.44s steps(1, end) infinite; }
+.pose-walk .rig-chest, .pose-walk .rig-belt, .pose-walk .rig-helmet, .pose-walk .rig-shield, .pose-walk .rig-sword { animation: rig-bob 0.22s ease-in-out infinite alternate; }
+.pose-walk .rig-cape { animation: rig-cape-run 0.44s ease-in-out infinite alternate; }
+
+/* attack: wind up, cut down, recover */
+.pose-attack .rig-sword { animation: rig-swing 0.38s cubic-bezier(0.3, 0, 0.2, 1) both; }
+.pose-attack .rig-chest, .pose-attack .rig-helmet, .pose-attack .rig-belt { animation: rig-lean 0.38s ease-out both; }
+.pose-attack .rig-cape { animation: rig-cape-run 0.19s ease-in-out 2 alternate; }
+
+/* block: the shield comes up and across */
+.pose-block .rig-shield { animation: rig-block 0.42s cubic-bezier(0.3, 0, 0.2, 1) both; }
+.pose-block .rig-chest, .pose-block .rig-helmet { animation: rig-brace 0.42s ease-out both; }
+
+/* hurt: knocked back, everything rattles */
+.pose-hurt .rig { animation: rig-rattle 0.4s ease-out both; }
+.pose-hurt .rig-helmet { animation: rig-rattle 0.4s ease-out 0.04s both reverse; }
+
+/* cheer: sword held high, a little bounce in the knees */
+.pose-cheer .rig-sword { animation: rig-raise 0.9s ease-in-out infinite alternate; }
+.pose-cheer .rig-legs { animation: rig-knees 0.45s ease-in-out infinite alternate; }
+.pose-cheer .rig-chest, .pose-cheer .rig-helmet, .pose-cheer .rig-belt, .pose-cheer .rig-shield { animation: rig-bob 0.45s ease-in-out infinite alternate; }
+.pose-cheer .rig-cape { animation: rig-cape 1.2s ease-in-out infinite; }
+
+/* fall: arms out, tipping */
+.pose-fall .rig-sword { animation: rig-flail 0.3s ease-in-out infinite alternate; }
+.pose-fall .rig-shield { animation: rig-flail 0.3s ease-in-out infinite alternate-reverse; }
+.pose-fall .rig-cape { animation: rig-cape-run 0.2s ease-in-out infinite alternate; }
+
+@keyframes rig-breathe { 50% { transform: translateY(-1.5px); } }
+@keyframes rig-nod { 50% { transform: translateY(-2.5px) rotate(-1deg); } }
+@keyframes rig-cape { 0%, 100% { transform: skewX(-2deg) scaleX(1); } 50% { transform: skewX(3deg) scaleX(1.04); } }
+@keyframes rig-sword-idle { 50% { transform: rotate(3deg) translateY(-1px); } }
+@keyframes rig-step { 0% { transform: skewX(7deg) scaleY(0.97); } 50% { transform: skewX(-7deg) scaleY(0.97); } }
+@keyframes rig-bob { to { transform: translateY(-4px); } }
+@keyframes rig-cape-run { from { transform: skewX(4deg) scaleX(1.04); } to { transform: skewX(10deg) scaleX(1.12); } }
+@keyframes rig-swing {
+  0% { transform: rotate(0deg); }
+  28% { transform: rotate(-48deg) translateY(-6px); }
+  62% { transform: rotate(96deg) translate(10px, 6px); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes rig-lean { 30% { transform: rotate(-3deg); } 62% { transform: translate(7px, 3px) rotate(5deg); } }
+@keyframes rig-block {
+  0% { transform: none; }
+  35%, 70% { transform: translate(62px, -22px) scale(1.14) rotate(8deg); }
+  100% { transform: none; }
+}
+@keyframes rig-brace { 35%, 70% { transform: translate(-3px, 3px); } }
+@keyframes rig-rattle {
+  15% { transform: translate(-9px, -3px) rotate(-5deg); }
+  45% { transform: translate(5px, 2px) rotate(3deg); }
+  75% { transform: translate(-3px, 0) rotate(-1deg); }
+}
+@keyframes rig-raise { from { transform: rotate(-16deg) translateY(-18px); } to { transform: rotate(8deg) translateY(-26px); } }
+@keyframes rig-knees { to { transform: scaleY(0.94); } }
+@keyframes rig-flail { from { transform: rotate(-30deg); } to { transform: rotate(34deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .knight-rig .rig { animation: none !important; }
+}
+
+/* ---- shared by every game ---- */
+.game-combo {
+  font-family: 'Fraunces', serif;
+  font-size: 1.4rem;
+  color: #f4efe2;
+  -webkit-text-stroke: 4px #221e26;
+  paint-order: stroke fill;
+  animation: check-pop 0.3s var(--spring) both;
+}
+.sprite-flap {
+  position: relative;
+  display: block;
+}
+.sprite-flap > span {
+  position: absolute;
+  inset: 0;
+}
+.sprite-flap .frame-a {
+  animation: frame-a 0.56s steps(1) infinite;
+}
+.sprite-flap .frame-b {
+  animation: frame-b 0.56s steps(1) infinite;
+}
+@keyframes frame-a { 50% { opacity: 0; } }
+@keyframes frame-b { 0% { opacity: 0; } 50% { opacity: 1; } }
+
+/* ---- Arrow Volley ---- */
+.volley-stage {
+  height: 290px;
+  touch-action: manipulation;
+}
+.volley-stage[data-shake] {
+  animation: stage-shake 0.4s var(--ease);
+}
+.volley-knight {
+  position: absolute;
+  left: -2px;
+  bottom: 14px;
+  z-index: 1;
+}
+.volley-knight.hurt {
+  animation: burned 0.5s var(--ease);
+}
+.volley-stage.lost .volley-knight {
+  animation: knight-kneel 0.6s var(--ease) 0.3s forwards;
+}
+.volley-archer {
+  position: absolute;
+  right: 4px;
+  margin-top: -22px;
+  animation: archer-bob 1.1s ease-in-out infinite alternate;
+}
+.volley-archer:nth-child(odd) {
+  animation-delay: -0.5s;
+}
+.volley-archer .loose {
+  display: block;
+  animation: archer-loose 0.34s var(--ease);
+}
+.volley-archer.flee {
+  animation: archer-flee 0.9s ease-in forwards;
+}
+.shot {
+  position: absolute;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 12px 0 6px;
+  margin: -22px 0 0 -30px;
+  border: 2px solid var(--text);
+  border-radius: 22px;
+  background: var(--surface);
+  color: var(--text);
+  font-family: 'Fraunces', serif;
+  font-size: 1.08rem;
+  font-weight: 600;
+  white-space: nowrap;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.shot:active {
+  background: var(--text);
+  color: var(--bg);
+}
+.volley-fx {
+  position: absolute;
+  z-index: 4;
+  margin: -18px 0 0 -18px;
+  pointer-events: none;
+  animation: spark 0.5s var(--ease) both;
+}
+.volley-fx.wrong,
+.volley-fx.struck {
+  filter: hue-rotate(-40deg) saturate(3);
+}
+@keyframes archer-bob { to { transform: translateY(-4px); } }
+@keyframes archer-loose { 30% { transform: translateX(7px) rotate(8deg); } }
+@keyframes archer-flee { to { transform: translateX(90px) rotate(20deg); opacity: 0; } }
+
+/* ---- the games' home, and the way in from Today ---- */
+.hub-stage {
+  height: 150px;
+}
+.hub-knight {
+  position: absolute;
+  left: 4%;
+  bottom: 10px;
+  animation: hub-march 7s linear infinite;
+}
+.hub-goblin {
+  position: absolute;
+  right: 34%;
+  bottom: 24px;
+  animation: archer-bob 0.5s ease-in-out infinite alternate;
+}
+.hub-dragon {
+  position: absolute;
+  right: 2%;
+  bottom: 26px;
+  animation: dragon-idle 2.6s ease-in-out infinite;
+}
+@keyframes hub-march {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(46px); }
+}
+.game-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--sp-2);
+}
+.game-card,
+.play-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--sp-3);
+  width: 100%;
+  min-height: 72px;
+  padding: var(--sp-2) var(--sp-4);
+  border: 2px solid var(--text);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  transition: transform var(--t-fast) var(--ease), background-color var(--t-fast) var(--ease);
+}
+.game-card:active,
+.play-card:active {
+  transform: scale(0.98);
+  background: var(--surface-2);
+}
+.game-card > svg:last-child,
+.play-card > svg:last-child {
+  width: 20px;
+  height: 20px;
+}
+.game-card-art {
+  width: 56px;
+  display: grid;
+  place-items: center;
+}
+.game-card-text,
+.play-card-text {
+  display: grid;
+  gap: 2px;
+}
+.game-card-text strong,
+.play-card-text strong {
+  font-family: 'Fraunces', serif;
+  font-size: 1.2rem;
+}
+.play-card {
+  padding-left: var(--sp-2);
+  overflow: hidden;
+}
+.play-card-knight {
+  height: 72px;
+  margin: -6px 0 -6px -6px;
+  display: grid;
+  place-items: center;
+}
+.play-card-text small {
+  color: var(--muted);
+}
+.tab {
+  min-width: 0;
 }

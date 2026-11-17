@@ -1,13 +1,28 @@
-// Minigames with the knight (v1.75.0, owner-requested: "fun but useful"). Pure logic only: what is asked and what counts as right.
-// The games are extra practice for fun; they never touch the schedule, the streak or coins.
-import { makeRng, shuffle } from './quiz.ts';
+// Minigames with the knight (v1.75.0, owner-requested: real-time games as the focal point). Pure logic only: what is asked and
+// what counts as right (Arrow Volley's simulation is in volley.ts). A game that is WON within the pile's mistake allowance is
+// recorded through the same `completeReview` as any other review type (see ui/games/Play.tsx); nothing else is saved.
+import { makeRng, mistakesAllowed, shuffle } from './quiz.ts';
+import type { Pile } from './types.ts';
 import { tokenize, type Word } from './text.ts';
 
-export type GameId = 'duel' | 'bridge';
+export type GameId = 'volley' | 'duel' | 'bridge';
 export const GAMES: { id: GameId; name: string; blurb: string }[] = [
-  { id: 'duel', name: 'Dragon Duel', blurb: 'Pick the next word to land each blow.' },
-  { id: 'bridge', name: 'Bridge of the Word', blurb: 'Lay the phrases in order to cross.' },
+  { id: 'volley', name: 'Arrow Volley', blurb: 'Cut down the arrow carrying the next word.' },
+  { id: 'duel', name: 'Dragon Duel', blurb: 'Strike with the next word before the fire comes.' },
+  { id: 'bridge', name: 'Bridge Run', blurb: 'Lay each phrase before the knight reaches the edge.' },
 ];
+
+/**
+ * Does this game count as the verse's review? Only a win, and only within the pile's usual mistake allowance (Daily forgives 3
+ * slips, the other piles none), exactly as the other review types. The caller then records it with `completeReview`.
+ */
+export const gameCounts = (pile: Pile, won: boolean, slips: number): boolean => won && slips <= mistakesAllowed(pile);
+
+/** How long the dragon takes to draw breath (ms): it gets quicker as the verse goes on. `progress` is 0 to 1. */
+export const duelChargeMs = (progress: number) => 7000 - 2600 * Math.max(0, Math.min(1, progress));
+/** How long the knight takes to walk one plank (ms). */
+export const BRIDGE_PLANK_MS = 4400;
+export const BRIDGE_HEARTS = 3;
 
 // ---------------------------------------------------------------- Dragon Duel: recall the next word
 

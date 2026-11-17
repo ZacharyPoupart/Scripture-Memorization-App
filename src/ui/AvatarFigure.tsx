@@ -9,11 +9,14 @@ function Background({ scene }: { scene: string }) {
   return url ? <image href={url} x="0" y="0" width="120" height="120" preserveAspectRatio="xMidYMid slice" style={PIXEL} /> : <rect width="120" height="120" fill="#cfe6ea" />;
 }
 
+/** How the knight moves (the games): each pose animates his pieces by themselves. No pose = a still picture. */
+export type KnightPose = 'idle' | 'walk' | 'attack' | 'block' | 'hurt' | 'cheer' | 'fall';
+
 /**
  * The knight. The painted pieces are placed in "figure units" (centred on x = 0, boots at y = 250); this scales them to fit the
  * 120 x 120 picture. The background is a painted picture; `bare` leaves it out (and the flag), for the games' own scenes.
  */
-export function AvatarFigure({ look, size = 120, title, view = 'full', bare = false }: { look: Look; size?: number; title?: string; view?: 'full' | 'face'; bare?: boolean }) {
+export function AvatarFigure({ look, size = 120, title, view = 'full', bare = false, pose }: { look: Look; size?: number; title?: string; view?: 'full' | 'face'; bare?: boolean; pose?: KnightPose }) {
   const face = view === 'face';
   const K = 0.448;
   return (
@@ -33,7 +36,7 @@ export function AvatarFigure({ look, size = 120, title, view = 'full', bare = fa
       <g clip-path={bare ? undefined : `url(#avc-${view}${size})`}>
         {!bare && <Background scene={look.scene} />}
         {!bare && !face && bannerFromFlag(look.flag ?? '') && <FlagStand banner={bannerFromFlag(look.flag)!} />}
-        <g transform={`translate(60 ${116 - 250 * K}) scale(${K})`}>
+        <g transform={`translate(60 ${116 - 250 * K}) scale(${K})`} class={pose ? `knight-rig pose-${pose}` : undefined}>
           <ArmorLayers look={look} />
         </g>
       </g>

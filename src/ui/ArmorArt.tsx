@@ -35,7 +35,12 @@ function Slot({ slot, id }: { slot: keyof typeof SLOT_LAYOUT; id: string }) {
   const h = at.h * U;
   const turn = at.rotate ? `rotate(${at.rotate} ${x + w / 2} ${y + h / 2})` : '';
   const tilt = at.tilt && at.pivot ? `rotate(${at.tilt} ${at.pivot[0] * U} ${(at.pivot[1] - TOP) * U}) ` : ''; // around the hand
-  return <image href={url} x={x} y={y} width={w} height={h} transform={`${tilt}${turn}` || undefined} style={PIXEL} />;
+  // each piece sits in its own group so the games can move it by itself (the sword swings, the shield comes up, the cape sways)
+  return (
+    <g class={`rig rig-${slot}`}>
+      <image href={url} x={x} y={y} width={w} height={h} transform={`${tilt}${turn}` || undefined} style={PIXEL} />
+    </g>
+  );
 }
 
 /** All the painted layers, back to front. */

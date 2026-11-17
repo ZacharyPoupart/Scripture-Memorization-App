@@ -120,6 +120,17 @@ export function Home() {
             })}
           </nav>
 
+          <button class="play-card" onClick={() => navigate('/play')} data-testid="play-card">
+            <span class="play-card-knight" aria-hidden="true">
+              <AvatarFigure look={currentLook(data)} size={84} bare pose="walk" />
+            </span>
+            <span class="play-card-text">
+              <strong>Play</strong>
+              <small>{readyAll > 0 ? `Win a game to review a verse · ${readyAll} ready` : 'Practice any verse with your knight'}</small>
+            </span>
+            <Icon name="arrow" />
+          </button>
+
           <div class="card stack today-card">
             <ModePicker />
             <div class="row spread today-head">

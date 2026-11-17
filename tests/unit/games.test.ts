@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DUEL_CHOICES, duelRight, duelRounds, plankFits, planks, scatter, stars } from '../../src/core/games.ts';
+import { DUEL_CHOICES, duelChargeMs, gameCounts, duelRight, duelRounds, plankFits, planks, scatter, stars } from '../../src/core/games.ts';
 import { tokenize } from '../../src/core/text.ts';
 
 const JOHN = 'For God so loved the world, that he gave his only Son, that whoever believes in him should not perish but have eternal life.';
@@ -53,5 +53,24 @@ describe('Bridge of the Word', () => {
 
   it('gives stars for a clean run', () => {
     expect([stars(0), stars(1), stars(2), stars(3), stars(9)]).toEqual([3, 2, 2, 1, 1]);
+  });
+});
+
+describe('what counts', () => {
+  it('only a win within the pile’s usual mistake allowance is a review', () => {
+    expect(gameCounts('daily', true, 0)).toBe(true);
+    expect(gameCounts('daily', true, 3)).toBe(true);
+    expect(gameCounts('daily', true, 4)).toBe(false);
+    expect(gameCounts('daily', false, 0)).toBe(false);
+    for (const pile of ['weekly', 'monthly', 'yearly'] as const) {
+      expect(gameCounts(pile, true, 0)).toBe(true);
+      expect(gameCounts(pile, true, 1)).toBe(false);
+    }
+  });
+
+  it('the dragon draws breath faster as the verse goes on', () => {
+    expect(duelChargeMs(0)).toBeGreaterThan(duelChargeMs(1));
+    expect(duelChargeMs(1)).toBeGreaterThan(3000);
+    expect(duelChargeMs(-5)).toBe(duelChargeMs(0));
   });
 });
