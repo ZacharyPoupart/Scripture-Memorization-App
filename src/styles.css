@@ -3310,87 +3310,11 @@ button.chip {
   min-height: 44px;
 }
 
-/* ================= cozy pass (v1.75.0, owner-requested): the knight companion and small rewarding motion ================= */
+/* ================= cozy pass (v1.75.0, owner-requested): soft corners and small rewarding motion ================= */
 :root {
   --radius: 12px;
   --radius-sm: 8px;
   --spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* a little overshoot: things land, they do not just stop */
-}
-
-/* ---- the knight says ---- */
-.knight-says {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: center;
-  gap: var(--sp-3);
-  text-align: left;
-}
-.knight-tap {
-  background: none;
-  border: 0;
-  padding: 0;
-  border-radius: var(--radius);
-  min-width: 44px;
-  min-height: 44px;
-}
-.knight-portrait {
-  display: block;
-  border-radius: var(--radius);
-  overflow: hidden;
-  border: 2px solid var(--text);
-  transform-origin: 50% 100%;
-  animation: knight-breathe 3.6s ease-in-out infinite;
-}
-.knight-portrait.cheer {
-  animation: knight-hop 0.9s var(--spring) 0.15s 2 both, knight-breathe 3.6s ease-in-out 2s infinite;
-}
-.knight-bubble {
-  position: relative;
-  margin: 0;
-  padding: var(--sp-3) var(--sp-4);
-  background: var(--surface);
-  border: 1.5px solid var(--text);
-  border-radius: var(--radius);
-  font-family: var(--serif, 'Fraunces', serif);
-  font-size: 1.02rem;
-  line-height: 1.4;
-  transform-origin: 0 60%;
-  animation: bubble-in 0.42s var(--spring) both;
-}
-.knight-bubble::before {
-  /* the little tail pointing at the knight */
-  content: '';
-  position: absolute;
-  left: -7px;
-  top: 50%;
-  width: 11px;
-  height: 11px;
-  margin-top: -6px;
-  background: var(--surface);
-  border-left: 1.5px solid var(--text);
-  border-bottom: 1.5px solid var(--text);
-  transform: rotate(45deg);
-}
-.result-card .knight-says,
-.alldone ~ .knight-says,
-.verse-area.center > .knight-says {
-  max-width: 340px;
-  margin: var(--sp-4) auto 0;
-}
-@keyframes knight-breathe {
-  0%, 100% { transform: scaleY(1); }
-  50% { transform: scaleY(1.035); }
-}
-@keyframes knight-hop {
-  0% { transform: translateY(0) scale(1, 1); }
-  20% { transform: translateY(0) scale(1.08, 0.9); }
-  50% { transform: translateY(-12px) scale(0.96, 1.06); }
-  80% { transform: translateY(0) scale(1.06, 0.94); }
-  100% { transform: translateY(0) scale(1, 1); }
-}
-@keyframes bubble-in {
-  from { opacity: 0; transform: scale(0.82) translateX(-6px); }
-  to { opacity: 1; transform: none; }
 }
 
 /* ---- a counted review lands ---- */
@@ -3473,9 +3397,6 @@ button.chip {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .knight-portrait,
-  .knight-portrait.cheer,
-  .knight-bubble,
   .result-card,
   .result-check .checkmark,
   .today-list li,

@@ -1,7 +1,7 @@
 """Turn the painted armor and backgrounds into pixel art (v1.75.0, owner-requested).
 
 Reads the painted originals kept in design/pixel/painted/ (a copy of public/armor and public/scenes as they were in v1.74.3) and
-writes public/armor (at twice the size, same proportions) and public/scenes, so nothing about placement changes: each picture is cut into CELL x CELL
+writes public/armor (at four times the size, same proportions) and public/scenes, so nothing about placement changes: each picture is cut into CELL x CELL
 blocks on one shared grid (the grid is lined up with the knight's own coordinates, so the pieces' pixels meet cleanly), each block
 gets one colour from a small palette, and the silhouette gets a dark outline.
 
@@ -14,10 +14,10 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / 'design/pixel/painted'
-UP = 2            # the painted pieces are small, so they are enlarged first (files are written at UP times the size)
-CELL = 3          # one art pixel = 3 x 3 of the enlarged pixels, i.e. 1.5 painted pixels: four times the detail of the first try
-COLOURS = 22      # palette per armor piece
-SCENE_CELL, SCENE_COLOURS = 2, 44
+UP = 4            # the painted pieces are small, so they are enlarged first (files are written at UP times the size)
+CELL = 3          # one art pixel = 3 x 3 of the enlarged pixels, i.e. three quarters of a painted pixel (the owner asked for four times the detail, twice)
+COLOURS = 32      # palette per armor piece
+SCENE_CELL, SCENE_COLOURS = 1, 64
 OUTLINE = (34, 30, 38, 255)
 
 def pixelate(im: Image.Image, cell: int, colours: int, ox: int = 0, oy: int = 0, outline: bool = True) -> Image.Image:

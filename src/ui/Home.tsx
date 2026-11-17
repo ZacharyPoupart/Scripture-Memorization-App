@@ -9,11 +9,9 @@ import { navigate } from '../router.ts';
 import { shouldNudgeBackup } from '../core/nudges.ts';
 import { currentLook, seedsBalance } from '../core/avatar.ts';
 import { downloadBackup, openTourMenu, stopBreak, updateSettings, useApp } from '../store.ts';
+import { AvatarFigure } from './AvatarFigure.tsx';
 import { Coin, Icon, PILE_INFO } from './common.tsx';
 import { ModePicker } from './ModePicker.tsx';
-
-import { todayLine, type TodayMood } from '../core/voice.ts';
-import { KnightSays } from './KnightSays.tsx';
 
 export function Home() {
   const { data, settings, online } = useApp();
@@ -55,26 +53,11 @@ export function Home() {
         : ''
       : [streak.count > 0 ? `Streak ${streak.count} day${streak.count === 1 ? '' : 's'}.` : '', nextText].filter(Boolean).join(' ');
 
-  const doneToday = todayList.reduce((n, { s }) => n + s.countedToday, 0);
-  const mood: TodayMood = !verses.length
-    ? { kind: 'empty' }
-    : onBreak
-      ? { kind: 'break' }
-      : readyAll > 0
-        ? { kind: 'ready', ready: readyAll, doneToday }
-        : todayList.some(({ s }) => s.state === 'waiting')
-          ? { kind: 'waiting' }
-          : today.outcome === 'c' || today.total > 0 || todayList.length > 0
-            ? { kind: 'done' }
-            : { kind: 'quiet' };
-  const knightLine = todayLine(mood, { hour: new Date(now).getHours(), day: Math.floor(now / 86_400_000), streak: streak.count });
-
   if (!verses.length) {
     return (
       <div class="scroll">
         <div class="narrow stack">
           <h1>Memorize For Life</h1>
-          {settings.avatarOn && <KnightSays look={currentLook(data)} line={knightLine} />}
           <EmptyState mark="book" title="Add your first verse" testid="empty-home">
             <button class="btn primary block" onClick={() => navigate('/add')}>
               Add a verse
@@ -105,6 +88,7 @@ export function Home() {
             <div class="row gap-2">
               {settings.avatarOn && (
                 <button class="avatar-bubble" onClick={() => navigate('/avatar')} aria-label={`Your avatar. ${seedsBalance(data)} coins.`} data-testid="avatar-bubble">
+                  <AvatarFigure look={currentLook(data)} size={44} view="face" />
                   <span class="seeds-chip" data-testid="seeds-chip"><Coin /> {seedsBalance(data)}</span>
                 </button>
               )}
@@ -135,8 +119,6 @@ export function Home() {
               );
             })}
           </nav>
-
-          {settings.avatarOn && <KnightSays look={currentLook(data)} line={knightLine} mood={mood.kind === 'done' ? 'cheer' : 'idle'} onTap={() => navigate('/avatar')} />}
 
           <div class="card stack today-card">
             <ModePicker />
