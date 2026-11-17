@@ -875,7 +875,7 @@ export function Friends({ joinCode = '', guildCode = '' }: { joinCode?: string; 
               class="btn block"
               onClick={async () => {
                 setStopping(false);
-                if (await stopSharing(false)) showToast('Sharing is off.');
+                if (await stopSharing(false)) showToast('Sharing is off. Nothing more is shared.');
               }}
               data-testid="friends-stop-keep"
             >

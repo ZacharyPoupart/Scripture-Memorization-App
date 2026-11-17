@@ -8,13 +8,17 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 ## [1.75.0] - 2026-11-17
 
 ### Added
-- Your knight is now pixel art: every piece of armor and all fifteen backgrounds were redrawn as crisp pixel art (four times the detail of a first try), and everything you own or wear stays exactly as it was.
-- Your knight talks to you. On Today he greets you with one warm line that fits the moment (the time of day, how much is ready, your streak, a break), after each review he says a word of encouragement, and at the end of a session he sums it up. Tap him to open your avatar. Never guilt, never hurry.
-- Small rewarding motion: the check mark pops with a burst of sparkles when a review counts, the result card lands with a little bounce, the progress bar fills, the knight hops when you finish, Today's verses slide in, the streak flame flickers, and buttons press in. Reduced motion keeps everything still.
+- Your knight is now pixel art: every piece of armor and all fifteen backgrounds were redrawn as fine pixel art, and everything you own or wear stays exactly as it was.
+- Two games to play with your knight, from any verse's page. **Dragon Duel:** pick the next word of the verse to land each blow; a wrong word costs a heart. **Bridge of the Word:** lay the verse's phrases in order to walk your knight across. Both give up to three stars for a clean run. They are for practice and fun: no review is counted and no coins are paid.
+- Small rewarding motion: the check mark pops with a burst of sparkles when a review counts, the result card lands with a little bounce, the progress bar fills, Today's verses slide in, the streak flame flickers, and buttons press in. Reduced motion keeps everything still.
 
 ### Changed
 - Softer, cozier shapes: rounded corners on buttons, cards, pop-ups and the pile row.
-- Today's top corner shows your coins and streak; the knight's picture moved into his speech bubble row.
+- The guided tour is much shorter: three lessons and fifteen steps (it was seven and thirty-three), each showing something you will really use.
+- Friendlier wording in the speaking messages and a few notices.
+
+### Fixed
+- Speak it hearing nothing on a second verse: the app no longer takes the microphone opening as proof it can hear (only real sound or words count), so a listener that hears nothing is replaced by a fresh one; a stopped listener is made to let go; and if nothing is heard for a few seconds a "Restart the microphone" button appears, which a phone always honours because it is your tap.
 
 ## [1.74.3] - 2026-11-13
 

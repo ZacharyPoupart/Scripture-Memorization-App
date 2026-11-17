@@ -1,4 +1,4 @@
-// Minigames with the knight (v1.76.0, owner-requested): two short games that practise a verse. Logic is in core/games.ts.
+// Minigames with the knight (v1.75.0, owner-requested): two short games that practise a verse. Logic is in core/games.ts.
 // Nothing here is saved: no review is counted, no coins, no streak. It is practice for the fun of it.
 import { useMemo, useState } from 'preact/hooks';
 import { currentLook } from '../../core/avatar.ts';

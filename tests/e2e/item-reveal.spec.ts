@@ -76,7 +76,7 @@ test('nothing pops up during the tour', async ({ page }) => {
   await openApp(page, '/#/settings');
   await page.getByTestId('take-tour').click();
   await page.getByTestId('tour-lesson-basics').click();
-  for (let i = 0; i < 2; i++) await page.getByTestId('tour-next').click(); // past the welcome and the + step (the lessons were merged in v1.76.0)
+  for (let i = 0; i < 2; i++) await page.getByTestId('tour-next').click(); // past the welcome and the + step (the lessons were merged in v1.75.0)
   for (const id of ['start-today', 'card-front', 'grade-good']) {
     await expect(page.getByTestId(id)).toBeVisible();
     await page.getByTestId(id).click();

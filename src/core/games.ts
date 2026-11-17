@@ -1,4 +1,4 @@
-// Minigames with the knight (v1.76.0, owner-requested: "fun but useful"). Pure logic only: what is asked and what counts as right.
+// Minigames with the knight (v1.75.0, owner-requested: "fun but useful"). Pure logic only: what is asked and what counts as right.
 // The games are extra practice for fun; they never touch the schedule, the streak or coins.
 import { makeRng, shuffle } from './quiz.ts';
 import { tokenize, type Word } from './text.ts';

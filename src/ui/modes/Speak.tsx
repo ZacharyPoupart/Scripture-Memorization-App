@@ -99,7 +99,7 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
       <>
         <div class="verse-area">
           <div class="banner info" data-testid="speak-unsupported">
-            <strong>Speaking isn't available here.</strong> This browser doesn't offer speech recognition (it's experimental, and works best in Safari or Chrome with the microphone allowed).
+            <strong>Speaking isn’t available here.</strong> This browser can’t listen yet. Safari or Chrome with the microphone allowed works best.
           </div>
         </div>
         <Dock>
@@ -158,9 +158,9 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
         setTranscript((finals.current + ' ' + interim).trim());
       };
       r.onerror = (e) => {
-        if (e.error === 'not-allowed' || e.error === 'service-not-allowed') fail('Microphone access was blocked. Allow it in your browser settings, or use another mode.');
+        if (e.error === 'not-allowed' || e.error === 'service-not-allowed') fail('The microphone is switched off for this app. Allow it in your settings, or pick another way to review.');
         else if (e.error === 'audio-capture') fail('The microphone is not available right now. Close anything else using it and try again.');
-        else if (e.error !== 'no-speech' && e.error !== 'aborted') setError(`Speech recognition problem: ${e.error}`);
+        else if (e.error !== 'no-speech' && e.error !== 'aborted') setError(`The microphone had a hiccup (${e.error}). Tap “I’m done”, then try again.`);
       };
       r.onend = () => {
         if (wantListening.current) {
@@ -179,7 +179,7 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
         // the last one is probably still closing: try again with a fresh one in a moment
         letGo(r);
         lastOne = null;
-        if (tries <= 0) return fail('Could not start the microphone. Tap Start speaking to try again.');
+        if (tries <= 0) return fail('The microphone didn’t start. Tap Start speaking to try again.');
         setTimeout(() => open(tries - 1, silentTries), 300);
         return;
       }
@@ -293,7 +293,7 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
               ? 'Perfect — every word!'
               : speechPassed(align)
                 ? `Close enough — ${Math.round(speechAccuracy(align) * 100)}% of the words. That counts.`
-                : `${align.mistakes} word${align.mistakes === 1 ? '' : 's'} missed or different (${Math.round(speechAccuracy(align) * 100)}%; ${Math.round(SPEECH_PASS * 100)}% passes).`}
+                : `Nearly. ${align.mistakes} word${align.mistakes === 1 ? ' was' : 's were'} different (${Math.round(speechAccuracy(align) * 100)}%, and ${Math.round(SPEECH_PASS * 100)}% passes).`}
           </div>
         )}
         {finished && transcript.trim() && !speechPassed(align) && (
@@ -310,7 +310,7 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
           </div>
         )}
         {error && <div class="banner bad" role="alert">{error}</div>}
-        <div class="hint-text center mt-3">Experimental — recognition may mishear words.</div>
+        <div class="hint-text center mt-3">Listening is still new here, so it may mishear a word or two.</div>
       </div>
       <Dock>
         <MistakeDots verse={verse} mistakes={mistakes} />

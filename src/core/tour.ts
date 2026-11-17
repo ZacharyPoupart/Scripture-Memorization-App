@@ -40,7 +40,7 @@ export interface TourLesson {
 
 const D = GRADUATION_DAYS;
 
-// Streamlined in v1.76.0 (owner-requested): three short lessons, fifteen steps, each one showing a thing you will really use.
+// Streamlined in v1.75.0 (owner-requested): three short lessons, fifteen steps, each one showing a thing you will really use.
 // It was seven lessons and thirty-three steps; the details it used to explain are where you meet them in the app.
 export const LESSONS: TourLesson[] = [
   {

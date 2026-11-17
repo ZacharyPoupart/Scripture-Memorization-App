@@ -50,7 +50,7 @@ test('first run: the welcome leads into the tour, every lesson can be walked, an
   await startFromWelcome(page);
   expect(await stepId(page)).toBe('welcome');
   const seen = await walk(page, 'done');
-  expect(seen.length).toBeLessThanOrEqual(15); // streamlined in v1.76.0: three lessons, fifteen steps
+  expect(seen.length).toBeLessThanOrEqual(15); // streamlined in v1.75.0: three lessons, fifteen steps
   for (const id of ['welcome', 'add', 'start', 'flip', 'grade', 'close', 'types', 'piles-row', 'sim', 'flame', 'break', 'coins', 'backup']) expect(seen, id).toContain(id);
   expect(await stepId(page)).toBe('done');
   await page.getByTestId('tour-next').click(); // Finish
