@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.75.0] - 2026-11-17
+
 ### Added
 - Your knight is now pixel art: every piece of armor and all fifteen backgrounds were redrawn as crisp pixel art (four times the detail of a first try), and everything you own or wear stays exactly as it was.
 - Your knight talks to you. On Today he greets you with one warm line that fits the moment (the time of day, how much is ready, your streak, a break), after each review he says a word of encouragement, and at the end of a session he sums it up. Tap him to open your avatar. Never guilt, never hurry.
