@@ -9,7 +9,7 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ### Added
 - Your knight is now pixel art: every piece of armor and all fifteen backgrounds were redrawn as fine pixel art, and everything you own or wear stays exactly as it was.
-- Two games to play with your knight, from any verse's page. **Dragon Duel:** pick the next word of the verse to land each blow; a wrong word costs a heart. **Bridge of the Word:** lay the verse's phrases in order to walk your knight across. Both give up to three stars for a clean run. They are for practice and fun: no review is counted and no coins are paid.
+- Two games to play with your knight, from any verse's page. **Dragon Duel:** pick the next word of the verse to land each blow; a wrong word costs a heart. **Bridge of the Word:** lay the verse's phrases in order to walk your knight across. Both are little pixel scenes set in your knight's own background: he lunges and a slash lands, right words in a row build a combo, the dragon rears and breathes fire back, hearts break, planks drop into place or tumble into the gap, and the last blow plays out before the result. Both give up to three stars for a clean run. They are for practice and fun: no review is counted and no coins are paid.
 - Small rewarding motion: the check mark pops with a burst of sparkles when a review counts, the result card lands with a little bounce, the progress bar fills, Today's verses slide in, the streak flame flickers, and buttons press in. Reduced motion keeps everything still.
 
 ### Changed

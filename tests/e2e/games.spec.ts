@@ -15,9 +15,12 @@ test.describe('minigames with the knight', () => {
     await expect(page.getByTestId('duel-hearts')).toHaveAttribute('data-hearts', '2');
     await expect(page.getByTestId('duel-text').locator('.w.ok')).toHaveCount(0);
     // then every right word, to the end
-    for (let i = 0; i < 60; i++) {
+    // (the last blow plays out for a moment before the result shows, and the buttons rest meanwhile)
+    for (let i = 0; i < 200; i++) {
       if (await page.getByTestId('game-finish').isVisible()) break;
-      await page.getByTestId('duel-choices').locator('button[data-right]').click();
+      const right = page.getByTestId('duel-choices').locator('button[data-right]:not([disabled])');
+      if (await right.count()) await right.click();
+      else await page.waitForTimeout(100);
     }
     await expect(page.getByTestId('game-finish')).toContainText('The dragon is beaten');
     await expect(page.getByTestId('game-stars')).toHaveAttribute('data-stars', '2'); // one slip

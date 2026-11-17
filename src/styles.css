@@ -3432,70 +3432,233 @@ button.chip {
   }
 }
 
-/* ================= minigames with the knight (v1.75.0) ================= */
+/* ================= minigames with the knight (v1.75.0): pixel scenes with real blows ================= */
 .game .review-head .title {
   display: grid;
 }
+.duel-stage,
+.bridge-stage {
+  position: relative;
+  overflow: hidden;
+  border: 2px solid var(--text);
+  border-radius: var(--radius);
+  background: var(--surface-2) center 62% / cover no-repeat;
+  image-rendering: pixelated;
+}
 .duel-stage {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: end;
-  justify-items: center;
-  gap: var(--sp-4);
-  padding: var(--sp-4);
-  background: var(--surface-2);
-  border-radius: var(--radius);
+  height: 214px;
 }
-.duel-knight,
-.duel-dragon {
-  display: grid;
-  justify-items: center;
-  gap: var(--sp-2);
+.duel-stage.hurt {
+  animation: stage-shake 0.42s var(--ease) 0.34s;
 }
-.duel-knight svg {
-  border-radius: var(--radius);
+.duel-ground {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 26px;
+  background: #3a3329;
+  border-top: 2px solid var(--text);
+  opacity: 0.86;
+}
+.duel-hud {
+  position: absolute;
+  inset: var(--sp-2) var(--sp-2) auto var(--sp-2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  z-index: 3;
 }
 .duel-hearts {
   display: flex;
-  gap: 4px;
+  gap: 3px;
+  padding: 3px 5px;
+  background: var(--surface);
+  border: 1.5px solid var(--text);
+  border-radius: var(--radius-sm);
+}
+.duel-hearts .gone {
+  animation: heart-break 0.5s var(--spring) 0.4s both;
 }
 .duel-hp {
-  width: 132px;
-  height: 8px;
+  width: 46%;
+  height: 12px;
   border: 1.5px solid var(--text);
   background: var(--surface);
-  border-radius: 4px;
+  border-radius: 6px;
 }
 .duel-hp > i {
   background: var(--bad);
+  transition: width 0.35s var(--ease) 0.12s;
 }
+.duel-knight,
+.duel-dragon {
+  position: absolute;
+  bottom: 12px;
+  z-index: 1;
+}
+.duel-knight {
+  left: -4px;
+}
+.duel-dragon {
+  right: 6px;
+  bottom: 18px;
+  transform-origin: 70% 100%;
+  animation: dragon-idle 2.6s ease-in-out infinite;
+}
+.duel-knight > svg {
+  animation: knight-idle 2.2s ease-in-out infinite;
+  transform-origin: 50% 100%;
+}
+/* the blow: the knight lunges, a slash sweeps across, the dragon flashes and is knocked back */
 .duel-knight.hit {
-  animation: lunge 0.36s var(--ease);
+  animation: lunge 0.46s var(--ease);
+  z-index: 2;
 }
 .duel-dragon.hit {
-  animation: struck 0.42s var(--ease);
+  animation: struck 0.5s var(--ease) 0.14s, dragon-idle 2.6s ease-in-out 0.7s infinite;
 }
+.duel-fx {
+  position: absolute;
+  right: 44px;
+  bottom: 44px;
+  width: 96px;
+  height: 96px;
+  z-index: 4;
+  pointer-events: none;
+}
+.duel-fx.big {
+  transform: scale(1.35);
+}
+.duel-slash {
+  position: absolute;
+  inset: 0;
+  fill: #f4efe2;
+  stroke: #221e26;
+  stroke-width: 1.5;
+  opacity: 0;
+  transform-origin: 20% 80%;
+  animation: slash 0.34s var(--ease) 0.12s both;
+}
+.duel-spark {
+  position: absolute;
+  left: 34px;
+  top: 30px;
+  opacity: 0;
+  animation: spark 0.4s var(--ease) 0.2s both;
+}
+.duel-dmg {
+  position: absolute;
+  left: 18px;
+  top: -6px;
+  font-family: 'Fraunces', serif;
+  font-size: 1.3rem;
+  color: #f4efe2;
+  -webkit-text-stroke: 4px #221e26;
+  paint-order: stroke fill;
+  opacity: 0;
+  animation: dmg-rise 0.8s var(--ease) 0.18s both;
+}
+/* the answer back: the dragon rears and breathes a flame that flies to the knight, who flashes */
 .duel-dragon.hurt {
-  animation: roar 0.4s var(--ease);
+  animation: roar 0.6s var(--ease), dragon-idle 2.6s ease-in-out 0.7s infinite;
+}
+.duel-flame {
+  position: absolute;
+  right: 150px;
+  bottom: 96px;
+  z-index: 4;
+  animation: flame-fly 0.44s linear 0.14s both;
 }
 .duel-knight.hurt {
-  animation: shake 0.36s var(--ease);
+  animation: burned 0.5s var(--ease) 0.5s;
+}
+/* the end */
+.duel-stage.won .duel-dragon {
+  animation: struck 0.5s var(--ease) 0.14s, dragon-fall 0.7s var(--ease) 0.5s forwards;
+}
+.duel-stage.won .duel-knight > svg {
+  animation: knight-cheer 0.5s var(--spring) 0.7s 2;
+}
+.duel-stage.lost .duel-knight {
+  animation: burned 0.5s var(--ease) 0.5s, knight-kneel 0.5s var(--ease) 0.9s forwards;
+}
+@keyframes knight-idle {
+  50% { transform: scaleY(1.02); }
+}
+@keyframes dragon-idle {
+  50% { transform: translateY(-5px) rotate(-1.5deg); }
 }
 @keyframes lunge {
-  40% { transform: translateX(22px) rotate(4deg); }
+  30% { transform: translateX(-10px) rotate(-5deg); }
+  55% { transform: translateX(86px) rotate(7deg); }
+  100% { transform: none; }
 }
 @keyframes struck {
-  20% { transform: translateX(10px); filter: brightness(1.6); }
-  60% { transform: translateX(-4px); }
+  0% { filter: brightness(4) saturate(0); transform: translateX(0); }
+  30% { filter: brightness(4) saturate(0); transform: translateX(16px) rotate(5deg); }
+  60% { filter: none; transform: translateX(-4px); }
+  100% { transform: none; }
+}
+@keyframes slash {
+  0% { opacity: 0; transform: rotate(-50deg) scale(0.5); }
+  35% { opacity: 1; }
+  100% { opacity: 0; transform: rotate(35deg) scale(1.25); }
+}
+@keyframes spark {
+  0% { opacity: 0; transform: scale(0.3); }
+  40% { opacity: 1; transform: scale(1.4) rotate(20deg); }
+  100% { opacity: 0; transform: scale(2) rotate(45deg); }
+}
+@keyframes dmg-rise {
+  0% { opacity: 0; transform: translateY(14px) scale(0.6); }
+  25% { opacity: 1; transform: translateY(0) scale(1.15); }
+  100% { opacity: 0; transform: translateY(-30px) scale(1); }
 }
 @keyframes roar {
-  40% { transform: translateX(-16px) scale(1.06); }
+  25% { transform: translateX(8px) rotate(6deg) scale(1.05); }
+  55% { transform: translateX(-22px) rotate(-6deg) scale(1.1); }
+  100% { transform: none; }
+}
+@keyframes flame-fly {
+  0% { opacity: 0; transform: translateX(0) scale(0.5); }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(-150px) translateY(22px) scale(1.5); }
+}
+@keyframes burned {
+  0%, 60% { filter: sepia(1) saturate(8) hue-rotate(-28deg) brightness(1.25); }
+  20% { transform: translateX(-10px); }
+  40% { transform: translateX(6px); }
+  100% { filter: none; transform: none; }
+}
+@keyframes stage-shake {
+  20% { transform: translate(-5px, 2px); }
+  40% { transform: translate(5px, -2px); }
+  60% { transform: translate(-3px, 1px); }
+  80% { transform: translate(2px, 0); }
+}
+@keyframes heart-break {
+  0% { transform: scale(1.5) rotate(-12deg); }
+  100% { transform: scale(1); }
+}
+@keyframes dragon-fall {
+  to { transform: translateY(46px) rotate(58deg); opacity: 0; }
+}
+@keyframes knight-cheer {
+  50% { transform: translateY(-16px); }
+}
+@keyframes knight-kneel {
+  to { transform: translateY(14px) rotate(-12deg); opacity: 0.75; }
 }
 .duel-text .w.gap {
   border-bottom: 2px solid var(--border);
 }
 .duel-text .w.cur {
   border-bottom-color: var(--accent);
+}
+.duel-text .w.fresh {
+  display: inline-block;
+  animation: check-pop 0.36s var(--spring) both;
 }
 .game-choices {
   display: grid;
@@ -3513,46 +3676,97 @@ button.chip {
   border-color: var(--bad);
   color: var(--bad);
 }
+
+/* ---- the bridge ---- */
 .bridge-stage {
-  position: relative;
-  height: 112px;
-  padding: 0 var(--sp-2);
-  background: var(--surface-2);
-  border-radius: var(--radius);
-  overflow: hidden;
+  height: 176px;
 }
-.bridge-walker {
+.bridge-cliff {
   position: absolute;
-  bottom: 30px;
-  transition: left 0.5s var(--spring);
-}
-.bridge-walker svg {
+  bottom: 0;
+  width: 16%;
+  height: 58px;
+  background: #5b5246;
   border: 2px solid var(--text);
-  border-radius: var(--radius-sm);
+  border-bottom: 0;
 }
-.bridge-goal {
+.bridge-cliff.near {
+  left: -2px;
+  border-radius: 0 8px 0 0;
+}
+.bridge-cliff.far {
+  right: -2px;
+  border-radius: 8px 0 0 0;
+}
+.bridge-cliff.far svg {
   position: absolute;
-  right: var(--sp-2);
-  bottom: 30px;
+  right: 6px;
+  bottom: 100%;
 }
 .bridge-planks {
   position: absolute;
-  left: var(--sp-2);
-  right: var(--sp-2);
-  bottom: 14px;
+  left: 16%;
+  right: 16%;
+  bottom: 44px;
   display: flex;
-  gap: 3px;
+  gap: 2px;
 }
 .bridge-planks i {
   flex: 1;
   height: 12px;
-  border: 1.5px dashed var(--border);
+  border: 1.5px dashed rgba(34, 30, 38, 0.55);
   border-radius: 3px;
 }
 .bridge-planks i.laid {
   border: 1.5px solid var(--text);
-  background: var(--warn);
-  animation: check-pop 0.4s var(--spring) both;
+  background: #a8703a;
+  animation: plank-drop 0.46s var(--spring) both;
+}
+.bridge-drop {
+  /* a plank that did not fit tumbles into the gap */
+  position: absolute;
+  bottom: 44px;
+  width: 8%;
+  height: 12px;
+  border: 1.5px solid var(--text);
+  border-radius: 3px;
+  background: #a8703a;
+  animation: plank-fall 0.7s ease-in both;
+}
+.bridge-walker {
+  position: absolute;
+  bottom: 50px;
+  width: 96px;
+  margin-left: -36px;
+  transition: left 0.55s var(--ease);
+  z-index: 2;
+}
+.bridge-walker.wobble {
+  animation: wobble 0.5s var(--ease);
+}
+.bridge-step {
+  animation: step-hop 0.55s var(--ease);
+}
+.bridge-stage.across .bridge-step {
+  animation: knight-cheer 0.5s var(--spring) 0.55s 2;
+}
+@keyframes plank-drop {
+  0% { transform: translateY(-70px) rotate(-8deg); opacity: 0; }
+  60% { opacity: 1; }
+  100% { transform: none; }
+}
+@keyframes plank-fall {
+  0% { transform: translateY(-40px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(80px) rotate(140deg); opacity: 0; }
+}
+@keyframes step-hop {
+  25% { transform: translateY(-9px) rotate(3deg); }
+  50% { transform: translateY(0); }
+  75% { transform: translateY(-6px) rotate(-2deg); }
+}
+@keyframes wobble {
+  25% { transform: rotate(-9deg); }
+  60% { transform: rotate(7deg); }
 }
 .bridge-text {
   min-height: 3.2em;
@@ -3569,6 +3783,7 @@ button.chip {
   font-weight: 500;
   font-size: 1.05rem;
   text-align: left;
+  animation: card-land 0.3s var(--spring) both;
 }
 .game-stars {
   display: flex;
@@ -3579,15 +3794,14 @@ button.chip {
   animation: check-pop 0.5s var(--spring) both;
 }
 @media (prefers-reduced-motion: reduce) {
-  .duel-knight,
-  .duel-dragon,
-  .game-choices .btn,
-  .game .btn.shake,
-  .bridge-planks i.laid,
-  .game-stars .on {
-    animation: none;
+  .game *,
+  .game *::before {
+    animation: none !important;
+    transition: none !important;
   }
-  .bridge-walker {
-    transition: none;
+  .duel-fx,
+  .duel-flame,
+  .bridge-drop {
+    display: none;
   }
 }
