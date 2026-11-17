@@ -3431,3 +3431,163 @@ button.chip {
     animation: none;
   }
 }
+
+/* ================= minigames with the knight (v1.76.0) ================= */
+.game .review-head .title {
+  display: grid;
+}
+.duel-stage {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: end;
+  justify-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-4);
+  background: var(--surface-2);
+  border-radius: var(--radius);
+}
+.duel-knight,
+.duel-dragon {
+  display: grid;
+  justify-items: center;
+  gap: var(--sp-2);
+}
+.duel-knight svg {
+  border-radius: var(--radius);
+}
+.duel-hearts {
+  display: flex;
+  gap: 4px;
+}
+.duel-hp {
+  width: 132px;
+  height: 8px;
+  border: 1.5px solid var(--text);
+  background: var(--surface);
+  border-radius: 4px;
+}
+.duel-hp > i {
+  background: var(--bad);
+}
+.duel-knight.hit {
+  animation: lunge 0.36s var(--ease);
+}
+.duel-dragon.hit {
+  animation: struck 0.42s var(--ease);
+}
+.duel-dragon.hurt {
+  animation: roar 0.4s var(--ease);
+}
+.duel-knight.hurt {
+  animation: shake 0.36s var(--ease);
+}
+@keyframes lunge {
+  40% { transform: translateX(22px) rotate(4deg); }
+}
+@keyframes struck {
+  20% { transform: translateX(10px); filter: brightness(1.6); }
+  60% { transform: translateX(-4px); }
+}
+@keyframes roar {
+  40% { transform: translateX(-16px) scale(1.06); }
+}
+.duel-text .w.gap {
+  border-bottom: 2px solid var(--border);
+}
+.duel-text .w.cur {
+  border-bottom-color: var(--accent);
+}
+.game-choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-2);
+}
+.game-choices .btn {
+  min-height: 56px;
+  font-size: 1.05rem;
+  padding: 0 var(--sp-2);
+  animation: card-land 0.26s var(--spring) both;
+}
+.game .btn.shake {
+  animation: shake 0.36s var(--ease);
+  border-color: var(--bad);
+  color: var(--bad);
+}
+.bridge-stage {
+  position: relative;
+  height: 112px;
+  padding: 0 var(--sp-2);
+  background: var(--surface-2);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.bridge-walker {
+  position: absolute;
+  bottom: 30px;
+  transition: left 0.5s var(--spring);
+}
+.bridge-walker svg {
+  border: 2px solid var(--text);
+  border-radius: var(--radius-sm);
+}
+.bridge-goal {
+  position: absolute;
+  right: var(--sp-2);
+  bottom: 30px;
+}
+.bridge-planks {
+  position: absolute;
+  left: var(--sp-2);
+  right: var(--sp-2);
+  bottom: 14px;
+  display: flex;
+  gap: 3px;
+}
+.bridge-planks i {
+  flex: 1;
+  height: 12px;
+  border: 1.5px dashed var(--border);
+  border-radius: 3px;
+}
+.bridge-planks i.laid {
+  border: 1.5px solid var(--text);
+  background: var(--warn);
+  animation: check-pop 0.4s var(--spring) both;
+}
+.bridge-text {
+  min-height: 3.2em;
+}
+.bridge-bank {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+.btn.plank {
+  min-height: 48px;
+  padding: var(--sp-2) var(--sp-4);
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+  font-size: 1.05rem;
+  text-align: left;
+}
+.game-stars {
+  display: flex;
+  justify-content: center;
+  gap: var(--sp-2);
+}
+.game-stars .on {
+  animation: check-pop 0.5s var(--spring) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .duel-knight,
+  .duel-dragon,
+  .game-choices .btn,
+  .game .btn.shake,
+  .bridge-planks i.laid,
+  .game-stars .on {
+    animation: none;
+  }
+  .bridge-walker {
+    transition: none;
+  }
+}
