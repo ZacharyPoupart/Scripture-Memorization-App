@@ -18,6 +18,7 @@ const ICONS: Record<string, string> = {
   home: 'M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z',
   piles: 'M4 6h16M4 12h16M4 18h16',
   plus: 'M12 5v14M5 12h14',
+  play: 'M14.5 4.5 20 3l-1.5 5.5L9 18l-3-3zM6 15l-2.5 2.5M9 18l-2.5 2.5M4.5 19.5 3 21', // a sword
   gear: 'M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM19.4 13a7.6 7.6 0 0 0 0-2l2-1.5-2-3.5-2.4 1a7.6 7.6 0 0 0-1.7-1L15 3.5h-4L10.7 6a7.6 7.6 0 0 0-1.7 1l-2.4-1-2 3.5 2 1.5a7.6 7.6 0 0 0 0 2l-2 1.5 2 3.5 2.4-1a7.6 7.6 0 0 0 1.7 1l.3 2.5h4l.3-2.5a7.6 7.6 0 0 0 1.7-1l2.4 1 2-3.5z',
   back: 'M15 5l-7 7 7 7',
   close: 'M6 6l12 12M18 6 6 18',
@@ -182,6 +183,17 @@ export function Confetti({ count = 46 }: { count?: number }) {
         <i key={i} style={{ left: `${p.left}%`, background: p.color, animationDelay: `${p.delay}s`, animationDuration: `${p.dur}s` }} />
       ))}
     </div>
+  );
+}
+
+/** A ring of small square sparkles that bursts outward once (behind the check mark after a counted review). */
+export function Sparkles({ count = 10 }: { count?: number }) {
+  return (
+    <span class="sparkles" aria-hidden="true">
+      {Array.from({ length: count }, (_, i) => (
+        <i key={i} style={{ '--a': `${(360 / count) * i}deg`, '--d': `${38 + (i % 3) * 10}px`, background: CONFETTI_COLORS[i % CONFETTI_COLORS.length], animationDelay: `${(i % 4) * 0.03}s` }} />
+      ))}
+    </span>
   );
 }
 

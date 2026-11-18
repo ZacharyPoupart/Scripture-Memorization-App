@@ -10,7 +10,7 @@ import { tooManyMistakes } from '../core/quiz.ts';
 import { PILES, type AppData, type LevelUp, type Pile, type ReviewMode, type Verse } from '../core/types.ts';
 import { back, navigate, type Route } from '../router.ts';
 import { act, completeReview, showToast, updateSettings, useApp } from '../store.ts';
-import { CheckMark, Confetti, Icon, PileBadge, PILE_INFO, pileProgress, progressUnitPlural } from './common.tsx';
+import { CheckMark, Confetti, Icon, PileBadge, PILE_INFO, pileProgress, progressUnitPlural, Sparkles } from './common.tsx';
 import { MODES } from './ModePicker.tsx';
 import { Overlay } from './common.tsx';
 import { CoinCount } from './CoinCount.tsx';
@@ -299,7 +299,7 @@ export function Review({ route }: { route: Route }) {
       {result ? (
         <div class="verse-area" onClick={next} data-testid="verse-result">
           <div class="result-card">
-            <div class="result-check">{result.counted ? <CheckMark size={64} /> : <div class="big">＋</div>}</div>
+            <div class="result-check">{result.counted ? <><Sparkles /><CheckMark size={64} /></> : <div class="big">＋</div>}</div>
             <h2 class="headline">{formatRef(verse)}</h2>
             <p class="muted">{result.counted ? `Review counted. ${doneLine(tally.counted)}` : 'Extra practice.'}</p>
             {verse.pile === 'daily' && (

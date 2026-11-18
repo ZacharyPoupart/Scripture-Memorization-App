@@ -132,7 +132,7 @@ function SyncCard() {
             onClick={() =>
               navigator.clipboard?.writeText(settings.syncCode).then(
                 () => showToast('Code copied.'),
-                () => showToast('Could not copy — show the code and copy it by hand.'),
+                () => showToast('That didn’t copy. Show the code and copy it by hand.'),
               )
             }
           >

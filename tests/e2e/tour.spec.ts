@@ -50,7 +50,8 @@ test('first run: the welcome leads into the tour, every lesson can be walked, an
   await startFromWelcome(page);
   expect(await stepId(page)).toBe('welcome');
   const seen = await walk(page, 'done');
-  for (const id of ['welcome', 'start', 'flip', 'grade', 'type-try', 'sandwich', 'sim', 'break', 'sword', 'shield', 'backup']) expect(seen, id).toContain(id);
+  expect(seen.length).toBeLessThanOrEqual(15); // streamlined in v1.75.0: three lessons, fifteen steps
+  for (const id of ['welcome', 'add', 'start', 'flip', 'grade', 'close', 'types', 'piles-row', 'sim', 'flame', 'break', 'coins', 'backup']) expect(seen, id).toContain(id);
   expect(await stepId(page)).toBe('done');
   await page.getByTestId('tour-next').click(); // Finish
   await expect(page.getByTestId('tour')).toHaveCount(0);
@@ -74,7 +75,7 @@ test('"Not now" skips the tour, and Settings can open it any time', async ({ pag
   await page.goto('/#/settings');
   await page.getByTestId('take-tour').click();
   await expect(page.getByTestId('tour-menu')).toBeVisible();
-  await page.getByTestId('tour-lesson-streak').click();
+  await page.getByTestId('tour-lesson-keep').click();
   await expect(page.getByTestId('tour-card')).toBeVisible();
   expect(await stepId(page)).toBe('flame');
 });
@@ -85,8 +86,8 @@ test('your own verses are untouched by the tour, and nothing done in it is saved
   const before = await realData(page);
   await page.goto('/#/settings');
   await page.getByTestId('take-tour').click();
-  await page.getByTestId('tour-lesson-review').click();
-  await walk(page, 'counted'); // does a real review on the practice verses
+  await page.getByTestId('tour-lesson-basics').click();
+  await walk(page, 'close'); // does a real review on the practice verses
   expect(await page.getByTestId('seeds-chip').count()).toBe(0);
   await page.getByTestId('tour-lessons').click();
   await page.getByTestId('tour-exit').click();
@@ -109,7 +110,7 @@ test('the simulator uses the real rules: a Daily verse moves up after a reviewed
   await openApp(page);
   await page.goto('/#/settings');
   await page.getByTestId('take-tour').click();
-  await page.getByTestId('tour-lesson-piles').click();
+  await page.getByTestId('tour-lesson-practice').click();
   while ((await stepId(page)) !== 'sim') await page.getByTestId('tour-next').click();
   await expect(page.getByTestId('sim-progress')).toHaveText('Day 84 of 90');
   await page.getByTestId('sim-skip').click();

@@ -8,6 +8,7 @@ import { back, navigate } from '../router.ts';
 import { act, showToast, useApp } from '../store.ts';
 import { Confirm, DaysSlider, Icon, Overlay, PILE_INFO, PileBadge, pileProgress, progressUnitPlural, statusLabel } from './common.tsx';
 import { MODES } from './ModePicker.tsx';
+import { GAMES } from '../core/games.ts';
 import { formatDays } from '../core/dates.ts';
 
 export function VerseDetail({ id }: { id: string }) {
@@ -103,6 +104,18 @@ export function VerseDetail({ id }: { id: string }) {
               <li key={m.value}>
                 <ListRow onClick={() => { if (m.value === 'type') primeKeyboard(); navigate(`/review?verse=${v.id}&mode=${m.value}`); }} testid={`review-${m.value}`}>
                   {m.long}
+                </ListRow>
+              </li>
+            ))}
+          </ul>
+        </Section>
+
+        <Section title="Play this verse">
+          <ul class="rows">
+            {GAMES.map((g) => (
+              <li key={g.id}>
+                <ListRow onClick={() => navigate(`/play/${g.id}/${v.id}`)} testid={`play-${g.id}`}>
+                  {g.name} <span class="muted small">· {g.blurb}</span>
                 </ListRow>
               </li>
             ))}

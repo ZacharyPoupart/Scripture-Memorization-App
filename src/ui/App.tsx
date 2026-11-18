@@ -1,3 +1,4 @@
+import { Play, PlayHub } from './games/Play.tsx';
 import { useEffect, useState } from 'preact/hooks';
 import { useRoute } from '../router.ts';
 import { startTour, updateSettings, useApp } from '../store.ts';
@@ -28,6 +29,7 @@ const TITLES: Record<string, string> = {
   add: 'Add a verse',
   edit: 'Edit verse',
   review: 'Review',
+  play: 'Play',
   stats: 'Progress',
   settings: 'Settings',
   avatar: 'Your avatar',
@@ -54,7 +56,7 @@ export function App({ onReload }: { onReload: () => void }) {
   if (!ready) return <div class="screen" aria-busy="true" />;
 
   const [a, b] = route.path;
-  const inReview = a === 'review';
+  const inReview = a === 'review' || (a === 'play' && !!b); // full screen, no tab bar
   let screen;
   let tab = '/';
   if (!a) screen = <Home />;
@@ -64,6 +66,8 @@ export function App({ onReload }: { onReload: () => void }) {
   else if (a === 'add') ((screen = <AddVerse key="add" />), (tab = '/add'));
   else if (a === 'edit' && b) ((screen = <AddVerse key={`edit-${b}`} editId={b} />), (tab = '/piles'));
   else if (a === 'review') screen = <Review route={route} key={route.query.toString()} />;
+  else if (a === 'play' && !b) ((screen = <PlayHub />), (tab = '/play'));
+  else if (a === 'play' && b) screen = <Play game={b} verseId={route.path[2] ?? ''} key={route.path.join('/')} />;
   else if (a === 'stats') ((screen = <Stats />), (tab = '/stats'));
   else if (a === 'friends') ((screen = <Friends />), (tab = '/friends'));
   else if (a === 'join') ((screen = <Friends key={`join-${b}`} joinCode={b ?? ''} />), (tab = '/friends'));

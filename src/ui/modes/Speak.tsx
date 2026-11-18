@@ -17,6 +17,8 @@ interface RecognitionLike {
   abort(): void;
   onstart: (() => void) | null;
   onaudiostart: (() => void) | null;
+  onsoundstart?: (() => void) | null;
+  onspeechstart?: (() => void) | null;
   addEventListener?(type: string, fn: () => void): void;
   onresult: ((e: any) => void) | null;
   onerror: ((e: any) => void) | null;
@@ -38,7 +40,7 @@ function track(r: RecognitionLike) {
 
 function letGo(r: RecognitionLike | null) {
   if (!r) return;
-  r.onstart = r.onaudiostart = r.onresult = r.onerror = r.onend = null; // nothing it says from now on may reach a screen
+  r.onstart = r.onaudiostart = r.onsoundstart = r.onspeechstart = r.onresult = r.onerror = r.onend = null; // nothing it says from now on may reach a screen
   if (!(r as any).__ended) {
     const gone = new Promise<void>((resolve) => {
       const t = setTimeout(resolve, 1500);
@@ -70,6 +72,9 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
   const [finished, setFinished] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [quiet, setQuiet] = useState(false); // listening for a while with nothing heard: offer a restart made by a tap
+  const quietTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const reopen = useRef<() => void>(() => {});
   const rec = useRef<RecognitionLike | null>(null);
   const wantListening = useRef(false);
   const finals = useRef('');
@@ -85,6 +90,7 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
   useEffect(() => () => {
     wantListening.current = false;
     clearTimeout(watchdog.current);
+    clearTimeout(quietTimer.current);
     letGo(rec.current);
   }, []);
 
@@ -93,7 +99,7 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
       <>
         <div class="verse-area">
           <div class="banner info" data-testid="speak-unsupported">
-            <strong>Speaking isn't available here.</strong> This browser doesn't offer speech recognition (it's experimental, and works best in Safari or Chrome with the microphone allowed).
+            <strong>Speaking isn’t available here.</strong> This browser can’t listen yet. Safari or Chrome with the microphone allowed works best.
           </div>
         </div>
         <Dock>
@@ -124,13 +130,15 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
       const w = window as any;
       const r: RecognitionLike = new (w.SpeechRecognition || w.webkitSpeechRecognition)();
       track(r);
-      let alive = false; // the phone has really started listening (or we heard something)
+      let alive = false; // this listener has really heard a sound or words
       let silent: ReturnType<typeof setTimeout> | undefined;
       r.continuous = true;
       r.interimResults = true;
       r.lang = 'en-US';
       r.onstart = () => clearTimeout(watchdog.current);
-      r.onaudiostart = () => {
+      // The microphone opening is not proof of hearing: an iPhone can show its microphone and still deliver nothing (the owner saw
+      // exactly that on a second verse). Only a sound, speech or words count as alive (v1.75.0).
+      r.onsoundstart = r.onspeechstart = () => {
         alive = true;
         clearTimeout(silent);
       };
@@ -139,6 +147,8 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
         clearTimeout(silent);
         heardSomething.current = true;
         clearTimeout(watchdog.current);
+        clearTimeout(quietTimer.current);
+        setQuiet(false);
         let interim = '';
         for (let i = e.resultIndex; i < e.results.length; i++) {
           const res = e.results[i];
@@ -148,9 +158,9 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
         setTranscript((finals.current + ' ' + interim).trim());
       };
       r.onerror = (e) => {
-        if (e.error === 'not-allowed' || e.error === 'service-not-allowed') fail('Microphone access was blocked. Allow it in your browser settings, or use another mode.');
+        if (e.error === 'not-allowed' || e.error === 'service-not-allowed') fail('The microphone is switched off for this app. Allow it in your settings, or pick another way to review.');
         else if (e.error === 'audio-capture') fail('The microphone is not available right now. Close anything else using it and try again.');
-        else if (e.error !== 'no-speech' && e.error !== 'aborted') setError(`Speech recognition problem: ${e.error}`);
+        else if (e.error !== 'no-speech' && e.error !== 'aborted') setError(`The microphone had a hiccup (${e.error}). Tap “I’m done”, then try again.`);
       };
       r.onend = () => {
         if (wantListening.current) {
@@ -169,7 +179,7 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
         // the last one is probably still closing: try again with a fresh one in a moment
         letGo(r);
         lastOne = null;
-        if (tries <= 0) return fail('Could not start the microphone. Tap Start speaking to try again.');
+        if (tries <= 0) return fail('The microphone didn’t start. Tap Start speaking to try again.');
         setTimeout(() => open(tries - 1, silentTries), 300);
         return;
       }
@@ -180,7 +190,7 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
         letGo(r);
         lastOne = null;
         closing.then(() => setTimeout(() => open(tries, silentTries - 1), 200));
-      }, 3500);
+      }, 4000);
     };
     // let go of the previous listener first, and wait until the phone really has before starting the next
     const previous = lastOne;
@@ -191,6 +201,19 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
       // a timer) can open the microphone indicator and then hear nothing. When nothing is still closing, start right now.
       open(6);
     } else closing.then(() => setTimeout(() => open(6), 250));
+    // a restart made inside a tap, which a phone always honours: offered when nothing has been heard for a while
+    reopen.current = () => {
+      setQuiet(false);
+      clearTimeout(quietTimer.current);
+      quietTimer.current = setTimeout(() => wantListening.current && !heardSomething.current && setQuiet(true), 7000);
+      const cur = rec.current;
+      lastOne = null;
+      letGo(cur);
+      open(6);
+    };
+    setQuiet(false);
+    clearTimeout(quietTimer.current);
+    quietTimer.current = setTimeout(() => wantListening.current && !heardSomething.current && setQuiet(true), 7000);
     // if the microphone never starts, say so instead of waiting in silence
     clearTimeout(watchdog.current);
     watchdog.current = setTimeout(() => !heardSomething.current && fail('The microphone did not start. Check that it is allowed for this app, then tap Start speaking to try again.'), 12000);
@@ -199,7 +222,19 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
   const stop = () => {
     wantListening.current = false;
     clearTimeout(watchdog.current);
-    rec.current?.stop();
+    clearTimeout(quietTimer.current);
+    setQuiet(false);
+    const r = rec.current;
+    r?.stop();
+    // a phone can hang on to a stopped listener for seconds, and the next verse then hears nothing: make it let go for certain
+    setTimeout(() => {
+      if (r && !(r as any).__ended)
+        try {
+          r.abort();
+        } catch {
+          /* already gone */
+        }
+    }, 700);
     setListening(false);
     setFinished(true);
   };
@@ -258,7 +293,7 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
               ? 'Perfect — every word!'
               : speechPassed(align)
                 ? `Close enough — ${Math.round(speechAccuracy(align) * 100)}% of the words. That counts.`
-                : `${align.mistakes} word${align.mistakes === 1 ? '' : 's'} missed or different (${Math.round(speechAccuracy(align) * 100)}%; ${Math.round(SPEECH_PASS * 100)}% passes).`}
+                : `Nearly. ${align.mistakes} word${align.mistakes === 1 ? ' was' : 's were'} different (${Math.round(speechAccuracy(align) * 100)}%, and ${Math.round(SPEECH_PASS * 100)}% passes).`}
           </div>
         )}
         {finished && transcript.trim() && !speechPassed(align) && (
@@ -266,8 +301,16 @@ export function Speak({ verse, onMistake, onDone, onRestart, mistakes }: ModePro
             Heard: {transcript}
           </div>
         )}
+        {listening && quiet && !finished && (
+          <div class="banner info stack" data-testid="speak-quiet">
+            <span>I can’t hear you yet.</span>
+            <button class="btn small" onClick={() => reopen.current()} data-testid="speak-restart">
+              Restart the microphone
+            </button>
+          </div>
+        )}
         {error && <div class="banner bad" role="alert">{error}</div>}
-        <div class="hint-text center mt-3">Experimental — recognition may mishear words.</div>
+        <div class="hint-text center mt-3">Listening is still new here, so it may mishear a word or two.</div>
       </div>
       <Dock>
         <MistakeDots verse={verse} mistakes={mistakes} />

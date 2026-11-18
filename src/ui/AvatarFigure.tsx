@@ -1,19 +1,22 @@
 import { armorWorn, sceneUrl, type Look } from '../core/avatar.ts';
 import { bannerFromFlag } from '../core/banner.ts';
-import { ArmorLayers } from './ArmorArt.tsx';
+import { ArmorLayers, PIXEL } from './ArmorArt.tsx';
 import { FlagStand } from './Banner.tsx';
 
 /** The painted background behind the knight. */
 function Background({ scene }: { scene: string }) {
   const url = sceneUrl(scene);
-  return url ? <image href={url} x="0" y="0" width="120" height="120" preserveAspectRatio="xMidYMid slice" /> : <rect width="120" height="120" fill="#cfe6ea" />;
+  return url ? <image href={url} x="0" y="0" width="120" height="120" preserveAspectRatio="xMidYMid slice" style={PIXEL} /> : <rect width="120" height="120" fill="#cfe6ea" />;
 }
+
+/** How the knight moves (the games): each pose animates his pieces by themselves. No pose = a still picture. */
+export type KnightPose = 'idle' | 'walk' | 'attack' | 'block' | 'hurt' | 'cheer' | 'fall';
 
 /**
  * The knight. The painted pieces are placed in "figure units" (centred on x = 0, boots at y = 250); this scales them to fit the
- * 120 x 120 picture. The background is a painted picture.
+ * 120 x 120 picture. The background is a painted picture; `bare` leaves it out (and the flag), for the games' own scenes.
  */
-export function AvatarFigure({ look, size = 120, title, view = 'full' }: { look: Look; size?: number; title?: string; view?: 'full' | 'face' }) {
+export function AvatarFigure({ look, size = 120, title, view = 'full', bare = false, pose }: { look: Look; size?: number; title?: string; view?: 'full' | 'face'; bare?: boolean; pose?: KnightPose }) {
   const face = view === 'face';
   const K = 0.448;
   return (
@@ -30,10 +33,10 @@ export function AvatarFigure({ look, size = 120, title, view = 'full' }: { look:
       <defs>
         <clipPath id={`avc-${view}${size}`}>{face ? <rect x="30" y="2" width="60" height="60" rx="13" /> : <rect width="120" height="120" rx="26" />}</clipPath>
       </defs>
-      <g clip-path={`url(#avc-${view}${size})`}>
-        <Background scene={look.scene} />
-        {!face && bannerFromFlag(look.flag ?? '') && <FlagStand banner={bannerFromFlag(look.flag)!} />}
-        <g transform={`translate(60 ${116 - 250 * K}) scale(${K})`}>
+      <g clip-path={bare ? undefined : `url(#avc-${view}${size})`}>
+        {!bare && <Background scene={look.scene} />}
+        {!bare && !face && bannerFromFlag(look.flag ?? '') && <FlagStand banner={bannerFromFlag(look.flag)!} />}
+        <g transform={`translate(60 ${116 - 250 * K}) scale(${K})`} class={pose ? `knight-rig pose-${pose}` : undefined}>
           <ArmorLayers look={look} />
         </g>
       </g>
