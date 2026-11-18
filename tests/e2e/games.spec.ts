@@ -33,7 +33,47 @@ async function winGate(page: Page) {
     else await page.waitForTimeout(80);
   }
 }
+/** Wins whichever game is on screen (for runs, where the game is chosen at random). */
+async function winAny(page: Page) {
+  const game = await page.getByTestId('game').getAttribute('data-game');
+  if (game === 'gate') return winGate(page);
+  if (game === 'burrows') return winBurrows(page);
+  if (game === 'duel') return winDuel(page);
+  const total = Number(await page.getByTestId('bridge-stage').getAttribute('data-total'));
+  for (let i = 0; i < total; i++) await page.getByTestId('bridge-bank').locator(`button[data-order="${i}"]`).dispatchEvent('pointerdown');
+}
+
 test.describe('the games', () => {
+  test('Play today’s reviews: every verse due, in Today’s order, each in a different random game, and each win counts', async ({ page }) => {
+    test.setTimeout(120_000);
+    await openApp(page);
+    await addVerse(page, PSALM23_1);
+    await addVerse(page, JOHN316);
+    await page.goto('/#/');
+    await expect(page.getByTestId('play-card')).toContainText('2 ready');
+    await page.getByTestId('play-card').click(); // straight into the run
+    await expect(page.getByTestId('game')).toHaveAttribute('data-run', '1/2');
+    await expect(page.getByTestId('game-ref')).toHaveText('Psalms 23:1'); // Today's order
+    const first = await page.getByTestId('game').getAttribute('data-game');
+    await winAny(page);
+    await expect(page.getByTestId('game-verdict')).toContainText('counted as its review');
+    await expect(page.getByTestId('game-swap')).toHaveCount(0);
+    await page.getByTestId('run-next').click();
+    await expect(page.getByTestId('game')).toHaveAttribute('data-run', '2/2');
+    await expect(page.getByTestId('game-ref')).toHaveText('John 3:16');
+    expect(await page.getByTestId('game').getAttribute('data-game')).not.toBe(first); // never the same game twice in a row
+    await winAny(page);
+    await expect(page.getByTestId('run-next')).toHaveText('Finish');
+    await page.getByTestId('run-next').click();
+    await expect(page.getByTestId('run-tally')).toContainText('2 verses played · 2 counted');
+    expect(await reviewsOf(page)).toBe(2);
+    await page.getByTestId('run-done').click();
+    await expect(page.getByTestId('today-list')).toContainText('1/3');
+    // the hub has the same button
+    await page.goto('/#/play');
+    await expect(page.getByTestId('play-run')).toHaveCount(0); // nothing ready right now (the spacing between Daily reviews)
+  });
+
   test('Hold the Gate: the first letter of the next word strikes the goblin; a score, stars and a personal best are kept', async ({ page }) => {
     await openApp(page);
     await addVerse(page, JOHN316);
@@ -86,7 +126,7 @@ test.describe('the games', () => {
     await addVerse(page, PSALM23_1);
     await addVerse(page, JOHN316);
     await page.goto('/#/');
-    await page.getByTestId('play-card').click();
+    await page.getByTestId('tab-play').click();
     await expect(page.getByTestId('play-hub')).toBeVisible();
     await expect(page.getByTestId('tab-play')).toHaveAttribute('aria-current', 'page');
     await expect(page.locator('[data-testid^="hub-"]:not([data-testid="hub-stars"])')).toHaveCount(4); // four games

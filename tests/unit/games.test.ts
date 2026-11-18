@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BANK_SIZE, bank, DUEL_CHOICES, duelChargeMs, gameCounts, duelRight, duelRounds, plankFits, planks, scatter, stars } from '../../src/core/games.ts';
+import { BANK_SIZE, bank, GAMES, runGames, DUEL_CHOICES, duelChargeMs, gameCounts, duelRight, duelRounds, plankFits, planks, scatter, stars } from '../../src/core/games.ts';
 import { tokenize } from '../../src/core/text.ts';
 
 const JOHN = 'For God so loved the world, that he gave his only Son, that whoever believes in him should not perish but have eternal life.';
@@ -92,5 +92,15 @@ describe('Bridge Run bank (single words)', () => {
     const after = bank(words, 1, 5).map((p) => p.order).filter((o) => o !== 5);
     expect(after).toEqual(before);
     expect([1, 2, 3, 4, 5, 6].some((seed) => bank(words, 0, seed).some((p, i) => p.order !== i))).toBe(true);
+  });
+});
+
+describe('Play today’s reviews', () => {
+  it('gives every verse a game, never the same one twice in a row, and uses them all', () => {
+    const games = runGames(400);
+    expect(games).toHaveLength(400);
+    for (let i = 1; i < games.length; i++) expect(games[i]).not.toBe(games[i - 1]);
+    expect(new Set(games)).toEqual(new Set(GAMES.map((g) => g.id)));
+    expect(runGames(0)).toEqual([]);
   });
 });

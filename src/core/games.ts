@@ -13,6 +13,16 @@ export const GAMES: { id: GameId; name: string; blurb: string }[] = [
   { id: 'bridge', name: 'Bridge Run', blurb: 'Lay each word in order before the knight reaches the edge.' },
 ];
 
+/** "Play today's reviews" (v1.79.0): a random game for each verse, never the same one twice in a row. */
+export function runGames(n: number, random: () => number = Math.random): GameId[] {
+  const out: GameId[] = [];
+  for (let i = 0; i < n; i++) {
+    const pool = GAMES.map((g) => g.id).filter((id) => id !== out[i - 1]);
+    out.push(pool[Math.floor(random() * pool.length)]);
+  }
+  return out;
+}
+
 // ---------------------------------------------------------------- score, combo and personal bests (shared by every game)
 
 /** Right answers in a row make each one worth more: x1.5 from 5, x2 from 10, x3 from 20. A slip starts it again. */

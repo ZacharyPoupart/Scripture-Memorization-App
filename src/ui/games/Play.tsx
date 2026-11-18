@@ -5,7 +5,7 @@
 // uses, so the schedule, streak and coins follow their usual rules; a game lost, or won with too many slips, saves nothing.
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { currentLook, sceneUrl, type Look } from '../../core/avatar.ts';
-import { BRIDGE_HEARTS, BRIDGE_PLANK_MS, DUEL_HEARTS, GAMES, bestKey, duelChargeMs, gameCounts, duelRight, duelRounds, isComboTier, plankFits, planks, points, recordBest, bank, stars, totalStars, verseStars, type GameId, type Plank } from '../../core/games.ts';
+import { BRIDGE_HEARTS, BRIDGE_PLANK_MS, DUEL_HEARTS, GAMES, bestKey, duelChargeMs, gameCounts, runGames, duelRight, duelRounds, isComboTier, plankFits, planks, points, recordBest, bank, stars, totalStars, verseStars, type GameId, type Plank } from '../../core/games.ts';
 import { mistakesAllowed } from '../../core/quiz.ts';
 import { formatRef } from '../../core/reference.ts';
 import { liveVerses, verseStatus } from '../../core/schedule.ts';
@@ -88,6 +88,109 @@ export function Play({ game, verseId }: { game: string; verseId: string }) {
   );
 }
 
+// ---------------------------------------------------------------- a run through everything due today, a random game each
+
+/**
+ * "Play today's reviews" (v1.79.0, owner-requested): the same verses, in the same order, as Today's own review session
+ * (`buildTodayQueue`, fixed when the run starts), each in a random game. Each win counts as that verse's review, like any game.
+ */
+export function PlayRun() {
+  const { data, settings } = useApp();
+  const { look, style } = useBackdrop();
+  const [queue] = useState(() => buildTodayQueue(data, Date.now()));
+  const [games] = useState(() => runGames(queue.length));
+  const [idx, setIdx] = useState(0);
+  const [round, setRound] = useState(1);
+  const [done, setDone] = useState<Outcome | null>(null);
+  const [tally, setTally] = useState({ played: 0, counted: 0, stars: 0, seeds: 0, base: 0, multiplier: 1 });
+  const verse = liveVerses(data).find((v) => v.id === queue[idx]);
+  const close = () => back('/play');
+
+  if (!queue.length || idx >= queue.length || !verse) {
+    const finished = queue.length > 0 && idx >= queue.length;
+    return (
+      <div class="review game" data-testid="run-summary">
+        <div class="review-head">
+          <button class="icon-btn" aria-label="Close" onClick={close} data-testid="game-close">
+            <Icon name="close" />
+          </button>
+        </div>
+        <div class="verse-area center stack pt-6">
+          {finished ? (
+            <>
+              <Confetti count={30} />
+              <h2 class="headline">Every verse played</h2>
+              <p class="muted" style={{ margin: 0 }} data-testid="run-tally">
+                {tally.played} verse{tally.played === 1 ? '' : 's'} played · {tally.counted} counted · {tally.stars} star{tally.stars === 1 ? '' : 's'}
+              </p>
+              {tally.seeds > 0 && settings.avatarOn && <CoinCount base={tally.base} total={tally.seeds} multiplier={tally.multiplier} testid="run-seeds" />}
+            </>
+          ) : (
+            <h2 class="headline">Nothing is due right now</h2>
+          )}
+          <button class="btn primary" onClick={() => navigate('/', true)} data-testid="run-done">
+            Back home
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const game = games[idx];
+  const info = GAMES.find((g) => g.id === game)!;
+  const last = idx + 1 >= queue.length;
+  const props = { verse, seed: round + idx * 31, look, backdrop: style, onDone: setDone };
+  const run: RunStep = {
+    nextLabel: last ? 'Finish' : `Next verse: ${GAMES.find((g) => g.id === games[idx + 1])!.name}`,
+    onNext: () => {
+      setDone(null);
+      setRound(1);
+      setIdx(idx + 1);
+    },
+    onRecorded: (rec, outcome) =>
+      setTally((t) => ({
+        played: t.played + 1,
+        counted: t.counted + (rec?.counted ? 1 : 0),
+        stars: t.stars + (outcome.won ? stars(outcome.slips) : 0),
+        seeds: t.seeds + (rec?.seeds ?? 0),
+        base: t.base + (rec?.base ?? 0),
+        multiplier: Math.max(t.multiplier, rec?.multiplier ?? 1),
+      })),
+  };
+  return (
+    <div class="review game" data-testid="game" data-game={game} data-run={`${idx + 1}/${queue.length}`}>
+      <div class="review-head">
+        <button class="icon-btn" aria-label="Close the games" onClick={close} data-testid="game-close">
+          <Icon name="close" />
+        </button>
+        <div class="title">
+          <span class="game-name">
+            {info.name} · {idx + 1} of {queue.length}
+          </span>
+          <strong class="game-ref" data-testid="game-ref">
+            {formatRef(verse)}
+          </strong>
+        </div>
+        <span style={{ width: '44px' }} />
+      </div>
+      <div class="review-progress" aria-hidden="true">
+        <i style={{ width: `${(idx / queue.length) * 100}%` }} />
+      </div>
+      {done ? (
+        <Finish key={`f${idx}-${round}`} game={game} verse={verse} outcome={done} onAgain={() => (setDone(null), setRound((r) => r + 1))} onSwap={() => {}} otherName="" run={run} />
+      ) : game === 'gate' ? (
+        <Gate key={`${idx}-${round}`} {...props} />
+      ) : game === 'burrows' ? (
+        <Burrows key={`${idx}-${round}`} {...props} />
+      ) : game === 'duel' ? (
+        <Duel key={`${idx}-${round}`} {...props} />
+      ) : (
+        <Bridge key={`${idx}-${round}`} {...props} />
+      )}
+    </div>
+  );
+}
+
 const WORDS: Record<GameId, { won: string; lost: string }> = {
   gate: { won: 'The gate holds', lost: 'The goblins broke through' },
   burrows: { won: 'Every goblin bonked', lost: 'The goblins got away' },
@@ -96,7 +199,14 @@ const WORDS: Record<GameId, { won: string; lost: string }> = {
 };
 
 /** The result. A win within the pile's mistake allowance is recorded here, once, like any other review. */
-function Finish({ game, verse, outcome, onAgain, onSwap, otherName }: { game: GameId; verse: Verse; outcome: Outcome; onAgain: () => void; onSwap: () => void; otherName: string }) {
+/** In a run of today's reviews the result moves on to the next verse (and its game) instead of offering a swap. */
+interface RunStep {
+  onNext: () => void;
+  nextLabel: string;
+  onRecorded: (rec: Recorded | null, outcome: Outcome) => void;
+}
+
+function Finish({ game, verse, outcome, onAgain, onSwap, otherName, run }: { game: GameId; verse: Verse; outcome: Outcome; onAgain: () => void; onSwap: () => void; otherName: string; run?: RunStep }) {
   const { data, settings } = useApp();
   const clean = outcome.slips <= mistakesAllowed(verse.pile);
   const counts = gameCounts(verse.pile, outcome.won, outcome.slips);
@@ -106,7 +216,9 @@ function Finish({ game, verse, outcome, onAgain, onSwap, otherName }: { game: Ga
   useEffect(() => {
     if (once.current) return;
     once.current = true;
-    if (counts) setRec(completeReview(verse.id));
+    const recorded = counts ? completeReview(verse.id) : null;
+    setRec(recorded);
+    run?.onRecorded(recorded, outcome);
     // personal bests are kept on this device (the stars and score of each game and verse)
     const key = bestKey(game, verse.id);
     const table = settings.gameBest ?? {};
@@ -157,16 +269,23 @@ function Finish({ game, verse, outcome, onAgain, onSwap, otherName }: { game: Ga
       </div>
       <Dock>
         <div class="stack">
-          {nextId && outcome.won && (
+          {run && (
+            <button class="btn primary block" onClick={run.onNext} data-testid="run-next">
+              {run.nextLabel}
+            </button>
+          )}
+          {!run && nextId && outcome.won && (
             <button class="btn primary block" onClick={() => navigate(`/play/${game}/${nextId}`, true)} data-testid="game-next">
               Next verse
             </button>
           )}
           <div class="row">
-            <button class="btn grow" onClick={onSwap} data-testid="game-swap">
-              Try {otherName}
-            </button>
-            <button class={`btn grow ${nextId && outcome.won ? '' : 'primary'}`} onClick={onAgain} data-testid="game-again">
+            {!run && (
+              <button class="btn grow" onClick={onSwap} data-testid="game-swap">
+                Try {otherName}
+              </button>
+            )}
+            <button class={`btn grow ${run || (nextId && outcome.won) ? '' : 'primary'}`} onClick={onAgain} data-testid="game-again">
               Play again
             </button>
           </div>
@@ -559,6 +678,11 @@ export function PlayHub() {
             <Dragon size={120} />
           </div>
         </div>
+        {readyCount > 0 && (
+          <button class="btn primary block" onClick={() => navigate('/play/run')} data-testid="play-run">
+            Play today’s reviews · {readyCount}
+          </button>
+        )}
         <label class="stack gap-1">
           <span class="label">
             Verse {readyCount > 0 && <span class="muted">· {readyCount} ready today</span>} <span class="muted">· {verseStars(best, verse.id)} of {GAMES.length * 3} stars</span>
