@@ -56,6 +56,37 @@ export const GOBLIN = [
   '...kbk.kbk...',
   '..kkk..kkk...',
 ];
+/** A goblin holding up a sign, for the burrows (the sign is drawn by the page, over its hands). */
+export const GOBLIN_UP = [
+  '...kkkkk...',
+  '.k.kgggk.k.',
+  'kgkgggggkgk',
+  '.kgrgggrgk.',
+  '..kgggggk..',
+  '..kgwwwgk..',
+  '.kkkkkkkkk.',
+  'kgkbbbbbkgk',
+  'kgkbbbbbkgk',
+  '.k.kbbbk.k.',
+];
+/** Seen from the side when struck: squashed, eyes shut. */
+export const GOBLIN_BONK = [
+  '...........',
+  '...........',
+  '...kkkkk...',
+  'kkkgggggkkk',
+  'kgkkgggkkgk',
+  '.kgggggggk.',
+  'kkkbbbbbkkk',
+  'kgkbbbbbkgk',
+  '.kkkkkkkkk.',
+  '...........',
+];
+/** A burrow: a dark mouth in a mound of earth. */
+export const HOLE = ['...bbbbbbbbb...', '.bbbsssssssbbb.', 'bbsskkkkkkkssbb', 'bbskkkkkkkkksbb', '.bbbbbbbbbbbbb.'];
+/** The gate the goblins march on. */
+export const GATE = ['kk.kk.kk.kk', 'kskkskkskks', 'ksssssssssk', 'kssbbbbbssk', 'ksbbkbkbbsk', 'ksbkbkbkbsk', 'ksbbkbkbbsk', 'ksbkbkbkbsk', 'ksbbkbkbbsk', 'kkkkkkkkkkk'];
+export const SHIELD_ICON = ['kkkkkkk', 'kyyyyyk', 'kywkwyk', 'kyywyyk', '.kyyyk.', '..kyk..', '...k...'];
 export const HEART = ['.kk.kk.', 'krrkrrk', 'krrrrrk', 'krrrrrk', '.krrrk.', '..krk..', '...k...'];
 export const STAR = ['...k...', '..kyk..', 'kkkykkk', 'kyyyyyk', '.kyyyk.', '.kykyk.', 'kk...kk'];
 export const TOWER = ['k.k.k', 'kkkkk', 'ksssk', 'ksssk', 'ksksk', 'ksksk'];
@@ -64,13 +95,35 @@ export const SPARK = ['..w..', '.wyw.', 'wyyyw', '.wyw.', '..w..'];
 export const ARROWHEAD = ['..k..', '.kwk.', 'kwwkk', '.kwk.', '..k..'];
 const INK: Record<string, string> = { k: '#221e26', g: '#3f8f5b', d: '#2c6a43', y: '#e8c66a', r: '#c8463c', w: '#f4efe2', s: '#a9a394', o: '#e2792f', b: '#7a5230' };
 
+// Each map is drawn once into a small SVG picture and cached, so a sprite costs one <img> however often the game redraws.
+const CACHE = new Map<string, { url: string; w: number; h: number }>();
+function picture(map: string[]) {
+  const key = map.join('|');
+  let pic = CACHE.get(key);
+  if (!pic) {
+    const w = map[0].length;
+    const h = map.length;
+    const rects = map.flatMap((row, y) => [...row].map((c, x) => (c === '.' || !INK[c] ? '' : `<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${INK[c]}"/>`))).join('');
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" shape-rendering="crispEdges">${rects}</svg>`;
+    pic = { url: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`, w, h };
+    CACHE.set(key, pic);
+  }
+  return pic;
+}
+
 export function Pixels({ map, size, dim, label }: { map: string[]; size: number; dim?: boolean; label?: string }) {
-  const w = map[0].length;
-  const h = map.length;
+  const pic = picture(map);
   return (
-    <svg viewBox={`0 0 ${w} ${h}`} width={size} height={(size * h) / w} shape-rendering="crispEdges" role={label ? 'img' : undefined} aria-label={label} aria-hidden={label ? undefined : 'true'} style={{ opacity: dim ? 0.22 : 1, display: 'block' }}>
-      {map.flatMap((row, y) => [...row].map((c, x) => (c === '.' ? null : <rect key={`${x}-${y}`} x={x} y={y} width="1.02" height="1.02" fill={INK[c]} />)))}
-    </svg>
+    <img
+      class="px"
+      src={pic.url}
+      width={size}
+      height={Math.round((size * pic.h) / pic.w)}
+      alt={label ?? ''}
+      aria-hidden={label ? undefined : 'true'}
+      draggable={false}
+      style={{ opacity: dim ? 0.22 : 1, display: 'block' }}
+    />
   );
 }
 

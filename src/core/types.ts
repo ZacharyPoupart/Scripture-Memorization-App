@@ -130,6 +130,8 @@ export interface Settings {
   flagGuild: string;
   /** The guided tour: lesson ids this device has finished (so the menu can tick them). */
   tour: { done: string[] };
+  /** The games: the best stars and score this device has won with, per `<game>:<verseId>` (v1.76.0). Device-only, never synced. */
+  gameBest: Record<string, { stars: number; score: number }>;
 }
 
 export const TRANSLATIONS = ['ESV', 'NIV', 'NLT', 'NASB', 'NKJV', 'CSB', 'KJV', 'WEB'] as const;

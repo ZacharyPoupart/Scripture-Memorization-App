@@ -5,6 +5,19 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Added
+- Two new games, built from game-design and memory research (first-letter cues are among the best aids for exact wording):
+  - **Hold the Gate:** goblins march on your gate, one for each word. Tap the first letter of the next word to strike each one down before it arrives; the word only appears once you have recalled it. Five right in a row charges your shield, which blocks the next slip. A computer keyboard works too.
+  - **Goblin Burrows:** three goblins pop up from six burrows holding words; bonk the one with the next word before they duck. Weekly, Monthly and Yearly verses show only first letters.
+- A score in every game: each right answer earns points, more for a quick one, and a combo (x1.5 from 5 in a row, x2 from 10, x3 from 20). Your best stars and score for each game and verse are kept on this device, the result says "New best!" when you beat it, and Play shows the stars you have collected.
+- Game feel: a burst of pixel sparks and the points pop where you strike, the screen shakes with the size of the hit, a big hit freezes the action for a split second, the combo counter punches, and a near goblin warns you. Reduced motion keeps the games playable without the shakes and bursts.
+- Game sounds (soft, synthesized, nothing downloaded): hits climb in pitch with your combo, plus sounds for a combo step, a slip, a landing plank, the shield, each star, a win and a loss. They follow the quiet-sounds setting (off by default); Play has its own sound switch.
+
+### Changed
+- Game buttons answer the moment your finger touches them, not when it lifts.
+- The order of the games: Hold the Gate, Goblin Burrows, Arrow Volley, Dragon Duel, Bridge Run.
+- Smoother games: sprites are drawn once and reused, and the screen shake no longer rebuilds the scene.
+
 ## [1.75.1] - 2026-11-18
 
 ### Changed
