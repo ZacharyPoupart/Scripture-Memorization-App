@@ -5,6 +5,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.75.1] - 2026-11-18
+
+### Changed
+- Softer boxes: the word choices in Fill in the blank (and in the games) are rounder, sit on a soft surface and have a quiet edge in place of a dark outline. The blank you are filling, cards, the flashcard, the verse picker's buttons, armor tiles and the on/off switches are rounded too.
+
 ## [1.75.0] - 2026-11-17
 
 ### Added
