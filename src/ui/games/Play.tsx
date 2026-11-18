@@ -1,24 +1,30 @@
-// The games (v1.75.0, owner-requested: real-time games as the focal point of the app). Three ways to practise a verse with the
-// knight, all against the clock: Arrow Volley (Volley.tsx), Dragon Duel and Bridge Run (here). The rules are in core/games.ts and
-// core/volley.ts. A game WON within the pile's mistake allowance is recorded with the same `completeReview` every review type
+// The games (v1.75.0, owner-requested: real-time games as the focal point of the app; v1.76.0 added Hold the Gate and Goblin
+// Burrows and the juice). Five ways to practise a verse with the knight, all against the clock: Hold the Gate (Gate.tsx), Goblin
+// Burrows (Burrows.tsx), Arrow Volley (Volley.tsx), Dragon Duel and Bridge Run (here). The rules are in core/games.ts, gate.ts,
+// burrows.ts and volley.ts. A game WON within the pile's mistake allowance is recorded with the same `completeReview` every review type
 // uses, so the schedule, streak and coins follow their usual rules; a game lost, or won with too many slips, saves nothing.
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { currentLook, sceneUrl, type Look } from '../../core/avatar.ts';
-import { BRIDGE_HEARTS, BRIDGE_PLANK_MS, DUEL_HEARTS, GAMES, duelChargeMs, gameCounts, duelRight, duelRounds, plankFits, planks, scatter, stars, type GameId, type Plank } from '../../core/games.ts';
+import { BRIDGE_HEARTS, BRIDGE_PLANK_MS, DUEL_HEARTS, GAMES, bestKey, duelChargeMs, gameCounts, duelRight, duelRounds, isComboTier, plankFits, planks, points, recordBest, scatter, stars, totalStars, verseStars, type GameId, type Plank } from '../../core/games.ts';
 import { mistakesAllowed } from '../../core/quiz.ts';
 import { formatRef } from '../../core/reference.ts';
 import { liveVerses, verseStatus } from '../../core/schedule.ts';
 import { buildTodayQueue } from '../../core/today.ts';
 import type { LevelUp, Verse } from '../../core/types.ts';
 import { back, navigate } from '../../router.ts';
-import { completeReview, useApp } from '../../store.ts';
+import { completeReview, updateSettings, useApp } from '../../store.ts';
+import { feedback } from '../../services/feedback.ts';
 import { AvatarFigure, type KnightPose } from '../AvatarFigure.tsx';
 import { CoinCount } from '../CoinCount.tsx';
 import { Confetti, Icon, PILE_INFO } from '../common.tsx';
 import { Dock } from '../modes/shared.tsx';
 import { EmptyState } from '../primitives.tsx';
-import { Dragon, FLAME, GOBLIN, Hearts, Pixels, SPARK, Stars, TOWER, useTicker } from './sprites.tsx';
+import { Dragon, FLAME, GATE, GOBLIN, GOBLIN_UP, Hearts, Pixels, SPARK, Stars, TOWER, useTicker } from './sprites.tsx';
 import { Volley } from './Volley.tsx';
+import { Gate } from './Gate.tsx';
+import { Burrows } from './Burrows.tsx';
+import { DUST, Fx, punch, shake, SPARKS, useHitStop, type FxHandle } from './juice.tsx';
+import type { GameProps, Outcome } from './types.ts';
 
 /** The scene behind a game: the knight's own background, as wide as the stage. */
 function useBackdrop(): { look: Look; style?: Record<string, string> } {
@@ -28,7 +34,6 @@ function useBackdrop(): { look: Look; style?: Record<string, string> } {
   return { look, style: url ? { backgroundImage: `url(${import.meta.env.BASE_URL}${url.replace(/^\//, '')})` } : undefined };
 }
 
-type Outcome = { won: boolean; slips: number };
 type Recorded = { counted: boolean; levelUps: LevelUp[]; seeds: number; base: number; multiplier: number };
 
 // ---------------------------------------------------------------- one game on one verse
@@ -69,6 +74,10 @@ export function Play({ game, verseId }: { game: string; verseId: string }) {
       </div>
       {done ? (
         <Finish key={`f${round}`} game={info.id} verse={verse} outcome={done} onAgain={again} onSwap={() => navigate(`/play/${other.id}/${verse.id}`, true)} otherName={other.name} />
+      ) : info.id === 'gate' ? (
+        <Gate key={round} {...props} />
+      ) : info.id === 'burrows' ? (
+        <Burrows key={round} {...props} />
       ) : info.id === 'volley' ? (
         <Volley key={round} {...props} />
       ) : info.id === 'duel' ? (
@@ -80,15 +89,9 @@ export function Play({ game, verseId }: { game: string; verseId: string }) {
   );
 }
 
-interface GameProps {
-  verse: Verse;
-  seed: number;
-  look: Look;
-  backdrop?: Record<string, string>;
-  onDone: (r: Outcome) => void;
-}
-
 const WORDS: Record<GameId, { won: string; lost: string }> = {
+  gate: { won: 'The gate holds', lost: 'The goblins broke through' },
+  burrows: { won: 'Every goblin bonked', lost: 'The goblins got away' },
   volley: { won: 'The archers are routed', lost: 'The arrows got through' },
   duel: { won: 'The dragon is beaten', lost: 'The dragon holds the gate' },
   bridge: { won: 'Safely across', lost: 'Into the river' },
@@ -101,10 +104,21 @@ function Finish({ game, verse, outcome, onAgain, onSwap, otherName }: { game: Ga
   const counts = gameCounts(verse.pile, outcome.won, outcome.slips);
   const [rec, setRec] = useState<Recorded | null>(null);
   const once = useRef(false);
+  const [best, setBest] = useState<{ newScore: boolean; newStars: boolean; prior: number }>({ newScore: false, newStars: false, prior: 0 });
   useEffect(() => {
-    if (once.current || !counts) return;
+    if (once.current) return;
     once.current = true;
-    setRec(completeReview(verse.id));
+    if (counts) setRec(completeReview(verse.id));
+    // personal bests are kept on this device (the stars and score of each game and verse)
+    const key = bestKey(game, verse.id);
+    const table = settings.gameBest ?? {};
+    const r = recordBest(table, key, { won: outcome.won, stars: outcome.won ? stars(outcome.slips) : 0, score: outcome.score });
+    setBest({ newScore: r.newScore, newStars: r.newStars, prior: table[key]?.score ?? 0 });
+    if (r.table !== table) updateSettings({ gameBest: r.table });
+    if (outcome.won) {
+      feedback.game('win');
+      for (let i = 1; i <= stars(outcome.slips); i++) setTimeout(() => feedback.game('star', i), 300 + 150 * i);
+    } else feedback.game('loss');
   }, []);
   const now = Date.now();
   const nextId = buildTodayQueue(data, now).find((id) => id !== verse.id);
@@ -126,6 +140,15 @@ function Finish({ game, verse, outcome, onAgain, onSwap, otherName }: { game: Ga
         {n > 0 && <Confetti count={n * 12} />}
         <h2 class="headline">{outcome.won ? WORDS[game].won : WORDS[game].lost}</h2>
         {n > 0 && <Stars n={n} />}
+        <div class="final-score" data-testid="game-final-score">
+          <span class="muted small">Score</span>
+          <b>{outcome.score}</b>
+          {best.newScore && (
+            <span class="new-best" data-testid="game-new-best">
+              New best!
+            </span>
+          )}
+        </div>
         <p class="muted measure-sm" style={{ margin: '0 auto' }} data-testid="game-verdict">
           {body}
         </p>
@@ -155,6 +178,13 @@ function Finish({ game, verse, outcome, onAgain, onSwap, otherName }: { game: Ga
   );
 }
 
+/** setTimeout that is cleared when the game closes. */
+function useLater() {
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  useEffect(() => () => timers.current.forEach(clearTimeout), []);
+  return (ms: number, fn: () => void) => void timers.current.push(setTimeout(fn, ms));
+}
+
 /** A pose that plays once and then settles (the key restarts it when the same pose comes twice in a row). */
 function usePose(rest: () => KnightPose) {
   const [pose, setPose] = useState<{ name: KnightPose; n: number }>({ name: 'idle', n: 0 });
@@ -179,18 +209,32 @@ function Duel({ verse, seed, look, backdrop, onDone }: GameProps) {
   const [beat, setBeat] = useState<{ kind: 'hit' | 'hurt'; n: number } | null>(null); // restarts the animations
   const [wrong, setWrong] = useState<string | null>(null);
   const [charge, setCharge] = useState(0); // the dragon drawing breath, 0 to 1
+  const [score, setScore] = useState(0);
+  const stage = useRef<HTMLDivElement>(null);
+  const dragonEl = useRef<HTMLDivElement>(null);
+  const comboEl = useRef<HTMLElement>(null);
+  const fxr = useRef<FxHandle>(null);
+  const stop = useHitStop(stage);
   const won = at >= rounds.length;
   const lost = hearts <= 0;
   const live = useRef({ won, lost });
   live.current = { won, lost };
   const [pose, play] = usePose(() => (live.current.won ? 'cheer' : live.current.lost ? 'fall' : 'idle'));
+  const later = useLater();
   useEffect(() => {
     if (!won && !lost) return;
-    const t = setTimeout(() => onDone({ won, slips }), 1300);
+    const t = setTimeout(() => onDone({ won, slips, score }), 1300);
     return () => clearTimeout(t);
   }, [won, lost]);
+  const dragonAt = (): [number, number] => {
+    const d = dragonEl.current?.getBoundingClientRect();
+    const b = stage.current?.getBoundingClientRect();
+    return d && b ? [d.left + d.width * 0.4 - b.left, d.top + d.height * 0.45 - b.top] : [0, 0];
+  };
 
   const burn = () => {
+    feedback.game('slip');
+    later(330, () => shake(stage.current, 0.55));
     setCombo(0);
     setSlips((n) => n + 1);
     setHearts((h) => h - 1);
@@ -199,6 +243,7 @@ function Duel({ verse, seed, look, backdrop, onDone }: GameProps) {
     play('hurt', 900);
   };
   useTicker((dt) => {
+    if (stop.eat(dt)) return;
     const next = charge + dt / duelChargeMs(at / rounds.length);
     if (next >= 1) burn(); // too slow: the dragon breathes
     else setCharge(next);
@@ -207,9 +252,24 @@ function Duel({ verse, seed, look, backdrop, onDone }: GameProps) {
   const cur = rounds[Math.min(at, rounds.length - 1)];
   const choose = (c: string) => {
     if (won || lost) return;
+    feedback.unlock();
     if (duelRight(cur, c)) {
+      const n = combo + 1;
+      const p = points(n, 1 - charge);
+      const [x, y] = dragonAt();
+      fxr.current?.burst(x, y, isComboTier(n) || at + 1 >= rounds.length ? 28 : 12, SPARKS);
+      fxr.current?.text(x, y - 40, `+${p}`);
+      if (isComboTier(n)) {
+        fxr.current?.text(x - 10, y - 80, `×${n}!`, true);
+        feedback.game('tier');
+      }
+      feedback.game('hit', n - 1);
+      stop.freeze(at + 1 >= rounds.length ? 180 : isComboTier(n) ? 110 : 60);
+      shake(stage.current, at + 1 >= rounds.length ? 0.8 : isComboTier(n) ? 0.45 : 0.25);
+      punch(comboEl.current);
+      setScore(score + p);
       setWrong(null);
-      setCombo(combo + 1);
+      setCombo(n);
       setBeat((b) => ({ kind: 'hit', n: (b?.n ?? 0) + 1 }));
       setAt(at + 1);
       setCharge(0);
@@ -225,9 +285,12 @@ function Duel({ verse, seed, look, backdrop, onDone }: GameProps) {
   return (
     <>
       <div class="verse-area stack">
-        <div class={`game-stage duel-stage ${beat?.kind ?? ''} ${won ? 'won' : ''} ${lost ? 'lost' : ''}`} style={backdrop} key={beat?.kind === 'hurt' ? `s${fx}` : 'stage'} data-testid="duel-stage">
+        <div class={`game-stage duel-stage ${beat?.kind ?? ''} ${won ? 'won' : ''} ${lost ? 'lost' : ''}`} style={backdrop} ref={stage} data-testid="duel-stage">
           <div class="game-hud">
             <Hearts n={hearts} of={DUEL_HEARTS} testid="duel-hearts" />
+            <b class="game-score duel-score" data-testid="game-score">
+              {score}
+            </b>
             <div class="duel-bars">
               <div class="bar duel-hp" role="img" aria-label={`The dragon has ${left} of ${rounds.length} strength left`}>
                 <i style={{ width: `${(left / rounds.length) * 100}%` }} />
@@ -241,7 +304,7 @@ function Duel({ verse, seed, look, backdrop, onDone }: GameProps) {
           <div class={`duel-knight ${beat?.kind ?? ''}`} key={`k${fx}`}>
             <AvatarFigure look={look} size={150} bare pose={pose.name} key={`${pose.name}${pose.n}`} />
           </div>
-          <div class={`duel-dragon ${beat?.kind ?? ''} ${charge > 0.7 ? 'rearing' : ''}`} key={`d${fx}`}>
+          <div class={`duel-dragon ${beat?.kind ?? ''} ${charge > 0.7 ? 'rearing' : ''}`} key={`d${fx}`} ref={dragonEl}>
             <Dragon size={150} />
           </div>
           {beat?.kind === 'hit' && (
@@ -260,6 +323,12 @@ function Duel({ verse, seed, look, backdrop, onDone }: GameProps) {
               <Pixels map={FLAME} size={54} />
             </div>
           )}
+          {combo >= 2 && (
+            <b class="game-combo hud-combo" ref={comboEl} data-testid="game-combo">
+              ×{combo}
+            </b>
+          )}
+          <Fx ref={fxr} />
         </div>
         <p class="verse-text duel-text" data-testid="duel-text">
           {rounds.map((r, i) => (
@@ -272,7 +341,7 @@ function Duel({ verse, seed, look, backdrop, onDone }: GameProps) {
       <Dock>
         <div class="game-choices" data-testid="duel-choices">
           {cur.choices.map((c) => (
-            <button key={`${at}-${c}`} class={`btn ${wrong === c ? 'shake' : ''}`} onClick={() => choose(c)} data-right={duelRight(cur, c) ? 'yes' : undefined} disabled={won || lost}>
+            <button key={`${at}-${c}`} class={`btn ${wrong === c ? 'shake' : ''}`} onPointerDown={(e) => (e.preventDefault(), choose(c))} onClick={(e) => e.detail === 0 && choose(c)} data-right={duelRight(cur, c) ? 'yes' : undefined} disabled={won || lost}>
               {c}
             </button>
           ))}
@@ -294,6 +363,12 @@ function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
   const [wrong, setWrong] = useState<number | null>(null);
   const [pos, setPos] = useState(-0.9); // where the knight is, in planks: below 0 is the near cliff, `laid` is the edge
   const [rest, setRest] = useState(0); // a breather after a fall (ms left)
+  const [score, setScore] = useState(0);
+  const [combo, setCombo] = useState(0);
+  const stage = useRef<HTMLDivElement>(null);
+  const plankRow = useRef<HTMLDivElement>(null);
+  const fxr = useRef<FxHandle>(null);
+  const stop = useHitStop(stage);
   const across = laid >= all.length;
   const lost = hearts <= 0;
   const live = useRef({ across, lost });
@@ -301,15 +376,19 @@ function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
   const [pose, play] = usePose(() => (live.current.across ? 'cheer' : live.current.lost ? 'fall' : 'walk'));
   useEffect(() => {
     if (!across && !lost) return;
-    const t = setTimeout(() => onDone({ won: across, slips }), across ? 1500 : 1200);
+    const t = setTimeout(() => onDone({ won: across, slips, score }), across ? 1500 : 1200);
     return () => clearTimeout(t);
   }, [across, lost]);
 
   const hurt = () => {
     setSlips((n) => n + 1);
     setHearts((h) => h - 1);
+    setCombo(0);
+    feedback.game('slip');
+    shake(stage.current, 0.5);
   };
   useTicker((dt) => {
+    if (stop.eat(dt)) return;
     if (lost) return;
     if (across) return setPos((p) => Math.min(all.length + 0.9, p + dt / 500)); // strides off the end onto the far cliff
     if (rest > 0) return setRest(rest - dt);
@@ -325,7 +404,27 @@ function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
 
   const pick = (p: Plank, i: number) => {
     if (across || lost) return;
+    feedback.unlock();
     if (plankFits(all, laid, p)) {
+      const n = combo + 1;
+      const pts = points(n, Math.max(0, Math.min(1, laid - pos - 0.2)));
+      const slot = plankRow.current?.children[laid] as HTMLElement | undefined;
+      const st = stage.current;
+      if (slot && st) {
+        const a = slot.getBoundingClientRect();
+        const b = st.getBoundingClientRect();
+        const x = a.left + a.width / 2 - b.left;
+        const y = a.top - b.top;
+        setTimeout(() => fxr.current?.burst(x, y + 6, isComboTier(n) ? 22 : 10, DUST, 0.7), 180); // when it lands
+        fxr.current?.text(x, y - 18, `+${pts}`);
+        if (isComboTier(n)) fxr.current?.text(x, y - 56, `×${n}!`, true);
+      }
+      setTimeout(() => feedback.game('thud'), 180);
+      feedback.game(isComboTier(n) ? 'tier' : 'hit', n - 1);
+      if (laid + 1 >= all.length) stop.freeze(160);
+      setTimeout(() => shake(stage.current, laid + 1 >= all.length ? 0.5 : 0.15), 180);
+      setCombo(n);
+      setScore(score + pts);
       setWrong(null);
       setUsed([...used, i]);
       setLaid(laid + 1);
@@ -341,16 +440,19 @@ function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
   return (
     <>
       <div class="verse-area stack">
-        <div class={`game-stage bridge-stage ${across ? 'across' : ''} ${lost ? 'lost' : ''}`} style={backdrop} data-testid="bridge-stage" data-laid={laid}>
+        <div class={`game-stage bridge-stage ${across ? 'across' : ''} ${lost ? 'lost' : ''}`} style={backdrop} ref={stage} data-testid="bridge-stage" data-laid={laid}>
           <div class="game-hud">
             <Hearts n={hearts} of={BRIDGE_HEARTS} testid="bridge-hearts" />
+            <b class="game-score" data-testid="game-score">
+              {score}
+            </b>
           </div>
           <div class="bridge-river" />
           <div class="bridge-cliff near" />
           <div class="bridge-cliff far">
             <Pixels map={TOWER} size={44} label="The far tower" />
           </div>
-          <div class="bridge-planks" aria-hidden="true">
+          <div class="bridge-planks" aria-hidden="true" ref={plankRow}>
             {all.map((_, i) => (
               <i key={i} class={i < laid ? 'laid' : i === laid && danger ? 'wanted' : ''} />
             ))}
@@ -359,6 +461,7 @@ function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
           <div class={`bridge-walker ${rest > 0 ? 'fell' : ''} ${danger ? 'danger' : ''}`} style={{ left: `${x}%` }} key={`w${rest > 0 ? slips : 'on'}`}>
             <AvatarFigure look={look} size={100} bare pose={rest > 0 ? 'fall' : pose.name} key={`${rest > 0 ? 'fall' : pose.name}${pose.n}`} />
           </div>
+          <Fx ref={fxr} />
         </div>
         <p class="verse-text bridge-text" data-testid="bridge-text">
           {laid === 0 ? <span class="muted">Tap the phrase that comes first.</span> : all.slice(0, laid).map((p) => p.text).join(' ')}
@@ -366,7 +469,7 @@ function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
         <div class="bridge-bank" data-testid="bridge-bank">
           {mixed.map((p, i) =>
             used.includes(i) ? null : (
-              <button key={i} class={`btn plank ${wrong === i ? 'shake' : ''}`} onClick={() => pick(p, i)} data-order={p.order} disabled={across || lost}>
+              <button key={i} class={`btn plank ${wrong === i ? 'shake' : ''}`} onPointerDown={(e) => (e.preventDefault(), pick(p, i))} onClick={(e) => e.detail === 0 && pick(p, i)} data-order={p.order} disabled={across || lost}>
                 {p.text}
               </button>
             ),
@@ -379,8 +482,28 @@ function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
 
 // ---------------------------------------------------------------- the games' home
 
+const ART: Record<GameId, () => preact.JSX.Element> = {
+  gate: () => <Pixels map={GATE} size={34} />,
+  burrows: () => <Pixels map={GOBLIN_UP} size={36} />,
+  volley: () => <Pixels map={GOBLIN} size={40} />,
+  duel: () => <Dragon size={52} />,
+  bridge: () => <Pixels map={TOWER} size={34} />,
+};
+
+/** Up to three small stars: the best this device has won with on this game and verse. */
+function BestStars({ n }: { n: number }) {
+  return (
+    <span class="best-stars" aria-label={n ? `Best: ${n} of 3 stars` : 'Not won yet'}>
+      {[1, 2, 3].map((i) => (
+        <i key={i} class={i <= n ? 'on' : ''} />
+      ))}
+    </span>
+  );
+}
+
 export function PlayHub() {
-  const { data } = useApp();
+  const { data, settings } = useApp();
+  const best = settings.gameBest ?? {};
   const { look, style } = useBackdrop();
   const now = Date.now();
   const verses = liveVerses(data);
@@ -407,7 +530,18 @@ export function PlayHub() {
   return (
     <div class="scroll">
       <div class="narrow stack" data-testid="play-hub">
-        <h1 class="headline">Play</h1>
+        <div class="row spread">
+          <h1 class="headline">Play</h1>
+          <div class="row gap-2">
+            <span class="hub-stars" data-testid="hub-stars" title="Stars you have won, across every game and verse">
+              <i class="best-star" aria-hidden="true" />
+              {totalStars(best)}
+            </span>
+            <button class={`icon-btn sound-toggle ${settings.soundOn ? 'on' : ''}`} onClick={() => (updateSettings({ soundOn: !settings.soundOn }), setTimeout(() => feedback.game('tier'), 30))} aria-pressed={settings.soundOn} aria-label={settings.soundOn ? 'Sound is on. Turn it off' : 'Sound is off. Turn it on'} data-testid="game-sound">
+              <Icon name={settings.soundOn ? 'sound' : 'mute'} />
+            </button>
+          </div>
+        </div>
         <div class="game-stage hub-stage" style={style} aria-hidden="true">
           <div class="game-ground" />
           <div class="hub-knight">
@@ -421,7 +555,9 @@ export function PlayHub() {
           </div>
         </div>
         <label class="stack gap-1">
-          <span class="label">Verse {readyCount > 0 && <span class="muted">· {readyCount} ready today</span>}</span>
+          <span class="label">
+            Verse {readyCount > 0 && <span class="muted">· {readyCount} ready today</span>} <span class="muted">· {verseStars(best, verse.id)} of {GAMES.length * 3} stars</span>
+          </span>
           <select class="input" value={verse.id} onChange={(e) => setChosen((e.target as HTMLSelectElement).value)} data-testid="play-verse">
             {sorted.map((v) => (
               <option key={v.id} value={v.id}>
@@ -435,10 +571,13 @@ export function PlayHub() {
           {GAMES.map((g) => (
             <li key={g.id}>
               <button class="game-card" onClick={() => navigate(`/play/${g.id}/${verse.id}`)} data-testid={`hub-${g.id}`}>
-                <span class="game-card-art">{g.id === 'volley' ? <Pixels map={GOBLIN} size={40} /> : g.id === 'duel' ? <Dragon size={52} /> : <Pixels map={TOWER} size={34} />}</span>
+                <span class="game-card-art">{ART[g.id]()}</span>
                 <span class="game-card-text">
-                  <strong>{g.name}</strong>
+                  <strong>
+                    {g.name} <BestStars n={best[bestKey(g.id, verse.id)]?.stars ?? 0} />
+                  </strong>
                   <small class="muted">{g.blurb}</small>
+                  {best[bestKey(g.id, verse.id)] && <small class="muted">Best {best[bestKey(g.id, verse.id)].score}</small>}
                 </span>
                 <Icon name="arrow" />
               </button>

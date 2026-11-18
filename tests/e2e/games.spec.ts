@@ -26,7 +26,85 @@ test.beforeEach(async ({ page }) => {
   await blockLookups(page);
 });
 
+async function winGate(page: Page) {
+  for (let i = 0; i < 200; i++) {
+    if (await page.getByTestId('game-finish').isVisible()) return;
+    const key = page.getByTestId('gate-keys').locator('button[data-right]:not([disabled])');
+    if (await key.count()) await key.dispatchEvent('pointerdown').catch(() => {});
+    else await page.waitForTimeout(80);
+  }
+}
+async function winBurrows(page: Page) {
+  for (let i = 0; i < 400; i++) {
+    if (await page.getByTestId('game-finish').isVisible()) return;
+    const mole = page.locator('[data-testid="burrow"][data-right]:not([disabled])');
+    if (await mole.count()) await mole.first().dispatchEvent('pointerdown').catch(() => {});
+    else await page.waitForTimeout(60);
+  }
+}
+
 test.describe('the games', () => {
+  test('Hold the Gate: the first letter of the next word strikes the goblin; a score, stars and a personal best are kept', async ({ page }) => {
+    await openApp(page);
+    await addVerse(page, JOHN316);
+    await page.goto('/#/play');
+    await expect(page.getByTestId('hub-stars')).toHaveText('0');
+    await page.getByTestId('hub-gate').click();
+    await expect(page.getByTestId('game')).toHaveAttribute('data-game', 'gate');
+    const keys = page.getByTestId('gate-keys').locator('button');
+    await expect(keys).toHaveCount(6);
+    // a wrong letter is a slip (a heart), and the word is not given away
+    await page.getByTestId('gate-keys').locator('button:not([data-right])').first().dispatchEvent('pointerdown');
+    await expect(page.getByTestId('gate-hearts')).toHaveAttribute('data-hearts', '2');
+    await expect(page.getByTestId('gate-text').locator('.w.ok')).toHaveCount(0);
+    // the right letter strikes, the word appears and the score goes up
+    await page.getByTestId('gate-keys').locator('button[data-right]').dispatchEvent('pointerdown');
+    await expect(page.getByTestId('gate-text').locator('.w.ok').first()).toHaveText('For');
+    await expect(page.getByTestId('game-score')).not.toHaveText('0');
+    // a computer keyboard works too
+    await page.keyboard.press('g');
+    await expect(page.getByTestId('gate-stage')).toHaveAttribute('data-next', '2');
+    await winGate(page);
+    await expect(page.getByTestId('game-finish')).toContainText('The gate holds');
+    await expect(page.getByTestId('game-stars')).toHaveAttribute('data-stars', '2');
+    const first = Number(await page.getByTestId('game-final-score').locator('b').textContent());
+    expect(first).toBeGreaterThan(100);
+    await expect(page.getByTestId('game-new-best')).toHaveCount(0); // a first win is not a "new best"
+    expect(await reviewsOf(page)).toBe(1);
+    // a clean second run scores more: a new best, and three stars kept for this game and verse
+    await page.getByTestId('game-again').click();
+    await winGate(page);
+    await expect(page.getByTestId('game-stars')).toHaveAttribute('data-stars', '3');
+    await expect(page.getByTestId('game-new-best')).toBeVisible();
+    await page.getByTestId('game-close').click();
+    await expect(page.getByTestId('hub-stars')).toHaveText('3');
+  });
+
+  test('Goblin Burrows: bonk the goblin with the next word; a wrong one costs a heart', async ({ page }) => {
+    await openApp(page);
+    await addVerse(page, JOHN316);
+    await page.goto('/#/play');
+    await page.getByTestId('hub-burrows').click();
+    const wrong = page.locator('[data-testid="burrow"]:not([data-right]) .mole');
+    await wrong.first().waitFor({ timeout: 5000 });
+    await page.locator('[data-testid="burrow"]:has(.mole):not([data-right])').first().dispatchEvent('pointerdown');
+    await expect(page.getByTestId('burrows-hearts')).toHaveAttribute('data-hearts', '2');
+    await winBurrows(page);
+    await expect(page.getByTestId('game-finish')).toContainText('Every goblin bonked');
+    await expect(page.getByTestId('game-verdict')).toContainText('counted as its review');
+  });
+
+  test('the sound switch on Play turns the quiet sounds on and off', async ({ page }) => {
+    await openApp(page);
+    await addVerse(page, JOHN316);
+    await page.goto('/#/play');
+    const sound = page.getByTestId('game-sound');
+    await expect(sound).toHaveAttribute('aria-pressed', 'false');
+    await sound.click();
+    await expect(sound).toHaveAttribute('aria-pressed', 'true');
+    expect(await page.evaluate(() => (window as any).__mfl.getState().settings.soundOn)).toBe(true);
+  });
+
   test('Play is a tab and a panel on Today; Arrow Volley is won by tapping the next word, and the win counts as the review', async ({ page }) => {
     await openApp(page);
     await addVerse(page, PSALM23_1);
@@ -116,6 +194,6 @@ test.describe('the games', () => {
     await expect(page.getByTestId('game-stars')).toHaveAttribute('data-stars', '2');
     // and over to another game from here
     await page.getByTestId('game-swap').click();
-    await expect(page.getByTestId('game')).toHaveAttribute('data-game', 'volley');
+    await expect(page.getByTestId('game')).toHaveAttribute('data-game', 'gate');
   });
 });

@@ -2,6 +2,7 @@
 // this is a tiny simulation: `volleyStep` moves time on and `volleyTap` is a tap on an arrow. Pure and seeded, so it can be tested
 // without a screen. Arrows fly from x = 0 (the archers) to x = 1 (the knight). Only the arrow carrying the NEXT word of the verse
 // is dangerous: cut it down in time. Tapping any other word, or letting the right one land, costs a heart.
+import { points } from './games.ts';
 import { makeRng } from './quiz.ts';
 import { tokenize, type Word } from './text.ts';
 
@@ -29,6 +30,7 @@ export interface VolleyState {
   hearts: number;
   slips: number;
   combo: number;
+  score: number;
   shots: Shot[];
   over: 'won' | 'lost' | null;
   /** Milliseconds since the last arrow left, and how many arrows since the needed word last flew. */
@@ -42,7 +44,7 @@ export const shown = (w: Word) => w.raw.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$
 
 export function newVolley(text: string, seed = 1): VolleyState {
   const words = tokenize(text);
-  return { words, next: 0, hearts: VOLLEY_HEARTS, slips: 0, combo: 0, shots: [], over: words.length ? null : 'won', sinceSpawn: 1e9, sinceAnswer: 99, nextId: 1, rng: makeRng(seed) };
+  return { words, next: 0, hearts: VOLLEY_HEARTS, slips: 0, combo: 0, score: 0, shots: [], over: words.length ? null : 'won', sinceSpawn: 1e9, sinceAnswer: 99, nextId: 1, rng: makeRng(seed) };
 }
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
@@ -111,6 +113,7 @@ export function volleyTap(s: VolleyState, id: number): VolleyEvent[] {
   if (sh.key === s.words[s.next].key) {
     s.next++;
     s.combo++;
+    s.score += points(s.combo, 1 - sh.x);
     if (s.next >= s.words.length) s.over = 'won';
     return [{ type: 'cut', shot: sh }];
   }

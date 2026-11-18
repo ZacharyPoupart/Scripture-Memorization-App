@@ -97,6 +97,7 @@ let state: AppState = {
     seenSaved: '',
     listSort: 'longest',
     flagGuild: '',
+    gameBest: {},
   },
   tick: 0,
   toast: null,

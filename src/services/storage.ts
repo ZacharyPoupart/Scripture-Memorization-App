@@ -93,6 +93,7 @@ export function defaultSettings(): Settings {
     seenSaved: '',
     listSort: 'longest',
     flagGuild: '',
+    gameBest: {},
   };
 }
 

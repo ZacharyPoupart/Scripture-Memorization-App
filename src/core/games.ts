@@ -5,12 +5,55 @@ import { makeRng, mistakesAllowed, shuffle } from './quiz.ts';
 import type { Pile } from './types.ts';
 import { tokenize, type Word } from './text.ts';
 
-export type GameId = 'volley' | 'duel' | 'bridge';
+export type GameId = 'gate' | 'burrows' | 'volley' | 'duel' | 'bridge';
 export const GAMES: { id: GameId; name: string; blurb: string }[] = [
+  { id: 'gate', name: 'Hold the Gate', blurb: 'Tap the first letter of the next word before the goblin reaches the gate.' },
+  { id: 'burrows', name: 'Goblin Burrows', blurb: 'Bonk the goblin holding the next word.' },
   { id: 'volley', name: 'Arrow Volley', blurb: 'Cut down the arrow carrying the next word.' },
   { id: 'duel', name: 'Dragon Duel', blurb: 'Strike with the next word before the fire comes.' },
   { id: 'bridge', name: 'Bridge Run', blurb: 'Lay each phrase before the knight reaches the edge.' },
 ];
+
+// ---------------------------------------------------------------- score, combo and personal bests (shared by every game)
+
+/** Right answers in a row make each one worth more: x1.5 from 5, x2 from 10, x3 from 20. A slip starts it again. */
+export function comboMultiplier(combo: number): number {
+  return combo >= 20 ? 3 : combo >= 10 ? 2 : combo >= 5 ? 1.5 : 1;
+}
+/** The combo counts at which the multiplier steps up (a bigger celebration). */
+export const COMBO_TIERS = [5, 10, 20] as const;
+export const isComboTier = (combo: number) => (COMBO_TIERS as readonly number[]).includes(combo);
+
+/**
+ * Points for one right answer: 10 times the combo multiplier (the combo including this answer), plus up to 5 for speed.
+ * `quick` is how much of the time was left, 0 to 1.
+ */
+export function points(combo: number, quick = 0): number {
+  return Math.round(10 * comboMultiplier(combo)) + Math.round(5 * Math.max(0, Math.min(1, quick)));
+}
+
+export interface Best {
+  stars: number;
+  score: number;
+}
+export const bestKey = (game: GameId, verseId: string) => `${game}:${verseId}`;
+
+/**
+ * A finished game against what this device has kept (device-only, `settings.gameBest`). Only wins are kept. Returns the new
+ * table (unchanged when nothing improved) and what is new, so the result can celebrate it.
+ */
+export function recordBest(table: Record<string, Best>, key: string, run: Best & { won: boolean }): { table: Record<string, Best>; newScore: boolean; newStars: boolean } {
+  const old = table[key];
+  if (!run.won) return { table, newScore: false, newStars: false };
+  const newScore = !old || run.score > old.score;
+  const newStars = !old || run.stars > old.stars;
+  if (!newScore && !newStars) return { table, newScore, newStars };
+  return { table: { ...table, [key]: { stars: Math.max(run.stars, old?.stars ?? 0), score: Math.max(run.score, old?.score ?? 0) } }, newScore: newScore && !!old, newStars };
+}
+
+/** Stars collected for one verse across every game (the best of each), and in all. */
+export const verseStars = (table: Record<string, Best>, verseId: string) => GAMES.reduce((n, g) => n + (table[bestKey(g.id, verseId)]?.stars ?? 0), 0);
+export const totalStars = (table: Record<string, Best>) => Object.values(table).reduce((n, b) => n + (b?.stars ?? 0), 0);
 
 /**
  * Does this game count as the verse's review? Only a win, and only within the pile's usual mistake allowance (Daily forgives 3
