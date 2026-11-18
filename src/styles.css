@@ -4498,3 +4498,223 @@ button.chip {
     animation: none !important;
   }
 }
+
+/* ================= the word flies home, and two more games (v1.77.0) ================= */
+.fly-word {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 50;
+  pointer-events: none;
+  font-family: 'Fraunces', serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--good);
+  white-space: nowrap;
+  will-change: transform;
+}
+/* the word in the verse waits for the flying one to land, then pops in */
+.duel-text .w.fresh {
+  display: inline-block;
+  animation: word-land 0.2s cubic-bezier(.34, 1.56, .64, 1) 0.28s both;
+}
+@keyframes word-land {
+  from { opacity: 0; transform: scale(1.35); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .duel-text .w.fresh {
+    animation: none;
+  }
+}
+
+.bridge-text .next-slot {
+  display: inline-block;
+  width: 3em;
+  height: 1em;
+}
+.bridge-text .bridge-fresh {
+  display: inline-block;
+  animation: word-land 0.2s cubic-bezier(.34, 1.56, .64, 1) 0.28s both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bridge-text .bridge-fresh {
+    animation: none;
+  }
+}
+
+/* ---- Sword Dance ---- */
+.dance-stage {
+  height: 290px;
+  touch-action: manipulation;
+}
+.dance-fuse {
+  flex: 1;
+  height: 10px;
+  margin: 0 var(--sp-2);
+  border: 1.5px solid var(--text);
+  border-radius: 5px;
+  background: var(--surface);
+  overflow: hidden;
+}
+.dance-fuse > i {
+  display: block;
+  height: 100%;
+  background: #e2792f;
+}
+.dance-fuse.hot {
+  animation: charge-hot 0.3s steps(2) infinite;
+}
+.dance-knight,
+.dance-ghost {
+  position: absolute;
+  z-index: 2;
+  margin: -64px 0 0 -42px; /* the feet stand on the point */
+  transition: left 110ms cubic-bezier(.2, .8, .2, 1), top 110ms cubic-bezier(.2, .8, .2, 1);
+}
+.dance-ghost {
+  z-index: 1;
+  transition: none;
+  pointer-events: none;
+  animation: ghost-fade 0.3s ease-out both;
+}
+@keyframes ghost-fade {
+  from { opacity: 0.45; }
+  to { opacity: 0; }
+}
+.dance-shield {
+  position: absolute;
+  z-index: 3;
+  display: grid;
+  justify-items: center;
+  min-width: 64px;
+  min-height: 64px;
+  margin: -32px 0 0 -32px;
+  padding: 0;
+  background: none;
+  border: 0;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  animation: shield-in 0.3s cubic-bezier(.34, 1.56, .64, 1) both;
+}
+.dance-shield .bearer {
+  margin-bottom: -18px;
+}
+.dance-shield .round {
+  position: relative;
+  min-width: 56px;
+  padding: 6px 10px;
+  border: 2.5px solid #221e26;
+  border-radius: 999px;
+  background: #e8c66a;
+  color: #221e26;
+  font: 700 0.98rem 'Fraunces', serif;
+  white-space: nowrap;
+  box-shadow: inset 0 0 0 3px #f4efe2;
+}
+.dance-shield:active .round {
+  transform: scale(0.94);
+}
+.dance-shield.broken {
+  animation: shield-break 0.32s ease-in both;
+}
+@keyframes shield-in {
+  from { transform: translateY(-30px) scale(0.6); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes shield-break {
+  0% { transform: scale(1.15) rotate(-6deg); filter: brightness(1.8); }
+  100% { transform: translateY(26px) scale(0.6) rotate(24deg); opacity: 0; }
+}
+
+/* ---- Parry ---- */
+.parry-stage {
+  height: 240px;
+}
+.parry-knight {
+  position: absolute;
+  left: 2%;
+  bottom: 12px;
+  z-index: 2;
+}
+.parry-rune {
+  position: absolute;
+  bottom: 54px;
+  margin-left: -44px;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  animation: rune-in 0.24s cubic-bezier(.34, 1.56, .64, 1) both, rune-spin 0.9s ease-in-out 0.24s infinite alternate;
+}
+.parry-rune .word {
+  position: absolute;
+  inset: 0 6px 6px 0;
+  display: grid;
+  place-items: center;
+  font: 700 1.05rem 'Fraunces', serif;
+  color: #221e26;
+  white-space: nowrap;
+}
+.parry-rune.near {
+  animation: rune-spin 0.18s ease-in-out infinite alternate;
+}
+@keyframes rune-in {
+  from { transform: scale(0.4) rotate(-20deg); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes rune-spin {
+  from { transform: rotate(-4deg) translateY(0); }
+  to { transform: rotate(4deg) translateY(-6px); }
+}
+.parry-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+}
+.parry-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-height: 72px;
+  border-radius: 16px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font: 700 1.25rem 'Fraunces', serif;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: transform 80ms var(--ease), background-color 80ms var(--ease);
+}
+.parry-btn svg {
+  width: 26px;
+  height: 26px;
+}
+.parry-btn.strike {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+.parry-btn:active {
+  transform: scale(0.95);
+}
+.parry-btn.good {
+  animation: check-pop 0.24s var(--spring);
+}
+.parry-btn.shake {
+  animation: shake 0.36s var(--ease);
+}
+@media (prefers-reduced-motion: reduce) {
+  .dance-knight,
+  .dance-ghost {
+    transition: none;
+    animation: none;
+  }
+  .dance-shield,
+  .parry-rune,
+  .parry-btn {
+    animation: none !important;
+  }
+}

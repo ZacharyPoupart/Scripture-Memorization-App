@@ -43,7 +43,59 @@ async function winBurrows(page: Page) {
   }
 }
 
+async function winDance(page: Page) {
+  for (let i = 0; i < 400; i++) {
+    if (await page.getByTestId('game-finish').isVisible()) return;
+    const sh = page.locator('[data-testid="dance-shield"][data-right]:not([disabled])');
+    if (await sh.count()) await sh.first().dispatchEvent('pointerdown').catch(() => {});
+    else await page.waitForTimeout(60);
+  }
+}
+async function winParry(page: Page) {
+  for (let i = 0; i < 600; i++) {
+    if (await page.getByTestId('game-finish').isVisible()) return;
+    const rune = page.getByTestId('parry-rune');
+    if (await rune.count()) {
+      const right = (await rune.getAttribute('data-right').catch(() => null)) === 'yes';
+      await page.getByTestId(right ? 'parry-strike' : 'parry-block').dispatchEvent('pointerdown').catch(() => {});
+    }
+    await page.waitForTimeout(60);
+  }
+}
+
 test.describe('the games', () => {
+  test('Sword Dance: the words of each phrase are cut in order; one out of order costs a heart', async ({ page }) => {
+    await openApp(page);
+    await addVerse(page, JOHN316);
+    await page.goto('/#/play');
+    await page.getByTestId('hub-dance').click();
+    await expect(page.getByTestId('dance-shield')).toHaveCount(5); // the first phrase: "For God so loved the"
+    await page.locator('[data-testid="dance-shield"]:not([data-right])').first().dispatchEvent('pointerdown');
+    await expect(page.getByTestId('dance-hearts')).toHaveAttribute('data-hearts', '2');
+    await page.locator('[data-testid="dance-shield"][data-right]').dispatchEvent('pointerdown');
+    // the word flies from the shield into its place in the verse
+    await expect(page.locator('.fly-word')).toHaveText('For');
+    await expect(page.getByTestId('dance-text').locator('.w.ok').first()).toHaveText('For');
+    await winDance(page);
+    await expect(page.getByTestId('game-finish')).toContainText('Every shield cut');
+    await expect(page.getByTestId('game-verdict')).toContainText('counted as its review');
+  });
+
+  test('Parry: strike the next word, block the rest; a wrong call costs a heart', async ({ page }) => {
+    await openApp(page);
+    await addVerse(page, JOHN316);
+    await page.goto('/#/play');
+    await page.getByTestId('hub-parry').click();
+    const rune = page.getByTestId('parry-rune');
+    await rune.waitFor({ timeout: 5000 });
+    const right = (await rune.getAttribute('data-right')) === 'yes';
+    await page.getByTestId(right ? 'parry-block' : 'parry-strike').dispatchEvent('pointerdown'); // the wrong call
+    await expect(page.getByTestId('parry-hearts')).toHaveAttribute('data-hearts', '2');
+    await winParry(page);
+    await expect(page.getByTestId('game-finish')).toContainText('Not one rune got past');
+    await expect(page.getByTestId('game-stars')).toHaveAttribute('data-stars', '2');
+  });
+
   test('Hold the Gate: the first letter of the next word strikes the goblin; a score, stars and a personal best are kept', async ({ page }) => {
     await openApp(page);
     await addVerse(page, JOHN316);

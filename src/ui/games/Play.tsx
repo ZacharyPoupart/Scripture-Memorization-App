@@ -19,11 +19,13 @@ import { CoinCount } from '../CoinCount.tsx';
 import { Confetti, Icon, PILE_INFO } from '../common.tsx';
 import { Dock } from '../modes/shared.tsx';
 import { EmptyState } from '../primitives.tsx';
-import { Dragon, FLAME, GATE, GOBLIN, GOBLIN_UP, Hearts, Pixels, SPARK, Stars, TOWER, useTicker } from './sprites.tsx';
+import { BEARER, Dragon, FLAME, GATE, GOBLIN, GOBLIN_UP, Hearts, Pixels, RUNE, SPARK, Stars, TOWER, useTicker } from './sprites.tsx';
 import { Volley } from './Volley.tsx';
 import { Gate } from './Gate.tsx';
 import { Burrows } from './Burrows.tsx';
-import { DUST, Fx, punch, shake, SPARKS, useHitStop, type FxHandle } from './juice.tsx';
+import { Dance } from './Dance.tsx';
+import { Parry } from './Parry.tsx';
+import { DUST, flyWord, Fx, gapIn, punch, shake, SPARKS, useHitStop, type FxHandle } from './juice.tsx';
 import type { GameProps, Outcome } from './types.ts';
 
 /** The scene behind a game: the knight's own background, as wide as the stage. */
@@ -78,6 +80,10 @@ export function Play({ game, verseId }: { game: string; verseId: string }) {
         <Gate key={round} {...props} />
       ) : info.id === 'burrows' ? (
         <Burrows key={round} {...props} />
+      ) : info.id === 'dance' ? (
+        <Dance key={round} {...props} />
+      ) : info.id === 'parry' ? (
+        <Parry key={round} {...props} />
       ) : info.id === 'volley' ? (
         <Volley key={round} {...props} />
       ) : info.id === 'duel' ? (
@@ -92,6 +98,8 @@ export function Play({ game, verseId }: { game: string; verseId: string }) {
 const WORDS: Record<GameId, { won: string; lost: string }> = {
   gate: { won: 'The gate holds', lost: 'The goblins broke through' },
   burrows: { won: 'Every goblin bonked', lost: 'The goblins got away' },
+  dance: { won: 'Every shield cut', lost: 'The fuse burned out' },
+  parry: { won: 'Not one rune got past', lost: 'The runes broke through' },
   volley: { won: 'The archers are routed', lost: 'The arrows got through' },
   duel: { won: 'The dragon is beaten', lost: 'The dragon holds the gate' },
   bridge: { won: 'Safely across', lost: 'Into the river' },
@@ -250,10 +258,11 @@ function Duel({ verse, seed, look, backdrop, onDone }: GameProps) {
   }, !won && !lost);
 
   const cur = rounds[Math.min(at, rounds.length - 1)];
-  const choose = (c: string) => {
+  const choose = (c: string, from?: Element) => {
     if (won || lost) return;
     feedback.unlock();
     if (duelRight(cur, c)) {
+      flyWord(cur.word.raw, from, gapIn('duel-text'));
       const n = combo + 1;
       const p = points(n, 1 - charge);
       const [x, y] = dragonAt();
@@ -341,7 +350,7 @@ function Duel({ verse, seed, look, backdrop, onDone }: GameProps) {
       <Dock>
         <div class="game-choices" data-testid="duel-choices">
           {cur.choices.map((c) => (
-            <button key={`${at}-${c}`} class={`btn ${wrong === c ? 'shake' : ''}`} onPointerDown={(e) => (e.preventDefault(), choose(c))} onClick={(e) => e.detail === 0 && choose(c)} data-right={duelRight(cur, c) ? 'yes' : undefined} disabled={won || lost}>
+            <button key={`${at}-${c}`} class={`btn ${wrong === c ? 'shake' : ''}`} onPointerDown={(e) => (e.preventDefault(), choose(c, e.currentTarget as Element))} onClick={(e) => e.detail === 0 && choose(c, e.currentTarget as Element)} data-right={duelRight(cur, c) ? 'yes' : undefined} disabled={won || lost}>
               {c}
             </button>
           ))}
@@ -402,10 +411,11 @@ function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
     } else setPos(next);
   }, pos < all.length + 0.9);
 
-  const pick = (p: Plank, i: number) => {
+  const pick = (p: Plank, i: number, from?: Element) => {
     if (across || lost) return;
     feedback.unlock();
     if (plankFits(all, laid, p)) {
+      flyWord(p.text, from, document.querySelector('[data-testid="bridge-text"] .next-slot'));
       const n = combo + 1;
       const pts = points(n, Math.max(0, Math.min(1, laid - pos - 0.2)));
       const slot = plankRow.current?.children[laid] as HTMLElement | undefined;
@@ -464,12 +474,21 @@ function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
           <Fx ref={fxr} />
         </div>
         <p class="verse-text bridge-text" data-testid="bridge-text">
-          {laid === 0 ? <span class="muted">Tap the phrase that comes first.</span> : all.slice(0, laid).map((p) => p.text).join(' ')}
+          {laid === 0 ? <span class="muted">Tap the phrase that comes first.</span> : all.slice(0, laid - 1).map((p) => p.text).join(' ')}
+          {laid > 0 && (
+            <>
+              {laid > 1 ? ' ' : ''}
+              <span class="bridge-fresh" key={laid}>
+                {all[laid - 1].text}
+              </span>
+            </>
+          )}{' '}
+          <span class="next-slot" aria-hidden="true" />
         </p>
         <div class="bridge-bank" data-testid="bridge-bank">
           {mixed.map((p, i) =>
             used.includes(i) ? null : (
-              <button key={i} class={`btn plank ${wrong === i ? 'shake' : ''}`} onPointerDown={(e) => (e.preventDefault(), pick(p, i))} onClick={(e) => e.detail === 0 && pick(p, i)} data-order={p.order} disabled={across || lost}>
+              <button key={i} class={`btn plank ${wrong === i ? 'shake' : ''}`} onPointerDown={(e) => (e.preventDefault(), pick(p, i, e.currentTarget as Element))} onClick={(e) => e.detail === 0 && pick(p, i, e.currentTarget as Element)} data-order={p.order} disabled={across || lost}>
                 {p.text}
               </button>
             ),
@@ -485,6 +504,8 @@ function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
 const ART: Record<GameId, () => preact.JSX.Element> = {
   gate: () => <Pixels map={GATE} size={34} />,
   burrows: () => <Pixels map={GOBLIN_UP} size={36} />,
+  dance: () => <Pixels map={BEARER} size={36} />,
+  parry: () => <Pixels map={RUNE} size={40} />,
   volley: () => <Pixels map={GOBLIN} size={40} />,
   duel: () => <Dragon size={52} />,
   bridge: () => <Pixels map={TOWER} size={34} />,

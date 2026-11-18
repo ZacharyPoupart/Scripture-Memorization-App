@@ -158,3 +158,41 @@ export function centerIn(el: Element | null | undefined, stage: Element | null |
   const b = stage.getBoundingClientRect();
   return [a.left + a.width / 2 - b.left, a.top + a.height / 2 - b.top];
 }
+
+/**
+ * The word you just recalled flies from where you struck to its place in the verse (v1.77.0, from the research: it ties the
+ * reward to the text). `from` is where it starts (the thing struck); `to` is the gap it fills. The word in the verse waits for it
+ * (`.w.fresh` lands a beat later). Nothing flies under reduced motion.
+ */
+export function flyWord(text: string, from: Element | DOMRect | null | undefined, to: Element | null | undefined) {
+  if (!from || !to || reducedMotion() || typeof document === 'undefined') return;
+  const a = from instanceof Element ? from.getBoundingClientRect() : from;
+  const b = to.getBoundingClientRect();
+  if (!b.width && !b.height) return;
+  const el = document.createElement('span');
+  el.className = 'fly-word';
+  el.setAttribute('aria-hidden', 'true');
+  el.textContent = text;
+  document.body.appendChild(el);
+  const fx = a.left + a.width / 2;
+  const fy = a.top + a.height / 2;
+  const tx = b.left + b.width / 2;
+  const ty = b.top + b.height / 2;
+  const lift = Math.min(70, Math.abs(tx - fx) * 0.25 + 30); // a little arc
+  const at = (x: number, y: number, s: number) => `translate(${x}px, ${y}px) translate(-50%, -50%) scale(${s})`;
+  const anim = el.animate(
+    [
+      { transform: at(fx, fy, 1.35), opacity: 0.2 },
+      { transform: at((fx + tx) / 2, Math.min(fy, ty) - lift, 1.15), opacity: 1, offset: 0.45 },
+      { transform: at(tx, ty, 1), opacity: 1 },
+    ],
+    { duration: 300, easing: 'cubic-bezier(.2,.8,.2,1)' },
+  );
+  const done = () => el.remove();
+  anim.onfinish = done;
+  anim.oncancel = done;
+  setTimeout(done, 800);
+}
+
+/** The gap the next word fills in a game's verse line (call before the screen updates). */
+export const gapIn = (testid: string) => (typeof document === 'undefined' ? null : document.querySelector(`[data-testid="${testid}"] .w.cur`));

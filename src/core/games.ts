@@ -5,10 +5,12 @@ import { makeRng, mistakesAllowed, shuffle } from './quiz.ts';
 import type { Pile } from './types.ts';
 import { tokenize, type Word } from './text.ts';
 
-export type GameId = 'gate' | 'burrows' | 'volley' | 'duel' | 'bridge';
+export type GameId = 'gate' | 'burrows' | 'dance' | 'parry' | 'volley' | 'duel' | 'bridge';
 export const GAMES: { id: GameId; name: string; blurb: string }[] = [
   { id: 'gate', name: 'Hold the Gate', blurb: 'Tap the first letter of the next word before the goblin reaches the gate.' },
   { id: 'burrows', name: 'Goblin Burrows', blurb: 'Bonk the goblin holding the next word.' },
+  { id: 'dance', name: 'Sword Dance', blurb: 'Cut through each phrase’s words in order before the fuse burns out.' },
+  { id: 'parry', name: 'Parry', blurb: 'Strike the rune with the next word, block every other.' },
   { id: 'volley', name: 'Arrow Volley', blurb: 'Cut down the arrow carrying the next word.' },
   { id: 'duel', name: 'Dragon Duel', blurb: 'Strike with the next word before the fire comes.' },
   { id: 'bridge', name: 'Bridge Run', blurb: 'Lay each phrase before the knight reaches the edge.' },
