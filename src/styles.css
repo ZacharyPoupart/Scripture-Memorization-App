@@ -4144,3 +4144,42 @@ button.chip {
 .tab {
   min-width: 0;
 }
+
+/* ================= softer boxes (v1.75.1, owner-requested: "less hard corners like word boxes on fill in the blank") ================= */
+/* word boxes: rounder, on a soft surface, with a quiet edge and not an ink outline */
+.option,
+.game-choices .btn,
+.btn.plank {
+  border-radius: 14px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+}
+.option:active,
+.game-choices .btn:active,
+.btn.plank:active {
+  background: var(--surface-2);
+  color: var(--text);
+  border-color: var(--text);
+  transform: scale(0.97);
+}
+.blank.cur {
+  border-radius: 6px;
+}
+/* the last square-cornered surfaces */
+.card,
+.flashcard-face,
+.pick-btn,
+.item-tile,
+.tour-lesson {
+  border-radius: var(--radius);
+}
+.seg button,
+.seg-tab {
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+.switch::before {
+  border-radius: 14px;
+}
+.switch > i {
+  border-radius: 10px;
+}
