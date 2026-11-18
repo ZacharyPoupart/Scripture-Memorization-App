@@ -1,144 +1,50 @@
-// The games' own pixel pictures, drawn from little maps (one square a letter), and the small pieces built from them.
+// The games' pictures (cut from the owner's sheet) and the small pieces built from them.
 import { useEffect, useRef } from 'preact/hooks';
+import CREATURES from './creatures.json';
 
-const W = 26;
-const pad = (rows: string[]) => rows.map((r) => r.padEnd(W, '.'));
-/** The dragon, wings up and wings folded: shown in turn, so it flaps. */
-export const DRAGON_UP = pad([
-  '..............kk......kk',
-  '.............kddk....kddk',
-  '......kk....kddddk..kdddk',
-  '.....kwk...kdddddkkkddddk',
-  '..kkkkgkk..kddddddddddddk',
-  '.kgggggggkkkgdddddddddgk',
-  'kgrgggggggggggggddddggk',
-  'kggggggggggggggggggggk',
-  'kwkwkgggggyyyygggggggk',
-  '.k.k.kkggyyyyyyggggggk',
-  '......kggyyyyyyygggggkk',
-  '......kgyyyyyyyygggggggk',
-  '......kggyyyyyygggkkgggk',
-  '.....kgggkkkkkgggk..kggk',
-  '.....kggk....kggk....kgk',
-  '....kkkkk...kkkkk....kkk',
-]);
-export const DRAGON_DOWN = pad([
-  '',
-  '',
-  '......kk',
-  '.....kwk',
-  '..kkkkgkk..kkkkkkkkkkkkkk',
-  '.kgggggggkkkddddddddddddk',
-  'kgrggggggggggdddddddddgk',
-  'kggggggggggggggggggggk',
-  'kwkwkgggggyyyygggggggk',
-  '.k.k.kkggyyyyyyggggggk',
-  '......kggyyyyyyygggggkk',
-  '......kgyyyyyyyygggggggk',
-  '......kggyyyyyygggkkgggk',
-  '.....kgggkkkkkgggk..kggk',
-  '.....kggk....kggk....kgk',
-  '....kkkkk...kkkkk....kkk',
-]);
-/** A goblin archer, facing left, bow in hand. */
-export const GOBLIN = [
-  '.....kkkk....',
-  '.k..kggggk.k.',
-  'kgkkgggggkkgk',
-  '.kggrggrggk..',
-  '..kgggggggk..',
-  '.w.kgwwwgk...',
-  'w..kkbbbkk...',
-  'w.kbbbbbbbk..',
-  'wkkbkbbbkbk..',
-  'w..kbbbbbk...',
-  '.w.kbbkbbk...',
-  '...kbk.kbk...',
-  '..kkk..kkk...',
-];
-/** The gate the goblins march on. */
-export const GATE = ['kk.kk.kk.kk', 'kskkskkskks', 'ksssssssssk', 'kssbbbbbssk', 'ksbbkbkbbsk', 'ksbkbkbkbsk', 'ksbbkbkbbsk', 'ksbkbkbkbsk', 'ksbbkbkbbsk', 'kkkkkkkkkkk'];
-export const SHIELD_ICON = ['kkkkkkk', 'kyyyyyk', 'kywkwyk', 'kyywyyk', '.kyyyk.', '..kyk..', '...k...'];
-/** A goblin holding up a sign, for the burrows (the sign is drawn by the page, over its hands). */
-export const GOBLIN_UP = [
-  '...kkkkk...',
-  '.k.kgggk.k.',
-  'kgkgggggkgk',
-  '.kgrgggrgk.',
-  '..kgggggk..',
-  '..kgwwwgk..',
-  '.kkkkkkkkk.',
-  'kgkbbbbbkgk',
-  'kgkbbbbbkgk',
-  '.k.kbbbk.k.',
-];
-/** Seen from the side when struck: squashed, eyes shut. */
-export const GOBLIN_BONK = [
-  '...........',
-  '...........',
-  '...kkkkk...',
-  'kkkgggggkkk',
-  'kgkkgggkkgk',
-  '.kgggggggk.',
-  'kkkbbbbbkkk',
-  'kgkbbbbbkgk',
-  '.kkkkkkkkk.',
-  '...........',
-];
-/** A burrow: a dark mouth in a mound of earth. */
-export const HOLE = ['...bbbbbbbbb...', '.bbbsssssssbbb.', 'bbsskkkkkkkssbb', 'bbskkkkkkkkksbb', '.bbbbbbbbbbbbb.'];
-export const HEART = ['.kk.kk.', 'krrkrrk', 'krrrrrk', 'krrrrrk', '.krrrk.', '..krk..', '...k...'];
-export const STAR = ['...k...', '..kyk..', 'kkkykkk', 'kyyyyyk', '.kyyyk.', '.kykyk.', 'kk...kk'];
-export const TOWER = ['k.k.k', 'kkkkk', 'ksssk', 'ksssk', 'ksksk', 'ksksk'];
-export const FLAME = ['..oo....', '.oyyoo..', 'oyywyyoo', '.oyyoo..', '..oo....'];
-export const SPARK = ['..w..', '.wyw.', 'wyyyw', '.wyw.', '..w..'];
-export const ARROWHEAD = ['..k..', '.kwk.', 'kwwkk', '.kwk.', '..k..'];
-const INK: Record<string, string> = { k: '#221e26', g: '#3f8f5b', d: '#2c6a43', y: '#e8c66a', r: '#c8463c', w: '#f4efe2', s: '#a9a394', o: '#e2792f', b: '#7a5230' };
+// The goblins, the dragon, their effects and the game pieces come from the owner's sheet (design/creatures/sheet.webp), cut by
+// design/creatures/cut.py into one strip a picture or animation (public/creatures/<name>.webp; sizes in creatures.json).
+export type SpriteName = keyof typeof CREATURES;
+export const stripUrl = (name: SpriteName) => `${import.meta.env.BASE_URL}creatures/${name}.webp`;
 
-// Each map is drawn once into a small SVG picture and cached, so a sprite costs one <img> however often the game redraws.
-const CACHE = new Map<string, { url: string; w: number; h: number }>();
-function picture(map: string[]) {
-  const key = map.join('|');
-  let pic = CACHE.get(key);
-  if (!pic) {
-    const w = map[0].length;
-    const h = map.length;
-    const rects = map.flatMap((row, y) => [...row].map((c, x) => (c === '.' || !INK[c] ? '' : `<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${INK[c]}"/>`))).join('');
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" shape-rendering="crispEdges">${rects}</svg>`;
-    pic = { url: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`, w, h };
-    CACHE.set(key, pic);
-  }
-  return pic;
-}
-
-export function Pixels({ map, size, dim, label }: { map: string[]; size: number; dim?: boolean; label?: string }) {
-  const pic = picture(map);
+/**
+ * A strip from the sheet at `scale` CSS pixels a sheet pixel (so pictures of one creature share a size). With several
+ * frames it plays at `fps`, looping, or once and holding the last (`once`); `frame` shows one frame and stands still.
+ */
+export function Sprite({ name, scale, fps = 8, once, frame, label, flip }: { name: SpriteName; scale: number; fps?: number; once?: boolean; frame?: number; label?: string; flip?: boolean }) {
+  const m = CREATURES[name];
+  const w = m.w * scale;
+  const h = m.h * scale;
+  const still = m.n === 1 || frame !== undefined;
+  const at = m.n === 1 ? 0 : ((frame ?? 0) / (m.n - 1)) * 100;
   return (
-    <img
-      class="px"
-      src={pic.url}
-      width={size}
-      height={Math.round((size * pic.h) / pic.w)}
-      alt={label ?? ''}
+    <span
+      class={`sprite ${flip ? 'flip' : ''}`}
+      role={label ? 'img' : undefined}
+      aria-label={label}
       aria-hidden={label ? undefined : 'true'}
-      draggable={false}
-      style={{ opacity: dim ? 0.22 : 1, display: 'block' }}
+      data-sprite={name}
+      style={{
+        width: `${w}px`,
+        height: `${h}px`,
+        backgroundImage: `url(${stripUrl(name)})`,
+        backgroundSize: `${m.n * w}px ${h}px`,
+        backgroundPosition: `${at}% 0`,
+        animation: still ? undefined : `sprite-play ${m.n / fps}s steps(${m.n}, jump-none) ${once ? '1 forwards' : 'infinite'}`,
+      }}
     />
   );
 }
 
-/** The dragon, flapping (two pictures shown in turn). */
-export function Dragon({ size }: { size: number }) {
-  return (
-    <span class="sprite-flap" role="img" aria-label="The dragon" style={{ width: `${size}px`, height: `${(size * 16) / W}px` }}>
-      <span class="frame-a">
-        <Pixels map={DRAGON_UP} size={size} />
-      </span>
-      <span class="frame-b">
-        <Pixels map={DRAGON_DOWN} size={size} />
-      </span>
-    </span>
-  );
+export type DragonState = 'idle' | 'charge' | 'breath' | 'hurt' | 'sleep';
+/** The dragon: flapping, drawing breath, breathing fire, struck, or asleep once beaten. `scale` as for Sprite. */
+export function Dragon({ scale, state = 'idle' }: { scale: number; state?: DragonState }) {
+  return <Sprite name={`dragon-${state}`} scale={scale} fps={6} label="The dragon" />;
+}
+
+/** A small picture from the sheet sized by its width (hearts, stars, the shield, the tower, the flame). */
+export function Pic({ name, size, label }: { name: SpriteName; size: number; label?: string }) {
+  return <Sprite name={name} scale={size / CREATURES[name].w} label={label} />;
 }
 
 export function Hearts({ n, of, testid }: { n: number; of: number; testid?: string }) {
@@ -146,7 +52,7 @@ export function Hearts({ n, of, testid }: { n: number; of: number; testid?: stri
     <div class="game-hearts" role="img" aria-label={`${n} of ${of} hearts`} data-testid={testid} data-hearts={n}>
       {Array.from({ length: of }, (_, i) => (
         <span key={`${i}-${i >= n}`} class={i >= n ? 'gone' : ''}>
-          <Pixels map={HEART} size={22} dim={i >= n} />
+          <Pic name={i >= n ? 'heart-empty' : 'heart'} size={22} />
         </span>
       ))}
     </div>
@@ -158,7 +64,7 @@ export function Stars({ n }: { n: number }) {
     <div class="game-stars" role="img" aria-label={`${n} of 3 stars`} data-testid="game-stars" data-stars={n}>
       {[1, 2, 3].map((i) => (
         <span key={i} class={i <= n ? 'on' : ''} style={{ animationDelay: `${0.15 * i}s` }}>
-          <Pixels map={STAR} size={40} dim={i > n} />
+          <Pic name={i > n ? 'star-empty' : 'star'} size={40} />
         </span>
       ))}
     </div>

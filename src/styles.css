@@ -3601,7 +3601,7 @@ button.chip {
 }
 /* the end */
 .duel-stage.won .duel-dragon {
-  animation: struck 0.5s var(--ease) 0.14s, dragon-fall 0.7s var(--ease) 0.5s forwards;
+  animation: struck 0.5s var(--ease) 0.14s; /* then it curls up asleep (its own picture) */
 }
 .duel-stage.won .duel-knight > svg {
   animation: knight-cheer 0.5s var(--spring) 0.7s 2;
@@ -3668,9 +3668,6 @@ button.chip {
   0% { transform: scale(1.5) rotate(-12deg); }
   100% { transform: scale(1); }
 }
-@keyframes dragon-fall {
-  to { transform: translateY(46px) rotate(58deg); opacity: 0; }
-}
 @keyframes knight-cheer {
   50% { transform: translateY(-16px); }
 }
@@ -3711,19 +3708,16 @@ button.chip {
 .bridge-cliff {
   position: absolute;
   bottom: 0;
-  width: 16%;
-  height: 58px;
-  background: #5b5246;
-  border: 2px solid var(--text);
-  border-bottom: 0;
+  width: 17%;
+  aspect-ratio: 211 / 224;
+  background: no-repeat center bottom / 100% 100%;
+  z-index: 1;
 }
 .bridge-cliff.near {
-  left: -2px;
-  border-radius: 0 8px 0 0;
+  left: 0;
 }
 .bridge-cliff.far {
-  right: -2px;
-  border-radius: 8px 0 0 0;
+  right: 0;
 }
 .bridge-cliff.far svg {
   position: absolute;
@@ -3780,10 +3774,8 @@ button.chip {
 .bridge-river {
   position: absolute;
   inset: auto 0 0 0;
-  height: 22px;
-  background: #2f5f7a;
-  border-top: 2px solid var(--text);
-  opacity: 0.9;
+  height: 40px;
+  background: repeat-x left bottom / auto 100%;
 }
 .bridge-planks i.wanted {
   border-style: solid;
@@ -3960,22 +3952,18 @@ button.chip {
   paint-order: stroke fill;
   animation: check-pop 0.3s var(--spring) both;
 }
-.sprite-flap {
-  position: relative;
+.sprite {
+  /* a strip cut from the owner's sheet (ui/games/sprites.tsx Sprite): one frame shows, stepping along for an animation */
   display: block;
+  background-repeat: no-repeat;
 }
-.sprite-flap > span {
-  position: absolute;
-  inset: 0;
+.sprite.flip {
+  transform: scaleX(-1);
 }
-.sprite-flap .frame-a {
-  animation: frame-a 0.56s steps(1) infinite;
+@keyframes sprite-play {
+  from { background-position: 0% 0; }
+  to { background-position: 100% 0; }
 }
-.sprite-flap .frame-b {
-  animation: frame-b 0.56s steps(1) infinite;
-}
-@keyframes frame-a { 50% { opacity: 0; } }
-@keyframes frame-b { 0% { opacity: 0; } 50% { opacity: 1; } }
 
 /* ---- the games' home, and the way in from Today ---- */
 .hub-stage {
@@ -4193,15 +4181,14 @@ button.chip {
 }
 .gate-goblin {
   position: absolute;
-  bottom: 24px;
-  margin-left: -26px;
+  bottom: 22px;
+  margin-left: -31px;
   z-index: 3;
   animation: goblin-in 0.32s var(--spring) both;
 }
 .gate-goblin .march {
   display: block;
-  transform: scaleX(-1); /* faces the gate */
-  animation: march 0.36s steps(2) infinite;
+  animation: march 0.36s steps(2) infinite; /* the walk's own frames do the legs; this is a small bob */
 }
 .gate-goblin.near .march {
   animation: march 0.2s steps(2) infinite;
@@ -4220,8 +4207,22 @@ button.chip {
   animation: charge-hot 0.3s steps(2) infinite;
 }
 @keyframes march {
-  0% { transform: scaleX(-1) translateY(0) rotate(-4deg); }
-  50% { transform: scaleX(-1) translateY(-4px) rotate(4deg); }
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+/* the goblin just beaten tumbles and vanishes in a puff; one that broke through swings its club at the gate */
+.gate-goblin.down,
+.gate-goblin.swing {
+  z-index: 2;
+  pointer-events: none;
+  animation: none;
+}
+.gate-goblin.down {
+  animation: goblin-gone 0.9s ease-in forwards;
+}
+@keyframes goblin-gone {
+  70% { opacity: 1; }
+  to { opacity: 0; }
 }
 @keyframes goblin-in {
   from { transform: translateX(40px) scale(0.6); opacity: 0; }
@@ -4301,16 +4302,17 @@ button.chip {
 }
 .burrow .mole {
   position: absolute;
-  bottom: 12px;
+  bottom: 0;
   left: 50%;
-  z-index: 1;
+  z-index: 3;
   display: grid;
   justify-items: center;
   transform: translate(-50%, 0);
-  animation: mole-up 0.16s cubic-bezier(.34, 1.56, .64, 1) both;
 }
-.burrow.leaving .mole {
-  animation: mole-down 0.26s ease-in both;
+/* the goblin's pictures carry their own mound, so the empty one hides while it is up */
+.burrow.up .hole,
+.burrow.bonked .hole {
+  visibility: hidden;
 }
 .burrow.bonked .mole {
   animation: mole-bonk 0.3s ease-in both;
@@ -4331,13 +4333,6 @@ button.chip {
 }
 .burrow:active .mole {
   transform: translate(-50%, 0) scale(0.92, 1.08);
-}
-@keyframes mole-up {
-  from { transform: translate(-50%, 70px); }
-  to { transform: translate(-50%, 0); }
-}
-@keyframes mole-down {
-  to { transform: translate(-50%, 70px); }
 }
 @keyframes mole-bonk {
   0% { transform: translate(-50%, 0) scale(1.3, 0.6); }

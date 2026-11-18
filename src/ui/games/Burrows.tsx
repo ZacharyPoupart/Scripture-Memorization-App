@@ -6,8 +6,10 @@ import { isComboTier } from '../../core/games.ts';
 import { feedback } from '../../services/feedback.ts';
 import { AvatarFigure, type KnightPose } from '../AvatarFigure.tsx';
 import { DUST, flyWord, Fx, gapIn, GOO, pointIn, punch, shake, slashWave, SPARKS, useHitStop, type FxHandle } from './juice.tsx';
-import { GOBLIN_BONK, GOBLIN_UP, Hearts, HOLE, Pixels, useTicker } from './sprites.tsx';
+import { Hearts, Sprite, useTicker } from './sprites.tsx';
 import type { GameProps } from './types.ts';
+
+const MOLE = 0.5; // CSS pixels a sheet pixel: a goblin in its burrow (the pictures carry their own mound)
 
 export function Burrows({ verse, seed, look, backdrop, onDone }: GameProps) {
   const game = useRef(newBurrows(verse.text, verse.pile, seed + verse.text.length));
@@ -123,11 +125,11 @@ export function Burrows({ verse, seed, look, backdrop, onDone }: GameProps) {
                 {(m || hit) && (
                   <span class="mole" key={m ? `${s.next}-${hole}` : `b${bonked?.n}`}>
                     {m && <span class="sign">{m.label}</span>}
-                    <Pixels map={hit ? GOBLIN_BONK : GOBLIN_UP} size={50} />
+                    <Sprite key={hit ? 'b' : leaving && m ? 'e' : 'p'} name={hit ? 'burrow-bonk' : leaving && m ? 'burrow-escape' : 'burrow-pop'} scale={MOLE} fps={hit ? 6 : 18} once={!hit} />
                   </span>
                 )}
                 <span class="hole">
-                  <Pixels map={HOLE} size={84} />
+                  <Sprite name="mound" scale={MOLE * 0.78} />
                 </span>
               </button>
             );

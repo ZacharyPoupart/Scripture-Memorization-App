@@ -6,11 +6,12 @@ import { GATE_HEARTS, gateStep, gateTap, newGate, type GateEvent } from '../../c
 import { feedback } from '../../services/feedback.ts';
 import { AvatarFigure, type KnightPose } from '../AvatarFigure.tsx';
 import { DUST, flyWord, Fx, gapIn, GOO, pointIn, punch, shake, slashWave, SPARKS, useHitStop, type FxHandle } from './juice.tsx';
-import { GATE, GOBLIN, Hearts, Pixels, SHIELD_ICON, useTicker } from './sprites.tsx';
+import { Hearts, Pic, Sprite, useTicker } from './sprites.tsx';
 import type { GameProps } from './types.ts';
 
 const GATE_X = 30; // % where the gate stands; the goblins start at the far right
 const START_X = 92;
+const GOBLIN = 0.45; // CSS pixels a sheet pixel
 
 export function Gate({ verse, seed, look, backdrop, onDone }: GameProps) {
   const game = useRef(newGate(verse.text, seed + verse.text.length));
@@ -26,6 +27,7 @@ export function Gate({ verse, seed, look, backdrop, onDone }: GameProps) {
   const [shown, setShown] = useState<number[]>([]); // words that got through and were shown
   const [wrongKey, setWrongKey] = useState<{ k: string; n: number } | null>(null);
   const [fresh, setFresh] = useState(0); // restarts the new goblin's entrance
+  const [gone, setGone] = useState<{ left: string; kind: 'down' | 'swing'; n: number } | null>(null); // the last goblin, knocked down or swinging at the gate
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
   const later = (ms: number, fn: () => void) => timers.current.push(setTimeout(fn, ms));
@@ -41,6 +43,13 @@ export function Gate({ verse, seed, look, backdrop, onDone }: GameProps) {
     const a = g.getBoundingClientRect();
     const b = st.getBoundingClientRect();
     return [a.left + a.width / 2 - b.left, a.top + a.height / 2 - b.top] as [number, number];
+  };
+
+  const leave = (kind: 'down' | 'swing') => {
+    const left = goblin.current?.style.left;
+    if (!left) return;
+    setGone((g) => ({ left, kind, n: (g?.n ?? 0) + 1 }));
+    later(kind === 'down' ? 900 : 520, () => setGone((g) => (g?.kind === kind ? null : g)));
   };
 
   const handle = (events: GateEvent[]) => {
@@ -61,6 +70,7 @@ export function Gate({ verse, seed, look, backdrop, onDone }: GameProps) {
         shake(stage.current, isComboTier(e.combo) ? 0.45 : 0.22);
         punch(comboEl.current);
         act('attack', 380);
+        leave('down');
         setFresh((n) => n + 1);
       }
       if (e.type === 'miss') {
@@ -74,6 +84,7 @@ export function Gate({ verse, seed, look, backdrop, onDone }: GameProps) {
         feedback.game('slip');
         shake(stage.current, 0.6);
         act('hurt', 420);
+        leave('swing');
         setFresh((n) => n + 1);
       }
       if (e.type === 'block') {
@@ -133,7 +144,7 @@ export function Gate({ verse, seed, look, backdrop, onDone }: GameProps) {
             <div class="hud-right">
               {s.shield && (
                 <span class="hud-shield" title="Shield ready: the next slip is blocked" data-testid="gate-shield">
-                  <Pixels map={SHIELD_ICON} size={22} label="Shield ready" />
+                  <Pic name="shield" size={18} label="Shield ready" />
                 </span>
               )}
               <b class="game-score" data-testid="game-score">
@@ -143,15 +154,20 @@ export function Gate({ verse, seed, look, backdrop, onDone }: GameProps) {
           </div>
           <div class="game-ground" />
           <div class="gate-wall">
-            <Pixels map={GATE} size={70} />
+            <Sprite name={s.hearts <= 1 ? 'gate-broken' : 'gate'} scale={0.36} />
           </div>
           <div class={`gate-knight pose-${pose.name}`} ref={knight}>
             <AvatarFigure look={look} size={124} bare pose={pose.name} key={`${pose.name}${pose.n}`} />
           </div>
+          {gone && (
+            <div class={`gate-goblin ${gone.kind}`} style={{ left: gone.left }} key={`gone${gone.n}`} aria-hidden="true">
+              <Sprite name={gone.kind === 'down' ? 'goblin-down' : 'goblin-swing'} scale={GOBLIN} fps={gone.kind === 'down' ? 5 : 8} once />
+            </div>
+          )}
           {!s.over && (
             <div class={`gate-goblin ${near ? 'near' : ''}`} style={{ left: `${x}%` }} ref={goblin} key={`g${fresh}`}>
               <span class="march">
-                <Pixels map={GOBLIN} size={52} label="A goblin" />
+                <Sprite name={near ? 'goblin-raise' : 'goblin-walk'} scale={GOBLIN} fps={near ? 12 : 7} label="A goblin" />
               </span>
             </div>
           )}
