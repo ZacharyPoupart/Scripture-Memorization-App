@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.76.0] - 2026-11-18
+
 ### Added
 - Two new games, built from game-design and memory research (first-letter cues are among the best aids for exact wording):
   - **Hold the Gate:** goblins march on your gate, one for each word. Tap the first letter of the next word to strike each one down before it arrives; the word only appears once you have recalled it. Five right in a row charges your shield, which blocks the next slip. A computer keyboard works too.
