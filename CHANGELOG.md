@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.80.0] - 2026-11-18
+
 ### Changed
 - New pictures for the games, painted to go with the knight: the goblins march with a real walking step, raise their club as they close in, tumble and vanish in a puff when struck, and swing at the gate when one gets through. In Goblin Burrows each goblin climbs out of its mound, throws its hands up with the word, sees stars when bonked, and sticks its tongue out as it ducks away. The dragon flaps, glows as it draws breath, breathes real fire, flinches when struck and curls up asleep when beaten. The gate cracks when you are down to your last heart, Bridge Run has rocky cliffs and a river, and the hearts, stars and shield are new too.
 
