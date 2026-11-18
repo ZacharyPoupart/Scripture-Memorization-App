@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.77.0] - 2026-11-18
+
 ### Added
 - The word you recall now flies from where you struck (the goblin, the arrow, the shield, the rune, the button or the plank) into its place in the verse, and lands with a little pop. Every game does it.
 - Two more games:
