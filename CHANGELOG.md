@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.78.0] - 2026-11-18
+
 ### Changed
 - The verse you are playing is now the big line at the top of every game (the game's name sits small above it), so you can tell at a glance which verse it is.
 - Fewer, more different games. Four now, each a different kind of recall: **Hold the Gate** (the first letter of the next word), **Goblin Burrows** (find the next word), **Dragon Duel** (choose the next word before the fire comes) and **Bridge Run** (the order of the words). Arrow Volley, Sword Dance and Parry are gone, as they were too close to these. Stars you won in them stay on your device but no longer count in the total.
