@@ -548,7 +548,7 @@ export function PlayHub() {
         <div class="game-stage hub-stage" style={style} aria-hidden="true">
           <div class="game-ground" />
           <div class="hub-knight">
-            <AvatarFigure look={look} size={128} bare pose="walk" />
+            <AvatarFigure look={look} size={128} bare pose="march" />
           </div>
           <div class="hub-goblin">
             <Pixels map={GOBLIN} size={44} />

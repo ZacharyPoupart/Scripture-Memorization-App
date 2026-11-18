@@ -122,7 +122,7 @@ export function Home() {
 
           <button class="play-card" onClick={() => navigate('/play')} data-testid="play-card">
             <span class="play-card-knight" aria-hidden="true">
-              <AvatarFigure look={currentLook(data)} size={84} bare pose="walk" />
+              <AvatarFigure look={currentLook(data)} size={84} bare pose="march" />
             </span>
             <span class="play-card-text">
               <strong>Play</strong>

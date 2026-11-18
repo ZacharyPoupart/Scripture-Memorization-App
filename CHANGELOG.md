@@ -5,6 +5,9 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Changed
+- The knight on Today's Play panel and at the top of Play now marches in place: he lifts one leg and then the other, slowly, and dips a little with each step, in place of swinging his legs. On Play he also strolls back and forth more slowly.
+
 ## [1.78.0] - 2026-11-18
 
 ### Changed

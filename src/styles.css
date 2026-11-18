@@ -3985,7 +3985,7 @@ button.chip {
   position: absolute;
   left: 4%;
   bottom: 10px;
-  animation: hub-march 7s linear infinite;
+  animation: hub-march 14s ease-in-out infinite;
 }
 .hub-goblin {
   position: absolute;
@@ -4516,4 +4516,29 @@ button.chip {
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
+}
+
+/* ---- marching in place (v1.79.0, owner-requested: the idle knight on Today and Play pulls his legs up and down, slowly) ----
+   Each leg lifts at the hip and comes back down in turn (the leg shortens from the hip, so the foot rises: a knee lift), the body
+   dips a little on each step, and the cape swings with it. One full step pair takes 1.4 s. */
+.pose-march .rig-leg-l { animation: leg-lift 1.4s ease-in-out infinite; }
+.pose-march .rig-leg-r { animation: leg-lift 1.4s ease-in-out -0.7s infinite; }
+.pose-march .rig-chest,
+.pose-march .rig-belt,
+.pose-march .rig-helmet,
+.pose-march .rig-shield,
+.pose-march .rig-sword { animation: march-dip 0.7s ease-in-out infinite; }
+.pose-march .rig-cape { animation: rig-cape 1.4s ease-in-out infinite; }
+@keyframes leg-lift {
+  0%, 55%, 100% { transform: none; }
+  20% { transform: translateY(-5px) scaleY(0.84); }
+  35% { transform: translateY(-3px) scaleY(0.9); }
+}
+@keyframes march-dip {
+  0%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-2px); }
+  60% { transform: translateY(1px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pose-march .rig { animation: none !important; }
 }

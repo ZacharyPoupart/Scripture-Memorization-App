@@ -10,7 +10,7 @@ function Background({ scene }: { scene: string }) {
 }
 
 /** How the knight moves (the games): each pose animates his pieces by themselves. No pose = a still picture. */
-export type KnightPose = 'idle' | 'walk' | 'attack' | 'block' | 'hurt' | 'cheer' | 'fall';
+export type KnightPose = 'idle' | 'march' | 'walk' | 'attack' | 'block' | 'hurt' | 'cheer' | 'fall';
 
 /**
  * The knight. The painted pieces are placed in "figure units" (centred on x = 0, boots at y = 250); this scales them to fit the
