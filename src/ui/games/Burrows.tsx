@@ -5,7 +5,7 @@ import { BURROWS, BURROW_HEARTS, burrowsNeeds, burrowsStep, burrowsTap, newBurro
 import { isComboTier } from '../../core/games.ts';
 import { feedback } from '../../services/feedback.ts';
 import { AvatarFigure, type KnightPose } from '../AvatarFigure.tsx';
-import { DUST, Fx, GOO, punch, shake, SPARKS, useHitStop, type FxHandle } from './juice.tsx';
+import { DUST, flyWord, Fx, gapIn, GOO, punch, shake, SPARKS, useHitStop, type FxHandle } from './juice.tsx';
 import { GOBLIN_BONK, GOBLIN_UP, Hearts, HOLE, Pixels, useTicker } from './sprites.tsx';
 import type { GameProps } from './types.ts';
 
@@ -41,6 +41,7 @@ export function Burrows({ verse, seed, look, backdrop, onDone }: GameProps) {
     for (const e of events) {
       if (e.type === 'rise') feedback.game('pop');
       if (e.type === 'bonk') {
+        flyWord(game.current.words[game.current.next - 1]?.raw ?? e.mole.label, holes.current[e.mole.hole], gapIn('burrows-text'));
         const [x, y] = centre(e.mole.hole);
         fx.current?.burst(x, y, isComboTier(e.combo) ? 26 : 12, SPARKS);
         fx.current?.burst(x, y, 6, GOO, 0.6);

@@ -5,7 +5,7 @@ import { isComboTier } from '../../core/games.ts';
 import { GATE_HEARTS, gateStep, gateTap, newGate, type GateEvent } from '../../core/gate.ts';
 import { feedback } from '../../services/feedback.ts';
 import { AvatarFigure, type KnightPose } from '../AvatarFigure.tsx';
-import { DUST, Fx, GOO, punch, shake, SPARKS, useHitStop, type FxHandle } from './juice.tsx';
+import { DUST, flyWord, Fx, gapIn, GOO, punch, shake, SPARKS, useHitStop, type FxHandle } from './juice.tsx';
 import { GATE, GOBLIN, Hearts, Pixels, SHIELD_ICON, useTicker } from './sprites.tsx';
 import type { GameProps } from './types.ts';
 
@@ -45,6 +45,7 @@ export function Gate({ verse, seed, look, backdrop, onDone }: GameProps) {
   const handle = (events: GateEvent[]) => {
     for (const e of events) {
       if (e.type === 'strike') {
+        flyWord(e.word.raw, goblin.current, gapIn('gate-text'));
         const [x, y] = at();
         fx.current?.burst(x, y, isComboTier(e.combo) ? 26 : 12, GOO);
         fx.current?.burst(x, y, 6, SPARKS, 0.7);

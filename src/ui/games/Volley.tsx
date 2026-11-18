@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 import { VOLLEY_HEARTS, VOLLEY_LANES, newVolley, shown, volleyStep, volleyTap, type VolleyEvent } from '../../core/volley.ts';
 import { isComboTier } from '../../core/games.ts';
 import { feedback } from '../../services/feedback.ts';
-import { Fx, GOO, punch, shake, SPARKS, useHitStop, type FxHandle } from './juice.tsx';
+import { flyWord, Fx, gapIn, GOO, punch, shake, SPARKS, useHitStop, type FxHandle } from './juice.tsx';
 import type { GameProps } from './types.ts';
 import { AvatarFigure, type KnightPose } from '../AvatarFigure.tsx';
 import { ARROWHEAD, GOBLIN, Hearts, Pixels, useTicker } from './sprites.tsx';
@@ -46,6 +46,8 @@ export function Volley({ verse, seed, look, backdrop, onDone }: GameProps) {
         const y = ((st?.clientHeight ?? 290) * at.top) / 100;
         if (e.type === 'cut') {
           const g = game.current;
+          const sr = st?.getBoundingClientRect();
+          if (sr) flyWord(g.words[g.next - 1]?.raw ?? e.shot.word, new DOMRect(sr.left + x - 30, sr.top + y - 20, 60, 40), gapIn('volley-text'));
           const last = g.over === 'won';
           fxr.current?.burst(x, y, isComboTier(g.combo) || last ? 26 : 12, SPARKS);
           fxr.current?.burst(x, y, 5, GOO, 0.5);

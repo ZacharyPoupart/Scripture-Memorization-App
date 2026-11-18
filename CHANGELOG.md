@@ -5,6 +5,12 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Added
+- The word you recall now flies from where you struck (the goblin, the arrow, the shield, the rune, the button or the plank) into its place in the verse, and lands with a little pop. Every game does it.
+- Two more games:
+  - **Sword Dance:** the verse comes a phrase at a time, its words on goblin shields scattered over the field. Cut through them in order before the fuse burns out; each right cut adds time, and the knight dashes from shield to shield. A word out of order costs a heart; if the fuse runs out, the rest of the phrase is shown and you lose a heart.
+  - **Parry:** runes fly at your knight one at a time, each with a word. Strike the one with the next word of the verse, block any other. A wrong call, or a rune that gets through, costs a heart. Keyboard: S or the right arrow to strike, B or the left arrow to block.
+
 ## [1.76.0] - 2026-11-18
 
 ### Added
