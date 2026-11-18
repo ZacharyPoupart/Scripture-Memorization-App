@@ -19,7 +19,7 @@ import { CoinCount } from '../CoinCount.tsx';
 import { Confetti, Icon, PILE_INFO } from '../common.tsx';
 import { Dock } from '../modes/shared.tsx';
 import { EmptyState } from '../primitives.tsx';
-import { Dragon, FLAME, GATE, Goblin, Hearts, Pixels, SPARK, Stars, TOWER, useTicker } from './sprites.tsx';
+import { Dragon, Hearts, Pic, Sprite, Stars, stripUrl, useTicker, type DragonState } from './sprites.tsx';
 import { Burrows } from './Burrows.tsx';
 import { Gate } from './Gate.tsx';
 import { DUST, flyWord, Fx, gapIn, pointIn, punch, shake, slashWave, SPARKS, useHitStop, type FxHandle } from './juice.tsx';
@@ -339,6 +339,11 @@ function Duel({ verse, seed, look, backdrop, onDone }: GameProps) {
   live.current = { won, lost };
   const [pose, play] = usePose(() => (live.current.won ? 'cheer' : live.current.lost ? 'fall' : 'idle'));
   const later = useLater();
+  const [face, setFace] = useState<DragonState | null>(null); // a moment's picture: breathing fire, or struck
+  const flash = (f: DragonState, ms: number) => {
+    setFace(f);
+    later(ms, () => setFace((x) => (x === f ? null : x)));
+  };
   useEffect(() => {
     if (!won && !lost) return;
     const t = setTimeout(() => onDone({ won, slips, score }), 1300);
@@ -357,6 +362,7 @@ function Duel({ verse, seed, look, backdrop, onDone }: GameProps) {
     setSlips((n) => n + 1);
     setHearts((h) => h - 1);
     setBeat((b) => ({ kind: 'hurt', n: (b?.n ?? 0) + 1 }));
+    flash('breath', 700);
     setCharge(0);
     play('hurt', 900);
   };
@@ -391,6 +397,7 @@ function Duel({ verse, seed, look, backdrop, onDone }: GameProps) {
       setWrong(null);
       setCombo(n);
       setBeat((b) => ({ kind: 'hit', n: (b?.n ?? 0) + 1 }));
+      flash('hurt', 480);
       setAt(at + 1);
       setCharge(0);
       play('attack', 420);
@@ -425,7 +432,7 @@ function Duel({ verse, seed, look, backdrop, onDone }: GameProps) {
             <AvatarFigure look={look} size={150} bare pose={pose.name} key={`${pose.name}${pose.n}`} />
           </div>
           <div class={`duel-dragon ${beat?.kind ?? ''} ${charge > 0.7 ? 'rearing' : ''}`} key={`d${fx}`} ref={dragonEl}>
-            <Dragon size={150} />
+            <Dragon scale={0.78} state={won ? 'sleep' : (face ?? (charge > 0.7 ? 'charge' : 'idle'))} />
           </div>
           {beat?.kind === 'hit' && (
             <div class={`duel-fx ${big ? 'big' : ''}`} key={`f${fx}`} aria-hidden="true">
@@ -433,14 +440,14 @@ function Duel({ verse, seed, look, backdrop, onDone }: GameProps) {
                 <path d="M6 50 Q30 4 56 10 Q34 16 16 54 Z" />
               </svg>
               <span class="duel-spark">
-                <Pixels map={SPARK} size={34} />
+                <Sprite name="spark" scale={0.42} fps={10} once />
               </span>
               <b class="duel-dmg">{combo >= 3 ? `×${combo}!` : 'Hit!'}</b>
             </div>
           )}
           {beat?.kind === 'hurt' && (
             <div class="duel-flame" key={`f${fx}`} aria-hidden="true">
-              <Pixels map={FLAME} size={54} />
+              <Sprite name="fire" scale={0.6} fps={10} />
             </div>
           )}
           {combo >= 2 && (
@@ -565,11 +572,9 @@ function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
               {score}
             </b>
           </div>
-          <div class="bridge-river" />
-          <div class="bridge-cliff near" />
-          <div class="bridge-cliff far">
-            <Pixels map={TOWER} size={44} label="The far tower" />
-          </div>
+          <div class="bridge-river" style={{ backgroundImage: `url(${stripUrl('river')})` }} />
+          <div class="bridge-cliff near" style={{ backgroundImage: `url(${stripUrl('cliff-near')})` }} />
+          <div class="bridge-cliff far" role="img" aria-label="The far tower" style={{ backgroundImage: `url(${stripUrl('cliff')})` }} />
           <div class="bridge-planks" aria-hidden="true" ref={plankRow}>
             {all.map((_, i) => (
               <i key={i} class={i < laid ? 'laid' : i === laid && danger ? 'wanted' : ''} />
@@ -608,10 +613,10 @@ function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
 // ---------------------------------------------------------------- the games' home
 
 const ART: Record<GameId, () => preact.JSX.Element> = {
-  gate: () => <Pixels map={GATE} size={34} />,
-  burrows: () => <Goblin pose="up" size={36} />,
-  duel: () => <Dragon size={52} />,
-  bridge: () => <Pixels map={TOWER} size={34} />,
+  gate: () => <Pic name="gate" size={40} />,
+  burrows: () => <Sprite name="burrow-pop" scale={0.24} frame={3} />,
+  duel: () => <Sprite name="dragon-idle" scale={0.22} frame={0} />,
+  bridge: () => <Pic name="cliff" size={38} />,
 };
 
 /** Up to three small stars: the best this device has won with on this game and verse. */
@@ -672,10 +677,10 @@ export function PlayHub() {
             <AvatarFigure look={look} size={128} bare pose="march" />
           </div>
           <div class="hub-goblin">
-            <Goblin size={44} />
+            <Sprite name="goblin-walk" scale={0.36} fps={7} />
           </div>
           <div class="hub-dragon">
-            <Dragon size={120} />
+            <Dragon scale={0.56} />
           </div>
         </div>
         {readyCount > 0 && (
