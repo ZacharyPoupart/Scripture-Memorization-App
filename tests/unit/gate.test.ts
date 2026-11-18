@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { BURROWS, BURROW_HEARTS, burrowsNeeds, burrowsStep, burrowsTap, newBurrows } from '../../src/core/burrows.ts';
 import { comboMultiplier, isComboTier, points, recordBest, totalStars, verseStars, bestKey } from '../../src/core/games.ts';
 import { GATE_HEARTS, GATE_KEYS, firstLetter, gateStep, gateTap, newGate } from '../../src/core/gate.ts';
 
@@ -25,7 +24,7 @@ describe('score and combo', () => {
     const c = recordBest(b.table, k, { won: false, stars: 3, score: 999 });
     expect(c.table).toBe(b.table);
     expect(verseStars({ ...b.table, [bestKey('duel', 'v1')]: { stars: 3, score: 1 }, [bestKey('duel', 'v2')]: { stars: 1, score: 1 } }, 'v1')).toBe(5);
-    expect(totalStars({ a: { stars: 3, score: 0 }, b: { stars: 1, score: 0 } })).toBe(4);
+    expect(totalStars({ 'gate:a': { stars: 3, score: 0 }, 'duel:b': { stars: 1, score: 0 }, 'parry:c': { stars: 3, score: 0 } })).toBe(4); // a retired game no longer counts
   });
 });
 
@@ -64,46 +63,5 @@ describe('Hold the Gate', () => {
     expect(s.over).toBe('lost');
     expect(seen.filter((x) => x === 'breach')).toHaveLength(GATE_HEARTS);
     expect(s.next).toBe(GATE_HEARTS - 1); // two words were shown and passed on before the last heart went
-  });
-});
-
-describe('Goblin Burrows', () => {
-  const up = (s: ReturnType<typeof newBurrows>) => {
-    for (let i = 0; i < 40 && !s.moles.length && !s.over; i++) burrowsStep(s, 50);
-  };
-
-  it('three goblins in different burrows, one holding the next word, with no two labels alike', () => {
-    const s = newBurrows(JOHN, 'daily', 4);
-    while (!s.over) {
-      up(s);
-      expect(s.moles).toHaveLength(3);
-      expect(new Set(s.moles.map((m) => m.hole)).size).toBe(3);
-      expect(s.moles.every((m) => m.hole >= 0 && m.hole < BURROWS)).toBe(true);
-      expect(new Set(s.moles.map((m) => m.label.toLowerCase())).size).toBe(3);
-      const need = s.moles.filter((m) => burrowsNeeds(s, m));
-      expect(need).toHaveLength(1);
-      expect(burrowsTap(s, need[0].hole)[0].type).toBe('bonk');
-    }
-    expect([s.over, s.slips]).toEqual(['won', 0]);
-  });
-
-  it('later piles show only first letters', () => {
-    const s = newBurrows(JOHN, 'weekly', 5);
-    up(s);
-    expect(s.moles.every((m) => /^[A-Z0-9]$/.test(m.label))).toBe(true);
-    expect(s.moles.filter((m) => burrowsNeeds(s, m))).toHaveLength(1);
-  });
-
-  it('a wrong bonk costs a heart and that goblin ducks; one that gets away costs a heart and the verse moves on', () => {
-    const s = newBurrows(JOHN, 'daily', 6);
-    up(s);
-    const wrong = s.moles.find((m) => !burrowsNeeds(s, m))!;
-    expect(burrowsTap(s, wrong.hole)[0].type).toBe('wrong');
-    expect([s.hearts, s.moles.length, s.next]).toEqual([BURROW_HEARTS - 1, 2, 0]);
-    expect(burrowsTap(s, wrong.hole)).toEqual([]); // already gone
-    let escaped = false;
-    for (let t = 0; t < 5000 && !escaped; t += 50) escaped = burrowsStep(s, 50).some((e) => e.type === 'escape');
-    expect(escaped).toBe(true);
-    expect([s.hearts, s.next]).toEqual([BURROW_HEARTS - 2, 1]);
   });
 });

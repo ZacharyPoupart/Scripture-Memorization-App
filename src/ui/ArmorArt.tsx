@@ -2,6 +2,7 @@
 // Every piece was painted to one scale and has the same canvas size for every set, so any piece can be swapped for another and
 // still fit. Where each slot sits comes from armorLayout.json (written by design/armor-v2 from placement.json), in the sheet's
 // own pixels; AvatarFigure draws the knight 250 units tall, so everything is scaled by U to fit that.
+import { useId } from 'preact/hooks';
 import type { Look } from '../core/avatar.ts';
 import layout from './armorLayout.json';
 import sizes from './armorSizes.json';
@@ -35,10 +36,40 @@ function Slot({ slot, id }: { slot: keyof typeof SLOT_LAYOUT; id: string }) {
   const h = at.h * U;
   const turn = at.rotate ? `rotate(${at.rotate} ${x + w / 2} ${y + h / 2})` : '';
   const tilt = at.tilt && at.pivot ? `rotate(${at.tilt} ${at.pivot[0] * U} ${(at.pivot[1] - TOP) * U}) ` : ''; // around the hand
+  // The legs are one painted piece; for the games they are cut down the middle into two legs, each turning at its own hip, so a
+  // stride swings one forward while the other goes back (v1.78.0, owner-requested "split the legs"). Standing still they meet
+  // exactly as painted.
+  if (slot === 'legs') return <Legs url={url} x={x} y={y} w={w} h={h} />;
   // each piece sits in its own group so the games can move it by itself (the sword swings, the shield comes up, the cape sways)
   return (
     <g class={`rig rig-${slot}`}>
       <image href={url} x={x} y={y} width={w} height={h} transform={`${tilt}${turn}` || undefined} style={PIXEL} />
+    </g>
+  );
+}
+
+function Legs({ url, x, y, w, h }: { url: string; x: number; y: number; w: number; h: number }) {
+  const id = useId().replace(/[^a-zA-Z0-9_-]/g, '');
+  const mid = x + w / 2;
+  const hipY = y + h * 0.04;
+  const half = (side: 'l' | 'r') => {
+    const hipX = x + w * (side === 'l' ? 0.3 : 0.7);
+    return (
+      <g transform={`translate(${hipX} ${hipY})`} key={side}>
+        <g class={`rig rig-legs rig-leg rig-leg-${side}`}>
+          <clipPath id={`leg-${side}-${id}`}>
+            <rect x={(side === 'l' ? x - 2 : mid - 0.6) - hipX} y={y - 2 - hipY} width={w / 2 + 2.6} height={h + 4} />
+          </clipPath>
+          <image href={url} x={x - hipX} y={y - hipY} width={w} height={h} clip-path={`url(#leg-${side}-${id})`} style={PIXEL} />
+        </g>
+      </g>
+    );
+  };
+  // the far leg first, so the near one draws over it where they cross
+  return (
+    <g class="rig-legs-pair">
+      {half('r')}
+      {half('l')}
     </g>
   );
 }

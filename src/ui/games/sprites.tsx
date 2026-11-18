@@ -56,6 +56,9 @@ export const GOBLIN = [
   '...kbk.kbk...',
   '..kkk..kkk...',
 ];
+/** The gate the goblins march on. */
+export const GATE = ['kk.kk.kk.kk', 'kskkskkskks', 'ksssssssssk', 'kssbbbbbssk', 'ksbbkbkbbsk', 'ksbkbkbkbsk', 'ksbbkbkbbsk', 'ksbkbkbkbsk', 'ksbbkbkbbsk', 'kkkkkkkkkkk'];
+export const SHIELD_ICON = ['kkkkkkk', 'kyyyyyk', 'kywkwyk', 'kyywyyk', '.kyyyk.', '..kyk..', '...k...'];
 /** A goblin holding up a sign, for the burrows (the sign is drawn by the page, over its hands). */
 export const GOBLIN_UP = [
   '...kkkkk...',
@@ -84,13 +87,6 @@ export const GOBLIN_BONK = [
 ];
 /** A burrow: a dark mouth in a mound of earth. */
 export const HOLE = ['...bbbbbbbbb...', '.bbbsssssssbbb.', 'bbsskkkkkkkssbb', 'bbskkkkkkkkksbb', '.bbbbbbbbbbbbb.'];
-/** The gate the goblins march on. */
-export const GATE = ['kk.kk.kk.kk', 'kskkskkskks', 'ksssssssssk', 'kssbbbbbssk', 'ksbbkbkbbsk', 'ksbkbkbkbsk', 'ksbbkbkbbsk', 'ksbkbkbkbsk', 'ksbbkbkbbsk', 'kkkkkkkkkkk'];
-export const SHIELD_ICON = ['kkkkkkk', 'kyyyyyk', 'kywkwyk', 'kyywyyk', '.kyyyk.', '..kyk..', '...k...'];
-/** A rune stone (Parry): the word is written over it by the page. */
-export const RUNE = ['..kkkkkkk..', '.kssssssk..', 'ksssssssssk', 'ksssssssssk', 'ksssssssssk', 'ksssssssssk', '.kssssssk..', '..kkkkkk...'];
-/** A goblin crouched behind a round shield (Sword Dance); the word goes on the shield. */
-export const BEARER = ['...kkkkk...', '.k.kgggk.k.', 'kgkgggggkgk', '.kgrgggrgk.', '..kgggggk..', '.kkkkkkkkk.', 'kgkbbbbbkgk', '.k.kbbbk.k.', '...kk.kk...'];
 export const HEART = ['.kk.kk.', 'krrkrrk', 'krrrrrk', 'krrrrrk', '.krrrk.', '..krk..', '...k...'];
 export const STAR = ['...k...', '..kyk..', 'kkkykkk', 'kyyyyyk', '.kyyyk.', '.kykyk.', 'kk...kk'];
 export const TOWER = ['k.k.k', 'kkkkk', 'ksssk', 'ksssk', 'ksksk', 'ksksk'];
