@@ -5,6 +5,15 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.79.0] - 2026-11-18
+
+### Added
+- **Play today's reviews:** one button on Play, and the Play panel on Today when something is ready, runs through everything due, in the same order as Today's own review, with each verse in a random game (never the same game twice in a row). Each win counts as that verse's review, the result moves you on to the next verse and its game, and the end shows how many you played, how many counted, the stars and the coins. Picking a single verse to play is still on the Play screen.
+
+### Changed
+- Sword waves: when you strike a goblin or the dragon, a crescent of light flies off the knight's sword to it and leaves a crossed cut where it lands; a combo step or the final blow makes a bigger, golden one.
+- The knight on Today's Play panel and at the top of Play now marches in place: he lifts one leg and then the other, slowly, and dips a little with each step, in place of swinging his legs. On Play he also strolls back and forth more slowly.
+
 ## [1.78.0] - 2026-11-18
 
 ### Changed

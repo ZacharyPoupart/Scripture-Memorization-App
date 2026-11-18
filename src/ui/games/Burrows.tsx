@@ -5,7 +5,7 @@ import { BURROWS, BURROW_HEARTS, burrowsNeeds, burrowsStep, burrowsTap, newBurro
 import { isComboTier } from '../../core/games.ts';
 import { feedback } from '../../services/feedback.ts';
 import { AvatarFigure, type KnightPose } from '../AvatarFigure.tsx';
-import { DUST, flyWord, Fx, gapIn, GOO, punch, shake, SPARKS, useHitStop, type FxHandle } from './juice.tsx';
+import { DUST, flyWord, Fx, gapIn, GOO, pointIn, punch, shake, slashWave, SPARKS, useHitStop, type FxHandle } from './juice.tsx';
 import { GOBLIN_BONK, GOBLIN_UP, Hearts, HOLE, Pixels, useTicker } from './sprites.tsx';
 import type { GameProps } from './types.ts';
 
@@ -14,6 +14,7 @@ export function Burrows({ verse, seed, look, backdrop, onDone }: GameProps) {
   const s = game.current;
   const stage = useRef<HTMLDivElement>(null);
   const holes = useRef<(HTMLButtonElement | null)[]>([]);
+  const knight = useRef<HTMLDivElement>(null);
   const comboEl = useRef<HTMLElement>(null);
   const fx = useRef<FxHandle>(null);
   const stop = useHitStop(stage);
@@ -43,6 +44,7 @@ export function Burrows({ verse, seed, look, backdrop, onDone }: GameProps) {
       if (e.type === 'bonk') {
         flyWord(game.current.words[game.current.next - 1]?.raw ?? e.mole.label, holes.current[e.mole.hole], gapIn('burrows-text'));
         const [x, y] = centre(e.mole.hole);
+        slashWave(stage.current, pointIn(knight.current, stage.current, 0.7, 0.4), [x, y], isComboTier(e.combo));
         fx.current?.burst(x, y, isComboTier(e.combo) ? 26 : 12, SPARKS);
         fx.current?.burst(x, y, 6, GOO, 0.6);
         fx.current?.text(x, y - 26, `+${e.points}`);
@@ -99,7 +101,7 @@ export function Burrows({ verse, seed, look, backdrop, onDone }: GameProps) {
             {s.score}
           </b>
         </div>
-        <div class="burrows-knight">
+        <div class="burrows-knight" ref={knight}>
           <AvatarFigure look={look} size={96} bare pose={pose.name} key={`${pose.name}${pose.n}`} />
         </div>
         <div class="burrows-grid">

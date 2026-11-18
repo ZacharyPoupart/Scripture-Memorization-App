@@ -3985,7 +3985,7 @@ button.chip {
   position: absolute;
   left: 4%;
   bottom: 10px;
-  animation: hub-march 7s linear infinite;
+  animation: hub-march 14s ease-in-out infinite;
 }
 .hub-goblin {
   position: absolute;
@@ -4516,4 +4516,82 @@ button.chip {
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
+}
+
+/* ---- marching in place (v1.79.0, owner-requested: the idle knight on Today and Play pulls his legs up and down, slowly) ----
+   Each leg lifts at the hip and comes back down in turn (the leg shortens from the hip, so the foot rises: a knee lift), the body
+   dips a little on each step, and the cape swings with it. One full step pair takes 1.4 s. */
+.pose-march .rig-leg-l { animation: leg-lift 1.4s ease-in-out infinite; }
+.pose-march .rig-leg-r { animation: leg-lift 1.4s ease-in-out -0.7s infinite; }
+.pose-march .rig-chest,
+.pose-march .rig-belt,
+.pose-march .rig-helmet,
+.pose-march .rig-shield,
+.pose-march .rig-sword { animation: march-dip 0.7s ease-in-out infinite; }
+.pose-march .rig-cape { animation: rig-cape 1.4s ease-in-out infinite; }
+@keyframes leg-lift {
+  0%, 55%, 100% { transform: none; }
+  20% { transform: translateY(-5px) scaleY(0.84); }
+  35% { transform: translateY(-3px) scaleY(0.9); }
+}
+@keyframes march-dip {
+  0%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-2px); }
+  60% { transform: translateY(1px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pose-march .rig { animation: none !important; }
+}
+
+/* ---- sword waves and cuts (v1.79.0, owner-requested) ---- */
+.slash-wave,
+.slash-cut {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 5;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+.slash-wave svg {
+  display: block;
+  overflow: visible;
+}
+.slash-wave path {
+  fill: #f4efe2;
+  stroke: #9fd3df;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+.slash-wave.big path {
+  fill: #fff6d8;
+  stroke: #e8c66a;
+  stroke-width: 3;
+}
+.slash-cut {
+  width: 64px;
+  height: 64px;
+}
+.slash-cut.big {
+  width: 92px;
+  height: 92px;
+}
+.slash-cut i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100%;
+  height: 6px;
+  margin: -3px 0 0 -50%;
+  background: #f4efe2;
+  border: 1.5px solid #221e26;
+  border-radius: 3px;
+  transform: rotate(35deg);
+}
+.slash-cut i + i {
+  transform: rotate(-35deg);
+}
+.slash-cut.big i {
+  height: 8px;
+  background: #fff6d8;
 }

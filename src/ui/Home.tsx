@@ -120,13 +120,13 @@ export function Home() {
             })}
           </nav>
 
-          <button class="play-card" onClick={() => navigate('/play')} data-testid="play-card">
+          <button class="play-card" onClick={() => navigate(readyAll > 0 ? '/play/run' : '/play')} data-testid="play-card">
             <span class="play-card-knight" aria-hidden="true">
-              <AvatarFigure look={currentLook(data)} size={84} bare pose="walk" />
+              <AvatarFigure look={currentLook(data)} size={84} bare pose="march" />
             </span>
             <span class="play-card-text">
               <strong>Play</strong>
-              <small>{readyAll > 0 ? `Win a game to review a verse · ${readyAll} ready` : 'Practice any verse with your knight'}</small>
+              <small>{readyAll > 0 ? `Play today’s reviews · ${readyAll} ready` : 'Practice any verse with your knight'}</small>
             </span>
             <Icon name="arrow" />
           </button>

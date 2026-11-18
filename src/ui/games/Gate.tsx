@@ -5,7 +5,7 @@ import { isComboTier } from '../../core/games.ts';
 import { GATE_HEARTS, gateStep, gateTap, newGate, type GateEvent } from '../../core/gate.ts';
 import { feedback } from '../../services/feedback.ts';
 import { AvatarFigure, type KnightPose } from '../AvatarFigure.tsx';
-import { DUST, flyWord, Fx, gapIn, GOO, punch, shake, SPARKS, useHitStop, type FxHandle } from './juice.tsx';
+import { DUST, flyWord, Fx, gapIn, GOO, pointIn, punch, shake, slashWave, SPARKS, useHitStop, type FxHandle } from './juice.tsx';
 import { GATE, GOBLIN, Hearts, Pixels, SHIELD_ICON, useTicker } from './sprites.tsx';
 import type { GameProps } from './types.ts';
 
@@ -17,6 +17,7 @@ export function Gate({ verse, seed, look, backdrop, onDone }: GameProps) {
   const s = game.current;
   const stage = useRef<HTMLDivElement>(null);
   const goblin = useRef<HTMLDivElement>(null);
+  const knight = useRef<HTMLDivElement>(null);
   const comboEl = useRef<HTMLElement>(null);
   const fx = useRef<FxHandle>(null);
   const stop = useHitStop(stage);
@@ -47,6 +48,7 @@ export function Gate({ verse, seed, look, backdrop, onDone }: GameProps) {
       if (e.type === 'strike') {
         flyWord(e.word.raw, goblin.current, gapIn('gate-text'));
         const [x, y] = at();
+        slashWave(stage.current, pointIn(knight.current, stage.current, 0.7, 0.45), [x, y], isComboTier(e.combo));
         fx.current?.burst(x, y, isComboTier(e.combo) ? 26 : 12, GOO);
         fx.current?.burst(x, y, 6, SPARKS, 0.7);
         fx.current?.text(x, y - 30, `+${e.points}`);
@@ -143,7 +145,7 @@ export function Gate({ verse, seed, look, backdrop, onDone }: GameProps) {
           <div class="gate-wall">
             <Pixels map={GATE} size={70} />
           </div>
-          <div class={`gate-knight pose-${pose.name}`}>
+          <div class={`gate-knight pose-${pose.name}`} ref={knight}>
             <AvatarFigure look={look} size={124} bare pose={pose.name} key={`${pose.name}${pose.n}`} />
           </div>
           {!s.over && (
