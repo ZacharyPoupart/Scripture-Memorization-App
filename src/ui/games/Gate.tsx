@@ -6,7 +6,7 @@ import { GATE_HEARTS, gateStep, gateTap, newGate, type GateEvent } from '../../c
 import { feedback } from '../../services/feedback.ts';
 import { AvatarFigure, type KnightPose } from '../AvatarFigure.tsx';
 import { DUST, flyWord, Fx, gapIn, GOO, pointIn, punch, shake, slashWave, SPARKS, useHitStop, type FxHandle } from './juice.tsx';
-import { GATE, GOBLIN, Hearts, Pixels, SHIELD_ICON, useTicker } from './sprites.tsx';
+import { GATE, Goblin, Hearts, Pixels, SHIELD_ICON, useTicker } from './sprites.tsx';
 import type { GameProps } from './types.ts';
 
 const GATE_X = 30; // % where the gate stands; the goblins start at the far right
@@ -151,7 +151,7 @@ export function Gate({ verse, seed, look, backdrop, onDone }: GameProps) {
           {!s.over && (
             <div class={`gate-goblin ${near ? 'near' : ''}`} style={{ left: `${x}%` }} ref={goblin} key={`g${fresh}`}>
               <span class="march">
-                <Pixels map={GOBLIN} size={52} label="A goblin" />
+                <Goblin size={52} label="A goblin" />
               </span>
             </div>
           )}

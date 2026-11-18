@@ -1,90 +1,9 @@
 // The games' own pixel pictures, drawn from little maps (one square a letter), and the small pieces built from them.
 import { useEffect, useRef } from 'preact/hooks';
 
-const W = 26;
-const pad = (rows: string[]) => rows.map((r) => r.padEnd(W, '.'));
-/** The dragon, wings up and wings folded: shown in turn, so it flaps. */
-export const DRAGON_UP = pad([
-  '..............kk......kk',
-  '.............kddk....kddk',
-  '......kk....kddddk..kdddk',
-  '.....kwk...kdddddkkkddddk',
-  '..kkkkgkk..kddddddddddddk',
-  '.kgggggggkkkgdddddddddgk',
-  'kgrgggggggggggggddddggk',
-  'kggggggggggggggggggggk',
-  'kwkwkgggggyyyygggggggk',
-  '.k.k.kkggyyyyyyggggggk',
-  '......kggyyyyyyygggggkk',
-  '......kgyyyyyyyygggggggk',
-  '......kggyyyyyygggkkgggk',
-  '.....kgggkkkkkgggk..kggk',
-  '.....kggk....kggk....kgk',
-  '....kkkkk...kkkkk....kkk',
-]);
-export const DRAGON_DOWN = pad([
-  '',
-  '',
-  '......kk',
-  '.....kwk',
-  '..kkkkgkk..kkkkkkkkkkkkkk',
-  '.kgggggggkkkddddddddddddk',
-  'kgrggggggggggdddddddddgk',
-  'kggggggggggggggggggggk',
-  'kwkwkgggggyyyygggggggk',
-  '.k.k.kkggyyyyyyggggggk',
-  '......kggyyyyyyygggggkk',
-  '......kgyyyyyyyygggggggk',
-  '......kggyyyyyygggkkgggk',
-  '.....kgggkkkkkgggk..kggk',
-  '.....kggk....kggk....kgk',
-  '....kkkkk...kkkkk....kkk',
-]);
-/** A goblin archer, facing left, bow in hand. */
-export const GOBLIN = [
-  '.....kkkk....',
-  '.k..kggggk.k.',
-  'kgkkgggggkkgk',
-  '.kggrggrggk..',
-  '..kgggggggk..',
-  '.w.kgwwwgk...',
-  'w..kkbbbkk...',
-  'w.kbbbbbbbk..',
-  'wkkbkbbbkbk..',
-  'w..kbbbbbk...',
-  '.w.kbbkbbk...',
-  '...kbk.kbk...',
-  '..kkk..kkk...',
-];
 /** The gate the goblins march on. */
 export const GATE = ['kk.kk.kk.kk', 'kskkskkskks', 'ksssssssssk', 'kssbbbbbssk', 'ksbbkbkbbsk', 'ksbkbkbkbsk', 'ksbbkbkbbsk', 'ksbkbkbkbsk', 'ksbbkbkbbsk', 'kkkkkkkkkkk'];
 export const SHIELD_ICON = ['kkkkkkk', 'kyyyyyk', 'kywkwyk', 'kyywyyk', '.kyyyk.', '..kyk..', '...k...'];
-/** A goblin holding up a sign, for the burrows (the sign is drawn by the page, over its hands). */
-export const GOBLIN_UP = [
-  '...kkkkk...',
-  '.k.kgggk.k.',
-  'kgkgggggkgk',
-  '.kgrgggrgk.',
-  '..kgggggk..',
-  '..kgwwwgk..',
-  '.kkkkkkkkk.',
-  'kgkbbbbbkgk',
-  'kgkbbbbbkgk',
-  '.k.kbbbk.k.',
-];
-/** Seen from the side when struck: squashed, eyes shut. */
-export const GOBLIN_BONK = [
-  '...........',
-  '...........',
-  '...kkkkk...',
-  'kkkgggggkkk',
-  'kgkkgggkkgk',
-  '.kgggggggk.',
-  'kkkbbbbbkkk',
-  'kgkbbbbbkgk',
-  '.kkkkkkkkk.',
-  '...........',
-];
 /** A burrow: a dark mouth in a mound of earth. */
 export const HOLE = ['...bbbbbbbbb...', '.bbbsssssssbbb.', 'bbsskkkkkkkssbb', 'bbskkkkkkkkksbb', '.bbbbbbbbbbbbb.'];
 export const HEART = ['.kk.kk.', 'krrkrrk', 'krrrrrk', 'krrrrrk', '.krrrk.', '..krk..', '...k...'];
@@ -127,17 +46,45 @@ export function Pixels({ map, size, dim, label }: { map: string[]; size: number;
   );
 }
 
-/** The dragon, flapping (two pictures shown in turn). */
-export function Dragon({ size }: { size: number }) {
+// The goblins and the dragon are painted and pixelated like the knight (design/pixel/creatures.py, public/creatures/*.webp).
+const CREATURES = { 'goblin-a': [120, 140], 'goblin-b': [120, 140], 'goblin-up': [120, 120], 'goblin-bonk': [120, 120], 'dragon-up': [240, 160], 'dragon-down': [240, 160] } as const;
+type Creature = keyof typeof CREATURES;
+const creatureUrl = (name: Creature) => `${import.meta.env.BASE_URL}creatures/${name}.webp`;
+const heightOf = (name: Creature, size: number) => Math.round((size * CREATURES[name][1]) / CREATURES[name][0]);
+
+function Painted({ name, size }: { name: Creature; size: number }) {
+  return <img class="px creature" src={creatureUrl(name)} width={size} height={heightOf(name, size)} alt="" aria-hidden="true" draggable={false} />;
+}
+
+/** Two pictures shown in turn (a flap, a step). */
+function Frames({ a, b, size, label, cls }: { a: Creature; b: Creature; size: number; label: string; cls: string }) {
   return (
-    <span class="sprite-flap" role="img" aria-label="The dragon" style={{ width: `${size}px`, height: `${(size * 16) / W}px` }}>
+    <span class={`sprite-flap ${cls}`} role="img" aria-label={label} style={{ width: `${size}px`, height: `${heightOf(a, size)}px` }}>
       <span class="frame-a">
-        <Pixels map={DRAGON_UP} size={size} />
+        <Painted name={a} size={size} />
       </span>
       <span class="frame-b">
-        <Pixels map={DRAGON_DOWN} size={size} />
+        <Painted name={b} size={size} />
       </span>
     </span>
+  );
+}
+
+/** The dragon, flapping. */
+export function Dragon({ size }: { size: number }) {
+  return <Frames a="dragon-up" b="dragon-down" size={size} label="The dragon" cls="dragon-flap" />;
+}
+
+/** A goblin: marching (facing left, a step each frame), up out of a burrow with its hands raised, or bonked. */
+export function Goblin({ size, pose = 'march', label }: { size: number; pose?: 'march' | 'still' | 'up' | 'bonk'; label?: string }) {
+  if (pose === 'march') return <Frames a="goblin-a" b="goblin-b" size={size} label={label ?? 'A goblin'} cls="goblin-step" />;
+  const name: Creature = pose === 'still' ? 'goblin-a' : pose === 'up' ? 'goblin-up' : 'goblin-bonk';
+  return label ? (
+    <span role="img" aria-label={label} style={{ display: 'block' }}>
+      <Painted name={name} size={size} />
+    </span>
+  ) : (
+    <Painted name={name} size={size} />
   );
 }
 

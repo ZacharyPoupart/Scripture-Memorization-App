@@ -19,7 +19,7 @@ import { CoinCount } from '../CoinCount.tsx';
 import { Confetti, Icon, PILE_INFO } from '../common.tsx';
 import { Dock } from '../modes/shared.tsx';
 import { EmptyState } from '../primitives.tsx';
-import { Dragon, FLAME, GATE, GOBLIN, GOBLIN_UP, Hearts, Pixels, SPARK, Stars, TOWER, useTicker } from './sprites.tsx';
+import { Dragon, FLAME, GATE, Goblin, Hearts, Pixels, SPARK, Stars, TOWER, useTicker } from './sprites.tsx';
 import { Burrows } from './Burrows.tsx';
 import { Gate } from './Gate.tsx';
 import { DUST, flyWord, Fx, gapIn, pointIn, punch, shake, slashWave, SPARKS, useHitStop, type FxHandle } from './juice.tsx';
@@ -609,7 +609,7 @@ function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
 
 const ART: Record<GameId, () => preact.JSX.Element> = {
   gate: () => <Pixels map={GATE} size={34} />,
-  burrows: () => <Pixels map={GOBLIN_UP} size={36} />,
+  burrows: () => <Goblin pose="up" size={36} />,
   duel: () => <Dragon size={52} />,
   bridge: () => <Pixels map={TOWER} size={34} />,
 };
@@ -672,7 +672,7 @@ export function PlayHub() {
             <AvatarFigure look={look} size={128} bare pose="march" />
           </div>
           <div class="hub-goblin">
-            <Pixels map={GOBLIN} size={44} />
+            <Goblin size={44} />
           </div>
           <div class="hub-dragon">
             <Dragon size={120} />

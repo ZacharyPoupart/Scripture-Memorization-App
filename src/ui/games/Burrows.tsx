@@ -6,7 +6,7 @@ import { isComboTier } from '../../core/games.ts';
 import { feedback } from '../../services/feedback.ts';
 import { AvatarFigure, type KnightPose } from '../AvatarFigure.tsx';
 import { DUST, flyWord, Fx, gapIn, GOO, pointIn, punch, shake, slashWave, SPARKS, useHitStop, type FxHandle } from './juice.tsx';
-import { GOBLIN_BONK, GOBLIN_UP, Hearts, HOLE, Pixels, useTicker } from './sprites.tsx';
+import { Goblin, Hearts, HOLE, Pixels, useTicker } from './sprites.tsx';
 import type { GameProps } from './types.ts';
 
 export function Burrows({ verse, seed, look, backdrop, onDone }: GameProps) {
@@ -123,7 +123,7 @@ export function Burrows({ verse, seed, look, backdrop, onDone }: GameProps) {
                 {(m || hit) && (
                   <span class="mole" key={m ? `${s.next}-${hole}` : `b${bonked?.n}`}>
                     {m && <span class="sign">{m.label}</span>}
-                    <Pixels map={hit ? GOBLIN_BONK : GOBLIN_UP} size={50} />
+                    <Goblin pose={hit ? 'bonk' : 'up'} size={50} />
                   </span>
                 )}
                 <span class="hole">

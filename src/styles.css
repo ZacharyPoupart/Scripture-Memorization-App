@@ -3976,6 +3976,15 @@ button.chip {
 }
 @keyframes frame-a { 50% { opacity: 0; } }
 @keyframes frame-b { 0% { opacity: 0; } 50% { opacity: 1; } }
+/* a goblin's step keeps time with its bob (.gate-goblin .march), faster when it is close */
+.goblin-step .frame-a,
+.goblin-step .frame-b {
+  animation-duration: 0.72s;
+}
+.gate-goblin.near .goblin-step .frame-a,
+.gate-goblin.near .goblin-step .frame-b {
+  animation-duration: 0.4s;
+}
 
 /* ---- the games' home, and the way in from Today ---- */
 .hub-stage {
@@ -4200,8 +4209,7 @@ button.chip {
 }
 .gate-goblin .march {
   display: block;
-  transform: scaleX(-1); /* faces the gate */
-  animation: march 0.36s steps(2) infinite;
+  animation: march 0.36s steps(2) infinite; /* the goblin is painted facing left, toward the gate */
 }
 .gate-goblin.near .march {
   animation: march 0.2s steps(2) infinite;
@@ -4220,8 +4228,8 @@ button.chip {
   animation: charge-hot 0.3s steps(2) infinite;
 }
 @keyframes march {
-  0% { transform: scaleX(-1) translateY(0) rotate(-4deg); }
-  50% { transform: scaleX(-1) translateY(-4px) rotate(4deg); }
+  0% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-3px) rotate(3deg); }
 }
 @keyframes goblin-in {
   from { transform: translateX(40px) scale(0.6); opacity: 0; }
