@@ -22,7 +22,7 @@ import { EmptyState } from '../primitives.tsx';
 import { Dragon, FLAME, GATE, GOBLIN, GOBLIN_UP, Hearts, Pixels, SPARK, Stars, TOWER, useTicker } from './sprites.tsx';
 import { Burrows } from './Burrows.tsx';
 import { Gate } from './Gate.tsx';
-import { DUST, flyWord, Fx, gapIn, punch, shake, SPARKS, useHitStop, type FxHandle } from './juice.tsx';
+import { DUST, flyWord, Fx, gapIn, pointIn, punch, shake, slashWave, SPARKS, useHitStop, type FxHandle } from './juice.tsx';
 import type { GameProps, Outcome } from './types.ts';
 
 /** The scene behind a game: the knight's own background, as wide as the stage. */
@@ -210,6 +210,7 @@ function Duel({ verse, seed, look, backdrop, onDone }: GameProps) {
   const [score, setScore] = useState(0);
   const stage = useRef<HTMLDivElement>(null);
   const dragonEl = useRef<HTMLDivElement>(null);
+  const knightEl = useRef<HTMLDivElement>(null);
   const comboEl = useRef<HTMLElement>(null);
   const fxr = useRef<FxHandle>(null);
   const stop = useHitStop(stage);
@@ -256,6 +257,7 @@ function Duel({ verse, seed, look, backdrop, onDone }: GameProps) {
       const n = combo + 1;
       const p = points(n, 1 - charge);
       const [x, y] = dragonAt();
+      slashWave(stage.current, pointIn(knightEl.current, stage.current, 0.75, 0.4), [x, y], isComboTier(n) || at + 1 >= rounds.length);
       fxr.current?.burst(x, y, isComboTier(n) || at + 1 >= rounds.length ? 28 : 12, SPARKS);
       fxr.current?.text(x, y - 40, `+${p}`);
       if (isComboTier(n)) {
@@ -300,7 +302,7 @@ function Duel({ verse, seed, look, backdrop, onDone }: GameProps) {
             </div>
           </div>
           <div class="game-ground" />
-          <div class={`duel-knight ${beat?.kind ?? ''}`} key={`k${fx}`}>
+          <div class={`duel-knight ${beat?.kind ?? ''}`} key={`k${fx}`} ref={knightEl}>
             <AvatarFigure look={look} size={150} bare pose={pose.name} key={`${pose.name}${pose.n}`} />
           </div>
           <div class={`duel-dragon ${beat?.kind ?? ''} ${charge > 0.7 ? 'rearing' : ''}`} key={`d${fx}`} ref={dragonEl}>

@@ -4542,3 +4542,56 @@ button.chip {
 @media (prefers-reduced-motion: reduce) {
   .pose-march .rig { animation: none !important; }
 }
+
+/* ---- sword waves and cuts (v1.79.0, owner-requested) ---- */
+.slash-wave,
+.slash-cut {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 5;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+.slash-wave svg {
+  display: block;
+  overflow: visible;
+}
+.slash-wave path {
+  fill: #f4efe2;
+  stroke: #9fd3df;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+.slash-wave.big path {
+  fill: #fff6d8;
+  stroke: #e8c66a;
+  stroke-width: 3;
+}
+.slash-cut {
+  width: 64px;
+  height: 64px;
+}
+.slash-cut.big {
+  width: 92px;
+  height: 92px;
+}
+.slash-cut i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100%;
+  height: 6px;
+  margin: -3px 0 0 -50%;
+  background: #f4efe2;
+  border: 1.5px solid #221e26;
+  border-radius: 3px;
+  transform: rotate(35deg);
+}
+.slash-cut i + i {
+  transform: rotate(-35deg);
+}
+.slash-cut.big i {
+  height: 8px;
+  background: #fff6d8;
+}

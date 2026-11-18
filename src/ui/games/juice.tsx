@@ -196,3 +196,60 @@ export function flyWord(text: string, from: Element | DOMRect | null | undefined
 
 /** The gap the next word fills in a game's verse line (call before the screen updates). */
 export const gapIn = (testid: string) => (typeof document === 'undefined' ? null : document.querySelector(`[data-testid="${testid}"] .w.cur`));
+
+/**
+ * A sword wave (v1.79.0, owner-requested "slashing animations like a wave coming off"): a crescent of light leaves the knight's
+ * sword, flies to what was struck and leaves a crossed cut where it lands. `from` and `to` are points in the stage's pixels.
+ * `big` (a combo step or the final blow) makes it wider and brighter. Nothing under reduced motion.
+ */
+export function slashWave(stage: HTMLElement | null | undefined, from: [number, number], to: [number, number], big = false) {
+  if (!stage || reducedMotion() || typeof document === 'undefined' || !('animate' in stage)) return;
+  const [fx, fy] = from;
+  const [tx, ty] = to;
+  const angle = (Math.atan2(ty - fy, tx - fx) * 180) / Math.PI;
+  const size = big ? 92 : 68;
+  const wave = document.createElement('div');
+  wave.className = `slash-wave ${big ? 'big' : ''}`;
+  wave.setAttribute('aria-hidden', 'true');
+  wave.innerHTML = `<svg viewBox="0 0 40 60" width="${size * 0.66}" height="${size}"><path d="M8 2 Q40 30 8 58 Q26 30 8 2 Z"/></svg>`;
+  stage.appendChild(wave);
+  const at = (x: number, y: number, s: number) => `translate(${x}px, ${y}px) translate(-50%, -50%) rotate(${angle}deg) scale(${s})`;
+  const travel = big ? 200 : 160;
+  wave.animate(
+    [
+      { transform: at(fx, fy, 0.4), opacity: 0 },
+      { transform: at(fx + (tx - fx) * 0.15, fy + (ty - fy) * 0.15, 1), opacity: 1, offset: 0.15 },
+      { transform: at(tx, ty, 1.15), opacity: 1, offset: 0.9 },
+      { transform: at(tx, ty, 1.4), opacity: 0 },
+    ],
+    { duration: travel, easing: 'cubic-bezier(.3,0,.6,1)' },
+  ).onfinish = () => wave.remove();
+  setTimeout(() => wave.remove(), travel + 200);
+  // the cut where it lands: two crossing strokes that flash and fade
+  setTimeout(() => {
+    const cut = document.createElement('div');
+    cut.className = `slash-cut ${big ? 'big' : ''}`;
+    cut.setAttribute('aria-hidden', 'true');
+    cut.innerHTML = '<i></i><i></i>';
+    cut.style.left = `${tx}px`;
+    cut.style.top = `${ty}px`;
+    stage.appendChild(cut);
+    cut.animate(
+      [
+        { transform: 'translate(-50%, -50%) scale(0.3)', opacity: 1 },
+        { transform: 'translate(-50%, -50%) scale(1.1)', opacity: 1, offset: 0.35 },
+        { transform: 'translate(-50%, -50%) scale(1.25)', opacity: 0 },
+      ],
+      { duration: big ? 380 : 300, easing: 'ease-out' },
+    ).onfinish = () => cut.remove();
+    setTimeout(() => cut.remove(), 700);
+  }, travel * 0.85);
+}
+
+/** The middle of an element, in its stage's pixels (for aiming a slash). */
+export function pointIn(el: Element | null | undefined, stage: Element | null | undefined, dx = 0.5, dy = 0.5): [number, number] {
+  if (!el || !stage) return [0, 0];
+  const a = el.getBoundingClientRect();
+  const b = stage.getBoundingClientRect();
+  return [a.left + a.width * dx - b.left, a.top + a.height * dy - b.top];
+}
