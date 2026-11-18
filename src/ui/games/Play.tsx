@@ -1,11 +1,11 @@
-// The games (v1.75.0, owner-requested: real-time games as the focal point of the app; v1.76.0 added Hold the Gate and Goblin
-// Burrows and the juice). Five ways to practise a verse with the knight, all against the clock: Hold the Gate (Gate.tsx), Goblin
-// Burrows (Burrows.tsx), Arrow Volley (Volley.tsx), Dragon Duel and Bridge Run (here). The rules are in core/games.ts, gate.ts,
-// burrows.ts and volley.ts. A game WON within the pile's mistake allowance is recorded with the same `completeReview` every review type
+// The games (v1.75.0, owner-requested: real-time games as the focal point of the app). Four ways to practise a verse with the
+// knight, all against the clock and each a different kind of recall: Hold the Gate (first letters, Gate.tsx), Goblin Burrows (the
+// next word, popping up, Burrows.tsx), Dragon Duel (the next word, chosen under fire) and Bridge Run (word order), here. v1.78.0
+// retired Arrow Volley, Sword Dance and Parry as too close to these. The rules are in core/games.ts, gate.ts and burrows.ts. A game WON within the pile's mistake allowance is recorded with the same `completeReview` every review type
 // uses, so the schedule, streak and coins follow their usual rules; a game lost, or won with too many slips, saves nothing.
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { currentLook, sceneUrl, type Look } from '../../core/avatar.ts';
-import { BRIDGE_HEARTS, BRIDGE_PLANK_MS, DUEL_HEARTS, GAMES, bestKey, duelChargeMs, gameCounts, duelRight, duelRounds, isComboTier, plankFits, planks, points, recordBest, scatter, stars, totalStars, verseStars, type GameId, type Plank } from '../../core/games.ts';
+import { BRIDGE_HEARTS, BRIDGE_PLANK_MS, DUEL_HEARTS, GAMES, bestKey, duelChargeMs, gameCounts, duelRight, duelRounds, isComboTier, plankFits, planks, points, recordBest, bank, stars, totalStars, verseStars, type GameId, type Plank } from '../../core/games.ts';
 import { mistakesAllowed } from '../../core/quiz.ts';
 import { formatRef } from '../../core/reference.ts';
 import { liveVerses, verseStatus } from '../../core/schedule.ts';
@@ -19,12 +19,9 @@ import { CoinCount } from '../CoinCount.tsx';
 import { Confetti, Icon, PILE_INFO } from '../common.tsx';
 import { Dock } from '../modes/shared.tsx';
 import { EmptyState } from '../primitives.tsx';
-import { BEARER, Dragon, FLAME, GATE, GOBLIN, GOBLIN_UP, Hearts, Pixels, RUNE, SPARK, Stars, TOWER, useTicker } from './sprites.tsx';
-import { Volley } from './Volley.tsx';
-import { Gate } from './Gate.tsx';
+import { Dragon, FLAME, GATE, GOBLIN, GOBLIN_UP, Hearts, Pixels, SPARK, Stars, TOWER, useTicker } from './sprites.tsx';
 import { Burrows } from './Burrows.tsx';
-import { Dance } from './Dance.tsx';
-import { Parry } from './Parry.tsx';
+import { Gate } from './Gate.tsx';
 import { DUST, flyWord, Fx, gapIn, punch, shake, SPARKS, useHitStop, type FxHandle } from './juice.tsx';
 import type { GameProps, Outcome } from './types.ts';
 
@@ -69,8 +66,10 @@ export function Play({ game, verseId }: { game: string; verseId: string }) {
           <Icon name="close" />
         </button>
         <div class="title">
-          <strong>{info.name}</strong>
-          <span class="sub">{formatRef(verse)}</span>
+          <span class="game-name">{info.name}</span>
+          <strong class="game-ref" data-testid="game-ref">
+            {formatRef(verse)}
+          </strong>
         </div>
         <span style={{ width: '44px' }} />
       </div>
@@ -80,12 +79,6 @@ export function Play({ game, verseId }: { game: string; verseId: string }) {
         <Gate key={round} {...props} />
       ) : info.id === 'burrows' ? (
         <Burrows key={round} {...props} />
-      ) : info.id === 'dance' ? (
-        <Dance key={round} {...props} />
-      ) : info.id === 'parry' ? (
-        <Parry key={round} {...props} />
-      ) : info.id === 'volley' ? (
-        <Volley key={round} {...props} />
       ) : info.id === 'duel' ? (
         <Duel key={round} {...props} />
       ) : (
@@ -98,9 +91,6 @@ export function Play({ game, verseId }: { game: string; verseId: string }) {
 const WORDS: Record<GameId, { won: string; lost: string }> = {
   gate: { won: 'The gate holds', lost: 'The goblins broke through' },
   burrows: { won: 'Every goblin bonked', lost: 'The goblins got away' },
-  dance: { won: 'Every shield cut', lost: 'The fuse burned out' },
-  parry: { won: 'Not one rune got past', lost: 'The runes broke through' },
-  volley: { won: 'The archers are routed', lost: 'The arrows got through' },
   duel: { won: 'The dragon is beaten', lost: 'The dragon holds the gate' },
   bridge: { won: 'Safely across', lost: 'Into the river' },
 };
@@ -363,10 +353,8 @@ function Duel({ verse, seed, look, backdrop, onDone }: GameProps) {
 // ---------------------------------------------------------------- Bridge Run: lay each phrase before the knight reaches the edge
 
 function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
-  const all = useMemo(() => planks(verse.text), [verse.text]);
-  const mixed = useMemo(() => scatter(all, seed + verse.text.length), [all, seed]);
+  const all = useMemo(() => planks(verse.text, 1), [verse.text]); // one word a plank (v1.78.0, owner-requested)
   const [laid, setLaid] = useState(0);
-  const [used, setUsed] = useState<number[]>([]); // the planks already taken from the bank (their place in `mixed`)
   const [hearts, setHearts] = useState(BRIDGE_HEARTS);
   const [slips, setSlips] = useState(0);
   const [wrong, setWrong] = useState<number | null>(null);
@@ -411,7 +399,7 @@ function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
     } else setPos(next);
   }, pos < all.length + 0.9);
 
-  const pick = (p: Plank, i: number, from?: Element) => {
+  const pick = (p: Plank, from?: Element) => {
     if (across || lost) return;
     feedback.unlock();
     if (plankFits(all, laid, p)) {
@@ -436,10 +424,9 @@ function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
       setCombo(n);
       setScore(score + pts);
       setWrong(null);
-      setUsed([...used, i]);
       setLaid(laid + 1);
     } else {
-      setWrong(i);
+      setWrong(p.order);
       hurt();
       play('hurt', 400);
     }
@@ -450,7 +437,7 @@ function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
   return (
     <>
       <div class="verse-area stack">
-        <div class={`game-stage bridge-stage ${across ? 'across' : ''} ${lost ? 'lost' : ''}`} style={backdrop} ref={stage} data-testid="bridge-stage" data-laid={laid}>
+        <div class={`game-stage bridge-stage ${across ? 'across' : ''} ${lost ? 'lost' : ''}`} style={backdrop} ref={stage} data-testid="bridge-stage" data-laid={laid} data-total={all.length}>
           <div class="game-hud">
             <Hearts n={hearts} of={BRIDGE_HEARTS} testid="bridge-hearts" />
             <b class="game-score" data-testid="game-score">
@@ -474,7 +461,7 @@ function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
           <Fx ref={fxr} />
         </div>
         <p class="verse-text bridge-text" data-testid="bridge-text">
-          {laid === 0 ? <span class="muted">Tap the phrase that comes first.</span> : all.slice(0, laid - 1).map((p) => p.text).join(' ')}
+          {laid === 0 ? <span class="muted">Tap the word that comes first.</span> : all.slice(0, laid - 1).map((p) => p.text).join(' ')}
           {laid > 0 && (
             <>
               {laid > 1 ? ' ' : ''}
@@ -486,13 +473,11 @@ function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
           <span class="next-slot" aria-hidden="true" />
         </p>
         <div class="bridge-bank" data-testid="bridge-bank">
-          {mixed.map((p, i) =>
-            used.includes(i) ? null : (
-              <button key={i} class={`btn plank ${wrong === i ? 'shake' : ''}`} onPointerDown={(e) => (e.preventDefault(), pick(p, i, e.currentTarget as Element))} onClick={(e) => e.detail === 0 && pick(p, i, e.currentTarget as Element)} data-order={p.order} disabled={across || lost}>
-                {p.text}
-              </button>
-            ),
-          )}
+          {bank(all, laid, seed + verse.text.length).map((p) => (
+            <button key={p.order} class={`btn plank ${wrong === p.order ? 'shake' : ''}`} onPointerDown={(e) => (e.preventDefault(), pick(p, e.currentTarget as Element))} onClick={(e) => e.detail === 0 && pick(p, e.currentTarget as Element)} data-order={p.order} disabled={across || lost}>
+              {p.text.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '') || p.text}
+            </button>
+          ))}
         </div>
       </div>
     </>
@@ -504,9 +489,6 @@ function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
 const ART: Record<GameId, () => preact.JSX.Element> = {
   gate: () => <Pixels map={GATE} size={34} />,
   burrows: () => <Pixels map={GOBLIN_UP} size={36} />,
-  dance: () => <Pixels map={BEARER} size={36} />,
-  parry: () => <Pixels map={RUNE} size={40} />,
-  volley: () => <Pixels map={GOBLIN} size={40} />,
   duel: () => <Dragon size={52} />,
   bridge: () => <Pixels map={TOWER} size={34} />,
 };

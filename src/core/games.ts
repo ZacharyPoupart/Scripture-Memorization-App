@@ -1,19 +1,16 @@
 // Minigames with the knight (v1.75.0, owner-requested: real-time games as the focal point). Pure logic only: what is asked and
-// what counts as right (Arrow Volley's simulation is in volley.ts). A game that is WON within the pile's mistake allowance is
+// what counts as right (the real-time games' simulations are in gate.ts and burrows.ts). A game that is WON within the pile's mistake allowance is
 // recorded through the same `completeReview` as any other review type (see ui/games/Play.tsx); nothing else is saved.
 import { makeRng, mistakesAllowed, shuffle } from './quiz.ts';
 import type { Pile } from './types.ts';
 import { tokenize, type Word } from './text.ts';
 
-export type GameId = 'gate' | 'burrows' | 'dance' | 'parry' | 'volley' | 'duel' | 'bridge';
+export type GameId = 'gate' | 'burrows' | 'duel' | 'bridge';
 export const GAMES: { id: GameId; name: string; blurb: string }[] = [
   { id: 'gate', name: 'Hold the Gate', blurb: 'Tap the first letter of the next word before the goblin reaches the gate.' },
   { id: 'burrows', name: 'Goblin Burrows', blurb: 'Bonk the goblin holding the next word.' },
-  { id: 'dance', name: 'Sword Dance', blurb: 'Cut through each phrase’s words in order before the fuse burns out.' },
-  { id: 'parry', name: 'Parry', blurb: 'Strike the rune with the next word, block every other.' },
-  { id: 'volley', name: 'Arrow Volley', blurb: 'Cut down the arrow carrying the next word.' },
   { id: 'duel', name: 'Dragon Duel', blurb: 'Strike with the next word before the fire comes.' },
-  { id: 'bridge', name: 'Bridge Run', blurb: 'Lay each phrase before the knight reaches the edge.' },
+  { id: 'bridge', name: 'Bridge Run', blurb: 'Lay each word in order before the knight reaches the edge.' },
 ];
 
 // ---------------------------------------------------------------- score, combo and personal bests (shared by every game)
@@ -55,7 +52,9 @@ export function recordBest(table: Record<string, Best>, key: string, run: Best &
 
 /** Stars collected for one verse across every game (the best of each), and in all. */
 export const verseStars = (table: Record<string, Best>, verseId: string) => GAMES.reduce((n, g) => n + (table[bestKey(g.id, verseId)]?.stars ?? 0), 0);
-export const totalStars = (table: Record<string, Best>) => Object.values(table).reduce((n, b) => n + (b?.stars ?? 0), 0);
+/** Stars from the games there are now (the games retired in v1.78.0 keep their entries on the device but no longer count). */
+export const totalStars = (table: Record<string, Best>) =>
+  Object.entries(table).reduce((n, [k, b]) => n + (GAMES.some((g) => k.startsWith(`${g.id}:`)) ? (b?.stars ?? 0) : 0), 0);
 
 /**
  * Does this game count as the verse's review? Only a win, and only within the pile's usual mistake allowance (Daily forgives 3
@@ -66,7 +65,9 @@ export const gameCounts = (pile: Pile, won: boolean, slips: number): boolean => 
 /** How long the dragon takes to draw breath (ms): it gets quicker as the verse goes on. `progress` is 0 to 1. */
 export const duelChargeMs = (progress: number) => 7000 - 2600 * Math.max(0, Math.min(1, progress));
 /** How long the knight takes to walk one plank (ms). */
-export const BRIDGE_PLANK_MS = 4400;
+export const BRIDGE_PLANK_MS = 2600;
+/** How many words lie on the bank at once (the next one and a few after it), so a long verse never fills the screen. */
+export const BANK_SIZE = 5;
 export const BRIDGE_HEARTS = 3;
 
 // ---------------------------------------------------------------- Dragon Duel: recall the next word
@@ -135,6 +136,15 @@ export function scatter(list: Plank[], seed = 1): Plank[] {
   for (let tries = 0; tries < 5 && mixed.every((p, i) => p.order === i); tries++) mixed = shuffle(list, rng);
   if (mixed.every((p, i) => p.order === i)) mixed = [...mixed.slice(1), mixed[0]];
   return mixed;
+}
+
+/**
+ * Bridge Run's bank (v1.78.0, owner-requested single words): the word needed now and the few after it, in a mixed order that
+ * stays put as the bank refills (each word keeps its own seeded place), so a laid word is replaced without the rest jumping.
+ */
+export function bank(all: Plank[], laid: number, seed: number, size = BANK_SIZE): Plank[] {
+  const rank = (p: Plank) => makeRng(seed * 7919 + p.order * 104729)();
+  return all.slice(laid, laid + size).sort((a, b) => rank(a) - rank(b));
 }
 
 /** Right when it is the next plank, or reads exactly the same as it (a repeated phrase may be laid in either place). */

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DUEL_CHOICES, duelChargeMs, gameCounts, duelRight, duelRounds, plankFits, planks, scatter, stars } from '../../src/core/games.ts';
+import { BANK_SIZE, bank, DUEL_CHOICES, duelChargeMs, gameCounts, duelRight, duelRounds, plankFits, planks, scatter, stars } from '../../src/core/games.ts';
 import { tokenize } from '../../src/core/text.ts';
 
 const JOHN = 'For God so loved the world, that he gave his only Son, that whoever believes in him should not perish but have eternal life.';
@@ -72,5 +72,25 @@ describe('what counts', () => {
     expect(duelChargeMs(0)).toBeGreaterThan(duelChargeMs(1));
     expect(duelChargeMs(1)).toBeGreaterThan(3000);
     expect(duelChargeMs(-5)).toBe(duelChargeMs(0));
+  });
+});
+
+describe('Bridge Run bank (single words)', () => {
+  const words = planks(JOHN, 1);
+  it('is one word a plank, and holds the next word and the few after it', () => {
+    expect(words).toHaveLength(24);
+    expect(words.every((w) => !w.text.includes(' '))).toBe(true);
+    for (const laid of [0, 7, 21, 23]) {
+      const b = bank(words, laid, 3);
+      expect(b.map((p) => p.order).sort((x, y) => x - y)).toEqual(words.slice(laid, laid + BANK_SIZE).map((p) => p.order));
+    }
+    expect(bank(words, 24, 3)).toEqual([]);
+  });
+
+  it('keeps the words that stay in the same order as it refills, and is not already in order', () => {
+    const before = bank(words, 0, 5).map((p) => p.order).filter((o) => o !== 0);
+    const after = bank(words, 1, 5).map((p) => p.order).filter((o) => o !== 5);
+    expect(after).toEqual(before);
+    expect([1, 2, 3, 4, 5, 6].some((seed) => bank(words, 0, seed).some((p, i) => p.order !== i))).toBe(true);
   });
 });
