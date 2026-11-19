@@ -4758,3 +4758,33 @@ button.chip {
   font-size: 1.05rem;
   color: var(--text);
 }
+
+/* ---- one frame (v1.83.0, owner-requested "make it all more in the same frame"): in a game the stage grows to fill the room
+   between the header and the verse, the verse sits right under it and the answers right under that, so nothing is far from
+   the action. A verse too long for its box scrolls inside it (keepInView follows your place); the stage never moves. ---- */
+.play-area {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-top: var(--sp-2);
+  padding-bottom: var(--sp-2);
+}
+.play-area.stack > * + * {
+  margin-top: var(--sp-3);
+}
+.play-area > .game-stage {
+  flex: 1 1 auto;
+  min-height: 190px;
+}
+.play-area > .verse-text {
+  flex: 0 1 auto;
+  min-height: 2.6em;
+  width: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  position: relative; /* so keepInView can measure the words from the top of the box */
+}
+/* Goblin Burrows: the knight stands between the rows wherever they are */
+.play-area .burrows-knight {
+  bottom: 22%;
+}

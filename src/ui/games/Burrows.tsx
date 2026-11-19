@@ -5,7 +5,7 @@ import { BURROWS, BURROW_HEARTS, burrowsNeeds, burrowsStep, burrowsTap, newBurro
 import { isComboTier } from '../../core/games.ts';
 import { feedback } from '../../services/feedback.ts';
 import { AvatarFigure, type KnightPose } from '../AvatarFigure.tsx';
-import { DUST, flyWord, Fx, gapIn, GOO, pointIn, punch, shake, slashWave, SPARKS, useHitStop, type FxHandle } from './juice.tsx';
+import { DUST, flyWord, Fx, gapIn, GOO, keepInView, pointIn, punch, shake, slashWave, SPARKS, type FxHandle, useHitStop } from './juice.tsx';
 import { Hearts, Sprite, stripUrl, useTicker } from './sprites.tsx';
 import type { GameProps } from './types.ts';
 
@@ -93,9 +93,10 @@ export function Burrows({ verse, seed, look, backdrop, onDone }: GameProps) {
   };
 
   const moleIn = (hole: number): Mole | undefined => s.moles.find((m) => m.hole === hole);
+  useEffect(() => keepInView('burrows-text'), [s.next]);
   const leaving = s.moles.length > 0 && s.upFor > s.stay - 260;
   return (
-    <div class="verse-area stack">
+    <div class="verse-area stack play-area">
       <div class={`game-stage burrows-stage ${s.over ?? ''}`} style={backdrop} ref={stage} data-testid="burrows-stage" data-next={s.next}>
         <div class="game-hud">
           <Hearts n={s.hearts} of={BURROW_HEARTS} testid="burrows-hearts" />

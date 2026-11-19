@@ -119,6 +119,7 @@ test('a verse that earned its promotion moves up with a celebration', async ({ p
   await page.getByTestId('celebration-close').click();
   await expect(page.getByTestId('count-weekly')).toHaveText('1');
   await expect(page.getByTestId('count-daily')).toHaveText('0');
+  await saved(page); // the "seen" note is saved before the reload (without this the reload could beat the save under load)
   await page.reload();
   await expect(page.getByTestId('celebration')).toBeHidden(); // only celebrated once
 });
