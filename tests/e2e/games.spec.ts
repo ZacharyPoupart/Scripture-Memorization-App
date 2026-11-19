@@ -62,6 +62,8 @@ test.describe('the games', () => {
     const first = await page.getByTestId('game').getAttribute('data-game');
     await winAny(page);
     await expect(page.getByTestId('game-verdict')).toContainText('counted as its review');
+    await expect(page.getByTestId('game-star-bonus')).toHaveText('Three stars · ×2 coins'); // a clean win doubles the coins
+    await expect(page.getByTestId('mult-reel')).toHaveAttribute('data-value', '2');
     await expect(page.getByTestId('game-swap')).toHaveCount(0);
     await page.getByTestId('run-next').click();
     await expect(page.getByTestId('game')).toHaveAttribute('data-run', '2/2');

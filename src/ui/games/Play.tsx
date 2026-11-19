@@ -5,7 +5,7 @@
 // uses, so the schedule, streak and coins follow their usual rules; a game lost, or won with too many slips, saves nothing.
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { currentLook, sceneUrl, type Look } from '../../core/avatar.ts';
-import { BRIDGE_HEARTS, BRIDGE_PLANK_MS, DUEL_HEARTS, GAMES, INTRO_MS, bestKey, duelChargeMs, gameCounts, runGames, duelRight, duelRounds, isComboTier, plankFits, planks, points, recordBest, bank, stars, totalStars, verseStars, type GameId, type Plank } from '../../core/games.ts';
+import { BRIDGE_HEARTS, BRIDGE_PLANK_MS, DUEL_HEARTS, GAMES, INTRO_MS, starBonus, bestKey, duelChargeMs, gameCounts, runGames, duelRight, duelRounds, isComboTier, plankFits, planks, points, recordBest, bank, stars, totalStars, verseStars, type GameId, type Plank } from '../../core/games.ts';
 import { mistakesAllowed } from '../../core/quiz.ts';
 import { formatRef } from '../../core/reference.ts';
 import { liveVerses, verseStatus } from '../../core/schedule.ts';
@@ -262,7 +262,7 @@ function Finish({ game, verse, outcome, onAgain, onSwap, otherName, run }: { gam
   useEffect(() => {
     if (once.current) return;
     once.current = true;
-    const recorded = counts ? completeReview(verse.id) : null;
+    const recorded = counts ? completeReview(verse.id, starBonus(stars(outcome.slips))) : null; // three stars: double coins
     setRec(recorded);
     run?.onRecorded(recorded, outcome);
     // personal bests are kept on this device (the stars and score of each game and verse)
@@ -279,6 +279,8 @@ function Finish({ game, verse, outcome, onAgain, onSwap, otherName, run }: { gam
   const now = Date.now();
   const nextId = buildTodayQueue(data, now).find((id) => id !== verse.id);
   const n = outcome.won ? stars(outcome.slips) : 0;
+  const boost = rec?.counted && rec.seeds > 0 ? starBonus(n) : 1;
+  const streaky = rec ? Math.round((rec.multiplier / boost) * 100) / 100 > 1 : false;
   const body = !outcome.won
     ? 'It got the better of you this time. Read the verse once more and have another go.'
     : !clean
@@ -296,6 +298,11 @@ function Finish({ game, verse, outcome, onAgain, onSwap, otherName, run }: { gam
         {n > 0 && <Confetti count={n * 12} />}
         <h2 class="headline">{outcome.won ? WORDS[game].won : WORDS[game].lost}</h2>
         {n > 0 && <Stars n={n} />}
+        {boost > 1 && settings.avatarOn && (
+          <p class="star-bonus" data-testid="game-star-bonus">
+            Three stars · ×{boost} coins
+          </p>
+        )}
         <div class="final-score" data-testid="game-final-score">
           <span class="muted small">Score</span>
           <b>{outcome.score}</b>
@@ -308,7 +315,7 @@ function Finish({ game, verse, outcome, onAgain, onSwap, otherName, run }: { gam
         <p class="muted measure-sm" style={{ margin: '0 auto' }} data-testid="game-verdict">
           {body}
         </p>
-        {rec && rec.seeds > 0 && settings.avatarOn && <CoinCount base={rec.base} total={rec.seeds} multiplier={rec.multiplier} testid="game-seeds" />}
+        {rec && rec.seeds > 0 && settings.avatarOn && <CoinCount base={rec.base} total={rec.seeds} multiplier={rec.multiplier} testid="game-seeds" why={boost > 1 ? (streaky ? 'your streak and three-star bonus' : 'your three-star bonus') : undefined} />}
         <p class="verse-text measure-sm" style={{ margin: '0 auto' }}>
           {verse.text}
         </p>

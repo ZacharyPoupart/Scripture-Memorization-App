@@ -6,6 +6,15 @@ import type { Pile } from './types.ts';
 import { tokenize, type Word } from './text.ts';
 
 export type GameId = 'gate' | 'burrows' | 'duel' | 'bridge';
+/**
+ * Coin bonus for a game won with stars (v1.81.0, owner-requested "a bonus 2x multiplier if they 3 star"): the coins a counted
+ * win earns are multiplied by this, on top of the streak multiplier. Stars not listed earn the usual coins.
+ */
+export const STAR_BONUS: Readonly<Record<number, number>> = { 3: 2 };
+export function starBonus(stars: number): number {
+  return STAR_BONUS[stars] ?? 1;
+}
+
 /** The pause before a game starts, showing which verse it is (v1.81.0, owner-requested); a tap starts it sooner. */
 export const INTRO_MS = 3000;
 

@@ -103,6 +103,7 @@ export function Burrows({ verse, seed, look, backdrop, onDone }: GameProps) {
             {s.score}
           </b>
         </div>
+        <div class="burrows-field" aria-hidden="true" />
         <div class="burrows-knight" ref={knight}>
           <AvatarFigure look={look} size={96} bare pose={pose.name} key={`${pose.name}${pose.n}`} />
         </div>

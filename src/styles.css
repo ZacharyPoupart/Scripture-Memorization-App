@@ -4273,6 +4273,26 @@ button.chip {
   height: 300px;
   touch-action: manipulation;
 }
+/* the meadow the burrows are dug in, so the mounds sit on the ground instead of floating over the scene (v1.81.0) */
+.burrows-field {
+  position: absolute;
+  inset: 44% 0 0 0;
+  background: #6c8c3d;
+  border-top: 3px solid #4d6a2b;
+}
+.burrows-field::after {
+  /* a darker band of earth along the front edge */
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 10px;
+  background: #4f3d28;
+}
+/* the back row is a little further away */
+.burrows-grid .burrow:nth-child(-n + 3) {
+  transform: scale(0.88);
+  transform-origin: 50% 100%;
+}
 .burrows-knight {
   position: absolute;
   left: 2%;
@@ -4666,4 +4686,16 @@ button.chip {
 @keyframes intro-in {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: none; }
+}
+/* three stars in a game double its coins (v1.81.0) */
+.star-bonus {
+  margin: var(--sp-1) 0 0;
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--accent);
+  animation: check-pop 0.4s var(--spring) 0.8s both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .star-bonus { animation: none; }
 }
