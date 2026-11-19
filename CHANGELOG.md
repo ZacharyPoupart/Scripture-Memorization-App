@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.81.0] - 2026-11-19
+
 ### Added
 - A short pause before every game: the verse's reference fills the screen (with its topic, if it has one, and the game's one-line rule), so you know which verse you are about to play. It starts by itself after three seconds, or tap Start (or anywhere) to begin at once. In Play today's reviews it shows before each verse ("Verse 2 of 5"); playing the same verse again skips it.
 
