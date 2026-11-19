@@ -1,6 +1,6 @@
 // Goblin Burrows (v1.76.0, owner-requested games). Whack-a-mole: three goblins pop up from six burrows, one holding the next
-// word of the verse; bonk that one before they duck. Daily verses show the words; Weekly, Monthly and Yearly verses show only
-// first letters (the same "harder in the later piles" rule as Fill in the blank). Pure and seeded.
+// word of the verse; bonk that one before they duck. Every goblin holds a whole word, in every pile (v1.82.0, owner-requested;
+// Weekly and later used to show first letters only). Pure and seeded.
 import { points } from './games.ts';
 import { makeRng, shuffle } from './quiz.ts';
 import { tokenize, type Word } from './text.ts';
@@ -19,7 +19,6 @@ export interface Mole {
 
 export interface BurrowsState {
   words: Word[];
-  letters: boolean; // show first letters only
   next: number;
   hearts: number;
   slips: number;
@@ -39,41 +38,36 @@ export type BurrowsEvent =
   | { type: 'wrong'; mole: Mole }
   | { type: 'escape'; word: Word };
 
-const label = (w: Word, letters: boolean) => (letters ? w.key[0].toUpperCase() : w.raw.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '') || w.raw);
+const label = (w: Word) => w.raw.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '') || w.raw;
 /** Goblins stay up 2.2 s at the start and 1.5 s by the end. */
 export const stayMs = (next: number, total: number) => 2200 - 700 * (total ? next / total : 0);
 
 function rise(s: BurrowsState) {
   const need = s.words[s.next];
-  const shown = new Set([label(need, s.letters).toLowerCase()]);
+  const shown = new Set([label(need).toLowerCase()]);
   const picks: Word[] = [need];
   const near = s.words.filter((w) => Math.abs(w.index - need.index) <= 5 && w.index !== need.index);
   for (const w of [...shuffle(near, s.rng), ...shuffle(s.words, s.rng)]) {
     if (picks.length >= UP) break;
-    const l = label(w, s.letters).toLowerCase();
+    const l = label(w).toLowerCase();
     if (w.key === need.key || shown.has(l)) continue;
     shown.add(l);
     picks.push(w);
   }
-  if (s.letters) for (const l of shuffle([...'ABCDEFGHIJKLMNOPRSTUWY'], s.rng)) {
-    if (picks.length >= UP) break;
-    if (shown.has(l.toLowerCase())) continue;
-    shown.add(l.toLowerCase());
-    picks.push({ index: -1, raw: l, key: l.toLowerCase(), first: l.toLowerCase() });
-  }
   const holes = shuffle(Array.from({ length: BURROWS }, (_, i) => i), s.rng);
-  s.moles = picks.map((w, i) => ({ hole: holes[i], key: w.key, label: label(w, s.letters) }));
+  s.moles = picks.map((w, i) => ({ hole: holes[i], key: w.key, label: label(w) }));
   s.upFor = 0;
   s.stay = stayMs(s.next, s.words.length);
 }
 
-export function newBurrows(text: string, pile: Pile, seed = 1): BurrowsState {
+/** `_pile` is kept so callers need not change: every pile now plays the same, with whole words. */
+export function newBurrows(text: string, _pile: Pile, seed = 1): BurrowsState {
   const words = tokenize(text);
-  const s: BurrowsState = { words, letters: pile !== 'daily', next: 0, hearts: BURROW_HEARTS, slips: 0, combo: 0, score: 0, moles: [], upFor: -400, stay: 0, over: words.length ? null : 'won', rng: makeRng(seed) };
+  const s: BurrowsState = { words, next: 0, hearts: BURROW_HEARTS, slips: 0, combo: 0, score: 0, moles: [], upFor: -400, stay: 0, over: words.length ? null : 'won', rng: makeRng(seed) };
   return s;
 }
 
-const isNeed = (s: BurrowsState, m: Mole) => m.key === s.words[s.next]?.key || (s.letters && m.label === label(s.words[s.next], true));
+const isNeed = (s: BurrowsState, m: Mole) => m.key === s.words[s.next]?.key;
 
 function hurt(s: BurrowsState) {
   s.slips++;

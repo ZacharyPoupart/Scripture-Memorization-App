@@ -5,6 +5,14 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.82.0] - 2026-11-19
+
+### Added
+- **Campaign mode.** "Start a campaign" on Play keeps you going game after game: the verses that are due come first, then any of your verses at random, each in a random game. Win and the knight runs straight on to the next verse, which shows first so you know what is coming (you can stop right there). Lose and you can try again, move on to the next verse, or stop. Coins collect in a pot at the top as you go and are paid out together when you stop, with your score, stars and how many counted. Every win is saved the moment it happens, so nothing is lost if the app closes.
+
+### Changed
+- Goblin Burrows: the goblins always hold up the whole word, for every verse. Weekly, Monthly and Yearly verses used to show only first letters.
+
 ## [1.81.1] - 2026-11-19
 
 ### Changed

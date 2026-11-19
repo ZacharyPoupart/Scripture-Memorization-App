@@ -1,5 +1,5 @@
 // Goblin Burrows: three goblins pop up from six burrows, one holding the next word; bonk that one before they duck.
-// Rules in core/burrows.ts. Daily verses show words, the later piles only first letters.
+// Rules in core/burrows.ts. Every goblin holds a whole word, in every pile.
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { BURROWS, BURROW_HEARTS, burrowsNeeds, burrowsStep, burrowsTap, newBurrows, type BurrowsEvent, type Mole } from '../../core/burrows.ts';
 import { isComboTier } from '../../core/games.ts';
@@ -151,7 +151,7 @@ export function Burrows({ verse, seed, look, backdrop, onDone }: GameProps) {
         ))}
       </p>
       <p class="muted small center" style={{ margin: 0 }}>
-        {s.letters ? 'Bonk the first letter of the next word.' : 'Bonk the next word.'}
+        Bonk the next word.
       </p>
     </div>
   );

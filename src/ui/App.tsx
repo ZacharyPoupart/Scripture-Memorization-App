@@ -1,4 +1,4 @@
-import { Play, PlayHub, PlayRun } from './games/Play.tsx';
+import { Campaign, Play, PlayHub, PlayRun } from './games/Play.tsx';
 import { useEffect, useState } from 'preact/hooks';
 import { useRoute } from '../router.ts';
 import { startTour, updateSettings, useApp } from '../store.ts';
@@ -68,6 +68,7 @@ export function App({ onReload }: { onReload: () => void }) {
   else if (a === 'review') screen = <Review route={route} key={route.query.toString()} />;
   else if (a === 'play' && !b) ((screen = <PlayHub />), (tab = '/play'));
   else if (a === 'play' && b === 'run') screen = <PlayRun key="run" />;
+  else if (a === 'play' && b === 'campaign') screen = <Campaign key="campaign" />;
   else if (a === 'play' && b) screen = <Play game={b} verseId={route.path[2] ?? ''} key={route.path.join('/')} />;
   else if (a === 'stats') ((screen = <Stats />), (tab = '/stats'));
   else if (a === 'friends') ((screen = <Friends />), (tab = '/friends'));

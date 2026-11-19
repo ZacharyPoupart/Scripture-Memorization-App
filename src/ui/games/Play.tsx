@@ -10,13 +10,14 @@ import { mistakesAllowed } from '../../core/quiz.ts';
 import { formatRef } from '../../core/reference.ts';
 import { liveVerses, verseStatus } from '../../core/schedule.ts';
 import { buildTodayQueue } from '../../core/today.ts';
-import type { LevelUp, Verse } from '../../core/types.ts';
+import { addToTally, campaignVerses, emptyTally, nextGame, type CampaignStep, type CampaignTally } from '../../core/campaign.ts';
+import type { LevelUp, Settings, Verse } from '../../core/types.ts';
 import { back, navigate } from '../../router.ts';
-import { completeReview, updateSettings, useApp } from '../../store.ts';
+import { completeReview, getState, updateSettings, useApp } from '../../store.ts';
 import { feedback } from '../../services/feedback.ts';
 import { AvatarFigure, type KnightPose } from '../AvatarFigure.tsx';
 import { CoinCount } from '../CoinCount.tsx';
-import { Confetti, Icon, PILE_INFO } from '../common.tsx';
+import { Coin, Confetti, Icon, PILE_INFO } from '../common.tsx';
 import { Dock } from '../modes/shared.tsx';
 import { EmptyState } from '../primitives.tsx';
 import { Dragon, Hearts, Pic, Sprite, Stars, stripUrl, useTicker, type DragonState } from './sprites.tsx';
@@ -237,6 +238,203 @@ function Intro({ verse, game, step, onStart }: { verse: Verse; game: GameId; ste
   );
 }
 
+// ---------------------------------------------------------------- campaign: game after game until you stop
+
+/**
+ * Campaign mode (v1.82.0, owner-requested): the verses that are due first, then any verse at random, each in a random game, one
+ * after another. A win sends the knight running on to the next verse straight away; before each one the next verse shows (and you
+ * can stop there); a loss offers another go or the next verse. Every win is saved as it happens (so closing the app loses nothing),
+ * but the coins are paid out together when you stop: a pot that grows on the way, and one slot-machine count at the end.
+ */
+export function Campaign() {
+  const { data, settings } = useApp();
+  const { look, style } = useBackdrop();
+  const queue = useRef<string[]>([]);
+  const pick = (last: string | null, prevGame: GameId | null) => {
+    const now = getState().data; // read fresh: a win just saved may have changed what is due
+    if (!queue.current.length) queue.current = campaignVerses(buildTodayQueue(now, Date.now()), liveVerses(now).map((v) => v.id), last, Math.random);
+    queue.current = queue.current.filter((id) => liveVerses(now).some((v) => v.id === id)); // a verse deleted meanwhile is skipped
+    const verseId = queue.current.shift();
+    return verseId ? { verseId, game: nextGame(prevGame, Math.random) } : null;
+  };
+  const [cur, setCur] = useState<(CampaignStep & { n: number }) | null>(() => {
+    const first = pick(null, null);
+    return first && { ...first, n: 1 };
+  });
+  const [phase, setPhase] = useState<'intro' | 'play' | 'lost' | 'done'>('intro');
+  const [tally, setTally] = useState<CampaignTally>(emptyTally);
+  const [last, setLast] = useState<{ ref: string; stars: number; counted: boolean } | null>(null);
+  const verse = cur ? liveVerses(data).find((v) => v.id === cur.verseId) : undefined;
+
+  const onward = () => {
+    if (!cur) return;
+    const next = pick(cur.verseId, cur.game);
+    setCur(next && { ...next, n: cur.n + 1 });
+    setPhase('intro');
+  };
+  const stop = () => (tally.played ? setPhase('done') : back('/play'));
+  const done = (outcome: Outcome) => {
+    if (!cur || !verse) return;
+    const r = saveGame(cur.game, verse, outcome, settings.gameBest ?? {});
+    const n = outcome.won ? stars(outcome.slips) : 0;
+    setTally((t) => addToTally(t, { won: outcome.won, stars: n, score: outcome.score }, r.rec));
+    if (outcome.won) {
+      setLast({ ref: formatRef(verse), stars: n, counted: !!r.rec?.counted });
+      onward(); // he runs straight on to the next verse
+    } else setPhase('lost');
+  };
+
+  if (phase === 'done' || !cur || !verse) {
+    return (
+      <div class="review game" data-testid="campaign-end">
+        <div class="review-head">
+          <button class="icon-btn" aria-label="Close" onClick={() => back('/play')} data-testid="game-close">
+            <Icon name="close" />
+          </button>
+        </div>
+        <div class="verse-area center stack pt-6">
+          {tally.won > 0 && <Confetti count={Math.min(60, 10 + tally.stars * 4)} />}
+          <h2 class="headline">{tally.played ? 'Campaign over' : 'Add a verse to play with'}</h2>
+          {tally.played > 0 && (
+            <>
+              <p class="muted" style={{ margin: 0 }} data-testid="campaign-tally">
+                {tally.won} of {tally.played} won · {tally.counted} counted · {tally.stars} star{tally.stars === 1 ? '' : 's'}
+              </p>
+              <div class="final-score">
+                <span class="muted small">Score</span>
+                <b>{tally.score}</b>
+              </div>
+              {tally.seeds > 0 && settings.avatarOn && <CoinCount base={tally.base} total={tally.seeds} multiplier={tally.multiplier} testid="campaign-seeds" why="your bonuses" />}
+            </>
+          )}
+        </div>
+        <Dock>
+          <button class="btn primary block" onClick={() => navigate('/play', true)} data-testid="campaign-done">
+            Back to Play
+          </button>
+        </Dock>
+      </div>
+    );
+  }
+
+  const info = GAMES.find((g) => g.id === cur.game)!;
+  const props = { verse, seed: cur.n * 17 + 3, look, backdrop: style, onDone: done };
+  return (
+    <div class="review game" data-testid="game" data-game={cur.game} data-campaign={cur.n}>
+      <div class="review-head">
+        <button class="icon-btn" aria-label="Stop the campaign" onClick={stop} data-testid="game-close">
+          <Icon name="close" />
+        </button>
+        <div class="title">
+          <span class="game-name">
+            Campaign · {info.name}
+          </span>
+          <strong class="game-ref" data-testid="game-ref">
+            {formatRef(verse)}
+          </strong>
+        </div>
+        <span class="campaign-pot" data-testid="campaign-pot" title="Coins in the pot, paid out when you stop">
+          {settings.avatarOn ? (
+            <>
+              {tally.seeds} <Coin />
+            </>
+          ) : (
+            <>{tally.stars}★</>
+          )}
+        </span>
+      </div>
+      {phase === 'intro' ? (
+        <CampaignIntro key={`i${cur.n}`} verse={verse} game={cur.game} look={look} backdrop={style} last={last} onStart={() => setPhase('play')} onStop={stop} />
+      ) : phase === 'lost' ? (
+        <>
+          <div class="verse-area center stack" data-testid="campaign-lost">
+            <h2 class="headline">{WORDS[cur.game].lost}</h2>
+            <p class="verse-text measure-sm" style={{ margin: '0 auto' }}>
+              {verse.text}
+            </p>
+          </div>
+          <Dock>
+            <div class="stack">
+              <button class="btn primary block" onClick={() => (setCur({ ...cur, n: cur.n + 1 }), setPhase('play'))} data-testid="campaign-retry">
+                Try again
+              </button>
+              <div class="row gap-2">
+                <button class="btn block" onClick={() => (setLast(null), onward())} data-testid="campaign-next">
+                  Next verse
+                </button>
+                <button class="btn block" onClick={stop} data-testid="campaign-stop">
+                  Stop here
+                </button>
+              </div>
+            </div>
+          </Dock>
+        </>
+      ) : cur.game === 'gate' ? (
+        <Gate key={cur.n} {...props} />
+      ) : cur.game === 'burrows' ? (
+        <Burrows key={cur.n} {...props} />
+      ) : cur.game === 'duel' ? (
+        <Duel key={cur.n} {...props} />
+      ) : (
+        <Bridge key={cur.n} {...props} />
+      )}
+    </div>
+  );
+}
+
+/** Between verses in a campaign: the knight runs across from the left and off to the right while the next verse shows. */
+function CampaignIntro({ verse, game, look, backdrop, last, onStart, onStop }: { verse: Verse; game: GameId; look: Look; backdrop?: Record<string, string>; last: { ref: string; stars: number; counted: boolean } | null; onStart: () => void; onStop: () => void }) {
+  const info = GAMES.find((g) => g.id === game)!;
+  const go = useRef(onStart);
+  go.current = onStart;
+  useEffect(() => {
+    const t = setTimeout(() => go.current(), INTRO_MS);
+    const key = (e: KeyboardEvent) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), go.current());
+    addEventListener('keydown', key);
+    return () => (clearTimeout(t), removeEventListener('keydown', key));
+  }, []);
+  return (
+    <>
+      <div class="verse-area stack campaign-intro" data-testid="game-intro">
+        <div class="game-stage march-stage" style={backdrop} aria-hidden="true">
+          <div class="game-ground" />
+          <div class="march-knight" style={{ animationDuration: `${INTRO_MS}ms` }}>
+            <AvatarFigure look={look} size={110} bare pose="walk" />
+          </div>
+        </div>
+        {last && (
+          <p class="campaign-last" data-testid="campaign-last">
+            {last.ref} <BestStars n={last.stars} /> {last.counted ? '· counted' : ''}
+          </p>
+        )}
+        <div class="game-intro" onPointerDown={() => go.current()} role="status" aria-live="polite">
+          <span class="intro-step">Next verse</span>
+          <h2 class="intro-ref" data-testid="intro-ref">
+            {formatRef(verse)}
+          </h2>
+          {verse.topic && <p class="intro-topic">{verse.topic}</p>}
+          <p class="intro-how">
+            <b>{info.name}.</b> {info.blurb}
+          </p>
+          <div class="intro-bar" aria-hidden="true">
+            <i style={{ animationDuration: `${INTRO_MS}ms` }} />
+          </div>
+        </div>
+      </div>
+      <Dock>
+        <div class="row gap-2">
+          <button class="btn block" onClick={onStop} data-testid="campaign-stop">
+            Stop here
+          </button>
+          <button class="btn primary block" onClick={() => go.current()} data-testid="intro-start">
+            Start
+          </button>
+        </div>
+      </Dock>
+    </>
+  );
+}
+
 const WORDS: Record<GameId, { won: string; lost: string }> = {
   gate: { won: 'The gate holds', lost: 'The goblins broke through' },
   burrows: { won: 'Every goblin bonked', lost: 'The goblins got away' },
@@ -252,29 +450,36 @@ interface RunStep {
   onRecorded: (rec: Recorded | null, outcome: Outcome) => void;
 }
 
+/**
+ * Keep a finished game: a win within the pile's allowance is recorded as the verse's review (three stars double its coins), the
+ * personal best is kept on this device, and the win or loss sounds. Used by the result screen and by campaign mode.
+ */
+function saveGame(game: GameId, verse: Verse, outcome: Outcome, table: NonNullable<Settings['gameBest']>) {
+  const n = outcome.won ? stars(outcome.slips) : 0;
+  const rec: Recorded | null = gameCounts(verse.pile, outcome.won, outcome.slips) ? completeReview(verse.id, starBonus(n)) : null;
+  const key = bestKey(game, verse.id);
+  const r = recordBest(table, key, { won: outcome.won, stars: n, score: outcome.score });
+  if (r.table !== table) updateSettings({ gameBest: r.table });
+  if (outcome.won) {
+    feedback.game('win');
+    for (let i = 1; i <= n; i++) setTimeout(() => feedback.game('star', i), 300 + 150 * i);
+  } else feedback.game('loss');
+  return { rec, best: { newScore: r.newScore, newStars: r.newStars, prior: table[key]?.score ?? 0 } };
+}
+
 function Finish({ game, verse, outcome, onAgain, onSwap, otherName, run }: { game: GameId; verse: Verse; outcome: Outcome; onAgain: () => void; onSwap: () => void; otherName: string; run?: RunStep }) {
   const { data, settings } = useApp();
   const clean = outcome.slips <= mistakesAllowed(verse.pile);
-  const counts = gameCounts(verse.pile, outcome.won, outcome.slips);
   const [rec, setRec] = useState<Recorded | null>(null);
   const once = useRef(false);
   const [best, setBest] = useState<{ newScore: boolean; newStars: boolean; prior: number }>({ newScore: false, newStars: false, prior: 0 });
   useEffect(() => {
     if (once.current) return;
     once.current = true;
-    const recorded = counts ? completeReview(verse.id, starBonus(stars(outcome.slips))) : null; // three stars: double coins
-    setRec(recorded);
-    run?.onRecorded(recorded, outcome);
-    // personal bests are kept on this device (the stars and score of each game and verse)
-    const key = bestKey(game, verse.id);
-    const table = settings.gameBest ?? {};
-    const r = recordBest(table, key, { won: outcome.won, stars: outcome.won ? stars(outcome.slips) : 0, score: outcome.score });
-    setBest({ newScore: r.newScore, newStars: r.newStars, prior: table[key]?.score ?? 0 });
-    if (r.table !== table) updateSettings({ gameBest: r.table });
-    if (outcome.won) {
-      feedback.game('win');
-      for (let i = 1; i <= stars(outcome.slips); i++) setTimeout(() => feedback.game('star', i), 300 + 150 * i);
-    } else feedback.game('loss');
+    const r = saveGame(game, verse, outcome, settings.gameBest ?? {});
+    setRec(r.rec);
+    run?.onRecorded(r.rec, outcome);
+    setBest(r.best);
   }, []);
   const now = Date.now();
   const nextId = buildTodayQueue(data, now).find((id) => id !== verse.id);
@@ -742,8 +947,11 @@ export function PlayHub() {
             <Dragon scale={0.56} />
           </div>
         </div>
+        <button class="btn primary block" onClick={() => navigate('/play/campaign')} data-testid="play-campaign">
+          Start a campaign
+        </button>
         {readyCount > 0 && (
-          <button class="btn primary block" onClick={() => navigate('/play/run')} data-testid="play-run">
+          <button class="btn block" onClick={() => navigate('/play/run')} data-testid="play-run">
             Play today’s reviews · {readyCount}
           </button>
         )}

@@ -4710,3 +4710,51 @@ button.chip {
 @media (prefers-reduced-motion: reduce) {
   .star-bonus { animation: none; }
 }
+
+/* ---- campaign mode (v1.82.0): the knight runs on to the next verse ---- */
+.campaign-intro {
+  gap: var(--sp-2);
+}
+.campaign-intro .game-intro {
+  min-height: 0;
+  padding-top: var(--sp-2);
+}
+.march-stage {
+  height: 150px;
+}
+.march-knight {
+  position: absolute;
+  bottom: 10px;
+  left: 40%; /* where he stands when nothing moves (reduced motion) */
+  width: 110px;
+  margin-left: -55px;
+  z-index: 1;
+  animation: run-across linear both; /* its duration is INTRO_MS, set inline */
+}
+.march-knight > svg {
+  display: block;
+}
+@keyframes run-across {
+  from { left: -18%; }
+  to { left: 118%; }
+}
+.campaign-last {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--sp-2);
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+.campaign-pot {
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--text);
+}
