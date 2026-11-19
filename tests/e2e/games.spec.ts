@@ -2,17 +2,20 @@ import { expect, test, type Page } from '@playwright/test';
 import { addVerse, autoDismissMilestones, blockLookups, JOHN316, openApp, PSALM23_1 } from './helpers';
 
 // The games run against the clock, so the helpers below play quickly and never wait on a moving thing to hold still.
-async function winBurrows(page: Page) {
+/** Has the game ended? On its own a game ends on the result screen; in a campaign a win runs straight on to the next verse. */
+type Ended = () => Promise<boolean>;
+const finished = (page: Page): Ended => () => page.getByTestId('game-finish').isVisible();
+async function winBurrows(page: Page, ended: Ended = finished(page)) {
   for (let i = 0; i < 400; i++) {
-    if (await page.getByTestId('game-finish').isVisible()) return;
+    if (await ended()) return;
     const mole = page.locator('[data-testid="burrow"][data-right]:not([disabled])');
     if (await mole.count()) await mole.first().dispatchEvent('pointerdown').catch(() => {});
     else await page.waitForTimeout(60);
   }
 }
-async function winDuel(page: Page) {
+async function winDuel(page: Page, ended: Ended = finished(page)) {
   for (let i = 0; i < 300; i++) {
-    if (await page.getByTestId('game-finish').isVisible()) return;
+    if (await ended()) return;
     const right = page.getByTestId('duel-choices').locator('button[data-right]:not([disabled])');
     if (await right.count()) await right.click();
     else await page.waitForTimeout(100);
@@ -27,20 +30,20 @@ test.beforeEach(async ({ page }) => {
   await blockLookups(page);
 });
 
-async function winGate(page: Page) {
+async function winGate(page: Page, ended: Ended = finished(page)) {
   for (let i = 0; i < 200; i++) {
-    if (await page.getByTestId('game-finish').isVisible()) return;
+    if (await ended()) return;
     const key = page.getByTestId('gate-keys').locator('button[data-right]:not([disabled])');
     if (await key.count()) await key.dispatchEvent('pointerdown').catch(() => {});
     else await page.waitForTimeout(80);
   }
 }
 /** Wins whichever game is on screen (for runs, where the game is chosen at random). */
-async function winAny(page: Page) {
+async function winAny(page: Page, ended: Ended = finished(page)) {
   const game = await page.getByTestId('game').getAttribute('data-game');
-  if (game === 'gate') return winGate(page);
-  if (game === 'burrows') return winBurrows(page);
-  if (game === 'duel') return winDuel(page);
+  if (game === 'gate') return winGate(page, ended);
+  if (game === 'burrows') return winBurrows(page, ended);
+  if (game === 'duel') return winDuel(page, ended);
   const total = Number(await page.getByTestId('bridge-stage').getAttribute('data-total'));
   for (let i = 0; i < total; i++) await page.getByTestId('bridge-bank').locator(`button[data-order="${i}"]`).dispatchEvent('pointerdown');
 }
@@ -81,6 +84,65 @@ test.describe('the games', () => {
     // the hub has the same button
     await page.goto('/#/play');
     await expect(page.getByTestId('play-run')).toHaveCount(0); // nothing ready right now (the spacing between Daily reviews)
+  });
+
+  test('Campaign: the due verses first, each win runs straight on to the next verse, and the pot pays out when you stop', async ({ page }) => {
+    test.setTimeout(120_000);
+    await openApp(page);
+    await addVerse(page, PSALM23_1);
+    await addVerse(page, JOHN316);
+    await page.goto('/#/play');
+    await page.getByTestId('play-campaign').click();
+    const game = page.getByTestId('game');
+    await expect(game).toHaveAttribute('data-campaign', '1');
+    const first = (await page.getByTestId('intro-ref').textContent())!;
+    expect(['Psalms 23:1', 'John 3:16']).toContain(first);
+    await expect(page.getByTestId('campaign-pot')).toHaveText(/^0/);
+    await start(page);
+    const onTo = (n: string): Ended => async () => (await game.getAttribute('data-campaign').catch(() => null)) === n;
+    await winAny(page, onTo('2'));
+    // no result screen: he runs on, the next verse shows, and the win is already saved
+    await expect(game).toHaveAttribute('data-campaign', '2');
+    await expect(page.getByTestId('campaign-last')).toContainText(first);
+    await expect(page.getByTestId('campaign-last')).toContainText('counted');
+    await expect(page.getByTestId('intro-ref')).toHaveText(first === 'John 3:16' ? 'Psalms 23:1' : 'John 3:16'); // the other due verse
+    await expect(page.getByTestId('campaign-pot')).not.toHaveText(/^0/); // coins in the pot
+    expect(await reviewsOf(page)).toBe(1);
+    const firstGame = await game.getAttribute('data-game');
+    await start(page);
+    await winAny(page, onTo('3'));
+    await expect(game).toHaveAttribute('data-campaign', '3');
+    expect(await reviewsOf(page)).toBe(2);
+    // stop between verses: the payout
+    await page.getByTestId('campaign-stop').click();
+    await expect(page.getByTestId('campaign-tally')).toContainText('2 of 2 won · 2 counted');
+    await expect(page.getByTestId('campaign-seeds')).toBeVisible();
+    await page.getByTestId('campaign-done').click();
+    await expect(page.getByTestId('play-hub')).toBeVisible();
+    expect(firstGame).toBeTruthy();
+  });
+
+  test('Campaign: a loss offers another go or the next verse, and stopping straight away pays nothing and just leaves', async ({ page }) => {
+    test.setTimeout(90_000);
+    await openApp(page);
+    await addVerse(page, JOHN316);
+    await page.goto('/#/play/campaign');
+    await page.getByTestId('campaign-stop').click(); // nothing played yet: straight back, no payout screen
+    await expect(page.getByTestId('game')).toHaveCount(0);
+    await expect(page.getByTestId('campaign-end')).toHaveCount(0);
+    await page.goto('/#/play/campaign');
+    await start(page);
+    // lose on purpose: wrong answers until the hearts run out
+    for (let i = 0; i < 400 && !(await page.getByTestId('campaign-lost').isVisible()); i++) {
+      const wrong = page.locator('[data-testid="gate-keys"] button:not([data-right]):not([disabled]), [data-testid="duel-choices"] button:not([data-right]):not([disabled]), [data-testid="bridge-bank"] button:not([data-order="0"]):not([disabled]), [data-testid="burrow"]:has(.mole):not([data-right]):not([disabled])');
+      if (await wrong.count()) await wrong.first().dispatchEvent('pointerdown').catch(() => {});
+      else await page.waitForTimeout(80);
+    }
+    await expect(page.getByTestId('campaign-lost')).toBeVisible();
+    expect(await reviewsOf(page)).toBe(0);
+    await page.getByTestId('campaign-retry').click();
+    await expect(page.getByTestId('campaign-lost')).toHaveCount(0);
+    await expect(page.getByTestId('game-intro')).toHaveCount(0); // another go starts at once
   });
 
   test('Hold the Gate: the first letter of the next word strikes the goblin; a score, stars and a personal best are kept', async ({ page }) => {
