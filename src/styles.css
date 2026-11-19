@@ -4277,7 +4277,8 @@ button.chip {
 .burrows-field {
   position: absolute;
   inset: 44% 0 0 0;
-  background: #6c8c3d;
+  background: #6c8c3d repeat 0 0 / 96px 96px; /* the grass tile (public/creatures/grass.webp), two screen pixels a grass pixel */
+  image-rendering: pixelated;
   border-top: 3px solid #4d6a2b;
 }
 .burrows-field::after {
@@ -4302,7 +4303,7 @@ button.chip {
 }
 .burrows-grid {
   position: absolute;
-  inset: 50px 4% 8px 26%;
+  inset: 50px 3% 8px 29%;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(2, 1fr);

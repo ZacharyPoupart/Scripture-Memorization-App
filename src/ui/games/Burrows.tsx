@@ -6,7 +6,7 @@ import { isComboTier } from '../../core/games.ts';
 import { feedback } from '../../services/feedback.ts';
 import { AvatarFigure, type KnightPose } from '../AvatarFigure.tsx';
 import { DUST, flyWord, Fx, gapIn, GOO, pointIn, punch, shake, slashWave, SPARKS, useHitStop, type FxHandle } from './juice.tsx';
-import { Hearts, Sprite, useTicker } from './sprites.tsx';
+import { Hearts, Sprite, stripUrl, useTicker } from './sprites.tsx';
 import type { GameProps } from './types.ts';
 
 const MOLE = 0.5; // CSS pixels a sheet pixel: a goblin in its burrow (the pictures carry their own mound)
@@ -103,9 +103,9 @@ export function Burrows({ verse, seed, look, backdrop, onDone }: GameProps) {
             {s.score}
           </b>
         </div>
-        <div class="burrows-field" aria-hidden="true" />
+        <div class="burrows-field" aria-hidden="true" style={{ backgroundImage: `url(${stripUrl('grass')})` }} />
         <div class="burrows-knight" ref={knight}>
-          <AvatarFigure look={look} size={96} bare pose={pose.name} key={`${pose.name}${pose.n}`} />
+          <AvatarFigure look={look} size={134} bare pose={pose.name} key={`${pose.name}${pose.n}`} />
         </div>
         <div class="burrows-grid">
           {Array.from({ length: BURROWS }, (_, hole) => {

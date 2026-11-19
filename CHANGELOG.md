@@ -13,7 +13,7 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ### Changed
 - Hold the Gate's castle is much bigger: it fills the left side of the stage, with the knight standing guard in front of its door.
-- Goblin Burrows: the burrows are dug into a grassy meadow, so the mounds sit on the ground instead of floating over the scene; the back row sits a little further away.
+- Goblin Burrows: the burrows are dug into a grassy meadow (with real grass texture), so the mounds sit on the ground instead of floating over the scene; the back row sits a little further away, and the knight is bigger.
 
 ## [1.80.0] - 2026-11-18
 
