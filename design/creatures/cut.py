@@ -130,6 +130,34 @@ def near_cliff(cliff):
 ANIMS['cliff-near'] = [near_cliff(ANIMS['cliff'][0])]
 
 
+def grass_tile(size=48, seed=3):
+    """A seamless tile of meadow grass for Goblin Burrows (v1.81.0, owner-requested "add grass texture"): the field's green with
+    short blades in a darker and two lighter greens, and a few seed heads, drawn wrapping round the edges so it repeats cleanly.
+    Pixel art: one pixel a cell, shown at 2x with crisp pixels."""
+    rng = np.random.default_rng(seed)
+    base = np.array([108, 140, 61])
+    px = np.tile(base, (size, size, 1)).astype(int)
+    px += rng.integers(-6, 7, (size, size, 1))  # a little unevenness in the ground colour
+    shades = [(77, 106, 43), (88, 120, 50), (143, 176, 79), (128, 160, 70)]
+    for _ in range(int(size * size * 0.09)):
+        x, y = rng.integers(0, size, 2)
+        h = int(rng.integers(2, 5))
+        lean = int(rng.choice([-1, 0, 0, 1]))
+        dark = shades[int(rng.integers(0, 2))]
+        light = shades[int(rng.integers(2, 4))]
+        for k in range(h):
+            xx, yy = (x + (lean if k >= h - 1 else 0)) % size, (y - k) % size
+            px[yy, xx] = light if k >= h - 2 else dark  # the tip catches the light
+    for _ in range(int(size * size * 0.004)):
+        x, y = rng.integers(0, size, 2)
+        px[y % size, x % size] = (226, 214, 150)  # a seed head
+    rgba = np.dstack([px.clip(0, 255), np.full((size, size), 255)]).astype(np.uint8)
+    return Image.fromarray(rgba, 'RGBA')
+
+
+ANIMS['grass'] = [grass_tile()]
+
+
 def main():
     out = ROOT / 'public/creatures'
     out.mkdir(exist_ok=True)
@@ -139,7 +167,10 @@ def main():
     sheets = []
     for name, frames in ANIMS.items():
         im, w, h = strip(frames)
-        im.save(out / f'{name}.webp', 'WEBP', quality=88, alpha_quality=100, method=6)  # soft painted art: lossy is a quarter the size and looks the same
+        if name == 'grass':
+            im.save(out / f'{name}.webp', 'WEBP', lossless=True, method=6)  # pixel art: crisp
+        else:
+            im.save(out / f'{name}.webp', 'WEBP', quality=88, alpha_quality=100, method=6)  # soft painted art: lossy is a quarter the size and looks the same
         meta[name] = {'w': w, 'h': h, 'n': len(frames)}
         sheets.append(im)
     (ROOT / 'src/ui/games/creatures.json').write_text(json.dumps(meta, indent=1) + '\n')

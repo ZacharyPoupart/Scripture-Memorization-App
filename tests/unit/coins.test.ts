@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { normalizeData } from '../../src/core/backup.ts';
 import { seedsEarned } from '../../src/core/avatar.ts';
 import { nextMultiplier, rollBonus, STREAK_MULTIPLIERS, streakMultiplier } from '../../src/core/coins.ts';
+import { starBonus } from '../../src/core/games.ts';
 import { mergeData } from '../../src/core/merge.ts';
 import { recordReview, settle } from '../../src/core/schedule.ts';
 import { at, D0, day, DEVICE, john316, newData, reviewEverythingDue } from './helpers.ts';
@@ -119,5 +120,44 @@ describe('coins earned with a streak', () => {
     expect(normalizeData(raw).coinBonus).toEqual({ 'dev-a': 3.5 });
     raw.coinBonus = 'nope';
     expect(normalizeData(raw).coinBonus).toBeUndefined();
+  });
+});
+
+describe('a game won with three stars doubles its coins (v1.81.0)', () => {
+  it('only three stars earn the bonus, and only ×2', () => {
+    expect(starBonus(3)).toBe(2);
+    expect(starBonus(2)).toBe(1);
+    expect(starBonus(1)).toBe(1);
+    expect(starBonus(0)).toBe(1);
+  });
+
+  it('with no streak the review earns its coins twice over: the extra is kept like the streak bonus', () => {
+    const d = newData();
+    const v = john316(d, at(D0, '07:00'));
+    const r = recordReview(d, v.id, at(day(1), '08:00'), DEVICE, () => 0, 2);
+    expect(r.multiplier).toBe(2);
+    expect(r.bonus).toBe(r.base); // twice the base: the base again, as extra
+    expect(Object.values(d.coinBonus ?? {})[0]).toBe(r.base);
+  });
+
+  it('on a streak it multiplies with the streak multiplier', () => {
+    const d = newData();
+    john316(d, at(D0, '07:00'));
+    for (let i = 1; i <= 7; i++) reviewEverythingDue(d, day(i));
+    settle(d, at(day(8), '08:00'));
+    const r = recordReview(d, Object.keys(d.verses)[0], at(day(8), '08:00'), DEVICE, () => 0, 2);
+    expect(r.multiplier).toBe(2.5); // ×1.25 for a week's streak, ×2 for three stars
+    expect(r.bonus).toBe(9); // 6 coins earned, 1.5 times that again
+  });
+
+  it('extra practice still earns nothing, three stars or not', () => {
+    const d = newData();
+    const v = john316(d, at(D0, '07:00'));
+    recordReview(d, v.id, at(day(1), '08:00'), DEVICE);
+    const before = { ...(d.coinBonus ?? {}) };
+    const r = recordReview(d, v.id, at(day(1), '08:01'), DEVICE, () => 0, 2); // too soon: extra practice
+    expect(r.counted).toBe(false);
+    expect(r.multiplier).toBe(1);
+    expect(d.coinBonus ?? {}).toEqual(before);
   });
 });

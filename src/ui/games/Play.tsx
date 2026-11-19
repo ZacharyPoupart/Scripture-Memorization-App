@@ -5,7 +5,7 @@
 // uses, so the schedule, streak and coins follow their usual rules; a game lost, or won with too many slips, saves nothing.
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { currentLook, sceneUrl, type Look } from '../../core/avatar.ts';
-import { BRIDGE_HEARTS, BRIDGE_PLANK_MS, DUEL_HEARTS, GAMES, bestKey, duelChargeMs, gameCounts, runGames, duelRight, duelRounds, isComboTier, plankFits, planks, points, recordBest, bank, stars, totalStars, verseStars, type GameId, type Plank } from '../../core/games.ts';
+import { BRIDGE_HEARTS, BRIDGE_PLANK_MS, DUEL_HEARTS, GAMES, INTRO_MS, starBonus, bestKey, duelChargeMs, gameCounts, runGames, duelRight, duelRounds, isComboTier, plankFits, planks, points, recordBest, bank, stars, totalStars, verseStars, type GameId, type Plank } from '../../core/games.ts';
 import { mistakesAllowed } from '../../core/quiz.ts';
 import { formatRef } from '../../core/reference.ts';
 import { liveVerses, verseStatus } from '../../core/schedule.ts';
@@ -44,6 +44,8 @@ export function Play({ game, verseId }: { game: string; verseId: string }) {
   const info = GAMES.find((g) => g.id === game);
   const [round, setRound] = useState(1); // "Play again" starts a fresh, differently mixed game
   const [done, setDone] = useState<Outcome | null>(null);
+  const [readyFor, setReadyFor] = useState(''); // the game and verse the intro has been shown for ("Play again" skips it)
+  const introKey = `${game}:${verseId}`;
   if (!verse || !info) {
     return (
       <div class="review">
@@ -73,7 +75,9 @@ export function Play({ game, verseId }: { game: string; verseId: string }) {
         </div>
         <span style={{ width: '44px' }} />
       </div>
-      {done ? (
+      {readyFor !== introKey ? (
+        <Intro key={introKey} verse={verse} game={info.id} onStart={() => setReadyFor(introKey)} />
+      ) : done ? (
         <Finish key={`f${round}`} game={info.id} verse={verse} outcome={done} onAgain={again} onSwap={() => navigate(`/play/${other.id}/${verse.id}`, true)} otherName={other.name} />
       ) : info.id === 'gate' ? (
         <Gate key={round} {...props} />
@@ -102,6 +106,7 @@ export function PlayRun() {
   const [idx, setIdx] = useState(0);
   const [round, setRound] = useState(1);
   const [done, setDone] = useState<Outcome | null>(null);
+  const [readyAt, setReadyAt] = useState(-1); // the verse in the run the intro has been shown for
   const [tally, setTally] = useState({ played: 0, counted: 0, stars: 0, seeds: 0, base: 0, multiplier: 1 });
   const verse = liveVerses(data).find((v) => v.id === queue[idx]);
   const close = () => back('/play');
@@ -176,7 +181,9 @@ export function PlayRun() {
       <div class="review-progress" aria-hidden="true">
         <i style={{ width: `${(idx / queue.length) * 100}%` }} />
       </div>
-      {done ? (
+      {readyAt !== idx ? (
+        <Intro key={`i${idx}`} verse={verse} game={game} step={`Verse ${idx + 1} of ${queue.length}`} onStart={() => setReadyAt(idx)} />
+      ) : done ? (
         <Finish key={`f${idx}-${round}`} game={game} verse={verse} outcome={done} onAgain={() => (setDone(null), setRound((r) => r + 1))} onSwap={() => {}} otherName="" run={run} />
       ) : game === 'gate' ? (
         <Gate key={`${idx}-${round}`} {...props} />
@@ -188,6 +195,45 @@ export function PlayRun() {
         <Bridge key={`${idx}-${round}`} {...props} />
       )}
     </div>
+  );
+}
+
+/**
+ * Before each game (v1.81.0, owner-requested "a slight pause before each game so that they know what verse they are doing"):
+ * the verse's reference, large, with its topic and the game's one-line rule, for `INTRO_MS`; the game itself is not mounted
+ * yet, so no clock runs. A tap anywhere, Enter or Space, or the Start button begins at once.
+ */
+function Intro({ verse, game, step, onStart }: { verse: Verse; game: GameId; step?: string; onStart: () => void }) {
+  const info = GAMES.find((g) => g.id === game)!;
+  const go = useRef(onStart);
+  go.current = onStart;
+  useEffect(() => {
+    const t = setTimeout(() => go.current(), INTRO_MS);
+    const key = (e: KeyboardEvent) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), go.current());
+    addEventListener('keydown', key);
+    return () => (clearTimeout(t), removeEventListener('keydown', key));
+  }, []);
+  return (
+    <>
+      <div class="verse-area game-intro" onPointerDown={() => go.current()} data-testid="game-intro" role="status" aria-live="polite">
+        <span class="intro-step">{step ?? 'Get ready'}</span>
+        <h2 class="intro-ref" data-testid="intro-ref">
+          {formatRef(verse)}
+        </h2>
+        {verse.topic && <p class="intro-topic">{verse.topic}</p>}
+        <p class="intro-how">
+          <b>{info.name}.</b> {info.blurb}
+        </p>
+        <div class="intro-bar" aria-hidden="true">
+          <i style={{ animationDuration: `${INTRO_MS}ms` }} />
+        </div>
+      </div>
+      <Dock>
+        <button class="btn primary block" onClick={() => go.current()} data-testid="intro-start">
+          Start
+        </button>
+      </Dock>
+    </>
   );
 }
 
@@ -216,7 +262,7 @@ function Finish({ game, verse, outcome, onAgain, onSwap, otherName, run }: { gam
   useEffect(() => {
     if (once.current) return;
     once.current = true;
-    const recorded = counts ? completeReview(verse.id) : null;
+    const recorded = counts ? completeReview(verse.id, starBonus(stars(outcome.slips))) : null; // three stars: double coins
     setRec(recorded);
     run?.onRecorded(recorded, outcome);
     // personal bests are kept on this device (the stars and score of each game and verse)
@@ -233,6 +279,8 @@ function Finish({ game, verse, outcome, onAgain, onSwap, otherName, run }: { gam
   const now = Date.now();
   const nextId = buildTodayQueue(data, now).find((id) => id !== verse.id);
   const n = outcome.won ? stars(outcome.slips) : 0;
+  const boost = rec?.counted && rec.seeds > 0 ? starBonus(n) : 1;
+  const streaky = rec ? Math.round((rec.multiplier / boost) * 100) / 100 > 1 : false;
   const body = !outcome.won
     ? 'It got the better of you this time. Read the verse once more and have another go.'
     : !clean
@@ -250,6 +298,11 @@ function Finish({ game, verse, outcome, onAgain, onSwap, otherName, run }: { gam
         {n > 0 && <Confetti count={n * 12} />}
         <h2 class="headline">{outcome.won ? WORDS[game].won : WORDS[game].lost}</h2>
         {n > 0 && <Stars n={n} />}
+        {boost > 1 && settings.avatarOn && (
+          <p class="star-bonus" data-testid="game-star-bonus">
+            Three stars · ×{boost} coins
+          </p>
+        )}
         <div class="final-score" data-testid="game-final-score">
           <span class="muted small">Score</span>
           <b>{outcome.score}</b>
@@ -262,7 +315,7 @@ function Finish({ game, verse, outcome, onAgain, onSwap, otherName, run }: { gam
         <p class="muted measure-sm" style={{ margin: '0 auto' }} data-testid="game-verdict">
           {body}
         </p>
-        {rec && rec.seeds > 0 && settings.avatarOn && <CoinCount base={rec.base} total={rec.seeds} multiplier={rec.multiplier} testid="game-seeds" />}
+        {rec && rec.seeds > 0 && settings.avatarOn && <CoinCount base={rec.base} total={rec.seeds} multiplier={rec.multiplier} testid="game-seeds" why={boost > 1 ? (streaky ? 'your streak and three-star bonus' : 'your three-star bonus') : undefined} />}
         <p class="verse-text measure-sm" style={{ margin: '0 auto' }}>
           {verse.text}
         </p>

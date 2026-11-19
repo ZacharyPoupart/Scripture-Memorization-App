@@ -18,6 +18,8 @@ async function winDuel(page: Page) {
     else await page.waitForTimeout(100);
   }
 }
+/** Every game opens with a short pause showing the verse (v1.81.0); Start skips the rest of it. */
+const start = (page: Page) => page.getByTestId('intro-start').click();
 const reviewsOf = (page: Page) => page.evaluate(() => Object.values((window as any).__mfl.getState().data.reviewsByDevice as Record<string, number>).reduce((n, c) => n + c, 0));
 
 test.beforeEach(async ({ page }) => {
@@ -54,14 +56,21 @@ test.describe('the games', () => {
     await page.getByTestId('play-card').click(); // straight into the run
     await expect(page.getByTestId('game')).toHaveAttribute('data-run', '1/2');
     await expect(page.getByTestId('game-ref')).toHaveText('Psalms 23:1'); // Today's order
+    await expect(page.getByTestId('game-intro')).toContainText('Verse 1 of 2');
+    await expect(page.getByTestId('intro-ref')).toHaveText('Psalms 23:1');
+    await start(page);
     const first = await page.getByTestId('game').getAttribute('data-game');
     await winAny(page);
     await expect(page.getByTestId('game-verdict')).toContainText('counted as its review');
+    await expect(page.getByTestId('game-star-bonus')).toHaveText('Three stars · ×2 coins'); // a clean win doubles the coins
+    await expect(page.getByTestId('mult-reel')).toHaveAttribute('data-value', '2');
     await expect(page.getByTestId('game-swap')).toHaveCount(0);
     await page.getByTestId('run-next').click();
     await expect(page.getByTestId('game')).toHaveAttribute('data-run', '2/2');
     await expect(page.getByTestId('game-ref')).toHaveText('John 3:16');
     expect(await page.getByTestId('game').getAttribute('data-game')).not.toBe(first); // never the same game twice in a row
+    await expect(page.getByTestId('intro-ref')).toHaveText('John 3:16'); // a pause before each verse
+    await start(page);
     await winAny(page);
     await expect(page.getByTestId('run-next')).toHaveText('Finish');
     await page.getByTestId('run-next').click();
@@ -81,6 +90,12 @@ test.describe('the games', () => {
     await expect(page.getByTestId('hub-stars')).toHaveText('0');
     await page.getByTestId('hub-gate').click();
     await expect(page.getByTestId('game')).toHaveAttribute('data-game', 'gate');
+    // first a pause that shows the verse, large; the game has not started (no keys, no goblin) until it ends or Start is tapped
+    await expect(page.getByTestId('intro-ref')).toHaveText('John 3:16');
+    await expect(page.getByTestId('game-intro')).toContainText('Hold the Gate');
+    await expect(page.getByTestId('gate-keys')).toHaveCount(0);
+    await expect(page.getByTestId('gate-keys')).toBeVisible({ timeout: 5000 }); // it starts by itself after a moment
+    await expect(page.getByTestId('game-intro')).toHaveCount(0);
     const keys = page.getByTestId('gate-keys').locator('button');
     await expect(keys).toHaveCount(6);
     // a wrong letter is a slip (a heart), and the word is not given away
@@ -103,6 +118,7 @@ test.describe('the games', () => {
     expect(await reviewsOf(page)).toBe(1);
     // a clean second run scores more: a new best, and three stars kept for this game and verse
     await page.getByTestId('game-again').click();
+    await expect(page.getByTestId('game-intro')).toHaveCount(0); // playing the same verse again needs no pause
     await winGate(page);
     await expect(page.getByTestId('game-stars')).toHaveAttribute('data-stars', '3');
     await expect(page.getByTestId('game-new-best')).toBeVisible();
@@ -133,6 +149,7 @@ test.describe('the games', () => {
     await page.getByTestId('hub-burrows').click();
     await expect(page.getByTestId('game')).toHaveAttribute('data-game', 'burrows');
     await expect(page.getByTestId('game-ref')).toHaveText('Psalms 23:1');
+    await start(page);
     // a goblin with the wrong word costs a heart
     await page.locator('[data-testid="burrow"]:not([data-right]) .mole').first().waitFor({ timeout: 5000 });
     await page.locator('[data-testid="burrow"]:has(.mole):not([data-right])').first().dispatchEvent('pointerdown');
@@ -147,6 +164,7 @@ test.describe('the games', () => {
     await page.getByTestId('game-next').click();
     await expect(page.getByTestId('game')).toHaveAttribute('data-game', 'burrows');
     await expect(page.getByTestId('game-ref')).toHaveText('John 3:16');
+    await expect(page.getByTestId('intro-ref')).toHaveText('John 3:16'); // a new verse: a pause again
     await page.getByTestId('game-close').click();
     await page.goto('/#/');
     await expect(page.getByTestId('today-list')).toContainText('1/3');
@@ -158,6 +176,7 @@ test.describe('the games', () => {
     await addVerse(page, PSALM23_1);
     await page.getByTestId('verse-card').click();
     await page.getByTestId('play-burrows').click();
+    await start(page);
     await expect(page.getByTestId('game-finish')).toContainText('The goblins got away', { timeout: 30_000 });
     await expect(page.getByTestId('game-finish')).toHaveAttribute('data-counted', 'no');
     expect(await reviewsOf(page)).toBe(0);
@@ -170,6 +189,7 @@ test.describe('the games', () => {
     await addVerse(page, JOHN316);
     await page.getByTestId('verse-card').click();
     await page.getByTestId('play-duel').click();
+    await start(page);
     await expect(page.getByTestId('duel-hearts')).toHaveAttribute('data-hearts', '3');
     // a wrong word costs a heart and the same word is asked again
     await page.getByTestId('duel-choices').locator('button:not([data-right])').first().click();
@@ -194,6 +214,7 @@ test.describe('the games', () => {
     await addVerse(page, JOHN316);
     await page.getByTestId('verse-card').click();
     await page.getByTestId('play-bridge').click();
+    await start(page);
     await expect(page.getByTestId('game-ref')).toHaveText('John 3:16'); // the verse is the big line at the top
     const bank = page.getByTestId('bridge-bank');
     await expect(bank.locator('button')).toHaveCount(5); // the next word and the few after it

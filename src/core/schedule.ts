@@ -666,13 +666,14 @@ export function recordReview(
   now: number,
   deviceId: string,
   random: () => number = Math.random, // rolls the left-over part of a multiplied coin (see `rollBonus`)
+  boost = 1, // a game's star bonus (`starBonus` in core/games.ts), multiplied with the streak's
 ): { counted: boolean; levelUps: LevelUp[]; todayComplete: boolean; base: number; multiplier: number; bonus: number } {
   const settled = settle(data, now);
   const v = data.verses[verseId];
   if (!v || v.deletedAt) throw new Error('Verse not found');
   const today = dayKeyOf(now);
   const coinsBefore = baseCoins(data);
-  const multiplier = streakMultiplier(streakInfo(data, now).count); // the streak you came in with
+  const multiplier = Math.round(streakMultiplier(streakInfo(data, now).count) * Math.max(1, boost) * 100) / 100; // the streak you came in with, times any game bonus
   const status = verseStatus(data, v, now);
   const counted = status.state === 'ready';
   data.ledger[today] = mergeLedgerDay(data.ledger[today], { r: 1 });

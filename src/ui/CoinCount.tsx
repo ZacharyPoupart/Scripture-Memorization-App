@@ -14,7 +14,7 @@ const MULT_AT = 1500; // when the multiplier reel starts
 const MULT_MS = 1700;
 const TOTAL_AT = MULT_AT + MULT_MS + 350;
 const TOTAL_MS = 1100;
-const MULTS = STREAK_MULTIPLIERS.map((m) => m.x);
+const STREAK_MULTS: number[] = STREAK_MULTIPLIERS.map((m) => m.x);
 const CYCLES = 6;
 
 function Reel({ items, at, ms, delay, lit, cls }: { items: string[]; at: number; ms: number; delay: number; lit?: boolean; cls?: string }) {
@@ -34,13 +34,15 @@ function Reel({ items, at, ms, delay, lit, cls }: { items: string[]; at: number;
 
 const DIGITS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
-export function CoinCount({ base, total, multiplier, testid }: { base: number; total: number; multiplier: number; testid?: string }) {
+export function CoinCount({ base, total, multiplier, testid, why = 'your streak bonus' }: { base: number; total: number; multiplier: number; testid?: string; why?: string }) {
   const spinsMultiplier = multiplier > 1;
+  // the reel shows the streak's steps, and this multiplier among them when a game bonus makes it one of its own (×2.5)
+  const MULTS = [...new Set<number>([...STREAK_MULTS, multiplier])].sort((a, b) => a - b);
   const reduce = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
   const digits = String(total).split('').map(Number);
   const n = digits.length;
   const baseDigits = String(base).padStart(n, ' ').split('').map((c) => (c === ' ' ? -1 : Number(c)));
-  const multIdx = Math.max(0, MULTS.indexOf(multiplier as (typeof MULTS)[number]));
+  const multIdx = Math.max(0, MULTS.indexOf(multiplier));
 
   // where each reel is stopped, counted in rows from the top of its strip
   const finalDigitAt = digits.map((d) => 40 + d); // reduced motion: straight to a row showing the final digit
@@ -86,7 +88,7 @@ export function CoinCount({ base, total, multiplier, testid }: { base: number; t
     <p class="seeds-gain coin-count" data-testid={testid}>
       <span class="sr-only">
         +{total} {word(total)}
-        {spinsMultiplier ? `, with your streak bonus ×${multiplier}` : ''}
+        {spinsMultiplier ? `, with ${why} ×${multiplier}` : ''}
       </span>
       <span aria-hidden="true" class={`slot ${done ? 'slot-done' : ''}`} data-done={done ? 'true' : 'false'} data-total={total}>
         <span class="slot-plus">+</span>

@@ -5,6 +5,16 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.81.0] - 2026-11-19
+
+### Added
+- Three stars, double coins: win a game cleanly (three stars) and the coins it earns as that verse's review are doubled, on top of your streak multiplier. The result says so, and the coin count spins up through the bonus.
+- A short pause before every game: the verse's reference fills the screen (with its topic, if it has one, and the game's one-line rule), so you know which verse you are about to play. It starts by itself after three seconds, or tap Start (or anywhere) to begin at once. In Play today's reviews it shows before each verse ("Verse 2 of 5"); playing the same verse again skips it.
+
+### Changed
+- Hold the Gate's castle is much bigger: it fills the left side of the stage, with the knight standing guard in front of its door.
+- Goblin Burrows: the burrows are dug into a grassy meadow (with real grass texture), so the mounds sit on the ground instead of floating over the scene; the back row sits a little further away, and the knight is bigger.
+
 ## [1.80.0] - 2026-11-18
 
 ### Changed
