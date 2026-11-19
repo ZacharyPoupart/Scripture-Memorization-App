@@ -4168,10 +4168,18 @@ button.chip {
   height: 250px;
 }
 .gate-wall {
+  /* the castle the knight defends: big, standing on the ground behind him (v1.81.0, owner-requested "way bigger") */
   position: absolute;
-  left: 2%;
-  bottom: 22px;
+  left: -4%;
+  bottom: 16px;
+  width: 58%;
+  max-width: 340px;
   z-index: 1;
+}
+.gate-wall img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 .gate-knight {
   position: absolute;
