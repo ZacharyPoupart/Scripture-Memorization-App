@@ -8,7 +8,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 ## [1.81.1] - 2026-11-19
 
 ### Changed
-- Goblin Burrows: the knight is a little bigger again.
+- Goblin Burrows: the knight is a little bigger again, and stands to the left of the burrows, between the back row and the front row.
+- Bridge Run: the knight really walks on the bridge. The planks are wooden boards laid at the height of the cliff tops, running from one cliff's edge to the other, and his boots stand on them (and on the cliffs) at any screen width.
 
 ## [1.81.0] - 2026-11-19
 

@@ -158,6 +158,29 @@ def grass_tile(size=48, seed=3):
 ANIMS['grass'] = [grass_tile()]
 
 
+def plank_tile(w=24, h=8, seed=5):
+    """One bridge plank seen from the side (v1.81.1, owner-requested: the knight should really walk on the bridge): a wooden board
+    with a lit top edge, grain lines and a nail at each end, outlined like the rest. Pixel art, shown with crisp pixels."""
+    rng = np.random.default_rng(seed)
+    wood, dark, light, grain, nail = (138, 93, 51), (85, 54, 32), (176, 126, 74), (110, 72, 40), (60, 56, 60)
+    px = np.zeros((h, w, 4), np.uint8)
+    px[..., :3] = wood
+    px[..., 3] = 255
+    px[1, :, :3] = light
+    for y in range(2, h - 1):
+        x = int(rng.integers(0, w // 2))
+        px[y, x: x + int(rng.integers(5, 12)), :3] = grain
+    px[h - 2, :, :3] = grain
+    for x in (2, w - 3):
+        px[h // 2, x, :3] = nail
+    px[0, :, :3] = px[-1, :, :3] = dark
+    px[:, 0, :3] = px[:, -1, :3] = dark
+    return Image.fromarray(px, 'RGBA')
+
+
+ANIMS['plank'] = [plank_tile()]
+
+
 def main():
     out = ROOT / 'public/creatures'
     out.mkdir(exist_ok=True)
@@ -167,7 +190,7 @@ def main():
     sheets = []
     for name, frames in ANIMS.items():
         im, w, h = strip(frames)
-        if name == 'grass':
+        if name in ('grass', 'plank'):
             im.save(out / f'{name}.webp', 'WEBP', lossless=True, method=6)  # pixel art: crisp
         else:
             im.save(out / f'{name}.webp', 'WEBP', quality=88, alpha_quality=100, method=6)  # soft painted art: lossy is a quarter the size and looks the same

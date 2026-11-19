@@ -820,3 +820,6 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 
 ## Burrows knight a tad bigger (v1.81.1, owner-requested)
 - `AvatarFigure` size 150 in `ui/games/Burrows.tsx` (was 134; 96 before v1.81.0). The grid's left inset (29%) still leaves him room.
+- Burrows knight placement (same release, owner-requested "move him left and more up so he is to the left and between"): `.burrows-knight` at left -3%, bottom 64px, so his boots are midway between the back row (about 131 px up) and the front row (8 px).
+- Bridge Run lined up (same release, owner-requested "make him actually match in bridge run"): the knight floated above the cliffs and the planks were small blocks hanging in the air. The stage is now a size container and `--deck` is the cliffs' grass height worked out from their width (`17cqw * 224/211 * 0.69`), so the planks (`bottom: deck - 10px`), the falling plank and the knight (`bottom: deck - 7px`, the soles' offset in the figure, with the picture made a block so no inline gap lifts him) all sit on it at any width. The bridge runs 13% to 87% (where the cliff tops end), and the knight's position uses the same span. Laid planks use a pixel-art board (`plank_tile` in `design/creatures/cut.py`, `public/creatures/plank.webp`, passed as `--plank`).
+

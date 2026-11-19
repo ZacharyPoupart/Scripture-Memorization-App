@@ -3704,6 +3704,10 @@ button.chip {
 /* ---- the bridge ---- */
 .bridge-stage {
   height: 214px;
+  /* the deck: the height of the cliffs' grass tops (the cliffs are 17% of the stage wide, and their tops sit at 69% of their
+     height), so the planks join the cliffs and the knight's boots stand on them at any width (v1.81.1) */
+  container-type: inline-size;
+  --deck: calc(17cqw * 224 / 211 * 0.69);
 }
 .bridge-cliff {
   position: absolute;
@@ -3726,40 +3730,45 @@ button.chip {
 }
 .bridge-planks {
   position: absolute;
-  left: 16%;
-  right: 16%;
-  bottom: 44px;
+  left: 13%;
+  right: 13%;
+  bottom: calc(var(--deck) - 10px);
   display: flex;
-  gap: 2px;
+  gap: 1px;
+  z-index: 1;
 }
 .bridge-planks i {
   flex: 1;
-  height: 12px;
-  border: 1.5px dashed rgba(34, 30, 38, 0.55);
-  border-radius: 3px;
+  height: 10px;
+  border: 1px dashed rgba(244, 239, 226, 0.6);
+  border-radius: 2px;
 }
 .bridge-planks i.laid {
-  border: 1.5px solid var(--text);
-  background: #a8703a;
+  border: 0;
+  border-radius: 0;
+  background: var(--plank) center / 100% 100% no-repeat;
+  image-rendering: pixelated;
   animation: plank-drop 0.46s var(--spring) both;
 }
 .bridge-drop {
   /* a plank that did not fit tumbles into the gap */
   position: absolute;
-  bottom: 44px;
-  width: 8%;
-  height: 12px;
-  border: 1.5px solid var(--text);
-  border-radius: 3px;
-  background: #a8703a;
+  bottom: calc(var(--deck) - 10px);
+  width: 6%;
+  height: 10px;
+  background: var(--plank) center / 100% 100% no-repeat;
+  image-rendering: pixelated;
   animation: plank-fall 0.7s ease-in both;
 }
 .bridge-walker {
   position: absolute;
-  bottom: 50px;
+  bottom: calc(var(--deck) - 7px); /* the soles sit about 7% of the figure above its bottom edge */
   width: 100px;
   margin-left: -50px;
   z-index: 2;
+}
+.bridge-walker > svg {
+  display: block; /* no gap below the picture, so the boots are where the deck is */
 }
 .bridge-walker.danger {
   animation: teeter 0.3s ease-in-out infinite alternate;
@@ -4295,9 +4304,10 @@ button.chip {
   transform-origin: 50% 100%;
 }
 .burrows-knight {
+  /* to the left of the burrows, standing between the back row and the front row (v1.81.1, owner-requested) */
   position: absolute;
-  left: 2%;
-  bottom: 6px;
+  left: -3%;
+  bottom: 64px;
   z-index: 1;
   opacity: 0.95;
 }

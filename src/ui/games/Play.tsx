@@ -612,13 +612,14 @@ function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
       play('hurt', 400);
     }
   };
-  const span = 68; // % of the stage the bridge covers, starting at 16%
-  const x = 16 + (Math.max(-0.9, Math.min(all.length + 0.9, pos)) / all.length) * span;
+  // the bridge runs from where the near cliff's top ends (13% of the stage) to where the far one's begins (87%)
+  const span = 74;
+  const x = 13 + (Math.max(-0.9, Math.min(all.length + 0.9, pos)) / all.length) * span;
   const danger = !across && !lost && rest <= 0 && laid - pos < 0.45;
   return (
     <>
       <div class="verse-area stack">
-        <div class={`game-stage bridge-stage ${across ? 'across' : ''} ${lost ? 'lost' : ''}`} style={backdrop} ref={stage} data-testid="bridge-stage" data-laid={laid} data-total={all.length}>
+        <div class={`game-stage bridge-stage ${across ? 'across' : ''} ${lost ? 'lost' : ''}`} style={{ ...backdrop, '--plank': `url(${stripUrl('plank')})` }} ref={stage} data-testid="bridge-stage" data-laid={laid} data-total={all.length}>
           <div class="game-hud">
             <Hearts n={hearts} of={BRIDGE_HEARTS} testid="bridge-hearts" />
             <b class="game-score" data-testid="game-score">
@@ -633,7 +634,7 @@ function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
               <i key={i} class={i < laid ? 'laid' : i === laid && danger ? 'wanted' : ''} />
             ))}
           </div>
-          {slips > 0 && wrong !== null && <i class="bridge-drop" key={`drop${slips}`} style={{ left: `${16 + (laid / all.length) * span}%` }} aria-hidden="true" />}
+          {slips > 0 && wrong !== null && <i class="bridge-drop" key={`drop${slips}`} style={{ left: `${13 + (laid / all.length) * span}%` }} aria-hidden="true" />}
           <div class={`bridge-walker ${rest > 0 ? 'fell' : ''} ${danger ? 'danger' : ''}`} style={{ left: `${x}%` }} key={`w${rest > 0 ? slips : 'on'}`}>
             <AvatarFigure look={look} size={100} bare pose={rest > 0 ? 'fall' : pose.name} key={`${rest > 0 ? 'fall' : pose.name}${pose.n}`} />
           </div>
