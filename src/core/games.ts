@@ -86,8 +86,10 @@ export const gameCounts = (pile: Pile, won: boolean, slips: number): boolean => 
 
 /** How long the dragon takes to draw breath (ms): it gets quicker as the verse goes on. `progress` is 0 to 1. */
 export const duelChargeMs = (progress: number) => 7000 - 2600 * Math.max(0, Math.min(1, progress));
-/** How long the knight takes to walk one plank (ms). */
-export const BRIDGE_PLANK_MS = 2600;
+/** How long the knight takes to walk one plank (ms): 2.2 s since v1.81.1 (it was 2.6 s), owner-requested "a tad faster". */
+export const BRIDGE_PLANK_MS = 2200;
+/** He stands still this long (ms) before setting off, so you can get your bearings (v1.81.1, owner-requested). */
+export const BRIDGE_START_MS = 2000;
 /** How many words lie on the bank at once (the next one and a few after it), so a long verse never fills the screen. */
 export const BANK_SIZE = 5;
 export const BRIDGE_HEARTS = 3;

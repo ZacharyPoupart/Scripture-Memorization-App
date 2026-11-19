@@ -5,7 +5,7 @@
 // uses, so the schedule, streak and coins follow their usual rules; a game lost, or won with too many slips, saves nothing.
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { currentLook, sceneUrl, type Look } from '../../core/avatar.ts';
-import { BRIDGE_HEARTS, BRIDGE_PLANK_MS, DUEL_HEARTS, GAMES, INTRO_MS, starBonus, bestKey, duelChargeMs, gameCounts, runGames, duelRight, duelRounds, isComboTier, plankFits, planks, points, recordBest, bank, stars, totalStars, verseStars, type GameId, type Plank } from '../../core/games.ts';
+import { BRIDGE_HEARTS, BRIDGE_PLANK_MS, BRIDGE_START_MS, DUEL_HEARTS, GAMES, INTRO_MS, starBonus, bestKey, duelChargeMs, gameCounts, runGames, duelRight, duelRounds, isComboTier, plankFits, planks, points, recordBest, bank, stars, totalStars, verseStars, type GameId, type Plank } from '../../core/games.ts';
 import { mistakesAllowed } from '../../core/quiz.ts';
 import { formatRef } from '../../core/reference.ts';
 import { liveVerses, verseStatus } from '../../core/schedule.ts';
@@ -541,6 +541,7 @@ function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
   const [wrong, setWrong] = useState<number | null>(null);
   const [pos, setPos] = useState(-0.9); // where the knight is, in planks: below 0 is the near cliff, `laid` is the edge
   const [rest, setRest] = useState(0); // a breather after a fall (ms left)
+  const [wait, setWait] = useState(BRIDGE_START_MS); // he stands still a moment before setting off (ms left); words can be laid already
   const [score, setScore] = useState(0);
   const [combo, setCombo] = useState(0);
   const stage = useRef<HTMLDivElement>(null);
@@ -549,9 +550,9 @@ function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
   const stop = useHitStop(stage);
   const across = laid >= all.length;
   const lost = hearts <= 0;
-  const live = useRef({ across, lost });
-  live.current = { across, lost };
-  const [pose, play] = usePose(() => (live.current.across ? 'cheer' : live.current.lost ? 'fall' : 'walk'));
+  const live = useRef({ across, lost, waiting: true });
+  live.current = { across, lost, waiting: wait > 0 };
+  const [pose, play] = usePose(() => (live.current.across ? 'cheer' : live.current.lost ? 'fall' : live.current.waiting ? 'idle' : 'walk'));
   useEffect(() => {
     if (!across && !lost) return;
     const t = setTimeout(() => onDone({ won: across, slips, score }), across ? 1500 : 1200);
@@ -569,6 +570,10 @@ function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
     if (stop.eat(dt)) return;
     if (lost) return;
     if (across) return setPos((p) => Math.min(all.length + 0.9, p + dt / 500)); // strides off the end onto the far cliff
+    if (wait > 0) {
+      if (wait - dt <= 0) play('walk', 10); // off he goes
+      return setWait(wait - dt);
+    }
     if (rest > 0) return setRest(rest - dt);
     const next = pos + dt / BRIDGE_PLANK_MS;
     if (next >= laid - 0.12) {
