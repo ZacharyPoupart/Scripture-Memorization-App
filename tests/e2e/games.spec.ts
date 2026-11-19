@@ -215,6 +215,11 @@ test.describe('the games', () => {
     await page.getByTestId('verse-card').click();
     await page.getByTestId('play-bridge').click();
     await start(page);
+    // he stands still for a moment before setting off
+    const walker = page.locator('.bridge-walker');
+    const at0 = await walker.getAttribute('style');
+    await page.waitForTimeout(1000);
+    expect(await walker.getAttribute('style')).toBe(at0);
     await expect(page.getByTestId('game-ref')).toHaveText('John 3:16'); // the verse is the big line at the top
     const bank = page.getByTestId('bridge-bank');
     await expect(bank.locator('button')).toHaveCount(5); // the next word and the few after it

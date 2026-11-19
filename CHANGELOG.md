@@ -5,6 +5,13 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.81.1] - 2026-11-19
+
+### Changed
+- Goblin Burrows: the knight is a little bigger again, and stands to the left of the burrows, between the back row and the front row.
+- Bridge Run: the knight really walks on the bridge. The planks are wooden boards laid at the height of the cliff tops, running from one cliff's edge to the other, and his boots stand on them (and on the cliffs) at any screen width.
+- Bridge Run: the knight now waits two seconds before he sets off, so you can get your bearings (you can lay words already), and then walks a little faster (2.2 seconds a plank instead of 2.6).
+
 ## [1.81.0] - 2026-11-19
 
 ### Added
