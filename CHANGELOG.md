@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.83.0] - 2026-11-19
+
 ### Changed
 - Every game now fits in one frame: the scene grows to fill the screen down to the verse, and the answer buttons sit right under the verse, so what is happening and what you tap are never far apart. A long verse scrolls inside its own box and keeps your place in view while the scene stays put, and Bridge Run's words sit in the bar at the bottom like the other games.
 
