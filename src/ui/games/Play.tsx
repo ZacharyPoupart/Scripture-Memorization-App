@@ -23,7 +23,7 @@ import { EmptyState } from '../primitives.tsx';
 import { Dragon, Hearts, Pic, Sprite, Stars, stripUrl, useTicker, type DragonState } from './sprites.tsx';
 import { Burrows } from './Burrows.tsx';
 import { Gate } from './Gate.tsx';
-import { DUST, flyWord, Fx, gapIn, pointIn, punch, shake, slashWave, SPARKS, useHitStop, type FxHandle } from './juice.tsx';
+import { DUST, flyWord, Fx, gapIn, keepInView, pointIn, punch, shake, slashWave, SPARKS, type FxHandle, useHitStop } from './juice.tsx';
 import type { GameProps, Outcome } from './types.ts';
 
 /** The scene behind a game: the knight's own background, as wide as the stage. */
@@ -667,9 +667,10 @@ function Duel({ verse, seed, look, backdrop, onDone }: GameProps) {
   const left = rounds.length - at;
   const fx = beat ? `${beat.kind}${beat.n}` : 'none';
   const big = combo >= 3 && beat?.kind === 'hit';
+  useEffect(() => keepInView('duel-text'), [at]);
   return (
     <>
-      <div class="verse-area stack">
+      <div class="verse-area stack play-area">
         <div class={`game-stage duel-stage ${beat?.kind ?? ''} ${won ? 'won' : ''} ${lost ? 'lost' : ''}`} style={backdrop} ref={stage} data-testid="duel-stage">
           <div class="game-hud">
             <Hearts n={hearts} of={DUEL_HEARTS} testid="duel-hearts" />
@@ -826,9 +827,10 @@ function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
   const span = 74;
   const x = 13 + (Math.max(-0.9, Math.min(all.length + 0.9, pos)) / all.length) * span;
   const danger = !across && !lost && rest <= 0 && laid - pos < 0.45;
+  useEffect(() => keepInView('bridge-text', '.next-slot'), [laid]);
   return (
     <>
-      <div class="verse-area stack">
+      <div class="verse-area stack play-area">
         <div class={`game-stage bridge-stage ${across ? 'across' : ''} ${lost ? 'lost' : ''}`} style={{ ...backdrop, '--plank': `url(${stripUrl('plank')})` }} ref={stage} data-testid="bridge-stage" data-laid={laid} data-total={all.length}>
           <div class="game-hud">
             <Hearts n={hearts} of={BRIDGE_HEARTS} testid="bridge-hearts" />
@@ -862,6 +864,8 @@ function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
           )}{' '}
           <span class="next-slot" aria-hidden="true" />
         </p>
+      </div>
+      <Dock>
         <div class="bridge-bank" data-testid="bridge-bank">
           {bank(all, laid, seed + verse.text.length).map((p) => (
             <button key={p.order} class={`btn plank ${wrong === p.order ? 'shake' : ''}`} onPointerDown={(e) => (e.preventDefault(), pick(p, e.currentTarget as Element))} onClick={(e) => e.detail === 0 && pick(p, e.currentTarget as Element)} data-order={p.order} disabled={across || lost}>
@@ -869,7 +873,7 @@ function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
             </button>
           ))}
         </div>
-      </div>
+      </Dock>
     </>
   );
 }

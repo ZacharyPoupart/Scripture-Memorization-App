@@ -5,7 +5,7 @@ import { isComboTier } from '../../core/games.ts';
 import { GATE_HEARTS, gateStep, gateTap, newGate, type GateEvent } from '../../core/gate.ts';
 import { feedback } from '../../services/feedback.ts';
 import { AvatarFigure, type KnightPose } from '../AvatarFigure.tsx';
-import { DUST, flyWord, Fx, gapIn, GOO, pointIn, punch, shake, slashWave, SPARKS, useHitStop, type FxHandle } from './juice.tsx';
+import { DUST, flyWord, Fx, gapIn, GOO, keepInView, pointIn, punch, shake, slashWave, SPARKS, useHitStop, type FxHandle } from './juice.tsx';
 import { Hearts, Pic, Sprite, stripUrl, useTicker } from './sprites.tsx';
 import type { GameProps } from './types.ts';
 
@@ -133,11 +133,12 @@ export function Gate({ verse, seed, look, backdrop, onDone }: GameProps) {
     return () => removeEventListener('keydown', on);
   }, []);
 
+  useEffect(() => keepInView('gate-text'), [s.next]);
   const x = GATE_X + 6 + (1 - Math.min(1, s.x)) * (START_X - GATE_X - 6);
   const near = s.x > 0.72 && !s.over;
   return (
     <>
-      <div class="verse-area stack">
+      <div class="verse-area stack play-area">
         <div class={`game-stage gate-stage ${s.over ?? ''}`} style={backdrop} ref={stage} data-testid="gate-stage" data-next={s.next}>
           <div class="game-hud">
             <Hearts n={s.hearts} of={GATE_HEARTS} testid="gate-hearts" />

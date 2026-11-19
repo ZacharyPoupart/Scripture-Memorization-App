@@ -253,3 +253,16 @@ export function pointIn(el: Element | null | undefined, stage: Element | null | 
   const b = stage.getBoundingClientRect();
   return [a.left + a.width * dx - b.left, a.top + a.height * dy - b.top];
 }
+
+/**
+ * When a long verse is taller than its box, keep the place you are at in view (v1.83.0): the box scrolls, the stage above it never
+ * moves. `testid` is the verse's box; `selector` the word to follow (the current gap, or the end of what is built so far).
+ */
+export function keepInView(testid: string, selector = '.cur') {
+  if (typeof document === 'undefined') return;
+  const box = document.querySelector<HTMLElement>(`[data-testid="${testid}"]`);
+  const at = box?.querySelector<HTMLElement>(selector);
+  if (!box || !at || box.scrollHeight <= box.clientHeight + 1) return;
+  const top = at.offsetTop;
+  if (top < box.scrollTop || top + at.offsetHeight > box.scrollTop + box.clientHeight) box.scrollTop = Math.max(0, top - box.clientHeight / 3);
+}
