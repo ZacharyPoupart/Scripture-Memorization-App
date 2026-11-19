@@ -23,11 +23,15 @@ describe('Goblin Burrows', () => {
     expect([s.over, s.slips]).toEqual(['won', 0]);
   });
 
-  it('later piles show only first letters', () => {
-    const s = newBurrows(JOHN, 'weekly', 5);
-    up(s);
-    expect(s.moles.every((m) => /^[A-Z0-9]$/.test(m.label))).toBe(true);
-    expect(s.moles.filter((m) => burrowsNeeds(s, m))).toHaveLength(1);
+  it('every pile shows whole words, never first letters (v1.82.0)', () => {
+    for (const pile of ['daily', 'weekly', 'monthly', 'yearly'] as const) {
+      const s = newBurrows(JOHN, pile, 5);
+      up(s);
+      expect(s.moles.some((m) => m.label.length > 1)).toBe(true);
+      const need = s.moles.filter((m) => burrowsNeeds(s, m));
+      expect(need).toHaveLength(1);
+      expect(need[0].label).toBe('For');
+    }
   });
 
   it('a wrong bonk costs a heart and that goblin ducks; one that gets away costs a heart and the verse moves on', () => {
