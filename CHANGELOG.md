@@ -5,6 +5,9 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Changed
+- Goblin Burrows: the knight is a little bigger again.
+
 ## [1.81.0] - 2026-11-19
 
 ### Added

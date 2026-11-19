@@ -818,3 +818,5 @@ No real iPhone or WebKit is available in this environment (Playwright runs Chrom
 - Test changes: coins.test adds the star bonus (only 3 stars; ×2 with no streak; ×2.5 on a week's streak; nothing for extra practice); the games run test checks the "Three stars · ×2 coins" line and the ×2 reel after a clean win.
 - Burrows, second pass (same release, owner-requested "make the knight bigger and add grass texture"): the knight is drawn at 134 (was 96) and the grid starts at 29% to leave him room; the meadow is a seamless 48 px pixel-art grass tile (`grass_tile` in `design/creatures/cut.py`, `public/creatures/grass.webp`, lossless) repeated at 2x with crisp pixels.
 
+## Burrows knight a tad bigger (v1.81.1, owner-requested)
+- `AvatarFigure` size 150 in `ui/games/Burrows.tsx` (was 134; 96 before v1.81.0). The grid's left inset (29%) still leaves him room.

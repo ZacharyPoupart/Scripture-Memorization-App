@@ -105,7 +105,7 @@ export function Burrows({ verse, seed, look, backdrop, onDone }: GameProps) {
         </div>
         <div class="burrows-field" aria-hidden="true" style={{ backgroundImage: `url(${stripUrl('grass')})` }} />
         <div class="burrows-knight" ref={knight}>
-          <AvatarFigure look={look} size={134} bare pose={pose.name} key={`${pose.name}${pose.n}`} />
+          <AvatarFigure look={look} size={150} bare pose={pose.name} key={`${pose.name}${pose.n}`} />
         </div>
         <div class="burrows-grid">
           {Array.from({ length: BURROWS }, (_, hole) => {
