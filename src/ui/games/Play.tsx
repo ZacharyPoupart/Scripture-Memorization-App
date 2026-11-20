@@ -69,7 +69,10 @@ export function Play({ game, verseId }: { game: string; verseId: string }) {
           <Icon name="close" />
         </button>
         <div class="title">
-          <span class="game-name">{info.name}</span>
+          <span class="game-name">
+            {info.name}
+            <ThreeStarsTag verse={verse} />
+          </span>
           <strong class="game-ref" data-testid="game-ref">
             {formatRef(verse)}
           </strong>
@@ -172,6 +175,7 @@ export function PlayRun() {
         <div class="title">
           <span class="game-name">
             {info.name} · {idx + 1} of {queue.length}
+            <ThreeStarsTag verse={verse} />
           </span>
           <strong class="game-ref" data-testid="game-ref">
             {formatRef(verse)}
@@ -225,6 +229,7 @@ function Intro({ verse, game, step, onStart }: { verse: Verse; game: GameId; ste
         <p class="intro-how">
           <b>{info.name}.</b> {info.blurb}
         </p>
+        <CleanRule verse={verse} />
         <div class="intro-bar" aria-hidden="true">
           <i style={{ animationDuration: `${INTRO_MS}ms` }} />
         </div>
@@ -328,6 +333,7 @@ export function Campaign() {
         <div class="title">
           <span class="game-name">
             Campaign · {info.name}
+            <ThreeStarsTag verse={verse} />
           </span>
           <strong class="game-ref" data-testid="game-ref">
             {formatRef(verse)}
@@ -416,6 +422,7 @@ function CampaignIntro({ verse, game, look, backdrop, last, onStart, onStop }: {
           <p class="intro-how">
             <b>{info.name}.</b> {info.blurb}
           </p>
+          <CleanRule verse={verse} />
           <div class="intro-bar" aria-hidden="true">
             <i style={{ animationDuration: `${INTRO_MS}ms` }} />
           </div>
@@ -432,6 +439,31 @@ function CampaignIntro({ verse, game, look, backdrop, last, onStart, onStop }: {
         </div>
       </Dock>
     </>
+  );
+}
+
+/**
+ * Weekly, Monthly and Yearly verses only count as their review with a clean win, three stars (v1.84.0, owner-requested "make it
+ * clearer that only a 3 star works for weekly"): said before the game, beside the game's name all through it, and on the result.
+ */
+function CleanRule({ verse }: { verse: Verse }) {
+  if (mistakesAllowed(verse.pile) > 0) return null;
+  return (
+    <p class="intro-rule" data-testid="intro-rule">
+      <Icon name="star" fill />
+      <span>
+        {PILE_INFO[verse.pile].label} verse: only a <b>three-star</b> win, with no slips, counts as its review.
+      </span>
+    </p>
+  );
+}
+function ThreeStarsTag({ verse }: { verse: Verse }) {
+  if (mistakesAllowed(verse.pile) > 0) return null;
+  return (
+    <span class="three-star-tag" data-testid="three-star-tag">
+      {' '}
+      · 3 stars to count
+    </span>
   );
 }
 
@@ -489,7 +521,7 @@ function Finish({ game, verse, outcome, onAgain, onSwap, otherName, run }: { gam
   const body = !outcome.won
     ? 'It got the better of you this time. Read the verse once more and have another go.'
     : !clean
-      ? `You won, with ${outcome.slips} slip${outcome.slips === 1 ? '' : 's'}. ${PILE_INFO[verse.pile].label} verses need a clean run to count as the review. Go again?`
+      ? `You won, with ${outcome.slips} slip${outcome.slips === 1 ? '' : 's'}. ${PILE_INFO[verse.pile].label} verses only count as the review with three stars, which means no slips. Go again?`
       : rec
         ? rec.levelUps.length
           ? `That counted as its review, and it moved up to ${PILE_INFO[rec.levelUps[rec.levelUps.length - 1].to].label}.`
@@ -990,7 +1022,7 @@ export function PlayHub() {
           ))}
         </ul>
         <p class="muted small" style={{ margin: 0 }}>
-          Win a game and it counts as that verse’s review. Weekly, Monthly and Yearly verses need a clean run.
+          Win a game and it counts as that verse’s review. Weekly, Monthly and Yearly verses need three stars (no slips).
         </p>
       </div>
     </div>

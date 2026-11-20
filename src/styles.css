@@ -4832,3 +4832,28 @@ button.chip {
 .streak-today.lit svg {
   color: var(--warn);
 }
+
+/* only a three-star win counts for Weekly, Monthly and Yearly verses (v1.84.0) */
+.intro-rule {
+  margin: 0;
+  max-width: 32ch;
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 0.95rem;
+  text-align: left;
+}
+.intro-rule svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  color: var(--warn);
+  transform: translateY(2px);
+}
+.three-star-tag {
+  color: var(--warn);
+}

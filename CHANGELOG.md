@@ -10,6 +10,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 ### Added
 - You can tell at a glance whether today's streak is earned. The flame at the top of Today stays grey until a review counts (or, on a day with nothing due, until you practise), then it lights up with a check. A line in the Today card says which it is ("Streak earned for today · 12 days", or what will earn it), and a note at the top says "Streak earned for today" the moment it happens, wherever you are: a review, a game or a campaign.
 
+- It is clearer that Weekly, Monthly and Yearly verses only count as their review with a three-star win (no slips): the pause before each game says so, the game's header reads "3 stars to count" all through the game, and the result explains it if you won with a slip.
+
 ### Changed
 - The games choose verses the same way the reviews do. "Play today's reviews" and campaign mode take the verses that are due in Today's order (the ones reviewed the fewest times today first, Daily before Weekly, and shuffled if you have shuffle on). A campaign checks again before every verse, so a Daily verse comes back in its turn once its next review unlocks, and only when nothing is due does it pick verses at random for extra practice.
 
