@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.84.0] - 2026-11-20
+
 ### Added
 - You can tell at a glance whether today's streak is earned. The flame at the top of Today stays grey until a review counts (or, on a day with nothing due, until you practise), then it lights up with a check. A line in the Today card says which it is ("Streak earned for today · 12 days", or what will earn it), and a note at the top says "Streak earned for today" the moment it happens, wherever you are: a review, a game or a campaign.
 
