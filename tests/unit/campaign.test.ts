@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addToTally, campaignVerses, emptyTally, nextGame, shuffle } from '../../src/core/campaign.ts';
+import { addToTally, campaignPick, campaignVerses, emptyTally, nextGame, shuffle } from '../../src/core/campaign.ts';
 import { GAMES } from '../../src/core/games.ts';
 
 const seq = (...xs: number[]) => {
@@ -48,5 +48,31 @@ describe('campaign mode (v1.82.0)', () => {
     t = addToTally(t, { won: false, stars: 0, score: 80 }, null);
     t = addToTally(t, { won: true, stars: 2, score: 150 }, { counted: false, seeds: 0, base: 0, multiplier: 1 });
     expect(t).toEqual({ played: 3, won: 2, counted: 1, stars: 5, score: 450, seeds: 12, base: 6, multiplier: 2 });
+  });
+});
+
+describe('campaign picks in the same order as the reviews (v1.84.0)', () => {
+  it('takes the due verses in the order given, skipping the one just played', () => {
+    expect(campaignPick(['b', 'a', 'c'], ['a', 'b', 'c', 'd'], null, [], Math.random).verseId).toBe('b');
+    expect(campaignPick(['b', 'a', 'c'], ['a', 'b', 'c', 'd'], 'b', [], Math.random).verseId).toBe('a');
+  });
+
+  it('when nothing else is due, goes round the verses at random as extra practice, each once a round, never straight back', () => {
+    let extra: string[] = [];
+    const seen: string[] = [];
+    let last: string | null = 'a';
+    for (let i = 0; i < 4; i++) {
+      const r = campaignPick(['a'], ['a', 'b', 'c', 'd'], last, extra, Math.random);
+      expect(r.verseId).not.toBe(last);
+      seen.push(r.verseId!);
+      extra = r.extra;
+      last = r.verseId;
+    }
+    expect(new Set(seen.slice(0, 3)).size).toBe(3);
+  });
+
+  it('skips verses deleted meanwhile, and plays the only verse there is', () => {
+    expect(campaignPick([], ['a'], 'a', ['gone'], Math.random).verseId).toBe('a');
+    expect(campaignPick([], [], null, [], Math.random).verseId).toBeNull();
   });
 });

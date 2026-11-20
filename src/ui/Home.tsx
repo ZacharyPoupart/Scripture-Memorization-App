@@ -93,14 +93,20 @@ export function Home() {
                 </button>
               )}
               <button
-                class="streak"
-                title={`Longest streak: ${streak.longest}`}
-                aria-label={`Streak: ${streak.count} day${streak.count === 1 ? '' : 's'}. Open progress.`}
+                class={`streak ${streak.todayDone ? 'lit' : 'unlit'}`}
+                title={`${streak.todayDone ? 'Streak earned for today. ' : ''}Longest streak: ${streak.longest}`}
+                aria-label={`Streak: ${streak.count} day${streak.count === 1 ? '' : 's'}${streak.todayDone ? ', earned for today' : ', not earned yet today'}. Open progress.`}
                 onClick={() => navigate('/stats')}
                 data-testid="streak"
+                data-today={streak.todayDone ? 'done' : 'not-yet'}
               >
-                <Icon name="flame" fill />
+                <Icon name="flame" fill={streak.todayDone} />
                 <span>{streak.count}</span>
+                {streak.todayDone && (
+                  <span class="streak-check" aria-hidden="true">
+                    <Icon name="check" />
+                  </span>
+                )}
                 {streak.longest > streak.count && <small class="streak-best">best {streak.longest}</small>}
               </button>
             </div>
@@ -146,6 +152,16 @@ export function Home() {
                 {today.total ? `${today.met}/${today.total}` : '✓'}
               </div>
             </div>
+            {!onBreak && (
+              <p class={`streak-today ${streak.todayDone ? 'lit' : ''}`} data-testid="streak-today">
+                <Icon name="flame" fill={streak.todayDone} />
+                {streak.todayDone
+                  ? `Streak earned for today · ${streak.count} day${streak.count === 1 ? '' : 's'}`
+                  : today.total > 0
+                    ? `One counted review today ${streak.count > 0 ? 'keeps your streak' : 'lights your flame'}`
+                    : `Practise any verse today ${streak.count > 0 ? 'to keep your streak' : 'to light your flame'}`}
+              </p>
+            )}
             {todayList.length > 0 && (
               <ul class="today-list" aria-label="Verses for today" data-testid="today-list">
                 {todayList.map(({ v, s }) => (

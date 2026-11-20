@@ -4788,3 +4788,47 @@ button.chip {
 .play-area .burrows-knight {
   bottom: 22%;
 }
+
+/* ---- today's streak, at a glance (v1.84.0, owner-requested "a clear way of knowing you earned your streak for today") ----
+   The flame on Today is grey until a counted review (or practice on a day with nothing due) earns today, then it lights with a
+   check; a line in the Today card says which it is, and a toast says so the moment it happens. */
+.streak.unlit {
+  color: var(--muted);
+}
+.streak.lit {
+  color: var(--warn);
+}
+.streak-check {
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--warn);
+  color: var(--bg);
+}
+.streak .streak-check svg {
+  width: 11px;
+  height: 11px;
+  stroke-width: 3;
+}
+.streak-today {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: 0.92rem;
+  color: var(--muted);
+}
+.streak-today svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+.streak-today.lit {
+  color: var(--text);
+  font-weight: 600;
+}
+.streak-today.lit svg {
+  color: var(--warn);
+}

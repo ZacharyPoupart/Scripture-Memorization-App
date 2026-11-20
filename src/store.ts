@@ -95,6 +95,7 @@ let state: AppState = {
     tour: { done: [] },
     seenUnlocks: null,
     seenSaved: '',
+    streakLitDay: '',
     listSort: 'longest',
     flagGuild: '',
     gameBest: {},

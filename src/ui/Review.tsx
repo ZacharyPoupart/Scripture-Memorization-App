@@ -134,7 +134,7 @@ export function Review({ route }: { route: Route }) {
     const q = buildQueue(data, route.query, now);
     if (route.query.get('verse')) return q; // one chosen verse stays one verse
     if (route.query.get('pile') && route.query.get('scope') === 'all') return reviewAllOrder(data, q, now, settings.shuffle ? Math.random : undefined); // what is not done today first
-    if (route.query.get('today')) return settings.shuffle ? fewestFirst(data, q, now, Math.random) : q; // the least-reviewed today first, shuffled inside each group
+    if (route.query.get('today')) return settings.shuffle ? fewestFirst(data, q, now, Math.random) : q; // the least-reviewed today first, shuffled inside each group (`todayOrder` does the same for the games)
     return settings.shuffle ? shuffled(q) : q;
   }, []);
   const [idx, setIdx] = useState(0);

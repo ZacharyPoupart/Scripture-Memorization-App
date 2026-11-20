@@ -146,3 +146,22 @@ test('Today: the verses reviewed the fewest times so far come first, in the list
   await page.getByTestId('start-today').click();
   await expect(page.getByTestId('card-front')).toContainText('Romans 8:28'); // the session starts with the one not reviewed yet
 });
+
+test('Today shows plainly whether today’s streak is earned: a grey flame until a review counts, then a lit one, a note and a check', async ({ page }) => {
+  await blockLookups(page);
+  await openApp(page);
+  await addVerse(page, JOHN316);
+  await page.goto('/#/');
+  await expect(page.getByTestId('streak')).toHaveAttribute('data-today', 'not-yet');
+  await expect(page.getByTestId('streak-today')).not.toHaveClass(/lit/);
+  await page.getByTestId('today-list').locator('button').first().click();
+  await finishFlashcard(page);
+  await expect(page.getByText('Streak earned for today · 1 day')).toBeVisible(); // said the moment it happens
+  await page.goto('/#/');
+  await expect(page.getByTestId('streak')).toHaveAttribute('data-today', 'done');
+  await expect(page.getByTestId('streak-today')).toHaveClass(/lit/);
+  await expect(page.getByTestId('streak-today')).toContainText('Streak earned for today');
+  await page.reload();
+  await page.waitForTimeout(500);
+  await expect(page.getByText('Streak earned for today · 1 day')).toHaveCount(1); // the line in the card, not the toast again
+});

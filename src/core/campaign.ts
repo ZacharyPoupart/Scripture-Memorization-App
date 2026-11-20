@@ -1,5 +1,6 @@
-// Campaign mode (v1.82.0, owner-requested): game after game, verse after verse, until you stop. The verses that are due come first
-// (they count as their reviews and earn coins), in a random order, and then any of your verses at random as extra practice, round
+// Campaign mode (v1.82.0, owner-requested): game after game, verse after verse, until you stop. The verses that are due come first,
+// in the same order as Today's review (v1.84.0, owner-requested: `todayOrder`, worked out afresh before each verse, so a Daily verse
+// whose next review unlocks comes back in its turn); when nothing else is due, any of your verses at random as extra practice, round
 // and round, never the same verse twice in a row; each in a random game, never the same game twice in a row. Pure: `random` is
 // passed in, so tests can fix it.
 import { GAMES, type GameId } from './games.ts';
@@ -37,6 +38,21 @@ export function campaignVerses(due: readonly string[], all: readonly string[], l
   const order = [...first, ...rest];
   if (order.length > 1 && order[0] === last) [order[0], order[1]] = [order[1], order[0]];
   return order;
+}
+
+/**
+ * The next verse: the first due one (in Today's order, `due`) that is not the verse just played; otherwise the next from the round
+ * of extra practice (`extra`, refilled from all the verses in a random order when it runs out). Returns the verse and what is left
+ * of the round.
+ */
+export function campaignPick(due: readonly string[], all: readonly string[], last: string | null, extra: readonly string[], random: () => number): { verseId: string | null; extra: string[] } {
+  const live = new Set(all);
+  const fromDue = due.find((id) => id !== last && live.has(id));
+  if (fromDue) return { verseId: fromDue, extra: [...extra] };
+  let round = extra.filter((id) => live.has(id));
+  if (!round.length) round = campaignVerses([], all, last, random);
+  if (round[0] === last && round.length > 1) round = [...round.slice(1), round[0]];
+  return { verseId: round[0] ?? null, extra: round.slice(1) };
 }
 
 /** What a campaign has done so far, for the pot and the payout at the end. */
