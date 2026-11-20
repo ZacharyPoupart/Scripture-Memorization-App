@@ -124,6 +124,8 @@ export interface Settings {
   seenUnlocks: string[] | null;
   /** The latest streak-saved day this device has already shown the "we saved your streak" popup for (empty until one is shown). */
   seenSaved: string;
+  /** The last day this device said "Streak earned for today" (v1.84.0), so the note shows once a day; empty until the first. */
+  streakLitDay: string;
   /** How the verse lists are sorted (Piles and each pile page). Remembered between visits and launches, so it is not chosen again every time. */
   listSort: 'longest' | 'reference' | 'added' | 'due';
   /** The group whose banner is on this device's flag stand ('' = none), so the flag follows it when the leader redesigns it. */

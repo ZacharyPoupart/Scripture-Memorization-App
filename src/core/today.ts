@@ -26,6 +26,16 @@ export function buildTodayQueue(data: AppData, now: number): string[] {
  * shuffle inside each group, so the least-reviewed still come first. Only the order a session visits them in: what is due and what
  * counts never looks at it.
  */
+/**
+ * The order Today's review visits the ready verses in, and the games too (v1.84.0, owner-requested "the same logic as the
+ * reviews"): `buildTodayQueue` (fewest reviews today first, Daily before Weekly, longest in the pile first), or, with the device's
+ * shuffle on (pass `random`), shuffled inside each group of equal reviews so far.
+ */
+export function todayOrder(data: AppData, now: number, random?: () => number): string[] {
+  const q = buildTodayQueue(data, now);
+  return random ? fewestFirst(data, q, now, random) : q;
+}
+
 export function fewestFirst(data: AppData, ids: readonly string[], now: number, random?: () => number): string[] {
   const today = dayKeyOf(now);
   const groups = new Map<number, string[]>();

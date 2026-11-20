@@ -7,6 +7,7 @@ import { ErrorBoundary } from './ErrorBoundary.tsx';
 import { AvatarScreen } from './AvatarScreen.tsx';
 import { AddVerse } from './AddVerse.tsx';
 import { Celebrations } from './Celebrations.tsx';
+import { StreakLit } from './StreakLit.tsx';
 import { ItemReveal } from './ItemReveal.tsx';
 import { StreakSaved } from './StreakSaved.tsx';
 import { Friends } from './Friends.tsx';
@@ -92,6 +93,7 @@ export function App({ onReload }: { onReload: () => void }) {
       <Celebrations suppressed={inReview || !settings.onboarded || sandbox} />
       <ItemReveal suppressed={inReview || !settings.onboarded || sandbox || !!tourOn} />
       <StreakSaved suppressed={inReview || !settings.onboarded || !!tourOn} />
+      <StreakLit />
       <ToastHost tabs={!inReview} />
       {(!settings.onboarded || intro) && (
         <Onboarding

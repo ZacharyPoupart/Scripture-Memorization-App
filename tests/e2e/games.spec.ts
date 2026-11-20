@@ -145,6 +145,27 @@ test.describe('the games', () => {
     await expect(page.getByTestId('game-intro')).toHaveCount(0); // another go starts at once
   });
 
+  test('Weekly verses say plainly that only a three-star win counts: before the game, in its header and on the result', async ({ page }) => {
+    await openApp(page);
+    await addVerse(page, JOHN316);
+    await page.getByTestId('verse-card').click();
+    await page.getByTestId('play-gate').click();
+    await expect(page.getByTestId('intro-ref')).toBeVisible();
+    await expect(page.getByTestId('intro-rule')).toHaveCount(0); // a Daily verse forgives a few slips
+    await expect(page.getByTestId('three-star-tag')).toHaveCount(0);
+    await page.getByTestId('game-close').click();
+    await page.getByTestId('move').click();
+    await page.getByTestId('move-weekly').click();
+    await page.getByTestId('play-gate').click();
+    await expect(page.getByTestId('intro-rule')).toContainText('Weekly verse: only a three-star win, with no slips, counts as its review');
+    await expect(page.getByTestId('three-star-tag')).toContainText('3 stars to count');
+    await start(page);
+    await expect(page.getByTestId('three-star-tag')).toBeVisible(); // still there while you play
+    await page.getByTestId('gate-keys').locator('button:not([data-right])').first().dispatchEvent('pointerdown'); // one slip
+    await winGate(page);
+    await expect(page.getByTestId('game-verdict')).toContainText('only count as the review with three stars');
+  });
+
   test('Hold the Gate: the first letter of the next word strikes the goblin; a score, stars and a personal best are kept', async ({ page }) => {
     await openApp(page);
     await addVerse(page, JOHN316);
