@@ -4938,3 +4938,117 @@ button.chip {
     animation: none;
   }
 }
+
+/* ---- medals (v1.85.0, owner-requested achievements in bronze, silver and gold) ----
+   Flat metal colours for the discs only (never text), kept with the other tokens so both themes match. */
+:root {
+  --bronze: #a8693a;
+  --bronze-dark: #6e4223;
+  --silver: #a2a7ab;
+  --silver-dark: #62676b;
+  --gold: #d4a52a;
+  --gold-dark: #8a6510;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bronze: #c58552;
+    --bronze-dark: #7a4b28;
+    --silver: #c3c8cc;
+    --silver-dark: #7b8185;
+    --gold: #e6bb45;
+    --gold-dark: #9a7416;
+  }
+}
+:root[data-theme='dark'] {
+  --bronze: #c58552;
+  --bronze-dark: #7a4b28;
+  --silver: #c3c8cc;
+  --silver-dark: #7b8185;
+  --gold: #e6bb45;
+  --gold-dark: #9a7416;
+}
+.medal {
+  flex: none;
+  display: block;
+}
+.medal .medal-ribbon {
+  fill: var(--accent);
+  opacity: 0.85;
+}
+.medal .medal-disc {
+  stroke: var(--text);
+  stroke-width: 1.5;
+}
+.medal .medal-rim {
+  fill: none;
+  stroke: var(--bg);
+  stroke-opacity: 0.55;
+  stroke-width: 1.2;
+}
+.medal .medal-mark {
+  fill: none;
+  stroke: var(--text);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.medal-bronze .medal-disc { fill: var(--bronze); }
+.medal-silver .medal-disc { fill: var(--silver); }
+.medal-gold .medal-disc { fill: var(--gold); }
+.medal-none .medal-ribbon { fill: var(--surface-2); opacity: 1; }
+.medal-none .medal-disc {
+  fill: none;
+  stroke: var(--border);
+  stroke-dasharray: 4 3;
+}
+.medal-none .medal-rim { stroke: none; }
+.medal-none .medal-mark { stroke: var(--muted); }
+.medal-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--sp-3);
+}
+.medal-row {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: var(--sp-3);
+  align-items: center;
+}
+.medal-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.medal-tier {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.medal-bar {
+  height: 6px;
+  margin-top: 4px;
+}
+.medal-bar.bronze > i { background: var(--bronze); }
+.medal-bar.silver > i { background: var(--silver-dark); }
+.medal-bar.gold > i { background: var(--gold); }
+/* the new-medal pop-up: the medal drops in on its ribbon and settles */
+.medal-reveal {
+  gap: var(--sp-2);
+}
+.medal-drop {
+  transform-origin: 50% 0;
+  animation: medal-drop 0.9s var(--spring) both;
+}
+@keyframes medal-drop {
+  0% { transform: translateY(-60px) rotate(-14deg); opacity: 0; }
+  55% { transform: translateY(6px) rotate(6deg); opacity: 1; }
+  75% { transform: rotate(-3deg); }
+  100% { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .medal-drop { animation: none; }
+}

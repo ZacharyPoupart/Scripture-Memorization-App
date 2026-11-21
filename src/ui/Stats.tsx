@@ -1,4 +1,6 @@
+import { achievementStates, medalTally, TIER_LABEL } from '../core/achievements.ts';
 import { formatRef } from '../core/reference.ts';
+import { Medal } from './Medal.tsx';
 import { EmptyState, Section, Stat } from './primitives.tsx';
 import { streakInfo } from '../core/schedule.ts';
 import { bestRuns, heatmap, nextGraduations, pileCounts, totals } from '../core/stats.ts';
@@ -10,7 +12,7 @@ const WEEKS = 26;
 const fmt = (day: string) => new Date(`${day}T12:00:00`).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 
 export function Stats() {
-  const { data } = useApp();
+  const { data, settings } = useApp();
   const now = Date.now();
   const streak = streakInfo(data, now);
   const t = totals(data);
@@ -24,6 +26,8 @@ export function Stats() {
   const maxPile = Math.max(1, ...piles.map((p) => p.count));
   const near = nextGraduations(data, now, 3);
   const runs = bestRuns(data, now, 5);
+  const medals = achievementStates({ data, now, gameBest: settings.gameBest }, settings.seenAchievements ?? []);
+  const tally = medalTally(medals);
 
   if (!t.verses && !t.daysPracticed) {
     return (
@@ -51,6 +55,34 @@ export function Stats() {
             <Stat value={t.verses} label={`verses, ${t.memorizedYearly} kept for life`} testid="stat-verses" />
           </div>
         </div>
+
+        <Section title="Medals" aside={<span data-testid="medal-tally">{tally.held} of {tally.total}</span>} testid="achievements">
+          <ul class="medal-list">
+            {medals.map((m) => (
+              <li key={m.achievement.id} class="medal-row" data-testid="achievement" data-id={m.achievement.id} data-tier={m.tier ?? 'none'}>
+                <Medal achievement={m.achievement} tier={m.tier} size={44} />
+                <div class="medal-text">
+                  <div class="row spread">
+                    <strong>{m.achievement.name}</strong>
+                    <span class={`medal-tier ${m.tier ?? ''}`}>{m.tier ? TIER_LABEL[m.tier] : ''}</span>
+                  </div>
+                  {m.next ? (
+                    <>
+                      <div class="muted small">
+                        {TIER_LABEL[m.next.tier]}: {m.achievement.ask(m.next.at)} · {Math.min(m.count, m.next.at).toLocaleString()} of {m.next.at.toLocaleString()}
+                      </div>
+                      <div class={`bar medal-bar ${m.next.tier}`} role="img" aria-label={`${Math.round(m.progress * 100)}% of the way to ${TIER_LABEL[m.next.tier]}`}>
+                        <i style={{ width: `${m.progress * 100}%` }} />
+                      </div>
+                    </>
+                  ) : (
+                    <div class="muted small">All three medals: {m.achievement.ask(m.achievement.at[2]).toLowerCase()}.</div>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </Section>
 
         <Section title="Your practice">
           <p class="sr-only" data-testid="heat-summary">

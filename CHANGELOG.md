@@ -5,6 +5,20 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Added
+- **Medals.** Nine achievements, each with a bronze, silver and gold medal for doing the same thing more:
+  - **Faithful:** a 7, 30 and 100-day streak.
+  - **Hidden in my heart:** 5, 20 and 50 verses.
+  - **Steady hand:** 50, 500 and 2,500 reviews.
+  - **Taking root:** 1, 10 and 30 verses moved up to Weekly or beyond.
+  - **For life:** 1, 5 and 20 verses in Yearly.
+  - **Every word:** 7, 30 and 100 full days.
+  - **The whole counsel:** verses from 5, 15 and 30 books of the Bible.
+  - **Champion:** 10, 60 and 200 stars in the games.
+  - **Fellowship:** your group's weekly goal reached 1, 5 and 20 times.
+
+  They live in a new Medals section at the top of Progress, each with how far you are toward the next medal. A new medal drops in with a short celebration the first time you earn it. Medals you have earned stay, even if a count later goes down.
+
 ## [1.84.1] - 2026-11-21
 
 ### Added

@@ -90,6 +90,7 @@ export function defaultSettings(): Settings {
     shuffle: false,
     tour: { done: [] },
     seenUnlocks: null,
+    seenAchievements: null,
     seenSaved: '',
     streakLitDay: '',
     listSort: 'longest',

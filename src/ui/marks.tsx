@@ -1,5 +1,5 @@
 /** Line pictograms for empty states, the welcome slides and pop-ups: one hairline weight, drawn on a 48-unit grid, coloured by the text around them. */
-const PATHS = {
+export const MARK_PATHS = {
   book: 'M6 10c6-2 12-2 18 2 6-4 12-4 18-2v26c-6-2-12-2-18 2-6-4-12-4-18-2zM24 12v26',
   plus: 'M24 10v28M10 24h28',
   piles: 'M8 12h32M8 20h26M8 28h20M8 36h14',
@@ -13,12 +13,12 @@ const PATHS = {
   pair: 'M17 34a9 9 0 1 1 0-18 9 9 0 0 1 0 18zM31 34a9 9 0 1 1 0-18 9 9 0 0 1 0 18z',
 } as const;
 
-export type MarkName = keyof typeof PATHS;
+export type MarkName = keyof typeof MARK_PATHS;
 
 export function Mark({ name, size = 44 }: { name: MarkName; size?: number }) {
   return (
     <svg class="mark" width={size} height={size} viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false">
-      <path d={PATHS[name]} />
+      <path d={MARK_PATHS[name]} />
     </svg>
   );
 }
