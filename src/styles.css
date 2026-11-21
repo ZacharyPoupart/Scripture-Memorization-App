@@ -4872,43 +4872,107 @@ button.chip {
 /* ---- "Streak earned for today" (v1.84.1, owner-requested: a screen with an animation when the streak is earned, and the flame
    moving a little once it is lit). Off under reduced motion. ---- */
 .streak-earned {
-  gap: var(--sp-2);
+  max-width: 300px;
+  padding: var(--sp-5) var(--sp-4) var(--sp-4);
+  display: grid;
+  justify-items: center;
+  gap: var(--sp-1);
+  border-radius: var(--radius);
 }
 .earned-flame {
+  position: relative;
   width: 96px;
   height: 96px;
-  margin: 0 auto;
   display: grid;
   place-items: center;
-  border-radius: 50%;
-  background: var(--warn-bg);
   color: var(--warn);
   animation: flame-in 0.7s var(--spring) both;
 }
 .earned-flame svg {
-  width: 54px;
-  height: 54px;
+  width: 96px;
+  height: 96px;
   transform-origin: 50% 90%;
   animation: flame-flicker 1.6s ease-in-out 0.7s infinite;
 }
+.earned-flame .spark {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--warn);
+  opacity: 0;
+  animation: spark-up 1.4s ease-out infinite;
+}
+.earned-flame .s1 { left: 22%; bottom: 40%; animation-delay: 0.8s; }
+.earned-flame .s2 { right: 20%; bottom: 52%; animation-delay: 1.2s; }
+.earned-flame .s3 { left: 48%; bottom: 72%; animation-delay: 1.6s; }
 .earned-count {
   display: flex;
   align-items: baseline;
   justify-content: center;
   gap: var(--sp-2);
+  margin-top: var(--sp-1);
   animation: count-land 0.5s var(--spring) 0.35s both;
 }
 .earned-count b {
   font-family: var(--serif);
-  font-size: 3rem;
+  font-size: 3.4rem;
   line-height: 1;
 }
 .earned-count span {
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+.earned-sub {
+  margin: 0;
   color: var(--muted);
   font-weight: 600;
 }
-.streak-earned h2 {
-  margin: 0;
+.earned-title {
+  margin: var(--sp-2) 0 0;
+  font-size: 1.25rem;
+}
+.earned-title + .earned-sub {
+  font-weight: 400;
+  text-align: center;
+}
+.earned-week {
+  list-style: none;
+  margin: var(--sp-3) 0 0;
+  padding: var(--sp-3) 0 0;
+  border-top: var(--rule);
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.earned-week li {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  color: var(--border);
+  animation: count-land 0.4s var(--spring) both;
+}
+.earned-week li.lit {
+  color: var(--warn);
+}
+.earned-week li svg {
+  width: 22px;
+  height: 22px;
+}
+.earned-week small {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+.earned-week li.today small {
+  color: var(--text);
+}
+@keyframes spark-up {
+  0% { transform: translateY(0) scale(1); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translateY(-34px) scale(0.3); opacity: 0; }
 }
 @keyframes flame-in {
   0% { transform: scale(0.3); opacity: 0; }
@@ -4934,8 +4998,12 @@ button.chip {
   .earned-flame,
   .earned-flame svg,
   .earned-count,
+  .earned-week li,
   .streak.lit > svg {
     animation: none;
+  }
+  .earned-flame .spark {
+    display: none;
   }
 }
 
