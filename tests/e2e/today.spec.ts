@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { addVerse, blockLookups, JOHN316, openApp, finishFlashcard, autoDismissMilestones, PSALM23_1, ROMANS8_28 } from './helpers';
+import { addVerse, blockLookups, JOHN316, openApp, finishFlashcard, autoDismissMilestones, PSALM23_1, ROMANS8_28, saved } from './helpers';
 
 test.beforeEach(async ({ page }) => {
   await autoDismissMilestones(page);
@@ -177,6 +177,7 @@ test('Today shows plainly whether today’s streak is earned: a grey flame until
   await expect(page.getByTestId('streak-earned').locator('.earned-week li.lit')).toHaveCount(2);
   await page.getByTestId('milestone-close').click();
   await expect(page.getByTestId('streak-earned')).toHaveCount(0);
+  await saved(page); // the "seen today" note is saved before the reload
   await page.reload();
   await page.waitForTimeout(500);
   await expect(page.getByTestId('streak-earned')).toHaveCount(0); // once a day
