@@ -72,8 +72,7 @@ export function AchievementReveal({ suppressed }: { suppressed: boolean }) {
                   </li>
                 ))}
               </ul>
-              <div class="reveal-kicker">New medals</div>
-              <h2 style={{ margin: 0 }}>{groups.length} new medals</h2>
+              <h2 style={{ margin: 'var(--sp-2) 0 0' }}>{groups.length} new medals</h2>
             </>
           )}
           {settings.avatarOn && (
