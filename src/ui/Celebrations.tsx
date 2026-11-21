@@ -1,3 +1,4 @@
+import type { ComponentChildren } from 'preact';
 import { useEffect } from 'preact/hooks';
 import { Mark } from './marks.tsx';
 import { addDays, dayKeyOf } from '../core/dates.ts';
@@ -5,7 +6,7 @@ import { isStreakMilestone, streakMilestoneId, streakMilestoneSize, streakMilest
 import { formatRef } from '../core/reference.ts';
 import { streakInfo } from '../core/schedule.ts';
 import { feedback } from '../services/feedback.ts';
-import { markLevelUpsSeen, markMilestoneSeen, setCelebrating, useApp } from '../store.ts';
+import { markLevelUpsSeen, markMilestoneSeen, setCelebrating, updateSettings, useApp } from '../store.ts';
 import { CloseX, Confetti, Icon, Overlay, PILE_INFO } from './common.tsx';
 
 /**
@@ -23,8 +24,11 @@ export function Celebrations({ suppressed }: { suppressed: boolean }) {
   const streak = streakInfo(data, now);
   const mid = streakMilestoneId(streak.count, now);
   const milestone = streak.todayDone && isStreakMilestone(streak.count) && !settings.seenMilestones.includes(mid);
-  const show = !suppressed && (ups.length > 0 || milestone);
-  const key = ups.length ? ups.map((u) => u.id).join(',') : mid;
+  // every other day the streak is earned gets its own small celebration (v1.84.1, owner-requested), once a day on this device
+  const today = dayKeyOf(now);
+  const earned = streak.todayDone && !isStreakMilestone(streak.count) && settings.streakLitDay !== today;
+  const show = !suppressed && (ups.length > 0 || milestone || earned);
+  const key = ups.length ? ups.map((u) => u.id).join(',') : milestone ? mid : `earned:${today}`;
 
   useEffect(() => {
     if (show) feedback.milestone();
@@ -63,24 +67,68 @@ export function Celebrations({ suppressed }: { suppressed: boolean }) {
     );
   }
 
+  // this week at a glance: the last seven days, a lit flame for each one that kept the streak
+  const week = Array.from({ length: 7 }, (_, i) => {
+    const d = addDays(today, i - 6);
+    const lit = d === today ? streak.todayDone : data.ledger[d]?.o === 'c';
+    return { d, lit, letter: new Date(`${d}T12:00:00`).toLocaleDateString(undefined, { weekday: 'narrow' }) };
+  });
+
+  if (!milestone) {
+    const close = () => updateSettings({ streakLitDay: today });
+    return (
+      <Overlay center label="Streak earned for today" onClose={close}>
+        <StreakCard count={streak.count} week={week} today={today} testid="streak-earned" onClose={close}>
+          <p class="earned-sub">Earned for today</p>
+        </StreakCard>
+      </Overlay>
+    );
+  }
+
   const size = streakMilestoneSize(streak.count);
   const text = streakMilestoneText(streak.count);
-  const close = () => markMilestoneSeen(mid);
+  const close = () => (markMilestoneSeen(mid), updateSettings({ streakLitDay: today })); // a milestone day is celebrated once
   return (
     <>
       {size !== 'small' && <Confetti count={size === 'large' ? 90 : 36} />}
       <Overlay center label="Streak milestone" onClose={close}>
-        <div class="modal stack center" data-testid="milestone">
-          <div class="milestone-flame">
-            <Icon name="flame" fill />
-          </div>
-          <h2>{text.title}</h2>
-          <p class="muted" style={{ margin: 0 }}>
-            {text.body}
-          </p>
-          <CloseX onClick={close} testId="milestone-close" />
-        </div>
+        <StreakCard count={streak.count} week={week} today={today} testid="milestone" onClose={close}>
+          <h2 class="earned-title">{text.title}</h2>
+          <p class="earned-sub">{text.body}</p>
+        </StreakCard>
       </Overlay>
     </>
+  );
+}
+
+/**
+ * The streak card (v1.84.1, owner-requested rework: "it looks bad with all that empty space"): a big flickering flame with sparks
+ * flying off it, the count, what it is for, and this week's flames, in a narrow card. Used for every day the streak is earned and,
+ * with the milestone's own words, for the milestones.
+ */
+function StreakCard({ count, week, today, testid, onClose, children }: { count: number; week: { d: string; lit: boolean; letter: string }[]; today: string; testid: string; onClose: () => void; children: ComponentChildren }) {
+  return (
+    <div class="modal center streak-earned" data-testid={testid}>
+      <CloseX onClick={onClose} testId="milestone-close" />
+      <div class="earned-flame" aria-hidden="true">
+        <i class="spark s1" />
+        <i class="spark s2" />
+        <i class="spark s3" />
+        <Icon name="flame" fill />
+      </div>
+      <div class="earned-count">
+        <b>{count}</b>
+        <span>day streak</span>
+      </div>
+      {children}
+      <ol class="earned-week" aria-label="This week">
+        {week.map((w, i) => (
+          <li key={w.d} class={`${w.lit ? 'lit' : ''} ${w.d === today ? 'today' : ''}`} style={{ animationDelay: `${0.5 + i * 0.06}s` }}>
+            <Icon name="flame" fill={w.lit} />
+            <small>{w.letter}</small>
+          </li>
+        ))}
+      </ol>
+    </div>
   );
 }

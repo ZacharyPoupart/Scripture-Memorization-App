@@ -4285,7 +4285,8 @@ button.chip {
 /* the meadow the burrows are dug in, so the mounds sit on the ground instead of floating over the scene (v1.81.0) */
 .burrows-field {
   position: absolute;
-  inset: 44% 0 0 0;
+  inset: auto 0 0 0;
+  height: min(70%, 380px); /* up to just above the back row, however tall the stage is */
   background: #6c8c3d repeat 0 0 / 96px 96px; /* the grass tile (public/creatures/grass.webp), two screen pixels a grass pixel */
   image-rendering: pixelated;
   border-top: 3px solid #4d6a2b;
@@ -4298,9 +4299,13 @@ button.chip {
   height: 10px;
   background: #4f3d28;
 }
-/* the back row is a little further away */
-.burrows-grid .burrow:nth-child(-n + 3) {
-  transform: scale(0.88);
+/* the rows further back are a little smaller (two burrows a row since v1.85.0) */
+.burrows-grid .burrow:nth-child(-n + 2) {
+  transform: scale(0.86);
+  transform-origin: 50% 100%;
+}
+.burrows-grid .burrow:nth-child(n + 3):nth-child(-n + 4) {
+  transform: scale(0.93);
   transform-origin: 50% 100%;
 }
 .burrows-knight {
@@ -4312,17 +4317,19 @@ button.chip {
   opacity: 0.95;
 }
 .burrows-grid {
+  /* two across, three up (v1.85.0, owner-requested "less spread out ... so they can be bigger") */
   position: absolute;
-  inset: 50px 3% 8px 29%;
+  inset: 50px 3% 8px 30%;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(2, 1fr);
-  gap: 4px 6px;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(3, minmax(0, 120px)); /* rows stay close together on a tall screen */
+  align-content: end;
+  gap: 2px var(--sp-3);
   z-index: 2;
 }
 .burrow {
   position: relative;
-  min-height: 88px;
+  min-height: 80px;
   min-width: 72px;
   padding: 0;
   background: none;
@@ -4331,7 +4338,7 @@ button.chip {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  overflow: hidden;
+  overflow: visible; /* a word's sign may reach into the row above rather than be cut off */
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
@@ -4786,7 +4793,11 @@ button.chip {
 }
 /* Goblin Burrows: the knight stands between the rows wherever they are */
 .play-area .burrows-knight {
-  bottom: 22%;
+  bottom: 96px; /* at the middle row */
+}
+/* three rows need room: the Burrows stage never shrinks below this */
+.play-area > .burrows-stage {
+  min-height: 340px;
 }
 
 /* ---- today's streak, at a glance (v1.84.0, owner-requested "a clear way of knowing you earned your streak for today") ----
@@ -4856,4 +4867,142 @@ button.chip {
 }
 .three-star-tag {
   color: var(--warn);
+}
+
+/* ---- "Streak earned for today" (v1.84.1, owner-requested: a screen with an animation when the streak is earned, and the flame
+   moving a little once it is lit). Off under reduced motion. ---- */
+.streak-earned {
+  max-width: 300px;
+  padding: var(--sp-5) var(--sp-4) var(--sp-4);
+  display: grid;
+  justify-items: center;
+  gap: var(--sp-1);
+  border-radius: var(--radius);
+}
+.earned-flame {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  display: grid;
+  place-items: center;
+  color: var(--warn);
+  animation: flame-in 0.7s var(--spring) both;
+}
+.earned-flame svg {
+  width: 96px;
+  height: 96px;
+  transform-origin: 50% 90%;
+  animation: flame-flicker 1.6s ease-in-out 0.7s infinite;
+}
+.earned-flame .spark {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--warn);
+  opacity: 0;
+  animation: spark-up 1.4s ease-out infinite;
+}
+.earned-flame .s1 { left: 22%; bottom: 40%; animation-delay: 0.8s; }
+.earned-flame .s2 { right: 20%; bottom: 52%; animation-delay: 1.2s; }
+.earned-flame .s3 { left: 48%; bottom: 72%; animation-delay: 1.6s; }
+.earned-count {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-1);
+  animation: count-land 0.5s var(--spring) 0.35s both;
+}
+.earned-count b {
+  font-family: var(--serif);
+  font-size: 3.4rem;
+  line-height: 1;
+}
+.earned-count span {
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+.earned-sub {
+  margin: 0;
+  color: var(--muted);
+  font-weight: 600;
+}
+.earned-title {
+  margin: var(--sp-2) 0 0;
+  font-size: 1.25rem;
+}
+.earned-title + .earned-sub {
+  font-weight: 400;
+  text-align: center;
+}
+.earned-week {
+  list-style: none;
+  margin: var(--sp-3) 0 0;
+  padding: var(--sp-3) 0 0;
+  border-top: var(--rule);
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.earned-week li {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  color: var(--border);
+  animation: count-land 0.4s var(--spring) both;
+}
+.earned-week li.lit {
+  color: var(--warn);
+}
+.earned-week li svg {
+  width: 22px;
+  height: 22px;
+}
+.earned-week small {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+.earned-week li.today small {
+  color: var(--text);
+}
+@keyframes spark-up {
+  0% { transform: translateY(0) scale(1); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translateY(-34px) scale(0.3); opacity: 0; }
+}
+@keyframes flame-in {
+  0% { transform: scale(0.3); opacity: 0; }
+  60% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); }
+}
+@keyframes flame-flicker {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.06, 0.97) rotate(-3deg); }
+  50% { transform: scale(0.97, 1.05) rotate(2deg); }
+  75% { transform: scale(1.04, 0.98) rotate(-1deg); }
+}
+@keyframes count-land {
+  from { transform: translateY(14px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+/* the lit flame in the corner of Today sways a little */
+.streak.lit > svg {
+  transform-origin: 50% 90%;
+  animation: flame-flicker 2.2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .earned-flame,
+  .earned-flame svg,
+  .earned-count,
+  .earned-week li,
+  .streak.lit > svg {
+    animation: none;
+  }
+  .earned-flame .spark {
+    display: none;
+  }
 }

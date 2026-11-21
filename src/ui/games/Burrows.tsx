@@ -9,7 +9,7 @@ import { DUST, flyWord, Fx, gapIn, GOO, keepInView, pointIn, punch, shake, slash
 import { Hearts, Sprite, stripUrl, useTicker } from './sprites.tsx';
 import type { GameProps } from './types.ts';
 
-const MOLE = 0.5; // CSS pixels a sheet pixel: a goblin in its burrow (the pictures carry their own mound)
+const MOLE = 0.66; // CSS pixels a sheet pixel: a goblin in its burrow (the pictures carry their own mound); 0.5 before v1.85.0's two-across layout
 
 export function Burrows({ verse, seed, look, backdrop, onDone }: GameProps) {
   const game = useRef(newBurrows(verse.text, verse.pile, seed + verse.text.length));
@@ -106,7 +106,7 @@ export function Burrows({ verse, seed, look, backdrop, onDone }: GameProps) {
         </div>
         <div class="burrows-field" aria-hidden="true" style={{ backgroundImage: `url(${stripUrl('grass')})` }} />
         <div class="burrows-knight" ref={knight}>
-          <AvatarFigure look={look} size={150} bare pose={pose.name} key={`${pose.name}${pose.n}`} />
+          <AvatarFigure look={look} size={180} bare pose={pose.name} key={`${pose.name}${pose.n}`} />
         </div>
         <div class="burrows-grid">
           {Array.from({ length: BURROWS }, (_, hole) => {

@@ -5,6 +5,17 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.84.1] - 2026-11-21
+
+### Added
+- A little celebration when you earn today's streak: a big flickering flame with sparks, your streak count, "Earned for today" and this week's flames, one lit for each day you kept it (once a day; milestone days use the same card with the milestone's own words). The flame at the top of Today flickers gently once today is earned. It replaces the short note at the top.
+
+### Changed
+- Goblin Burrows is less spread out: two burrows across and three rows up, close together near the bottom of the meadow, so the goblins and their words are bigger.
+- Bridge Run: the knight walks faster (1.8 seconds a plank), and if he falls he climbs back three planks (or to the cliff) and rests a moment, so there is time to find the next word.
+- Goblin Burrows: the knight is bigger.
+
+
 ## [1.84.0] - 2026-11-20
 
 ### Added

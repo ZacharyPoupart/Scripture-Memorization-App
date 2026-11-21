@@ -5,7 +5,7 @@
 // uses, so the schedule, streak and coins follow their usual rules; a game lost, or won with too many slips, saves nothing.
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { currentLook, sceneUrl, type Look } from '../../core/avatar.ts';
-import { BRIDGE_HEARTS, BRIDGE_PLANK_MS, BRIDGE_START_MS, DUEL_HEARTS, GAMES, INTRO_MS, starBonus, bestKey, duelChargeMs, gameCounts, runGames, duelRight, duelRounds, isComboTier, plankFits, planks, points, recordBest, bank, stars, totalStars, verseStars, type GameId, type Plank } from '../../core/games.ts';
+import { BRIDGE_FALL_BACK, BRIDGE_FALL_REST_MS, BRIDGE_HEARTS, BRIDGE_PLANK_MS, BRIDGE_START_MS, DUEL_HEARTS, GAMES, INTRO_MS, starBonus, bestKey, duelChargeMs, gameCounts, runGames, duelRight, duelRounds, isComboTier, plankFits, planks, points, recordBest, bank, stars, totalStars, verseStars, type GameId, type Plank } from '../../core/games.ts';
 import { mistakesAllowed } from '../../core/quiz.ts';
 import { formatRef } from '../../core/reference.ts';
 import { liveVerses, verseStatus } from '../../core/schedule.ts';
@@ -818,8 +818,8 @@ function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
       // out of bridge: he tips over the edge, loses a heart, and climbs back a plank
       hurt();
       play('fall', 800);
-      setRest(900);
-      setPos(Math.max(-0.9, laid - 1.1));
+      setRest(BRIDGE_FALL_REST_MS);
+      setPos(Math.max(-0.9, laid - BRIDGE_FALL_BACK)); // back on the planks already laid (or the cliff), with time to answer
     } else setPos(next);
   }, pos < all.length + 0.9);
 
