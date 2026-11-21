@@ -147,7 +147,9 @@ test('Today: the verses reviewed the fewest times so far come first, in the list
   await expect(page.getByTestId('card-front')).toContainText('Romans 8:28'); // the session starts with the one not reviewed yet
 });
 
-test('Today shows plainly whether today’s streak is earned: a grey flame until a review counts, then a lit one, a note and a check', async ({ page }) => {
+test('Today shows plainly whether today’s streak is earned: a grey flame until a review counts, then a lit one, a note and a celebration', async ({ page }) => {
+  await page.clock.install({ time: new Date(2026, 2, 10, 8, 0) });
+  await page.clock.resume();
   await blockLookups(page);
   await openApp(page);
   await addVerse(page, JOHN316);
@@ -156,12 +158,24 @@ test('Today shows plainly whether today’s streak is earned: a grey flame until
   await expect(page.getByTestId('streak-today')).not.toHaveClass(/lit/);
   await page.getByTestId('today-list').locator('button').first().click();
   await finishFlashcard(page);
-  await expect(page.getByText('Streak earned for today · 1 day')).toBeVisible(); // said the moment it happens
-  await page.goto('/#/');
+  await page.goto('/#/'); // day one is a milestone: its own celebration (closed for us by the handler), not a second one
   await expect(page.getByTestId('streak')).toHaveAttribute('data-today', 'done');
   await expect(page.getByTestId('streak-today')).toHaveClass(/lit/);
-  await expect(page.getByTestId('streak-today')).toContainText('Streak earned for today');
+  await expect(page.getByTestId('streak-today')).toContainText('Streak earned for today · 1 day');
+  // the next day: a review earns the streak, and a screen says so once
+  await page.removeLocatorHandler(page.getByTestId('milestone-close'));
+  await page.clock.setSystemTime(new Date(2026, 2, 11, 8, 0));
+  await page.goto('/#/');
+  await page.reload();
+  await expect(page.getByTestId('streak')).toHaveAttribute('data-today', 'not-yet');
+  await page.getByTestId('today-list').locator('button').first().click();
+  await finishFlashcard(page);
+  await page.goto('/#/');
+  await expect(page.getByTestId('streak-earned')).toContainText('Streak earned for today');
+  await expect(page.getByTestId('streak-earned')).toContainText('2');
+  await page.getByTestId('milestone-close').click();
+  await expect(page.getByTestId('streak-earned')).toHaveCount(0);
   await page.reload();
   await page.waitForTimeout(500);
-  await expect(page.getByText('Streak earned for today · 1 day')).toHaveCount(1); // the line in the card, not the toast again
+  await expect(page.getByTestId('streak-earned')).toHaveCount(0); // once a day
 });

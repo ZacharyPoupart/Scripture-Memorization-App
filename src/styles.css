@@ -4868,3 +4868,73 @@ button.chip {
 .three-star-tag {
   color: var(--warn);
 }
+
+/* ---- "Streak earned for today" (v1.84.1, owner-requested: a screen with an animation when the streak is earned, and the flame
+   moving a little once it is lit). Off under reduced motion. ---- */
+.streak-earned {
+  gap: var(--sp-2);
+}
+.earned-flame {
+  width: 96px;
+  height: 96px;
+  margin: 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--warn-bg);
+  color: var(--warn);
+  animation: flame-in 0.7s var(--spring) both;
+}
+.earned-flame svg {
+  width: 54px;
+  height: 54px;
+  transform-origin: 50% 90%;
+  animation: flame-flicker 1.6s ease-in-out 0.7s infinite;
+}
+.earned-count {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--sp-2);
+  animation: count-land 0.5s var(--spring) 0.35s both;
+}
+.earned-count b {
+  font-family: var(--serif);
+  font-size: 3rem;
+  line-height: 1;
+}
+.earned-count span {
+  color: var(--muted);
+  font-weight: 600;
+}
+.streak-earned h2 {
+  margin: 0;
+}
+@keyframes flame-in {
+  0% { transform: scale(0.3); opacity: 0; }
+  60% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); }
+}
+@keyframes flame-flicker {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.06, 0.97) rotate(-3deg); }
+  50% { transform: scale(0.97, 1.05) rotate(2deg); }
+  75% { transform: scale(1.04, 0.98) rotate(-1deg); }
+}
+@keyframes count-land {
+  from { transform: translateY(14px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+/* the lit flame in the corner of Today sways a little */
+.streak.lit > svg {
+  transform-origin: 50% 90%;
+  animation: flame-flicker 2.2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .earned-flame,
+  .earned-flame svg,
+  .earned-count,
+  .streak.lit > svg {
+    animation: none;
+  }
+}

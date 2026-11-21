@@ -5,7 +5,7 @@ import { isStreakMilestone, streakMilestoneId, streakMilestoneSize, streakMilest
 import { formatRef } from '../core/reference.ts';
 import { streakInfo } from '../core/schedule.ts';
 import { feedback } from '../services/feedback.ts';
-import { markLevelUpsSeen, markMilestoneSeen, setCelebrating, useApp } from '../store.ts';
+import { markLevelUpsSeen, markMilestoneSeen, setCelebrating, updateSettings, useApp } from '../store.ts';
 import { CloseX, Confetti, Icon, Overlay, PILE_INFO } from './common.tsx';
 
 /**
@@ -23,8 +23,11 @@ export function Celebrations({ suppressed }: { suppressed: boolean }) {
   const streak = streakInfo(data, now);
   const mid = streakMilestoneId(streak.count, now);
   const milestone = streak.todayDone && isStreakMilestone(streak.count) && !settings.seenMilestones.includes(mid);
-  const show = !suppressed && (ups.length > 0 || milestone);
-  const key = ups.length ? ups.map((u) => u.id).join(',') : mid;
+  // every other day the streak is earned gets its own small celebration (v1.84.1, owner-requested), once a day on this device
+  const today = dayKeyOf(now);
+  const earned = streak.todayDone && !isStreakMilestone(streak.count) && settings.streakLitDay !== today;
+  const show = !suppressed && (ups.length > 0 || milestone || earned);
+  const key = ups.length ? ups.map((u) => u.id).join(',') : milestone ? mid : `earned:${today}`;
 
   useEffect(() => {
     if (show) feedback.milestone();
@@ -63,9 +66,28 @@ export function Celebrations({ suppressed }: { suppressed: boolean }) {
     );
   }
 
+  if (!milestone) {
+    const close = () => updateSettings({ streakLitDay: today });
+    return (
+      <Overlay center label="Streak earned for today" onClose={close}>
+        <div class="modal stack center streak-earned" data-testid="streak-earned">
+          <div class="earned-flame" aria-hidden="true">
+            <Icon name="flame" fill />
+          </div>
+          <div class="earned-count">
+            <b>{streak.count}</b>
+            <span>day{streak.count === 1 ? '' : 's'}</span>
+          </div>
+          <h2>Streak earned for today</h2>
+          <CloseX onClick={close} testId="milestone-close" />
+        </div>
+      </Overlay>
+    );
+  }
+
   const size = streakMilestoneSize(streak.count);
   const text = streakMilestoneText(streak.count);
-  const close = () => markMilestoneSeen(mid);
+  const close = () => (markMilestoneSeen(mid), updateSettings({ streakLitDay: today })); // a milestone day is celebrated once
   return (
     <>
       {size !== 'small' && <Confetti count={size === 'large' ? 90 : 36} />}
