@@ -188,6 +188,20 @@ export function recordMedals(c: AchievementContext): string[] {
   return fresh;
 }
 
+/**
+ * Medals waiting to be shown, one entry per achievement with the best new tier (bronze and silver for the same streak show as
+ * silver), in the order of `ACHIEVEMENTS`, so several at once (a restored backup, a sync) are one card, not a chain of pop-ups.
+ */
+export function newMedalGroups(fresh: readonly string[]): { achievement: Achievement; tier: Tier; ids: string[] }[] {
+  const out: { achievement: Achievement; tier: Tier; ids: string[] }[] = [];
+  for (const a of ACHIEVEMENTS) {
+    const ids = fresh.filter((id) => id.split(':')[0] === a.id);
+    const tiers = ids.map((id) => TIERS.indexOf(id.split(':')[1] as Tier)).filter((i) => i >= 0);
+    if (tiers.length) out.push({ achievement: a, tier: TIERS[Math.max(...tiers)], ids });
+  }
+  return out;
+}
+
 /** How many medals there are, and how many are held. */
 export function medalTally(states: readonly AchievementState[]): { held: number; total: number } {
   return { held: states.reduce((n, s) => n + (s.tier ? TIERS.indexOf(s.tier) + 1 : 0), 0), total: states.length * TIERS.length };

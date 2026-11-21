@@ -17,7 +17,7 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
   - **Champion:** 10, 60 and 200 stars in the games.
   - **Fellowship:** your group's weekly goal reached 1, 5 and 20 times.
 
-  Each medal pays coins: 50 for bronze, 100 for silver and 250 for gold. They live in a new Medals section at the top of Progress, each with how far you are toward the next medal and what it pays. A new medal drops in with a short celebration the first time you earn it. Medals you have earned, and their coins, stay, even if a count later goes down. Medals you had already earned before this update are added with their coins straight away.
+  Each medal pays coins: 50 for bronze, 100 for silver and 250 for gold. They live in a new Medals section at the top of Progress, each with how far you are toward the next medal and what it pays. A new medal drops in with a short celebration the first time you earn it; several earned at once (after restoring a backup, say) come together in one card. Medals you have earned, and their coins, stay, even if a count later goes down. Medals you had already earned before this update are added with their coins straight away.
 
 ## [1.84.1] - 2026-11-21
 

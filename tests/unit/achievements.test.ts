@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ACHIEVEMENTS, achievementStates, earnedMedals, freshMedals, medalId, medalTally, recordMedals, TIERS } from '../../src/core/achievements.ts';
+import { ACHIEVEMENTS, achievementStates, earnedMedals, freshMedals, medalId, medalTally, newMedalGroups, recordMedals, TIERS } from '../../src/core/achievements.ts';
 import { seedsEarned } from '../../src/core/avatar.ts';
 import { normalizeData } from '../../src/core/backup.ts';
 import { medalCoins } from '../../src/core/coins.ts';
@@ -67,6 +67,17 @@ describe('achievements: bronze, silver and gold for the same thing, more each ti
     expect(freshMedals(['faithful:silver', 'treasured:bronze', 'faithful:bronze'], ['faithful:bronze'])).toEqual(['treasured:bronze', 'faithful:silver']);
     expect(freshMedals(['faithful:bronze'], null)).toEqual([]);
     expect(freshMedals(['faithful:bronze'], ['faithful:bronze'])).toEqual([]);
+  });
+
+  it('several new at once make one card: each achievement once, at its best new tier, in the usual order', () => {
+    const g = newMedalGroups(['treasured:bronze', 'faithful:bronze', 'faithful:silver', 'steady:bronze']);
+    expect(g.map((x) => [x.achievement.id, x.tier])).toEqual([
+      ['faithful', 'silver'],
+      ['treasured', 'bronze'],
+      ['steady', 'bronze'],
+    ]);
+    expect(g[0].ids).toEqual(['faithful:bronze', 'faithful:silver']);
+    expect(newMedalGroups([])).toEqual([]);
   });
 });
 

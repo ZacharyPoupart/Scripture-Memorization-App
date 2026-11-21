@@ -25,6 +25,7 @@ export const BOOK_NAMES: Record<number, string> = { 19: 'Psalms', 43: 'John', 45
 /** Open the app fresh and dismiss the first-run walkthrough. */
 export async function openApp(page: Page, path = '/') {
   await closeRevealsAutomatically(page);
+  await closeMedalsAutomatically(page);
   await page.goto(path);
   const skip = page.getByTestId('onboarding-skip');
   await skip.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {});
@@ -50,6 +51,24 @@ async function closeRevealsAutomatically(page: Page) {
     },
     { noWaitAfter: true },
   );
+}
+
+const medalsWanted = new WeakSet<Page>();
+const medalsHandled = new WeakSet<Page>();
+
+/** For a test about the medal pop-up itself: call before `openApp`, and medal cards are left for the test to close. */
+export function wantMedals(page: Page) {
+  medalsWanted.add(page);
+}
+
+/**
+ * A new medal (v1.85.0) pops up over whatever screen is open (five verses added, a restored backup with a long streak). Unless a test
+ * is about medals, close it whenever it covers something the test wants to tap; a later medal reuses the button, so do not wait.
+ */
+async function closeMedalsAutomatically(page: Page) {
+  if (medalsWanted.has(page) || medalsHandled.has(page)) return;
+  medalsHandled.add(page);
+  await page.addLocatorHandler(page.getByTestId('medal-close'), async (btn) => btn.click(), { noWaitAfter: true });
 }
 
 /** Stop any real network lookups; offline-style typing is what these tests exercise. */

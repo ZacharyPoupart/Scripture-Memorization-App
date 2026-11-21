@@ -5138,3 +5138,24 @@ button.chip {
   font-weight: 700;
   font-size: 1.2rem;
 }
+/* several new medals at once: one card with the medals in a row */
+.medal-drop-row {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--sp-3);
+}
+.medal-drop-row li {
+  display: grid;
+  justify-items: center;
+  gap: var(--sp-1);
+  width: 76px;
+}
+.medal-drop-row small {
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
