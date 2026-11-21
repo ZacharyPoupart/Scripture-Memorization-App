@@ -1,4 +1,5 @@
 import { achievementStates, medalTally, TIER_LABEL } from '../core/achievements.ts';
+import { MEDAL_COINS } from '../core/coins.ts';
 import { formatRef } from '../core/reference.ts';
 import { Medal } from './Medal.tsx';
 import { EmptyState, Section, Stat } from './primitives.tsx';
@@ -70,6 +71,7 @@ export function Stats() {
                     <>
                       <div class="muted small">
                         {TIER_LABEL[m.next.tier]}: {m.achievement.ask(m.next.at)} · {Math.min(m.count, m.next.at).toLocaleString()} of {m.next.at.toLocaleString()}
+                        {settings.avatarOn ? ` · +${MEDAL_COINS[m.next.tier]} coins` : ''}
                       </div>
                       <div class={`bar medal-bar ${m.next.tier}`} role="img" aria-label={`${Math.round(m.progress * 100)}% of the way to ${TIER_LABEL[m.next.tier]}`}>
                         <i style={{ width: `${m.progress * 100}%` }} />

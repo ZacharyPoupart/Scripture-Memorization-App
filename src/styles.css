@@ -5052,3 +5052,12 @@ button.chip {
 @media (prefers-reduced-motion: reduce) {
   .medal-drop { animation: none; }
 }
+.medal-coins {
+  margin: var(--sp-1) 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 1.2rem;
+}

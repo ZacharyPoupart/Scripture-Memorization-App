@@ -138,7 +138,7 @@ export interface AchievementState {
 
 /** Every achievement with its count, medal and the way to the next one. `seen` are medal ids already shown on this device (kept). */
 export function achievementStates(c: AchievementContext, seen: readonly string[] = []): AchievementState[] {
-  const kept = new Set(seen);
+  const kept = new Set([...seen, ...(c.data.medals ?? [])]); // recorded (synced) or shown here: kept
   return ACHIEVEMENTS.map((a) => {
     const count = a.count(c);
     let held = -1;
@@ -175,6 +175,17 @@ export function freshMedals(earned: readonly string[], seen: readonly string[] |
   const s = new Set(seen);
   const order = (id: string) => TIERS.indexOf(id.split(':')[1] as Tier);
   return earned.filter((id) => !s.has(id)).sort((a, b) => order(a) - order(b));
+}
+
+/**
+ * Record the medals the counts have earned and that are not recorded yet, in `data.medals` (grow-only; each pays `MEDAL_COINS`
+ * once). Returns the ones just recorded. Called when the data changes, never in the tour's sandbox.
+ */
+export function recordMedals(c: AchievementContext): string[] {
+  const have = new Set(c.data.medals ?? []);
+  const fresh = earnedMedals(c).filter((id) => !have.has(id));
+  if (fresh.length) c.data.medals = [...have, ...fresh].sort();
+  return fresh;
 }
 
 /** How many medals there are, and how many are held. */

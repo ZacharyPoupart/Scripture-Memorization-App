@@ -1,8 +1,9 @@
 import { useEffect } from 'preact/hooks';
 import { achievementById, earnedMedals, freshMedals, TIER_LABEL, type Tier } from '../core/achievements.ts';
 import { feedback } from '../services/feedback.ts';
-import { updateSettings, useApp } from '../store.ts';
-import { CloseX, Confetti, Overlay } from './common.tsx';
+import { recordEarnedMedals, updateSettings, useApp } from '../store.ts';
+import { MEDAL_COINS } from '../core/coins.ts';
+import { CloseX, Coin, Confetti, Overlay } from './common.tsx';
 import { Medal } from './Medal.tsx';
 
 /**
@@ -13,7 +14,12 @@ import { Medal } from './Medal.tsx';
 export function AchievementReveal({ suppressed }: { suppressed: boolean }) {
   const { data, settings, sandbox, celebrating, reveals } = useApp();
   const ctx = { data, now: Date.now(), gameBest: settings.gameBest };
-  const earned = earnedMedals(ctx);
+  const earned = [...new Set([...earnedMedals(ctx), ...(data.medals ?? [])])]; // earned here, or recorded on another device
+
+  // a medal just earned is recorded in the synced data at once, which pays its coins
+  useEffect(() => {
+    recordEarnedMedals();
+  }, [data, settings.gameBest]);
 
   useEffect(() => {
     if (sandbox || settings.seenAchievements !== null) return;
@@ -45,6 +51,11 @@ export function AchievementReveal({ suppressed }: { suppressed: boolean }) {
           <p class="muted" style={{ margin: 0 }}>
             {achievement.ask(at)}.
           </p>
+          {settings.avatarOn && (
+            <p class="medal-coins" data-testid="medal-coins">
+              +{MEDAL_COINS[tier]} coins <Coin />
+            </p>
+          )}
           <CloseX onClick={close} testId="milestone-close" />
         </div>
       </Overlay>

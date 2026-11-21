@@ -1,4 +1,5 @@
 // App-wide state: the data document, device settings, and the glue to storage and sync.
+import { earnedMedals, recordMedals } from './core/achievements.ts';
 import { useEffect, useState } from 'preact/hooks';
 import { BackupError, exportBackup, parseBackup } from './core/backup.ts';
 import { buyItem, currentLook, equipItem, GUILD_WIN_COINS, resetAvatar, seedsEarned, testing, type BuyResult } from './core/avatar.ts';
@@ -179,6 +180,15 @@ export function completeReview(verseId: string, boost = 1): { counted: boolean; 
   });
   schedulePush();
   return r;
+}
+
+/** Record medals just earned (v1.85.0): each pays its coins once and stays, even if its count later drops. Only writes when there is one to record. */
+export function recordEarnedMedals() {
+  if (state.sandbox) return;
+  const ctx = { data: state.data, now: Date.now(), gameBest: state.settings.gameBest };
+  const have = new Set(state.data.medals ?? []);
+  if (!earnedMedals(ctx).some((id) => !have.has(id))) return;
+  act((d, now) => recordMedals({ data: d, now, gameBest: state.settings.gameBest }));
 }
 
 /** Spend seeds on an item and wear it right away. */

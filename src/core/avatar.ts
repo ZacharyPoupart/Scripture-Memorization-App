@@ -6,7 +6,7 @@
 // steel armor (free); every piece can be swapped for another, because all the painted pieces are drawn to the same size.
 // Some pieces cost seeds, some need a long streak first, and the finest take the most of both.
 import { bannerFromFlag } from './banner.ts';
-import { baseCoins, coinBonusTotal } from './coins.ts';
+import { baseCoins, coinBonusTotal, medalCoins } from './coins.ts';
 import { STREAK_MILESTONES } from './milestones.ts';
 import type { AppData } from './types.ts';
 
@@ -253,7 +253,7 @@ const totalCounted = (data: AppData) => Object.values(data.reviewsByDevice).redu
 export function seedsEarned(data: AppData): number {
   let bonus = 0;
   for (const m of STREAK_MILESTONES) if (data.longestStreak >= m) bonus += STREAK_SEED_BONUS[m] ?? 0;
-  return baseCoins(data) + coinBonusTotal(data) + (data.guildWins?.length ?? 0) * GUILD_WIN_COINS + bonus;
+  return baseCoins(data) + coinBonusTotal(data) + (data.guildWins?.length ?? 0) * GUILD_WIN_COINS + medalCoins(data) + bonus;
 }
 
 export function seedsSpent(data: AppData): number {

@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { ACHIEVEMENTS, achievementStates, earnedMedals, freshMedals, medalId, medalTally, TIERS } from '../../src/core/achievements.ts';
+import { ACHIEVEMENTS, achievementStates, earnedMedals, freshMedals, medalId, medalTally, recordMedals, TIERS } from '../../src/core/achievements.ts';
+import { seedsEarned } from '../../src/core/avatar.ts';
+import { normalizeData } from '../../src/core/backup.ts';
+import { medalCoins } from '../../src/core/coins.ts';
+import { mergeData } from '../../src/core/merge.ts';
 import { addVerse } from '../../src/core/schedule.ts';
 import { at, D0, day, john316, newData, reviewEverythingDue } from './helpers.ts';
 
@@ -63,5 +67,40 @@ describe('achievements: bronze, silver and gold for the same thing, more each ti
     expect(freshMedals(['faithful:silver', 'treasured:bronze', 'faithful:bronze'], ['faithful:bronze'])).toEqual(['treasured:bronze', 'faithful:silver']);
     expect(freshMedals(['faithful:bronze'], null)).toEqual([]);
     expect(freshMedals(['faithful:bronze'], ['faithful:bronze'])).toEqual([]);
+  });
+});
+
+describe('medals pay coins, recorded once (v1.85.0)', () => {
+  it('bronze 50, silver 100, gold 250, for medals recorded in the data', () => {
+    const d = newData();
+    const before = seedsEarned(d);
+    d.medals = ['faithful:bronze', 'faithful:silver', 'treasured:gold'];
+    expect(medalCoins(d)).toBe(50 + 100 + 250);
+    expect(seedsEarned(d) - before).toBe(400);
+  });
+
+  it('records each earned medal once, and keeps it (and its coins) when the count drops', () => {
+    const d = newData();
+    for (let i = 0; i < 5; i++) addVerse(d, { book: 1 + i, chapter: 1, start: 1, end: 1, translation: 'ESV', text: `Verse ${i}.` }, at(D0));
+    expect(recordMedals({ data: d, now: at(D0) })).toEqual(['treasured:bronze', 'wholecounsel:bronze']);
+    expect(recordMedals({ data: d, now: at(D0) })).toEqual([]); // once
+    const coins = seedsEarned(d);
+    for (const v of Object.values(d.verses)) v.deletedAt = at(D0);
+    expect(seedsEarned(d)).toBe(coins);
+    expect(state(achievementStates({ data: d, now: at(D0) }), 'treasured').tier).toBe('bronze');
+  });
+
+  it('merges by union, in any order', () => {
+    const a = newData();
+    const b = newData();
+    a.medals = ['faithful:bronze'];
+    b.medals = ['treasured:bronze', 'faithful:bronze'];
+    expect(mergeData(a, b).medals).toEqual(['faithful:bronze', 'treasured:bronze']);
+    expect(mergeData(b, a).medals).toEqual(mergeData(a, b).medals);
+  });
+
+  it('a backup drops anything that is not a medal id', () => {
+    const d = normalizeData({ ...newData(), medals: ['faithful:gold', 'nonsense', 42, 'x:platinum'] });
+    expect(d.medals).toEqual(['faithful:gold']);
   });
 });

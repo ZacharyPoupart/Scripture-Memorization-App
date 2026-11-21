@@ -89,6 +89,8 @@ export interface AppData {
   guildWins?: string[];
   /** Extra-practice reviews (ones that did not count for the schedule) done this week, per device, so they can count toward a guild's goal. Only the current week matters: a newer week replaces an older one, the same week keeps the larger count. Never earns coins. */
   extraWeek?: Record<string, { w: string; n: number }>;
+  /** Medals earned (`<achievement>:<tier>`, v1.85.0): recorded once, grow-only, merged by union; each pays coins (`MEDAL_COINS`), so the coins never drop even if a count later does. */
+  medals?: string[];
 }
 
 export type ReviewMode = 'flashcard' | 'blanks' | 'type' | 'speak';

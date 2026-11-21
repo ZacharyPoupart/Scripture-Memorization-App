@@ -181,6 +181,15 @@ describe('friends (v1.37.0): the private identity and sharing choice travel with
     expect(mergeData(parseBackup(BACKUP), data).guildWins).toEqual(data.guildWins);
   });
 
+  it('opens a backup that records medals (v1.85.0) and older ones without them', () => {
+    expect(parseBackup(BACKUP).medals).toBeUndefined();
+    const data = parseBackup(read('backup-v1.85.0-medals.json'));
+    expect(data.medals).toEqual(['faithful:bronze', 'faithful:silver', 'treasured:bronze']);
+    expect(parseBackup(exportBackup(data, '9.9.9', at('2026-03-15')))).toEqual(data);
+    expect(mergeData(data, data)).toEqual(data);
+    expect(mergeData(parseBackup(BACKUP), data).medals).toEqual(data.medals);
+  });
+
   it('opens a backup that tallies extra practice for the guild goal (v1.51.0) and older ones without it', () => {
     expect(parseBackup(BACKUP).extraWeek).toBeUndefined();
     const data = parseBackup(read('backup-v1.51.0-extraweek.json'));

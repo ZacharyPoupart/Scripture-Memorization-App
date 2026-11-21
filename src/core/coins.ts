@@ -49,6 +49,16 @@ export function baseCoins(data: AppData): number {
   return reviews * SEEDS_PER_REVIEW + finished.length * SEEDS_PER_DAY + full * SEEDS_PER_FULL_DAY + data.levelUps.length * SEEDS_PER_LEVELUP;
 }
 
+/** Coins for each medal (v1.85.0, owner-requested "maybe 50 then 100 then 250 coins"), paid once when it is recorded in `data.medals`. */
+export const MEDAL_COINS = { bronze: 50, silver: 100, gold: 250 } as const;
+
+/** The coins the recorded medals have paid. */
+export function medalCoins(data: AppData): number {
+  let n = 0;
+  for (const id of data.medals ?? []) n += MEDAL_COINS[id.split(':')[1] as keyof typeof MEDAL_COINS] ?? 0;
+  return n;
+}
+
 /** The extra coins the streak multiplier has earned so far (whole coins). */
 export function coinBonusTotal(data: AppData): number {
   return Math.floor(Object.values(data.coinBonus ?? {}).reduce((a, b) => a + b, 0) + 1e-9);

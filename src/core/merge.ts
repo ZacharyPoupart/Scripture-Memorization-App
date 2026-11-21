@@ -109,6 +109,7 @@ export function mergeData(a: AppData, b: AppData): AppData {
     merged.coinBonus = bonus;
   }
   if (a.guildWins || b.guildWins) merged.guildWins = [...new Set([...(a.guildWins ?? []), ...(b.guildWins ?? [])])].sort();
+  if (a.medals || b.medals) merged.medals = [...new Set([...(a.medals ?? []), ...(b.medals ?? [])])].sort();
   if (a.extraWeek || b.extraWeek) {
     const out: NonNullable<AppData['extraWeek']> = {};
     for (const id of new Set([...Object.keys(a.extraWeek ?? {}), ...Object.keys(b.extraWeek ?? {})])) {
