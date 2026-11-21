@@ -42,7 +42,7 @@ export function AchievementReveal({ suppressed }: { suppressed: boolean }) {
     <>
       {tier !== 'bronze' && <Confetti count={tier === 'gold' ? 60 : 24} />}
       <Overlay center label={`${TIER_LABEL[tier]} medal: ${achievement.name}`} onClose={close}>
-        <div class={`modal stack center medal-reveal medal-reveal-${tier}`} data-testid="medal-reveal" data-medal={id} key={id}>
+        <div class={`modal center medal-reveal medal-reveal-${tier}`} data-testid="medal-reveal" data-medal={id} key={id}>
           <div class="medal-drop">
             <Medal achievement={achievement} tier={tier} size={112} />
           </div>

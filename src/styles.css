@@ -5035,9 +5035,18 @@ button.chip {
 .medal-bar.bronze > i { background: var(--bronze); }
 .medal-bar.silver > i { background: var(--silver-dark); }
 .medal-bar.gold > i { background: var(--gold); }
-/* the new-medal pop-up: the medal drops in on its ribbon and settles */
+/* the new-medal pop-up: the medal drops in on its ribbon and settles, in a narrow card like the streak card */
 .medal-reveal {
-  gap: var(--sp-2);
+  max-width: 300px;
+  padding: var(--sp-5) var(--sp-4) var(--sp-4);
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: var(--sp-1);
+  border-radius: var(--radius);
+}
+.medal-drop {
+  margin-bottom: var(--sp-2);
 }
 .medal-drop {
   transform-origin: 50% 0;
