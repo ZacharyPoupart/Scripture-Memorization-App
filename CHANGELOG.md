@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.85.0] - 2026-11-21
+
 ### Added
 - **Medals.** Nine achievements, each with a bronze, silver and gold medal for doing the same thing more:
   - **Faithful:** a 7, 30 and 100-day streak.
