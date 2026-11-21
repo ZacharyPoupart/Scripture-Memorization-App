@@ -89,6 +89,8 @@ export interface AppData {
   guildWins?: string[];
   /** Extra-practice reviews (ones that did not count for the schedule) done this week, per device, so they can count toward a guild's goal. Only the current week matters: a newer week replaces an older one, the same week keeps the larger count. Never earns coins. */
   extraWeek?: Record<string, { w: string; n: number }>;
+  /** Medals earned (`<achievement>:<tier>`, v1.85.0): recorded once, grow-only, merged by union; each pays coins (`MEDAL_COINS`), so the coins never drop even if a count later does. */
+  medals?: string[];
 }
 
 export type ReviewMode = 'flashcard' | 'blanks' | 'type' | 'speak';
@@ -122,6 +124,8 @@ export interface Settings {
   avatarOn: boolean;
   /** Achievement items (sword, shield) already shown in the "new item" popup on this device; `null` until first looked at (then everything already earned is just remembered). */
   seenUnlocks: string[] | null;
+  /** Achievement medals already shown on this device (`<achievement>:<tier>`, v1.85.0); `null` until first looked at (then what is already earned is only remembered). A medal shown here stays even if its count later drops. */
+  seenAchievements: string[] | null;
   /** The latest streak-saved day this device has already shown the "we saved your streak" popup for (empty until one is shown). */
   seenSaved: string;
   /** The last day this device said "Streak earned for today" (v1.84.0), so the note shows once a day; empty until the first. */

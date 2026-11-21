@@ -5,6 +5,22 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.85.0] - 2026-11-21
+
+### Added
+- **Medals.** Nine achievements, each with a bronze, silver and gold medal for doing the same thing more:
+  - **Faithful:** a 7, 30 and 100-day streak.
+  - **Hidden in my heart:** 5, 20 and 50 verses.
+  - **Steady hand:** 50, 500 and 2,500 reviews.
+  - **Taking root:** 1, 10 and 30 verses moved up to Weekly or beyond.
+  - **For life:** 1, 5 and 20 verses in Yearly.
+  - **Every word:** 7, 30 and 100 full days.
+  - **The whole counsel:** verses from 5, 15 and 30 books of the Bible.
+  - **Champion:** 10, 60 and 200 stars in the games.
+  - **Fellowship:** your group's weekly goal reached 1, 5 and 20 times.
+
+  Each medal pays coins: 50 for bronze, 100 for silver and 250 for gold. They live in a new Medals section at the top of Progress, each with how far you are toward the next medal and what it pays. A new medal drops in with a short celebration the first time you earn it; several earned at once (after restoring a backup, say) come together in one card. Medals you have earned, and their coins, stay, even if a count later goes down. Medals you had already earned before this update are added with their coins straight away.
+
 ## [1.84.1] - 2026-11-21
 
 ### Added

@@ -157,6 +157,10 @@ export function normalizeData(raw: unknown): AppData {
     for (const [k, n] of Object.entries(raw.coinBonus)) if (k !== '__proto__' && isNum(n) && n >= 0 && n <= 1e9) bonus[k] = n;
     if (Object.keys(bonus).length) out.coinBonus = bonus;
   }
+  if (Array.isArray(raw.medals)) {
+    const medals = [...new Set(raw.medals.filter((m): m is string => isStr(m) && /^[a-z]{1,32}:(bronze|silver|gold)$/.test(m)))].sort().slice(0, 300);
+    if (medals.length) out.medals = medals;
+  }
   if (Array.isArray(raw.guildWins)) {
     const wins = [...new Set(raw.guildWins.filter((w): w is string => isStr(w) && /^[A-Za-z0-9_-]{1,64}:\d{4}-\d{2}-\d{2}$/.test(w)))].sort().slice(0, 1000);
     if (wins.length) out.guildWins = wins;
