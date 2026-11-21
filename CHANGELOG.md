@@ -5,6 +5,9 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Changed
+- Goblin Burrows is less spread out: two burrows across and three rows up, close together near the bottom of the meadow, so the goblins and their words are bigger.
+
 ## [1.84.0] - 2026-11-20
 
 ### Added
