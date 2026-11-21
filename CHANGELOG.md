@@ -8,7 +8,7 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 ## [1.84.1] - 2026-11-21
 
 ### Added
-- A little celebration when you earn today's streak: the flame flares up on screen with your streak count and "Streak earned for today" (once a day; on milestone days the milestone's own celebration does it), and the flame at the top of Today flickers gently once today is earned. It replaces the short note at the top.
+- A little celebration when you earn today's streak: a big flickering flame with sparks, your streak count, "Earned for today" and this week's flames, one lit for each day you kept it (once a day; milestone days use the same card with the milestone's own words). The flame at the top of Today flickers gently once today is earned. It replaces the short note at the top.
 
 ### Changed
 - Goblin Burrows is less spread out: two burrows across and three rows up, close together near the bottom of the meadow, so the goblins and their words are bigger.

@@ -171,8 +171,10 @@ test('Today shows plainly whether today’s streak is earned: a grey flame until
   await page.getByTestId('today-list').locator('button').first().click();
   await finishFlashcard(page);
   await page.goto('/#/');
-  await expect(page.getByTestId('streak-earned')).toContainText('Streak earned for today');
-  await expect(page.getByTestId('streak-earned')).toContainText('2');
+  await expect(page.getByTestId('streak-earned')).toContainText('2day streak');
+  await expect(page.getByTestId('streak-earned')).toContainText('Earned for today');
+  await expect(page.getByTestId('streak-earned').locator('.earned-week li')).toHaveCount(7); // this week at a glance
+  await expect(page.getByTestId('streak-earned').locator('.earned-week li.lit')).toHaveCount(2);
   await page.getByTestId('milestone-close').click();
   await expect(page.getByTestId('streak-earned')).toHaveCount(0);
   await page.reload();
