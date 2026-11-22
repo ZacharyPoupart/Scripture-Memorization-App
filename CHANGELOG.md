@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.85.1] - 2026-11-22
+
 ### Fixed
 - Hold the Gate: a letter you tap by mistake flashes red for a moment and then goes back to normal. It used to stay red for the rest of the game.
 
