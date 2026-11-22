@@ -3834,19 +3834,50 @@ button.chip {
 .bridge-text {
   min-height: 3.2em;
 }
+/* always two rows, three planks over two like the courses of a wall (v1.85.1, owner-requested: the bank flipped between one row and
+   two as the words changed, and the whole game moved with it); the rows keep their height to the last word */
 .bridge-bank {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-rows: repeat(2, 48px);
   gap: var(--sp-2);
+}
+.bridge-bank > .plank {
+  grid-column: span 2;
+}
+.bridge-bank > .plank:nth-child(4) {
+  grid-area: 2 / 2 / 3 / 4;
+}
+.bridge-bank > .plank:nth-child(5) {
+  grid-area: 2 / 4 / 3 / 6;
+}
+/* fewer words near the end: the last ones stay in the middle */
+.bridge-bank > .plank:nth-child(4):last-child {
+  grid-area: 2 / 3 / 3 / 5;
+}
+.bridge-bank > .plank:first-child:nth-last-child(2) {
+  grid-column: 2 / 4;
+}
+.bridge-bank > .plank:only-child {
+  grid-column: 3 / 5;
 }
 .btn.plank {
   min-height: 48px;
-  padding: var(--sp-2) var(--sp-4);
+  min-width: 0;
+  padding: 0 var(--sp-1);
   font-family: 'Fraunces', serif;
   font-weight: 500;
   font-size: 1.05rem;
-  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
   animation: card-land 0.3s var(--spring) both;
+}
+.btn.plank.long {
+  font-size: 0.92rem;
+}
+.btn.plank.xlong {
+  font-size: 0.8rem;
+  letter-spacing: -0.01em;
 }
 .game-stars {
   display: flex;
@@ -4281,12 +4312,13 @@ button.chip {
 .burrows-stage {
   height: 300px;
   touch-action: manipulation;
+  --field: min(70%, 380px); /* the height of the meadow: up to just above the back row, however tall the stage is */
 }
 /* the meadow the burrows are dug in, so the mounds sit on the ground instead of floating over the scene (v1.81.0) */
 .burrows-field {
   position: absolute;
   inset: auto 0 0 0;
-  height: min(70%, 380px); /* up to just above the back row, however tall the stage is */
+  height: var(--field);
   background: #6c8c3d repeat 0 0 / 96px 96px; /* the grass tile (public/creatures/grass.webp), two screen pixels a grass pixel */
   image-rendering: pixelated;
   border-top: 3px solid #4d6a2b;
@@ -4308,22 +4340,36 @@ button.chip {
   transform: scale(0.93);
   transform-origin: 50% 100%;
 }
+/* the burrows and the knight, in the middle of the grass (v1.85.1, owner-requested "centered on the grass"): the box is the meadow
+   above its band of earth, never shorter than three rows need */
+.burrows-ground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 10px;
+  height: max(calc(var(--field) - 13px), 250px);
+  z-index: 2;
+  container-type: size; /* so the rows can be lifted only by the room they do not need (cqh below) */
+}
 .burrows-knight {
   /* to the left of the burrows, standing between the back row and the front row (v1.81.1, owner-requested) */
   position: absolute;
   left: -3%;
-  bottom: 64px;
+  bottom: calc(50% - 70px);
   z-index: 1;
   opacity: 0.95;
 }
 .burrows-grid {
-  /* two across, three up (v1.85.0, owner-requested "less spread out ... so they can be bigger") */
+  /* two across, three up (v1.84.1, owner-requested "less spread out ... so they can be bigger") */
   position: absolute;
-  inset: 50px 3% 8px 30%;
+  inset: 0 3% 0 30%;
+  /* a burrow is drawn at the bottom of its cell: lift the rows so the mounds, not the cells, are centred, but only with the room left
+     once the three rows have 90 px each (a goblin and its sign need about that) */
+  bottom: clamp(0px, calc(100cqh - 276px), 60px);
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(3, minmax(0, 120px)); /* rows stay close together on a tall screen */
-  align-content: end;
+  grid-template-rows: repeat(3, minmax(0, 104px)); /* rows stay close together on a tall screen */
+  align-content: center;
   gap: 2px var(--sp-3);
   z-index: 2;
 }
@@ -4791,10 +4837,6 @@ button.chip {
   overscroll-behavior: contain;
   position: relative; /* so keepInView can measure the words from the top of the box */
 }
-/* Goblin Burrows: the knight stands between the rows wherever they are */
-.play-area .burrows-knight {
-  bottom: 96px; /* at the middle row */
-}
 /* three rows need room: the Burrows stage never shrinks below this */
 .play-area > .burrows-stage {
   min-height: 340px;
@@ -5039,35 +5081,47 @@ button.chip {
   flex: none;
   display: block;
 }
-.medal .medal-ribbon {
-  fill: var(--accent);
-  opacity: 0.85;
-}
+/* a medallion (v1.85.1): the scalloped edge and the raised centre in the metal, outlined in ink; beads and an inner ring in the
+   darker shade of the metal; the pictogram engraved in ink */
+.medal .medal-edge,
 .medal .medal-disc {
   stroke: var(--text);
-  stroke-width: 1.5;
+  stroke-width: 1.4;
+  stroke-linejoin: round;
 }
 .medal .medal-rim {
   fill: none;
-  stroke: var(--bg);
-  stroke-opacity: 0.55;
-  stroke-width: 1.2;
+  stroke-width: 1;
 }
 .medal .medal-mark {
   fill: none;
   stroke: var(--text);
-  stroke-width: 2.6;
+  stroke-width: 3.2;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+.medal-bronze .medal-edge,
 .medal-bronze .medal-disc { fill: var(--bronze); }
+.medal-silver .medal-edge,
 .medal-silver .medal-disc { fill: var(--silver); }
+.medal-gold .medal-edge,
 .medal-gold .medal-disc { fill: var(--gold); }
-.medal-none .medal-ribbon { fill: var(--surface-2); opacity: 1; }
+.medal-bronze .medal-bead { fill: var(--bronze-dark); }
+.medal-silver .medal-bead { fill: var(--silver-dark); }
+.medal-gold .medal-bead { fill: var(--gold-dark); }
+.medal-bronze .medal-rim { stroke: var(--bronze-dark); }
+.medal-silver .medal-rim { stroke: var(--silver-dark); }
+.medal-gold .medal-rim { stroke: var(--gold-dark); }
+/* not earned yet: a dashed outline with faint beads */
+.medal-none .medal-edge {
+  fill: none;
+  stroke: var(--border);
+  stroke-dasharray: 3 2.5;
+}
+.medal-none .medal-bead { fill: var(--border); }
 .medal-none .medal-disc {
   fill: none;
   stroke: var(--border);
-  stroke-dasharray: 4 3;
 }
 .medal-none .medal-rim { stroke: none; }
 .medal-none .medal-mark { stroke: var(--muted); }
@@ -5103,7 +5157,7 @@ button.chip {
 .medal-bar.bronze > i { background: var(--bronze); }
 .medal-bar.silver > i { background: var(--silver-dark); }
 .medal-bar.gold > i { background: var(--gold); }
-/* the new-medal pop-up: the medal drops in on its ribbon and settles, in a narrow card like the streak card */
+/* the new-medal pop-up: the medallion turns in and settles, in a narrow card like the streak card */
 .medal-reveal {
   max-width: 300px;
   padding: var(--sp-5) var(--sp-4) var(--sp-4);
@@ -5117,13 +5171,14 @@ button.chip {
   margin-bottom: var(--sp-2);
 }
 .medal-drop {
-  transform-origin: 50% 0;
+  transform-origin: 50% 50%;
   animation: medal-drop 0.9s var(--spring) both;
 }
+/* the medallion turns in like a coin and settles (v1.85.1; it swung on a ribbon before) */
 @keyframes medal-drop {
-  0% { transform: translateY(-60px) rotate(-14deg); opacity: 0; }
-  55% { transform: translateY(6px) rotate(6deg); opacity: 1; }
-  75% { transform: rotate(-3deg); }
+  0% { transform: scale(0.3) rotateY(180deg); opacity: 0; }
+  60% { transform: scale(1.08) rotateY(-14deg); opacity: 1; }
+  80% { transform: scale(0.98) rotateY(5deg); }
   100% { transform: none; }
 }
 @media (prefers-reduced-motion: reduce) {

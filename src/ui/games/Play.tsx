@@ -3,7 +3,7 @@
 // next word, popping up, Burrows.tsx), Dragon Duel (the next word, chosen under fire) and Bridge Run (word order), here. v1.78.0
 // retired Arrow Volley, Sword Dance and Parry as too close to these. The rules are in core/games.ts, gate.ts and burrows.ts. A game WON within the pile's mistake allowance is recorded with the same `completeReview` every review type
 // uses, so the schedule, streak and coins follow their usual rules; a game lost, or won with too many slips, saves nothing.
-import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { currentLook, sceneUrl, type Look } from '../../core/avatar.ts';
 import { BRIDGE_FALL_BACK, BRIDGE_FALL_REST_MS, BRIDGE_HEARTS, BRIDGE_PLANK_MS, BRIDGE_START_MS, DUEL_HEARTS, GAMES, INTRO_MS, starBonus, bestKey, duelChargeMs, gameCounts, runGames, duelRight, duelRounds, isComboTier, plankFits, planks, points, recordBest, bank, stars, totalStars, verseStars, type GameId, type Plank } from '../../core/games.ts';
 import { mistakesAllowed } from '../../core/quiz.ts';
@@ -771,6 +771,40 @@ function Duel({ verse, seed, look, backdrop, onDone }: GameProps) {
 
 // ---------------------------------------------------------------- Bridge Run: lay each phrase before the knight reaches the edge
 
+/**
+ * The bank is always two rows, three planks over two (v1.85.1, owner-requested: it flipped between one row and two as the words
+ * changed, and the whole game moved with it), so a long word is set smaller to fit its plank instead of pushing the others about:
+ * first by its length, then (`fitPlanks`) by measuring, so it fits whatever the font and the width of the screen.
+ */
+const plankSize = (word: string) => (word.length >= 12 ? 'xlong' : word.length >= 9 ? 'long' : '');
+
+/** Shrink the word on any plank it does not fit, just enough (measured, so it holds for any font, and again once the fonts load). */
+function useFitPlanks(box: { current: HTMLElement | null }, key: unknown) {
+  useLayoutEffect(() => {
+    const fit = () => {
+      for (const b of box.current?.querySelectorAll<HTMLElement>('.plank') ?? []) {
+        b.style.fontSize = '';
+        const pad = parseFloat(getComputedStyle(b).paddingLeft) * 2 || 0;
+        let size = parseFloat(getComputedStyle(b).fontSize);
+        // text does not shrink exactly in proportion, so measure again until it fits (a few rounds at most)
+        for (let i = 0; i < 4 && b.scrollWidth > b.clientWidth && size > 9; i++) {
+          const scale = Math.min(0.97, (b.clientWidth - pad) / Math.max(1, b.scrollWidth - pad));
+          size = Math.max(9, Math.floor(size * scale * 10) / 10);
+          b.style.fontSize = `${size}px`;
+        }
+      }
+    };
+    fit();
+    let live = true;
+    void document.fonts?.ready.then(() => live && fit());
+    addEventListener('resize', fit);
+    return () => {
+      live = false;
+      removeEventListener('resize', fit);
+    };
+  }, [key]);
+}
+
 function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
   const all = useMemo(() => planks(verse.text, 1), [verse.text]); // one word a plank (v1.78.0, owner-requested)
   const [laid, setLaid] = useState(0);
@@ -784,6 +818,8 @@ function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
   const [combo, setCombo] = useState(0);
   const stage = useRef<HTMLDivElement>(null);
   const plankRow = useRef<HTMLDivElement>(null);
+  const bankBox = useRef<HTMLDivElement>(null);
+  useFitPlanks(bankBox, laid);
   const fxr = useRef<FxHandle>(null);
   const stop = useHitStop(stage);
   const across = laid >= all.length;
@@ -898,12 +934,15 @@ function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
         </p>
       </div>
       <Dock>
-        <div class="bridge-bank" data-testid="bridge-bank">
-          {bank(all, laid, seed + verse.text.length).map((p) => (
-            <button key={p.order} class={`btn plank ${wrong === p.order ? 'shake' : ''}`} onPointerDown={(e) => (e.preventDefault(), pick(p, e.currentTarget as Element))} onClick={(e) => e.detail === 0 && pick(p, e.currentTarget as Element)} data-order={p.order} disabled={across || lost}>
-              {p.text.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '') || p.text}
-            </button>
-          ))}
+        <div class="bridge-bank" data-testid="bridge-bank" ref={bankBox}>
+          {bank(all, laid, seed + verse.text.length).map((p) => {
+            const word = p.text.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '') || p.text;
+            return (
+              <button key={p.order} class={`btn plank ${plankSize(word)} ${wrong === p.order ? 'shake' : ''}`} onPointerDown={(e) => (e.preventDefault(), pick(p, e.currentTarget as Element))} onClick={(e) => e.detail === 0 && pick(p, e.currentTarget as Element)} data-order={p.order} disabled={across || lost}>
+                {word}
+              </button>
+            );
+          })}
         </div>
       </Dock>
     </>

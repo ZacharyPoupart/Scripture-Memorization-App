@@ -11,6 +11,7 @@ import type { GameProps } from './types.ts';
 
 const GATE_X = 30; // % where the gate stands; the goblins start at the far right
 const START_X = 92;
+const WRONG_MS = 600; // how long a wrongly tapped key stays red (its shake takes 360 ms)
 const GOBLIN = 0.45; // CSS pixels a sheet pixel
 
 export function Gate({ verse, seed, look, backdrop, onDone }: GameProps) {
@@ -25,7 +26,8 @@ export function Gate({ verse, seed, look, backdrop, onDone }: GameProps) {
   const [, redraw] = useState(0);
   const [pose, setPose] = useState<{ name: KnightPose; n: number }>({ name: 'idle', n: 0 });
   const [shown, setShown] = useState<number[]>([]); // words that got through and were shown
-  const [wrongKey, setWrongKey] = useState<{ k: string; n: number } | null>(null);
+  const [wrong, setWrong] = useState<{ k: string; n: number } | null>(null); // the key just tapped wrongly, red for a moment
+  const wrongKey = useRef<{ k: string; n: number } | null>(null);
   const [fresh, setFresh] = useState(0); // restarts the new goblin's entrance
   const [gone, setGone] = useState<{ left: string; kind: 'down' | 'swing'; n: number } | null>(null); // the last goblin, knocked down or swinging at the gate
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -72,9 +74,14 @@ export function Gate({ verse, seed, look, backdrop, onDone }: GameProps) {
         act('attack', 380);
         leave('down');
         setFresh((n) => n + 1);
+        setWrong(null);
       }
       if (e.type === 'miss') {
-        setWrongKey((w) => ({ k: e.letter, n: (w?.n ?? 0) + 1 }));
+        // the wrong key flashes red and shakes, then goes back to normal (it used to stay red for the rest of the game)
+        const n = (wrongKey.current?.n ?? 0) + 1;
+        wrongKey.current = { k: e.letter, n };
+        setWrong(wrongKey.current);
+        later(WRONG_MS, () => setWrong((w) => (w?.n === n ? null : w)));
         feedback.game('slip');
       }
       if (e.type === 'breach') {
@@ -192,8 +199,8 @@ export function Gate({ verse, seed, look, backdrop, onDone }: GameProps) {
           <div class="letter-keys" data-testid="gate-keys">
             {s.keys.map((k) => (
               <button
-                key={`${s.next}-${k}`}
-                class={`letter-key ${wrongKey?.k === k ? 'shake' : ''}`}
+                key={`${s.next}-${k}-${wrong?.k === k ? wrong.n : 0}`}
+                class={`letter-key ${wrong?.k === k ? 'shake' : ''}`}
                 onPointerDown={(e) => (e.preventDefault(), tap(k))}
                 onClick={(e) => e.detail === 0 && tap(k)}
                 disabled={!!s.over}

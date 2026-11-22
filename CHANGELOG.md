@@ -5,6 +5,16 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.85.1] - 2026-11-22
+
+### Fixed
+- Hold the Gate: a letter you tap by mistake flashes red for a moment and then goes back to normal. It used to stay red for the rest of the game.
+
+### Changed
+- Goblin Burrows: the burrows and the knight sit in the middle of the grass instead of down at its bottom edge (the grass itself has not moved).
+- Bridge Run: the words to choose from always sit in two rows, three over two, so the bank no longer jumps between one row and two (and the whole game with it) as the words change. Long words are set a little smaller to fit.
+- Medals are now medallions: round, with a scalloped edge, a ring of beads and the achievement's picture in the middle, in bronze, silver or gold. A new one turns in like a coin.
+
 ## [1.85.0] - 2026-11-21
 
 ### Added
