@@ -305,6 +305,7 @@ test.describe('the games', () => {
     await start(page);
     const bank = page.getByTestId('bridge-bank');
     await expect(bank.locator('button')).toHaveCount(5);
+    await page.evaluate(() => document.fonts.ready); // measured in the game's own font
     const clipped = () => bank.evaluate((el) => [...el.querySelectorAll('button')].filter((b) => b.scrollWidth > b.clientWidth + 1).map((b) => b.textContent));
     const rows = () => bank.evaluate((el) => new Set([...el.querySelectorAll('button')].map((b) => Math.round(b.getBoundingClientRect().top))).size);
     expect(await clipped()).toEqual([]);
