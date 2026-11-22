@@ -66,7 +66,7 @@ export const LESSONS: TourLesson[] = [
         route: '/',
         target: 'start-today',
         title: 'Start a review',
-        body: 'Today lists what is ready. Tap here to review it all.',
+        body: 'Training lists what is ready today. Tap here to begin.',
         advance: { kind: 'click' },
       },
       {
@@ -81,7 +81,7 @@ export const LESSONS: TourLesson[] = [
         id: 'grade',
         target: 'grade-good',
         title: 'How did it go?',
-        body: 'Tap Nailed it if you knew it. Needs work shows it again.',
+        body: 'Tap Struck true if you knew it. Not yet shows it again.',
         advance: { kind: 'click' },
       },
       {

@@ -39,14 +39,14 @@ test.describe('review modes', () => {
     await addVerse(page, JOHN316);
   });
 
-  test('flashcard: reference first, tap to flip, Nailed it / Needs work (no reference step)', async ({ page }) => {
+  test('flashcard: reference first, tap to flip, Struck true / Not yet (no reference step)', async ({ page }) => {
     await startVerseReview(page, 'flashcard');
     await expect(page.getByTestId('review')).toContainText('John 3:16');
     await expect(page.getByTestId('card-front')).toBeVisible();
     await page.getByTestId('card-front').click(); // tap the card itself to flip, like Quizlet
     await expect(page.getByTestId('card-back')).toContainText('For God so loved the world');
-    await expect(page.getByTestId('grade-good')).toHaveText('Nailed it');
-    await expect(page.getByTestId('grade-missed')).toHaveText('Needs work');
+    await expect(page.getByTestId('grade-good')).toHaveText('Struck true');
+    await expect(page.getByTestId('grade-missed')).toHaveText('Not yet');
     await expect(page.getByTestId('grade-almost')).toHaveCount(0);
     await page.getByTestId('grade-good').click();
     // no reference-recall step after a flashcard
@@ -55,10 +55,10 @@ test.describe('review modes', () => {
     await expect(page.getByTestId('session-summary')).toBeVisible({ timeout: 5000 });
   });
 
-  test('flashcard: "Needs work" restarts the same verse in the same mode', async ({ page }) => {
+  test('flashcard: "Not yet" restarts the same verse in the same mode', async ({ page }) => {
     await startVerseReview(page, 'flashcard');
     await page.getByTestId('flip').click();
-    await page.getByTestId('grade-missed').click(); // "Needs work"
+    await page.getByTestId('grade-missed').click(); // "Not yet"
     await expect(page.getByTestId('card-front')).toBeVisible();
     await expect(page.getByTestId('toast')).toContainText('try that verse again');
   });

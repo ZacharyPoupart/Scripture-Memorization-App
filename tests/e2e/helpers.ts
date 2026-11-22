@@ -133,7 +133,7 @@ export async function answerReference(page: Page, v: VerseInput) {
   await page.getByTestId('ref-check').click();
 }
 
-/** A flashcard: flip the card, say "Nailed it" (no reference step after flashcards). */
+/** A flashcard: flip the card, say "Struck true" (no reference step after flashcards). */
 export async function finishFlashcard(page: Page) {
   await page.getByTestId('flip').click();
   await page.getByTestId('grade-good').click();

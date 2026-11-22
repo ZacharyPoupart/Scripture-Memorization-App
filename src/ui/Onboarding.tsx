@@ -3,11 +3,12 @@ import { Overlay } from './common.tsx';
 import { Mark, type MarkName } from './marks.tsx';
 
 const SLIDES: { mark: MarkName; title: string; body: string }[] = [
-  { mark: 'book', title: 'Keep Scripture for life', body: 'A calm daily habit that makes verses stick.' },
-  { mark: 'plus', title: 'Add verses', body: 'Pick a book, chapter and verses. The text is looked up for you, or paste your own.' },
-  { mark: 'piles', title: 'Four piles', body: 'New verses start in Daily. As they settle they move up to Weekly, Monthly and Yearly.' },
-  { mark: 'cards', title: 'Four ways to practice', body: 'Flashcards, blanks, typing or speaking.' },
-  { mark: 'flame', title: 'Build your streak', body: 'A short tour shows you around and earns your first shield.' },
+  // the knight's theme (v1.87.0, owner-requested): God's word is the sword of the Spirit (Ephesians 6:17)
+  { mark: 'book', title: 'Keep Scripture for life', body: 'Train a little each day, and God’s word becomes the sword of the Spirit in your hand.' },
+  { mark: 'plus', title: 'Arm yourself', body: 'Add a verse: pick a book, chapter and verses. The text is looked up for you, or paste your own.' },
+  { mark: 'piles', title: 'Rise through the ranks', body: 'New verses start in Daily. As they hold, they are promoted to Weekly, Monthly and Yearly.' },
+  { mark: 'cards', title: 'Train four ways, then battle', body: 'Flashcards, blanks, typing or speaking, and games against goblins and a dragon.' },
+  { mark: 'flame', title: 'Keep your flame lit', body: 'A short tour shows you around and earns your first shield.' },
 ];
 
 export function Onboarding({ onClose, onTour }: { onClose: () => void; onTour: () => void }) {

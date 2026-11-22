@@ -213,7 +213,7 @@ export function Home() {
           data-testid="start-today"
         >
           <Icon name="target" />
-          {onBreak ? 'Review anyway' : "Start today's reviews"} · {readyAll}
+          {onBreak ? 'Train anyway' : "Begin today's training"} · {readyAll}
         </button>
       </div>}
     </>
