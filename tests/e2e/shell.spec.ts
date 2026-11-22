@@ -62,12 +62,17 @@ test('navigation tabs work and the streak chip is shown', async ({ page }) => {
   await blockLookups(page);
   await openApp(page);
   await addVerse(page, JOHN316);
-  await page.getByRole('link', { name: 'Today' }).click();
+  // the tabs carry the knight's names (v1.87.0): Training, Armory, Battle, Add, Allies, Honors, Settings
+  await page.getByRole('link', { name: 'Training' }).click();
   await expect(page.getByTestId('streak')).toBeVisible();
-  await page.getByRole('link', { name: 'Piles' }).click();
-  await expect(page.getByRole('heading', { name: 'All verses' })).toBeVisible();
-  await page.getByRole('link', { name: 'Friends' }).click();
-  await expect(page.getByRole('heading', { name: 'Friends' })).toBeVisible();
+  await page.getByRole('link', { name: 'Armory' }).click();
+  await expect(page.getByRole('heading', { name: 'Armory' })).toBeVisible();
+  await page.getByRole('link', { name: 'Battle' }).click();
+  await expect(page.getByRole('heading', { name: 'Battle' })).toBeVisible();
+  await page.getByRole('link', { name: 'Honors' }).click();
+  await expect(page.getByRole('heading', { name: 'Honors', exact: true })).toBeVisible();
+  await page.getByRole('link', { name: 'Allies' }).click();
+  await expect(page.getByRole('heading', { name: 'Allies' })).toBeVisible();
   await expect(page.getByTestId('tab-friends')).toHaveAttribute('aria-current', 'page');
   await page.getByRole('link', { name: 'Settings' }).click();
   await expect(page.getByRole('heading', { name: 'Settings' })).toBeVisible();

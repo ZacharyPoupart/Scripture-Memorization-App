@@ -23,21 +23,21 @@ import { VerseDetail } from './VerseDetail.tsx';
 import { PILES, type Pile } from '../core/types.ts';
 
 const TITLES: Record<string, string> = {
-  '': 'Today',
-  piles: 'All verses',
+  '': 'Training',
+  piles: 'Armory',
   pile: 'Pile',
   verse: 'Verse',
   add: 'Add a verse',
   edit: 'Edit verse',
   review: 'Review',
-  play: 'Play',
-  stats: 'Progress',
+  play: 'Battle',
+  stats: 'Honors',
   settings: 'Settings',
-  avatar: 'Your avatar',
+  avatar: 'Your knight',
   about: 'About',
-  friends: 'Friends',
-  join: 'Friends',
-  guild: 'Friends',
+  friends: 'Allies',
+  join: 'Allies',
+  guild: 'Allies',
 };
 
 function CrashProbe() {

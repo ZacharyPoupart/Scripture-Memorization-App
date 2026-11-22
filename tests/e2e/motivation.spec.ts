@@ -64,9 +64,9 @@ test.describe('stats screen', () => {
     // the fixture contains a recorded level-up; its celebration is shown once, then dismissed
     if (await page.getByTestId('celebration').isVisible()) await page.getByTestId('celebration-close').click();
     await page.getByTestId('streak').click();
-    await expect(page.getByRole('heading', { name: 'Progress' })).toBeVisible();
-    await page.getByRole('link', { name: 'Today' }).click();
-    await page.getByRole('link', { name: 'Stats' }).click();
+    await expect(page.getByRole('heading', { name: 'Honors', exact: true })).toBeVisible();
+    await page.getByRole('link', { name: 'Training' }).click();
+    await page.getByRole('link', { name: 'Honors' }).click();
     await expect(page.getByTestId('stats')).toBeVisible();
   });
 });

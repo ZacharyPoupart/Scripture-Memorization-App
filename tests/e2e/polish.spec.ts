@@ -171,7 +171,7 @@ test.describe('keyboard and screen reader basics', () => {
   test('each screen sets a meaningful page title', async ({ page }) => {
     await blockLookups(page);
     await openApp(page);
-    for (const [route, title] of [['/#/stats', 'Progress'], ['/#/settings', 'Settings'], ['/#/piles', 'All verses'], ['/#/about', 'About']]) {
+    for (const [route, title] of [['/#/stats', 'Honors'], ['/#/settings', 'Settings'], ['/#/piles', 'Armory'], ['/#/about', 'About']]) {
       await page.goto(route);
       await expect(page).toHaveTitle(new RegExp(`^${title}`));
     }

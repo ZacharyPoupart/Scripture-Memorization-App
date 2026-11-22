@@ -523,7 +523,7 @@ export function Friends({ joinCode = '', guildCode = '' }: { joinCode?: string; 
     return (
       <div class="scroll">
         <div class="narrow stack">
-          <h1 style={{ margin: 0 }}>Friends</h1>
+          <h1 style={{ margin: 0 }}>Allies</h1>
           {(invitedBy || invitedGuild) && (
             <div class="banner good" data-testid="invited-banner">
               {invitedBy ? `${invitedBy} invited you to be friends.` : `You are invited to join “${invitedGuild}”.`} Turn on friends below to say yes.
@@ -568,7 +568,7 @@ export function Friends({ joinCode = '', guildCode = '' }: { joinCode?: string; 
   return (
     <div class="scroll">
       <div class="narrow stack">
-        <h1 style={{ margin: 0 }}>Friends</h1>
+        <h1 style={{ margin: 0 }}>Allies</h1>
 
         {friendCode && invitedBy && (
           <div class="card stack" data-testid="join-card">

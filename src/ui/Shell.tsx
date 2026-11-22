@@ -3,13 +3,18 @@ import { dismissToast, getState, useApp } from '../store.ts';
 import { navigate } from '../router.ts';
 import { Icon } from './common.tsx';
 
+/**
+ * The knight's theme (v1.87.0, owner-requested): you train every day (Today), keep your verses, the sword of the Spirit, in the
+ * Armory (Piles), fight with them in Battle (the games), and win Honors (medals and progress) alongside your Allies (friends and
+ * groups). Routes and test ids keep their old names.
+ */
 const TABS = [
-  { path: '/', label: 'Today', icon: 'home' },
-  { path: '/piles', label: 'Piles', icon: 'piles' },
-  { path: '/play', label: 'Play', icon: 'play' },
+  { path: '/', label: 'Training', icon: 'target' },
+  { path: '/piles', label: 'Armory', icon: 'armory' },
+  { path: '/play', label: 'Battle', icon: 'play' },
   { path: '/add', label: 'Add', icon: 'plus' },
-  { path: '/friends', label: 'Friends', icon: 'friends' },
-  { path: '/stats', label: 'Stats', icon: 'chart' },
+  { path: '/friends', label: 'Allies', icon: 'allies' },
+  { path: '/stats', label: 'Honors', icon: 'honors' },
   { path: '/settings', label: 'Settings', icon: 'gear' },
 ] as const;
 

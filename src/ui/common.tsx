@@ -23,6 +23,11 @@ const ICONS: Record<string, string> = {
   play: 'M12 1.8l3 3.6v9.2H9V5.4zM12 6.2v6.8M5 13v1.6h14V13M12 14.6v4.6M12 19.2a1.6 1.6 0 1 0 0 3.2 1.6 1.6 0 0 0 0-3.2z',
   // training: a target with an arrow in its centre, the way into the day's reviews (v1.86.0, owner-requested)
   target: 'M12 12h.01M12 7a5 5 0 1 0 5 5M13 3.06A9 9 0 1 0 20.94 11M12 12l4-4M16 8V5l3-3v3h3l-3 3z',
+  // the knight's theme for the tabs (v1.87.0, owner-requested "more medieval/knight game themed"): your verses are kept in the
+  // Armory (a shield with a cross), your Allies fly a banner, your Honors are a medallion with a star
+  armory: 'M12 3 4.5 5.8v5.7c0 4.6 3.2 8 7.5 9.5 4.3-1.5 7.5-4.9 7.5-9.5V5.8zM12 7v10M8.5 10.5h7',
+  allies: 'M5 21V3.5M5 4h13l-3 4.5 3 4.5H5',
+  honors: 'M12 14.5a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM8.6 13.3 7 21l5-2.6 5 2.6-1.6-7.7M12 6.5l.9 1.9 2 .3-1.5 1.4.4 2-1.8-1-1.8 1 .4-2-1.5-1.4 2-.3z',
   gear: 'M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM19.4 13a7.6 7.6 0 0 0 0-2l2-1.5-2-3.5-2.4 1a7.6 7.6 0 0 0-1.7-1L15 3.5h-4L10.7 6a7.6 7.6 0 0 0-1.7 1l-2.4-1-2 3.5 2 1.5a7.6 7.6 0 0 0 0 2l-2 1.5 2 3.5 2.4-1a7.6 7.6 0 0 0 1.7 1l.3 2.5h4l.3-2.5a7.6 7.6 0 0 0 1.7-1l2.4 1 2-3.5z',
   back: 'M15 5l-7 7 7 7',
   close: 'M6 6l12 12M18 6 6 18',
