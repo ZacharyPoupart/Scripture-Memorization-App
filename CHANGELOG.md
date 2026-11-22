@@ -10,6 +10,9 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 - "Start today's reviews" has a training icon: a target with an arrow in its centre.
 - The Play tab's icon is a knight's sword standing upright.
 
+### Removed
+- The NIV copyright line under the verse text on Add verse.
+
 ## [1.85.1] - 2026-11-22
 
 ### Fixed

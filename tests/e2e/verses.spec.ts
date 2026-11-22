@@ -151,7 +151,7 @@ test.describe('adding, editing and organizing verses', () => {
     await page.getByTestId('translation').selectOption('NIV');
     await pickRef(page, { book: 43, chapter: 3, start: 16 });
     await expect(page.getByTestId('text')).toHaveValue('For God so loved the world (NIV text).');
-    await expect(page.getByTestId('niv-note')).toContainText('Biblica');
+    await expect(page.getByTestId('niv-note')).toHaveCount(0); // the NIV copyright line under the text was removed (v1.86.0, owner-requested)
     expect(calls).toBeGreaterThan(0);
 
     // not configured on the server (501) -> the next source is tried, and if everything fails you can type it
