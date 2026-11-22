@@ -18,6 +18,8 @@ test('medals: Progress lists every achievement with the way to bronze; the fifth
   await page.goto('/#/stats');
   await expect(page.getByTestId('achievements')).toBeVisible();
   await expect(page.getByTestId('medal-tally')).toHaveText('0 of 27');
+  await expect(page.getByTestId('rank')).toHaveAttribute('data-rank', 'Page'); // ranks (v1.87.0)
+  await expect(page.getByTestId('rank')).toContainText('Squire at 2 medals');
   const treasured = page.locator('[data-testid="achievement"][data-id="treasured"]');
   await expect(treasured).toHaveAttribute('data-tier', 'none');
   await expect(treasured).toContainText('Bronze: Add 5 verses · 1 of 5 · +50 coins');
@@ -29,6 +31,7 @@ test('medals: Progress lists every achievement with the way to bronze; the fifth
   await expect(card).toContainText('Bronze medal');
   await expect(card).toContainText('Hidden in my heart');
   await expect(page.getByTestId('medal-coins')).toContainText('+50 coins');
+  await expect(page.getByTestId('medal-rank')).toHaveCount(0); // one medal is not yet a new rank
   await page.getByTestId('medal-close').click();
   await expect(card).toHaveCount(0);
   expect(await coins(page)).toBe(before + 50);
@@ -55,9 +58,14 @@ test('medals: several earned at once (a restored backup) are one card, not a cha
   await expect(card).toContainText('4 new medals');
   await expect(card.locator('.medal-drop-row li')).toHaveCount(4);
   await expect(page.getByTestId('medal-coins')).toContainText('+400 coins'); // 50 + 100 twice, 50 twice
+  await expect(page.getByTestId('medal-rank')).toContainText('New rank: Knight'); // six medals held (v1.87.0)
   await page.getByTestId('medal-close').click();
   await expect(card).toHaveCount(0);
   await page.waitForTimeout(600);
   await expect(card).toHaveCount(0); // closed once for all of them
   await expect(page.locator('[data-testid="achievement"][data-id="faithful"]')).toHaveAttribute('data-tier', 'silver');
+  await expect(page.getByTestId('rank')).toHaveAttribute('data-rank', 'Knight');
+  await expect(page.getByTestId('rank')).toContainText('Captain at 9 medals');
+  await page.goto('/#/avatar');
+  await expect(page.getByTestId('avatar-rank')).toHaveAttribute('data-rank', 'Knight');
 });

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ACHIEVEMENTS, achievementStates, earnedMedals, freshMedals, medalId, medalTally, newMedalGroups, recordMedals, TIERS } from '../../src/core/achievements.ts';
+import { ACHIEVEMENTS, achievementStates, earnedMedals, freshMedals, heldMedals, medalId, medalTally, newMedalGroups, RANKS, rankFor, recordMedals, TIERS } from '../../src/core/achievements.ts';
 import { seedsEarned } from '../../src/core/avatar.ts';
 import { normalizeData } from '../../src/core/backup.ts';
 import { medalCoins } from '../../src/core/coins.ts';
@@ -113,5 +113,34 @@ describe('medals pay coins, recorded once (v1.85.0)', () => {
   it('a backup drops anything that is not a medal id', () => {
     const d = normalizeData({ ...newData(), medals: ['faithful:gold', 'nonsense', 42, 'x:platinum'] });
     expect(d.medals).toEqual(['faithful:gold']);
+  });
+});
+
+describe('knightly ranks, earned by medals (v1.87.0)', () => {
+  it('rise from Page to Legend as medals are held, Legend being every medal', () => {
+    expect(rankFor(0)).toMatchObject({ name: 'Page', next: { name: 'Squire', at: 2 } });
+    expect(rankFor(1).name).toBe('Page');
+    expect(rankFor(2).name).toBe('Squire');
+    expect(rankFor(5).name).toBe('Knight');
+    expect(rankFor(9).name).toBe('Captain');
+    expect(rankFor(14).name).toBe('Champion');
+    expect(rankFor(20).name).toBe('Paladin');
+    expect(RANKS[RANKS.length - 1].at).toBe(ACHIEVEMENTS.length * TIERS.length);
+    expect(rankFor(ACHIEVEMENTS.length * 3)).toMatchObject({ name: 'Legend', next: null });
+    for (let i = 1; i < RANKS.length; i++) expect(RANKS[i].at).toBeGreaterThan(RANKS[i - 1].at);
+  });
+
+  it('counts a silver as two and a gold as three, and ignores anything that is not a medal', () => {
+    expect(heldMedals([])).toBe(0);
+    expect(heldMedals(['faithful:silver'])).toBe(2);
+    expect(heldMedals(['faithful:bronze', 'faithful:silver', 'treasured:gold'])).toBe(5);
+    expect(heldMedals(['nonsense:gold', 'faithful:platinum'])).toBe(0);
+  });
+
+  it('agrees with the tally on Progress', () => {
+    const d = newData();
+    for (let i = 0; i < 5; i++) addVerse(d, { book: 1 + i, chapter: 1, start: 1, end: 1, translation: 'ESV', text: `Verse ${i}.` }, at(D0));
+    const ctx = { data: d, now: at(D0) };
+    expect(heldMedals(earnedMedals(ctx))).toBe(medalTally(achievementStates(ctx)).held);
   });
 });

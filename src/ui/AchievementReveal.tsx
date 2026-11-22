@@ -1,5 +1,5 @@
 import { useEffect } from 'preact/hooks';
-import { earnedMedals, freshMedals, newMedalGroups, TIER_LABEL, TIERS, type Tier } from '../core/achievements.ts';
+import { earnedMedals, freshMedals, heldMedals, newMedalGroups, rankFor, TIER_LABEL, TIERS, type Tier } from '../core/achievements.ts';
 import { feedback } from '../services/feedback.ts';
 import { recordEarnedMedals, updateSettings, useApp } from '../store.ts';
 import { MEDAL_COINS } from '../core/coins.ts';
@@ -40,6 +40,11 @@ export function AchievementReveal({ suppressed }: { suppressed: boolean }) {
   const coins = fresh.reduce((n, id) => n + (MEDAL_COINS[id.split(':')[1] as Tier] ?? 0), 0);
   const close = () => updateSettings({ seenAchievements: [...new Set([...(settings.seenAchievements ?? []), ...fresh])] });
   const one = groups.length === 1 ? groups[0] : null;
+  // the medals on this card may raise the knight's rank (v1.87.0): what was held before is what this device had already shown
+  const seen = settings.seenAchievements ?? [];
+  const rankBefore = rankFor(heldMedals(seen));
+  const rankAfter = rankFor(heldMedals([...seen, ...fresh]));
+  const promoted = rankAfter.index > rankBefore.index ? rankAfter.name : null;
   const label = one ? `${TIER_LABEL[one.tier]} medal: ${one.achievement.name}` : `${groups.length} new medals`;
   return (
     <>
@@ -74,6 +79,11 @@ export function AchievementReveal({ suppressed }: { suppressed: boolean }) {
               </ul>
               <h2 style={{ margin: 'var(--sp-2) 0 0' }}>{groups.length} new medals</h2>
             </>
+          )}
+          {promoted && (
+            <p class="medal-rank" data-testid="medal-rank">
+              New rank: <b>{promoted}</b>
+            </p>
           )}
           {settings.avatarOn && (
             <p class="medal-coins" data-testid="medal-coins">
