@@ -771,6 +771,12 @@ function Duel({ verse, seed, look, backdrop, onDone }: GameProps) {
 
 // ---------------------------------------------------------------- Bridge Run: lay each phrase before the knight reaches the edge
 
+/**
+ * The bank is always two rows, three planks over two (v1.85.1, owner-requested: it flipped between one row and two as the words
+ * changed, and the whole game moved with it), so a long word is set smaller to fit its plank instead of pushing the others about.
+ */
+const plankSize = (word: string) => (word.length >= 12 ? 'xlong' : word.length >= 9 ? 'long' : '');
+
 function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
   const all = useMemo(() => planks(verse.text, 1), [verse.text]); // one word a plank (v1.78.0, owner-requested)
   const [laid, setLaid] = useState(0);
@@ -899,11 +905,14 @@ function Bridge({ verse, seed, look, backdrop, onDone }: GameProps) {
       </div>
       <Dock>
         <div class="bridge-bank" data-testid="bridge-bank">
-          {bank(all, laid, seed + verse.text.length).map((p) => (
-            <button key={p.order} class={`btn plank ${wrong === p.order ? 'shake' : ''}`} onPointerDown={(e) => (e.preventDefault(), pick(p, e.currentTarget as Element))} onClick={(e) => e.detail === 0 && pick(p, e.currentTarget as Element)} data-order={p.order} disabled={across || lost}>
-              {p.text.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '') || p.text}
-            </button>
-          ))}
+          {bank(all, laid, seed + verse.text.length).map((p) => {
+            const word = p.text.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '') || p.text;
+            return (
+              <button key={p.order} class={`btn plank ${plankSize(word)} ${wrong === p.order ? 'shake' : ''}`} onPointerDown={(e) => (e.preventDefault(), pick(p, e.currentTarget as Element))} onClick={(e) => e.detail === 0 && pick(p, e.currentTarget as Element)} data-order={p.order} disabled={across || lost}>
+                {word}
+              </button>
+            );
+          })}
         </div>
       </Dock>
     </>

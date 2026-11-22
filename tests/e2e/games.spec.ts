@@ -296,6 +296,26 @@ test.describe('the games', () => {
     expect(await reviewsOf(page)).toBe(1);
   });
 
+  test('Bridge Run: long words fit their planks on a narrow phone, and the bank keeps its two rows', async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 740 });
+    await openApp(page);
+    await addVerse(page, { book: 19, chapter: 36, start: 5, text: 'Lovingkindness, righteousness, understanding, thanksgiving, everlasting commandments and faithfulness forever.' });
+    await page.getByTestId('verse-card').click();
+    await page.getByTestId('play-bridge').click();
+    await start(page);
+    const bank = page.getByTestId('bridge-bank');
+    await expect(bank.locator('button')).toHaveCount(5);
+    const clipped = () => bank.evaluate((el) => [...el.querySelectorAll('button')].filter((b) => b.scrollWidth > b.clientWidth + 1).map((b) => b.textContent));
+    const rows = () => bank.evaluate((el) => new Set([...el.querySelectorAll('button')].map((b) => Math.round(b.getBoundingClientRect().top))).size);
+    expect(await clipped()).toEqual([]);
+    expect(await rows()).toBe(2); // three over two
+    const h = await bank.evaluate((el) => el.getBoundingClientRect().height);
+    for (let i = 0; i < 6; i++) await bank.locator(`button[data-order="${i}"]`).dispatchEvent('pointerdown');
+    expect(await clipped()).toEqual([]);
+    await expect(bank.locator('button')).toHaveCount(3); // near the end: fewer words, the same height
+    expect(await bank.evaluate((el) => el.getBoundingClientRect().height)).toBe(h);
+  });
+
   test('Bridge Run: one word a plank, laid in order, carries the knight across; standing still, he walks off the edge', async ({ page }) => {
     await openApp(page);
     await addVerse(page, JOHN316);
@@ -320,7 +340,19 @@ test.describe('the games', () => {
     await expect(bank.locator('button')).toHaveCount(5);
     await expect(page.getByTestId('bridge-stage')).toHaveAttribute('data-laid', '0');
     await expect(page.getByTestId('bridge-hearts')).toHaveAttribute('data-hearts', '1');
-    for (let i = 0; i < total; i++) await bank.locator(`button[data-order="${i}"]`).dispatchEvent('pointerdown');
+    // the bank is always the same two rows, so nothing jumps between one row and two as the words change (v1.85.1), and every word
+    // fits its plank
+    const heights = new Set<number>();
+    for (let i = 0; i < total; i++) {
+      const box = await bank.evaluate((el) => ({
+        h: Math.round(el.getBoundingClientRect().height),
+        clipped: [...el.querySelectorAll('button')].filter((b) => b.scrollWidth > b.clientWidth + 1).map((b) => b.textContent),
+      }));
+      heights.add(box.h);
+      expect(box.clipped).toEqual([]);
+      await bank.locator(`button[data-order="${i}"]`).dispatchEvent('pointerdown');
+    }
+    expect([...heights]).toHaveLength(1);
     await expect(page.getByTestId('game-finish')).toContainText('Safely across');
     await expect(page.getByTestId('game-stars')).toHaveAttribute('data-stars', '2');
     // and over to another game from here

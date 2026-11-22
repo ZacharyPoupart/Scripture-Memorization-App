@@ -7,7 +7,7 @@ import { CloseX, Coin, Confetti, Overlay } from './common.tsx';
 import { Medal } from './Medal.tsx';
 
 /**
- * A new medal (v1.85.0): the medal drops in with its tier and what it was for. Several new at once (a restored backup, a sync, a
+ * A new medal (v1.85.0): the medallion turns in with its tier and what it was for. Several new at once (a restored backup, a sync, a
  * long streak passing two marks) are one card with the medals in a row, never a chain of pop-ups. The first time a device looks it
  * only remembers what is already earned. It waits during reviews and games, the tour and the other celebrations, and never shows
  * the same medal twice on a device.
