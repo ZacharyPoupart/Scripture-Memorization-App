@@ -78,13 +78,7 @@ export function Home() {
       <div class="scroll">
         <div class="narrow stack calm">
           <div class="row spread home-top">
-            <div>
-              {!online && (
-                <div class="offline-note small muted" data-testid="offline-note">
-                  Offline.
-                </div>
-              )}
-            </div>
+            {/* the knight and the coins in the top left corner (v1.86.0, owner-requested), the streak in the top right */}
             <div class="row gap-2">
               {settings.avatarOn && (
                 <button class="avatar-bubble" onClick={() => navigate('/avatar')} aria-label={`Your avatar. ${seedsBalance(data)} coins.`} data-testid="avatar-bubble">
@@ -92,6 +86,13 @@ export function Home() {
                   <span class="seeds-chip" data-testid="seeds-chip"><Coin /> {seedsBalance(data)}</span>
                 </button>
               )}
+              {!online && (
+                <div class="offline-note small muted" data-testid="offline-note">
+                  Offline.
+                </div>
+              )}
+            </div>
+            <div class="row gap-2">
               <button
                 class={`streak ${streak.todayDone ? 'lit' : 'unlit'}`}
                 title={`${streak.todayDone ? 'Streak earned for today. ' : ''}Longest streak: ${streak.longest}`}
@@ -211,6 +212,7 @@ export function Home() {
           onClick={() => { if (settings.defaultMode === 'type') primeKeyboard(); navigate(`/review?today=1&mode=${settings.defaultMode}`); }}
           data-testid="start-today"
         >
+          <Icon name="target" />
           {onBreak ? 'Review anyway' : "Start today's reviews"} · {readyAll}
         </button>
       </div>}

@@ -2124,6 +2124,9 @@ button.streak:active {
 .seeds-chip {
   min-height: 44px;
   min-width: 44px;
+  display: inline-flex;
+  align-items: center; /* level with the knight's face beside it (v1.86.0) */
+  gap: 5px; /* as a .chip has */
   justify-content: center;
   font-weight: 700;
   white-space: nowrap;

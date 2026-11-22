@@ -12,6 +12,7 @@ test('Today: one tap starts the queue, then a calm all-done state says when the 
   await page.goto('/#/');
   await expect(page.getByTestId('today-title')).toContainText('1 verse to review');
   await expect(page.getByTestId('today-list')).toContainText('John 3:16');
+  await expect(page.getByTestId('start-today').locator('svg')).toHaveCount(1); // the training target (v1.86.0)
   await page.getByTestId('start-today').click();
   await finishFlashcard(page);
   await expect(page.getByTestId('verse-result')).toBeVisible();
