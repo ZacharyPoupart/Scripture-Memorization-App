@@ -105,37 +105,39 @@ export function Burrows({ verse, seed, look, backdrop, onDone }: GameProps) {
           </b>
         </div>
         <div class="burrows-field" aria-hidden="true" style={{ backgroundImage: `url(${stripUrl('grass')})` }} />
-        <div class="burrows-knight" ref={knight}>
-          <AvatarFigure look={look} size={180} bare pose={pose.name} key={`${pose.name}${pose.n}`} />
-        </div>
-        <div class="burrows-grid">
-          {Array.from({ length: BURROWS }, (_, hole) => {
-            const m = moleIn(hole);
-            const hit = bonked?.hole === hole;
-            return (
-              <button
-                key={hole}
-                ref={(el) => void (holes.current[hole] = el)}
-                class={`burrow ${m ? 'up' : ''} ${m && leaving ? 'leaving' : ''} ${hit ? 'bonked' : ''}`}
-                onPointerDown={(e) => (e.preventDefault(), tap(hole))}
-                onClick={(e) => e.detail === 0 && tap(hole)}
-                aria-label={m ? m.label : 'An empty burrow'}
-                disabled={!!s.over}
-                data-testid="burrow"
-                data-right={m && burrowsNeeds(s, m) ? 'yes' : undefined}
-              >
-                {(m || hit) && (
-                  <span class="mole" key={m ? `${s.next}-${hole}` : `b${bonked?.n}`}>
-                    {m && <span class="sign">{m.label}</span>}
-                    <Sprite key={hit ? 'b' : leaving && m ? 'e' : 'p'} name={hit ? 'burrow-bonk' : leaving && m ? 'burrow-escape' : 'burrow-pop'} scale={MOLE} fps={hit ? 6 : 18} once={!hit} />
+        <div class="burrows-ground">
+          <div class="burrows-knight" ref={knight}>
+            <AvatarFigure look={look} size={180} bare pose={pose.name} key={`${pose.name}${pose.n}`} />
+          </div>
+          <div class="burrows-grid">
+            {Array.from({ length: BURROWS }, (_, hole) => {
+              const m = moleIn(hole);
+              const hit = bonked?.hole === hole;
+              return (
+                <button
+                  key={hole}
+                  ref={(el) => void (holes.current[hole] = el)}
+                  class={`burrow ${m ? 'up' : ''} ${m && leaving ? 'leaving' : ''} ${hit ? 'bonked' : ''}`}
+                  onPointerDown={(e) => (e.preventDefault(), tap(hole))}
+                  onClick={(e) => e.detail === 0 && tap(hole)}
+                  aria-label={m ? m.label : 'An empty burrow'}
+                  disabled={!!s.over}
+                  data-testid="burrow"
+                  data-right={m && burrowsNeeds(s, m) ? 'yes' : undefined}
+                >
+                  {(m || hit) && (
+                    <span class="mole" key={m ? `${s.next}-${hole}` : `b${bonked?.n}`}>
+                      {m && <span class="sign">{m.label}</span>}
+                      <Sprite key={hit ? 'b' : leaving && m ? 'e' : 'p'} name={hit ? 'burrow-bonk' : leaving && m ? 'burrow-escape' : 'burrow-pop'} scale={MOLE} fps={hit ? 6 : 18} once={!hit} />
+                    </span>
+                  )}
+                  <span class="hole">
+                    <Sprite name="mound" scale={MOLE * 0.78} />
                   </span>
-                )}
-                <span class="hole">
-                  <Sprite name="mound" scale={MOLE * 0.78} />
-                </span>
-              </button>
-            );
-          })}
+                </button>
+              );
+            })}
+          </div>
         </div>
         {s.combo >= 2 && (
           <b class="game-combo hud-combo" ref={comboEl} data-testid="game-combo">

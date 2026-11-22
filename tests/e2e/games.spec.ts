@@ -185,6 +185,10 @@ test.describe('the games', () => {
     await page.getByTestId('gate-keys').locator('button:not([data-right])').first().dispatchEvent('pointerdown');
     await expect(page.getByTestId('gate-hearts')).toHaveAttribute('data-hearts', '2');
     await expect(page.getByTestId('gate-text').locator('.w.ok')).toHaveCount(0);
+    // the wrong key turns red for a moment, then goes back to normal (it used to stay red for the rest of the game)
+    const red = page.getByTestId('gate-keys').locator('.letter-key.shake');
+    await expect(red).toHaveCount(1);
+    await expect(red).toHaveCount(0, { timeout: 2000 });
     // the right letter strikes, the word appears and the score goes up
     await page.getByTestId('gate-keys').locator('button[data-right]').dispatchEvent('pointerdown');
     await expect(page.getByTestId('gate-text').locator('.w.ok').first()).toHaveText('For');

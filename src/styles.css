@@ -4281,12 +4281,13 @@ button.chip {
 .burrows-stage {
   height: 300px;
   touch-action: manipulation;
+  --field: min(70%, 380px); /* the height of the meadow: up to just above the back row, however tall the stage is */
 }
 /* the meadow the burrows are dug in, so the mounds sit on the ground instead of floating over the scene (v1.81.0) */
 .burrows-field {
   position: absolute;
   inset: auto 0 0 0;
-  height: min(70%, 380px); /* up to just above the back row, however tall the stage is */
+  height: var(--field);
   background: #6c8c3d repeat 0 0 / 96px 96px; /* the grass tile (public/creatures/grass.webp), two screen pixels a grass pixel */
   image-rendering: pixelated;
   border-top: 3px solid #4d6a2b;
@@ -4308,22 +4309,36 @@ button.chip {
   transform: scale(0.93);
   transform-origin: 50% 100%;
 }
+/* the burrows and the knight, in the middle of the grass (v1.85.1, owner-requested "centered on the grass"): the box is the meadow
+   above its band of earth, never shorter than three rows need */
+.burrows-ground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 10px;
+  height: max(calc(var(--field) - 13px), 250px);
+  z-index: 2;
+  container-type: size; /* so the rows can be lifted only by the room they do not need (cqh below) */
+}
 .burrows-knight {
   /* to the left of the burrows, standing between the back row and the front row (v1.81.1, owner-requested) */
   position: absolute;
   left: -3%;
-  bottom: 64px;
+  bottom: calc(50% - 70px);
   z-index: 1;
   opacity: 0.95;
 }
 .burrows-grid {
-  /* two across, three up (v1.85.0, owner-requested "less spread out ... so they can be bigger") */
+  /* two across, three up (v1.84.1, owner-requested "less spread out ... so they can be bigger") */
   position: absolute;
-  inset: 50px 3% 8px 30%;
+  inset: 0 3% 0 30%;
+  /* a burrow is drawn at the bottom of its cell: lift the rows so the mounds, not the cells, are centred, but only with the room left
+     once the three rows have 90 px each (a goblin and its sign need about that) */
+  bottom: clamp(0px, calc(100cqh - 276px), 60px);
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(3, minmax(0, 120px)); /* rows stay close together on a tall screen */
-  align-content: end;
+  grid-template-rows: repeat(3, minmax(0, 104px)); /* rows stay close together on a tall screen */
+  align-content: center;
   gap: 2px var(--sp-3);
   z-index: 2;
 }
@@ -4790,10 +4805,6 @@ button.chip {
   overflow-y: auto;
   overscroll-behavior: contain;
   position: relative; /* so keepInView can measure the words from the top of the box */
-}
-/* Goblin Burrows: the knight stands between the rows wherever they are */
-.play-area .burrows-knight {
-  bottom: 96px; /* at the middle row */
 }
 /* three rows need room: the Burrows stage never shrinks below this */
 .play-area > .burrows-stage {
