@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.87.0] - 2026-11-22
+
 ### Added
 - **Ranks.** Your medals raise your knight through the ranks: Page, Squire (2 medals), Knight (5), Captain (9), Champion (14), Paladin (20) and Legend (every medal). Your rank and the next one show on Honors and on your knight's page, and a medal that raises your rank says so on its card.
 
