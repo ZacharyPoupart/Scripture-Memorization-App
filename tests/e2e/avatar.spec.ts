@@ -12,6 +12,12 @@ test.describe('avatar and seeds', () => {
     await addVerse(page, JOHN316);
     await page.goto('/#/');
     await expect(page.getByTestId('seeds-chip')).toContainText('0');
+    // the knight and the coins sit in the top left corner, the streak in the top right (v1.86.0)
+    const bubble = (await page.getByTestId('avatar-bubble').boundingBox())!;
+    const flame = (await page.getByTestId('streak').boundingBox())!;
+    expect(bubble.x + bubble.width / 2).toBeLessThan(page.viewportSize()!.width / 2);
+    expect(bubble.x).toBeLessThan(flame.x);
+    expect(Math.abs(bubble.y + bubble.height / 2 - (flame.y + flame.height / 2))).toBeLessThan(12); // one line
     await page.goto('/#/pile/daily');
     await page.getByTestId('verse-card').click();
     await page.getByTestId('review-flashcard').click();

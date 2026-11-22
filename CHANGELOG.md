@@ -5,6 +5,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+### Changed
+- Today: your knight and coins sit in the top left corner, with the streak flame in the top right.
+- "Start today's reviews" has a training icon: a target with an arrow in its centre.
+- The Play tab's icon is a knight's sword standing upright.
+
 ## [1.85.1] - 2026-11-22
 
 ### Fixed

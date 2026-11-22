@@ -18,7 +18,11 @@ const ICONS: Record<string, string> = {
   home: 'M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z',
   piles: 'M4 6h16M4 12h16M4 18h16',
   plus: 'M12 5v14M5 12h14',
-  play: 'M14.5 4.5 20 3l-1.5 5.5L9 18l-3-3zM6 15l-2.5 2.5M9 18l-2.5 2.5M4.5 19.5 3 21', // a sword
+  // a knight's sword standing upright: pointed blade with a fuller, a crossguard with upturned ends, grip and round pommel (v1.86.0, owner-requested "a
+  // different style sword"; it was a short diagonal blade)
+  play: 'M12 1.8l3 3.6v9.2H9V5.4zM12 6.2v6.8M5 13v1.6h14V13M12 14.6v4.6M12 19.2a1.6 1.6 0 1 0 0 3.2 1.6 1.6 0 0 0 0-3.2z',
+  // training: a target with an arrow in its centre, the way into the day's reviews (v1.86.0, owner-requested)
+  target: 'M12 12h.01M12 7a5 5 0 1 0 5 5M13 3.06A9 9 0 1 0 20.94 11M12 12l4-4M16 8V5l3-3v3h3l-3 3z',
   gear: 'M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM19.4 13a7.6 7.6 0 0 0 0-2l2-1.5-2-3.5-2.4 1a7.6 7.6 0 0 0-1.7-1L15 3.5h-4L10.7 6a7.6 7.6 0 0 0-1.7 1l-2.4-1-2 3.5 2 1.5a7.6 7.6 0 0 0 0 2l-2 1.5 2 3.5 2.4-1a7.6 7.6 0 0 0 1.7 1l.3 2.5h4l.3-2.5a7.6 7.6 0 0 0 1.7-1l2.4 1 2-3.5z',
   back: 'M15 5l-7 7 7 7',
   close: 'M6 6l12 12M18 6 6 18',
