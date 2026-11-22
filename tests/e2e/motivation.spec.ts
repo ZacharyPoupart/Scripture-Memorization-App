@@ -64,9 +64,9 @@ test.describe('stats screen', () => {
     // the fixture contains a recorded level-up; its celebration is shown once, then dismissed
     if (await page.getByTestId('celebration').isVisible()) await page.getByTestId('celebration-close').click();
     await page.getByTestId('streak').click();
-    await expect(page.getByRole('heading', { name: 'Progress' })).toBeVisible();
-    await page.getByRole('link', { name: 'Today' }).click();
-    await page.getByRole('link', { name: 'Stats' }).click();
+    await expect(page.getByRole('heading', { name: 'Honors', exact: true })).toBeVisible();
+    await page.getByRole('link', { name: 'Training' }).click();
+    await page.getByRole('link', { name: 'Honors' }).click();
     await expect(page.getByTestId('stats')).toBeVisible();
   });
 });
@@ -92,7 +92,7 @@ test.describe('feedback and celebrations', () => {
     await expect(page.getByTestId('result-progress')).toContainText('days toward Weekly');
     await expect(page.getByTestId('verse-result')).toContainText('everything for today');
     await expect(page.getByTestId('session-summary')).toBeVisible({ timeout: 9000 });
-    await expect(page.getByTestId('all-done')).toContainText('All done for today');
+    await expect(page.getByTestId('all-done')).toContainText('Training complete');
     await expect(page.getByTestId('all-done')).toContainText('Streak: 7 days');
     await page.getByTestId('session-done').click();
     await expect(page.getByTestId('milestone')).toBeHidden(); // already celebrated once

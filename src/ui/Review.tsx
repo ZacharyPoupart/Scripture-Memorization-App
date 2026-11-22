@@ -233,15 +233,15 @@ export function Review({ route }: { route: Route }) {
             <div class="alldone" data-testid="all-done">
               <Confetti count={36} />
               <CheckMark size={72} />
-              <h1>All done for today</h1>
+              <h1>Training complete</h1>
               <p class="muted" style={{ margin: 0 }}>
-                {streak.count > 0 ? `Streak: ${streak.count} day${streak.count === 1 ? '' : 's'}. See you tomorrow.` : 'See you tomorrow.'}
+                {streak.count > 0 ? `Streak: ${streak.count} day${streak.count === 1 ? '' : 's'}. Rest well, and train again tomorrow.` : 'Rest well, and train again tomorrow.'}
               </p>
             </div>
           ) : sum.outcome === 'c' ? (
             <div class="alldone" data-testid="streak-kept">
               <CheckMark size={64} />
-              <h1>Nice work</h1>
+              <h1>Well fought</h1>
               <p class="muted" style={{ margin: 0 }}>
                 {streak.count > 0 ? `Your streak is ${streak.count} day${streak.count === 1 ? '' : 's'}.` : 'Your flame is lit.'}
               </p>
@@ -249,7 +249,7 @@ export function Review({ route }: { route: Route }) {
           ) : (
             <>
               <Mark name="leaf" />
-              <h1>Session complete</h1>
+              <h1>Drill complete</h1>
             </>
           )}
           <p class="muted">

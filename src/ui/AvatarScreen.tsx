@@ -31,6 +31,7 @@ import { armorUrl } from './ArmorArt.tsx';
 import { AvatarFigure } from './AvatarFigure.tsx';
 import { BannerFigure } from './Banner.tsx';
 import { CloseX, Coin, Icon } from './common.tsx';
+import { RankLine } from './Rank.tsx';
 
 /** Your knight: everyone starts in the same basic armor, and any piece can be swapped for another with coins and streaks. */
 export function AvatarScreen() {
@@ -85,7 +86,7 @@ export function AvatarScreen() {
             <button class="icon-btn" aria-label="Back" onClick={() => back('/')}>
               <Icon name="back" />
             </button>
-            <h1>Your avatar</h1>
+            <h1>Your knight</h1>
             {multiplier > 1 && (
               <button class="chip" aria-expanded={guide === 'multiplier'} onClick={() => setGuide(guide === 'multiplier' ? null : 'multiplier')} data-testid="streak-multiplier" aria-label={`Streak multiplier ${multiplier}. Tap to see why.`}>
                 ×{multiplier}
@@ -95,6 +96,7 @@ export function AvatarScreen() {
               <Coin /> {balance}
             </button>
           </div>
+          <RankLine testid="avatar-rank" />
           {guide && (
             <div class="card stack coins-guide" data-testid="coins-guide" role="region" aria-label={guide === 'coins' ? 'How you earn coins' : 'Your streak multiplier'}>
               <div class="row spread">

@@ -8,8 +8,8 @@ let lastStep: RevealStep = 'phrase'; // remembered while the app is open
 type View = 'front' | 'gradual' | 'back';
 
 /**
- * Quizlet-style flashcard: the reference on the front, tap to flip to the whole verse, then "Nailed it" or
- * "Needs work". For a gentler start there is also "Uncover bit by bit": the verse appears a phrase (or
+ * Quizlet-style flashcard: the reference on the front, tap to flip to the whole verse, then "Struck true" or
+ * "Not yet" (the knight's words since v1.87.0; they were "Nailed it" and "Needs work"). For a gentler start there is also "Uncover bit by bit": the verse appears a phrase (or
  * word) at a time. There is no reference-recall step after a flashcard (the reference is on the card).
  */
 export function Flashcard({ verse, onDone, onRestart }: ModeProps) {
@@ -82,10 +82,10 @@ export function Flashcard({ verse, onDone, onRestart }: ModeProps) {
         {view === 'back' ? (
           <div class="grid2">
             <button class="btn good" onClick={() => { feedback.correct(); onDone(); }} data-testid="grade-good">
-              Nailed it
+              Struck true
             </button>
             <button class="btn" onClick={onRestart} data-testid="grade-missed">
-              Needs work
+              Not yet
             </button>
           </div>
         ) : view === 'front' ? (

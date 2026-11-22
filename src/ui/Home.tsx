@@ -132,8 +132,8 @@ export function Home() {
               <AvatarFigure look={currentLook(data)} size={84} bare pose="march" />
             </span>
             <span class="play-card-text">
-              <strong>Play</strong>
-              <small>{readyAll > 0 ? `Play today’s reviews · ${readyAll} ready` : 'Practice any verse with your knight'}</small>
+              <strong>Battle</strong>
+              <small>{readyAll > 0 ? `Battle today’s reviews · ${readyAll} ready` : 'Take any verse into battle'}</small>
             </span>
             <Icon name="arrow" />
           </button>
@@ -213,7 +213,7 @@ export function Home() {
           data-testid="start-today"
         >
           <Icon name="target" />
-          {onBreak ? 'Review anyway' : "Start today's reviews"} · {readyAll}
+          {onBreak ? 'Train anyway' : "Begin today's training"} · {readyAll}
         </button>
       </div>}
     </>

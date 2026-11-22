@@ -33,7 +33,7 @@ test.describe('avatar and seeds', () => {
     await replaceDataWith(page, fixture);
     await page.goto('/#/');
     await page.getByTestId('avatar-bubble').click();
-    await expect(page.getByRole('heading', { name: 'Your avatar' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Your knight' })).toBeVisible();
     const before = Number((await page.getByTestId('seeds-balance').innerText()).replace(/\D/g, ''));
     expect(before).toBeGreaterThan(100);
     // everyone starts in the same free basic steel armor

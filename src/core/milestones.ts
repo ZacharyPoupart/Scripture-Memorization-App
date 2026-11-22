@@ -18,15 +18,16 @@ export function streakMilestoneId(count: number, now: number): string {
 }
 
 export function streakMilestoneText(count: number): { title: string; body: string } {
-  if (count === 1) return { title: 'Day one', body: 'Your flame is lit. Every day you practise it grows.' };
-  if (count >= 365) return { title: `${count} days in a row`, body: 'A whole year of showing up. Scripture is becoming part of you.' };
-  if (count >= 100) return { title: `${count} days in a row`, body: 'That kind of steadiness changes a person. Well done.' };
-  if (count >= 30) return { title: `${count} days in a row`, body: 'A month of daily practice. The habit is real now.' };
-  if (count >= 14) return { title: `${count} days in a row`, body: 'Two weeks of steady practice.' };
-  if (count >= 7) return { title: 'A full week', body: 'Seven days in a row. Nicely done.' };
-  return { title: `${count} days in a row`, body: 'A good rhythm is starting.' };
+  // in the knight's voice since v1.87.0 (owner-requested); calm, never a warning
+  if (count === 1) return { title: 'Day one', body: 'Your flame is lit. Every day you train it grows.' };
+  if (count >= 365) return { title: `${count} days in a row`, body: 'A whole year of training. Scripture is becoming part of you.' };
+  if (count >= 100) return { title: `${count} days in a row`, body: 'That kind of steadiness makes a knight. Well done.' };
+  if (count >= 30) return { title: `${count} days in a row`, body: 'A month of daily training. The habit is yours now.' };
+  if (count >= 14) return { title: `${count} days in a row`, body: 'Two weeks of steady training.' };
+  if (count >= 7) return { title: 'A full week', body: 'Seven days in a row. Well fought.' };
+  return { title: `${count} days in a row`, body: 'A squire’s rhythm is forming.' };
 }
 
 /** Gentle, never guilt-based copy for finishing a review (rotates, deterministic from a counter). */
-const DONE_LINES = ['Well done.', 'That one is a little more yours now.', 'Steady and sure.', 'Good work.', 'Another one planted.'];
+const DONE_LINES = ['Well struck.', 'That one is a little more yours now.', 'Steady and sure.', 'Your sword is sharper.', 'Another lesson learned.'];
 export const doneLine = (n: number) => DONE_LINES[Math.abs(n) % DONE_LINES.length];

@@ -46,10 +46,10 @@ export function Celebrations({ suppressed }: { suppressed: boolean }) {
     return (
       <>
         <Confetti count={toYearly ? 90 : 40} />
-        <Overlay center label="Level up" onClose={close}>
+        <Overlay center label="Promoted" onClose={close}>
           <div class="modal stack center" data-testid="celebration">
             <Mark name={toYearly ? 'tree' : 'burst'} size={52} />
-            <h2 class="headline">{ups.length === 1 ? 'A verse levelled up!' : `${ups.length} verses levelled up!`}</h2>
+            <h2 class="headline">{ups.length === 1 ? 'A verse was promoted!' : `${ups.length} verses were promoted!`}</h2>
             <div class="stack">
               {ups.map((u) => (
                 <div key={u.id}>

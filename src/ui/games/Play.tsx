@@ -984,7 +984,7 @@ export function PlayHub() {
     return (
       <div class="scroll">
         <div class="narrow stack">
-          <h1 class="headline">Play</h1>
+          <h1 class="headline">Battle</h1>
           <EmptyState mark="book" title="Add a verse to play with" testid="play-empty">
             <button class="btn primary block" onClick={() => navigate('/add')}>
               Add a verse
@@ -999,7 +999,7 @@ export function PlayHub() {
     <div class="scroll">
       <div class="narrow stack" data-testid="play-hub">
         <div class="row spread">
-          <h1 class="headline">Play</h1>
+          <h1 class="headline">Battle</h1>
           <div class="row gap-2">
             <span class="hub-stars" data-testid="hub-stars" title="Stars you have won, across every game and verse">
               <i class="best-star" aria-hidden="true" />
@@ -1027,7 +1027,7 @@ export function PlayHub() {
         </button>
         {readyCount > 0 && (
           <button class="btn block" onClick={() => navigate('/play/run')} data-testid="play-run">
-            Play today’s reviews · {readyCount}
+            Battle today’s reviews · {readyCount}
           </button>
         )}
         <label class="stack gap-1">

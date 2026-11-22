@@ -5217,3 +5217,32 @@ button.chip {
   font-weight: 600;
   line-height: 1.2;
 }
+
+/* ---- the knight's rank (v1.87.0, owner-requested knight theme): earned by medals, shown on Honors and the knight's page ---- */
+.rank-line {
+  margin: 0 0 var(--sp-2);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--sp-1);
+}
+.rank-kicker {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.rank-line b {
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  line-height: 1.1;
+}
+.medal-rank {
+  margin: var(--sp-1) 0 0;
+}
+.medal-rank b {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+}
+

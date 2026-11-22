@@ -2,6 +2,7 @@ import { achievementStates, medalTally, TIER_LABEL } from '../core/achievements.
 import { MEDAL_COINS } from '../core/coins.ts';
 import { formatRef } from '../core/reference.ts';
 import { Medal } from './Medal.tsx';
+import { RankLine } from './Rank.tsx';
 import { EmptyState, Section, Stat } from './primitives.tsx';
 import { streakInfo } from '../core/schedule.ts';
 import { bestRuns, heatmap, nextGraduations, pileCounts, totals } from '../core/stats.ts';
@@ -34,8 +35,8 @@ export function Stats() {
     return (
       <div class="scroll">
         <div class="narrow stack">
-          <h1>Progress</h1>
-          <EmptyState mark="sprout" title="Your progress will grow here" testid="stats-empty">
+          <h1>Honors</h1>
+          <EmptyState mark="sprout" title="Your honors will be won here" testid="stats-empty">
             <button class="btn primary" onClick={() => navigate('/add')}>Add a verse</button>
           </EmptyState>
         </div>
@@ -46,7 +47,7 @@ export function Stats() {
   return (
     <div class="scroll">
       <div class="narrow stack" data-testid="stats">
-        <h1>Progress</h1>
+        <h1>Honors</h1>
 
         <div class="stat-hero">
           <Stat big value={streak.count} label={streak.count === 1 ? 'day streak' : 'day streak'} testid="stat-streak" />
@@ -58,6 +59,7 @@ export function Stats() {
         </div>
 
         <Section title="Medals" aside={<span data-testid="medal-tally">{tally.held} of {tally.total}</span>} testid="achievements">
+          <RankLine testid="rank" />
           <ul class="medal-list">
             {medals.map((m) => (
               <li key={m.achievement.id} class="medal-row" data-testid="achievement" data-id={m.achievement.id} data-tier={m.tier ?? 'none'}>

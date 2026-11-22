@@ -19,7 +19,7 @@ export function PilesOverview() {
   return (
     <div class="scroll">
       <div class="narrow stack">
-        <h1>All verses</h1>
+        <h1>Armory</h1>
         <ListControls state={list} update={update} topics={topics} />
         {filtersActive(list) && (
           <div class="row spread small muted" role="status" data-testid="match-count">

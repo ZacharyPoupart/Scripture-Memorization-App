@@ -207,6 +207,45 @@ export function medalTally(states: readonly AchievementState[]): { held: number;
   return { held: states.reduce((n, s) => n + (s.tier ? TIERS.indexOf(s.tier) + 1 : 0), 0), total: states.length * TIERS.length };
 }
 
+/**
+ * Knightly ranks (v1.87.0, owner-requested "more medieval/knight game themed ... training and fighting and rewards"), earned by the
+ * medals held: bronze, silver and gold each count one (gold in an achievement is three). Worked out from the medals, so nothing new
+ * is stored, devices agree, and a rank once held stays, as the medals do. Legend is every medal there is.
+ */
+export const RANKS: readonly { name: string; at: number }[] = [
+  { name: 'Page', at: 0 },
+  { name: 'Squire', at: 2 },
+  { name: 'Knight', at: 5 },
+  { name: 'Captain', at: 9 },
+  { name: 'Champion', at: 14 },
+  { name: 'Paladin', at: 20 },
+  { name: 'Legend', at: ACHIEVEMENTS.length * TIERS.length },
+];
+
+/** The rank for a number of medals held, and the next one with how many medals it needs (null at Legend). */
+export function rankFor(held: number): { name: string; index: number; next: { name: string; at: number } | null } {
+  let index = 0;
+  RANKS.forEach((r, i) => {
+    if (held >= r.at) index = i;
+  });
+  const next = RANKS[index + 1] ?? null;
+  return { name: RANKS[index].name, index, next };
+}
+
+/** How many medals a list of medal ids holds: per achievement, its best tier counts with the ones below it (silver is two). */
+export function heldMedals(ids: readonly string[]): number {
+  const best = new Map<string, number>();
+  for (const id of ids) {
+    const [a, t] = id.split(':');
+    const i = TIERS.indexOf(t as Tier);
+    if (i < 0 || !achievementById(a)) continue;
+    best.set(a, Math.max(best.get(a) ?? -1, i));
+  }
+  let n = 0;
+  for (const i of best.values()) n += i + 1;
+  return n;
+}
+
 export function achievementById(id: string): Achievement | undefined {
   return ACHIEVEMENTS.find((a) => a.id === id);
 }

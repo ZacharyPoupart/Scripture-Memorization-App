@@ -5,6 +5,16 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.87.0] - 2026-11-22
+
+### Added
+- **Ranks.** Your medals raise your knight through the ranks: Page, Squire (2 medals), Knight (5), Captain (9), Champion (14), Paladin (20) and Legend (every medal). Your rank and the next one show on Honors and on your knight's page, and a medal that raises your rank says so on its card.
+
+### Changed
+- **A knight's theme.** The tabs are now Training (your daily reviews), Armory (your verses, the sword of the Spirit), Battle (the games), Add, Allies (friends and groups), Honors (medals and progress) and Settings, each with its own icon, and the screens carry the same names.
+- The start button reads "Begin today's training". Flashcards ask "Struck true" or "Not yet". A finished day is "Training complete", a session that kept your streak is "Well fought", and verses that move up are "promoted".
+- Streak milestones, the welcome slides and the little lines after a review speak in the same voice.
+
 ## [1.86.0] - 2026-11-22
 
 ### Changed

@@ -10,11 +10,11 @@ test.beforeEach(async ({ page }) => {
 
 const ROUTES: [string, RegExp][] = [
   ['/#/', /to review|Done for now|All done|Nothing due|On a break/],
-  ['/#/piles', /All verses/],
+  ['/#/piles', /Armory/],
   ['/#/add', /Add a verse/],
   ['/#/settings', /Settings/],
   ['/#/about', /About/],
-  ['/#/stats', /Progress/],
+  ['/#/stats', /Honors/],
   ['/#/pile/daily', /Daily/],
 ];
 
@@ -48,7 +48,7 @@ test('every screen loads and is clickable with the network off', async ({ page, 
   await page.goto('/#/');
   await page.getByRole('link', { name: 'Settings' }).click();
   await expect(page.getByRole('heading', { name: 'Settings' })).toBeVisible();
-  await page.getByRole('link', { name: 'Today' }).click();
+  await page.getByRole('link', { name: 'Training' }).click();
 
   // a full review works offline
   await page.goto('/#/pile/daily');
