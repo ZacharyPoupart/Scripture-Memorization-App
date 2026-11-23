@@ -5,6 +5,8 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.87.1] - 2026-11-23
+
 ### Changed
 - Every box is now closed on all four sides: the flashcard, the Training card, verse cards in the Armory and pile pages, the panels on Settings, About and Allies, the figures on Honors, the review and battle rows on a verse's page, the knight's picture and the item tiles. Before, many had a line along the top (or top and bottom) only, which left the sides open.
 
