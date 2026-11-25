@@ -3269,9 +3269,11 @@ button.chip {
   text-transform: uppercase;
   color: var(--muted);
 }
+/* the day streak, centred in its half of the box (v1.87.2, owner-requested: since the box was enclosed it sat against the left edge) */
 .stat-big {
-  padding-left: 0;
-  padding-block: var(--sp-5);
+  padding: var(--sp-5) var(--sp-4);
+  justify-items: center;
+  text-align: center;
 }
 .stat-big .stat-value {
   font-size: 5.5rem;

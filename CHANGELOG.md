@@ -5,6 +5,11 @@ Add notes for the next release under **Unreleased**; `npm run release -- patch|m
 
 ## [Unreleased]
 
+## [1.87.2] - 2026-11-25
+
+### Fixed
+- Honors: your day streak sits in the middle of its half of the box instead of against the left edge.
+
 ## [1.87.1] - 2026-11-23
 
 ### Changed
