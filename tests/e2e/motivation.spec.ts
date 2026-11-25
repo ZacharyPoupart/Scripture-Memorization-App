@@ -52,6 +52,11 @@ test.describe('stats screen', () => {
     await expect(page.getByTestId('stat-longest')).toContainText('37');
     await expect(page.getByTestId('stat-reviews')).toContainText('828');
     await expect(page.getByTestId('stat-verses')).toContainText('4');
+    // the day streak sits in the middle of its half of the box, clear of the border (v1.87.2)
+    const half = (await page.getByTestId('stat-streak').boundingBox())!;
+    const num = (await page.getByTestId('stat-streak').locator('.stat-value').boundingBox())!;
+    expect(Math.abs(num.x + num.width / 2 - (half.x + half.width / 2))).toBeLessThan(4);
+    expect(num.x - half.x).toBeGreaterThan(12);
     await expect(page.getByTestId('heatmap').locator('.cell')).toHaveCount(26 * 7);
     expect(await page.getByTestId('heatmap').locator('.cell.k-complete').count()).toBeGreaterThan(50);
     await expect(page.getByTestId('heat-summary')).toContainText(/days with every verse reviewed/); // screen-reader summary
